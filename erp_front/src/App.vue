@@ -19,13 +19,6 @@ import LoginPage from './components/LoginPage.vue';
   (Ces styles ne sont PAS 'scoped')
   Placez-les ici ou dans votre 'src/assets/main.css'.
 */
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-#app {
-  height: 100vh;
-}
+
 </style>
