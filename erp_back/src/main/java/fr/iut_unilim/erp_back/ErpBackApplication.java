@@ -1,4 +1,4 @@
-package org.example.erp_back;
+package fr.iut_unilim.erp_back;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
