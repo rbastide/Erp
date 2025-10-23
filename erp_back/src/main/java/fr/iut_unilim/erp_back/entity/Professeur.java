@@ -17,7 +17,8 @@ public class Professeur {
     @Column(name = "prenom")
     private String prenom;
 
-    public Professeur() {}
+    public Professeur() {
+    }
 
     public Professeur(String nom, String prenom) {
         this.nom = nom;

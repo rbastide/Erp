@@ -12,7 +12,7 @@ public class HelloController {
     }
 
     @GetMapping("/non")
-    public String sayNo(){
+    public String sayNo() {
         return "no";
     }
 }
