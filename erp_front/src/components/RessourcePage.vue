@@ -133,7 +133,7 @@
       left: 38px;
       top: 196px;
 
-      font-family: 'Roboto';
+      font-family: 'Roboto', sans-serif;
       font-style: normal;
       font-weight: 400;
       font-size: 32px;
@@ -168,7 +168,7 @@
     }
 
     .text-button {
-      font-family: 'SF Pro', sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-weight: 510;
       font-size: 64px;
       text-align: center;         /* Texte centré à l'intérieur */

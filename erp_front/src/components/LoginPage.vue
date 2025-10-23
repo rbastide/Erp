@@ -143,6 +143,7 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* --- Style de la Carte de Connexion --- */
