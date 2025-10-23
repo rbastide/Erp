@@ -4,11 +4,13 @@
     Tout le reste (les composants d'exemple) a été supprimé.
   -->
   <LoginPage />
+  <RessourcePage/>
 </template>
 
 <script setup>
 // 1. Importer le composant que nous venons de créer
 import LoginPage from './components/LoginPage.vue';
+import RessourcePage from './components/RessourcePage.vue';
 
 // 2. Le composant est automatiquement enregistré et utilisable
 //    dans le <template> grâce à 'script setup'.
