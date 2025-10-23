@@ -5,56 +5,66 @@
     </div>
     <div class="contact">Contact</div>
     <div class="date">00/00/00 <br> 12:00:00</div>
-     </header>
-     <main class="main-content">
-           <form class="login-card">
+  </header>
+   <main class="main-content">
+         <form class="login-card">
 
-             <!-- Groupe pour l'identifiant -->
-             <div class="form-group">
-               <label for="username">Identifiant</label>
-               <!--
-                 v-model="username" lie cet input à la variable 'username'
-                 dans notre script.
-               -->
-               <input
-                 type="text"
-                 id="username"
-                 placeholder="Identifiant"
-                 v-model="username"
-                 required
-               />
-             </div>
+           <!-- Groupe pour l'identifiant -->
+           <div class="form-group">
+             <label for="username">Identifiant</label>
+             <!--
+               v-model="username" lie cet input à la variable 'username'
+               dans notre script.
+             -->
+             <input
+               type="text"
+               id="username"
+               placeholder="Identifiant"
+               v-model="username"
+               required
+             />
+           </div>
 
-             <!-- Groupe pour le mot de passe -->
-             <div class="form-group">
-               <label for="password">Mot de passe</label>
-               <!--
-                 v-model="password" lie cet input à la variable 'password'
-                 dans notre script.
-               -->
-               <input
-                 type="password"
-                 id="password"
-                 placeholder="Mot de passe"
-                 v-model="password"
-                 required
-               />
-             </div>
+           <!-- Groupe pour le mot de passe -->
+           <div class="form-group">
+             <label for="password">Mot de passe</label>
+             <!--
+               v-model="password" lie cet input à la variable 'password'
+               dans notre script.
+             -->
+             <input
+               type="password"
+               id="password"
+               placeholder="Mot de passe"
+               v-model="password"
+               required
+             />
+           </div>
 
-             <!-- Bouton de soumission -->
-             <button type="submit" class="login-button">Se connecter</button>
-
-           </form>
-         </main>
-
-
+           <!-- Bouton de soumission -->
+           <button @click="handleLogin" class="login-button">Se connecter</button>
+         </form>
+       </main>
 </template>
 
-<style scoped>
+<script setup>
+import { useRouter } from 'vue-router';
 
-  .body {
-  background-color: white;
+const router = useRouter();
+
+const handleLogin = () => {
+  // 🛑 ÉTAPE CRUCIALE : Effectuer ici la vérification des identifiants (API, etc.)
+  const loginSuccessful = true; // Simuler une connexion réussie
+
+  if (loginSuccessful) {
+    router.push('/home');
+  } else {
+    alert("Identifiants incorrects.");
   }
+};
+</script>
+
+<style scoped>
 
   .page-header {
     position: absolute;
@@ -207,7 +217,4 @@
   padding-top: 172px;
   box-sizing: border-box;
   }
-
-
-
 </style>

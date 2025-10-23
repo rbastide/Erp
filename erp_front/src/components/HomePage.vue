@@ -13,7 +13,7 @@
   </header>
 
   <div class="main-content">
-    <div class="remplir"><p>Remplir une fiche ressource</p></div>
+    <div @click="handleRemplir" class="remplir"><p>Remplir une fiche ressource</p></div>
     <div class="afficher"><p>Afficher les fiches ressource</p></div>
   </div>
 </template>
@@ -145,6 +145,12 @@
 }
 </style>
 
-<style scoped>
+<script setup>
+  import { useRouter } from 'vue-router';
 
-</style>
+  const router = useRouter();
+
+  const handleRemplir = () => {
+      router.push('/ressource');
+  };
+</script>
