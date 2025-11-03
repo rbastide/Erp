@@ -53,8 +53,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleLogin = () => {
-  // 🛑 ÉTAPE CRUCIALE : Effectuer ici la vérification des identifiants (API, etc.)
-  const loginSuccessful = true; // Simuler une connexion réussie
+  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
 
   if (loginSuccessful) {
     router.push('/home');

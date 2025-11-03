@@ -14,7 +14,7 @@
 
   <div class="main-content">
     <div @click="handleRemplir" class="remplir"><p>Remplir une fiche ressource</p></div>
-    <div class="afficher"><p>Afficher les fiches ressource</p></div>
+    <div @click="handleAfficher" class="afficher"><p>Afficher les fiches ressource</p></div>
   </div>
 </template>
 
@@ -129,6 +129,13 @@
   margin: 50px;
 }
 
+.remplir:hover,
+.afficher:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
+}
+
 .remplir, .afficher p {
   width: 328px;
   height: 200px;
@@ -153,4 +160,8 @@
   const handleRemplir = () => {
       router.push('/ressource');
   };
+
+  const handleAfficher = () => {
+    router.push('/history');
+  }
 </script>
