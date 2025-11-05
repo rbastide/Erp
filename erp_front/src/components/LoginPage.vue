@@ -122,7 +122,7 @@ const handleLogin = () => {
     color: #FFFFFF;
   }
 
-/* --- Style du Contenu Principal --- */
+/* Style du Contenu Principal */
 .main-content {
   background-color: #FFFFFF;
   display: flex;
@@ -132,7 +132,7 @@ const handleLogin = () => {
   font-family: 'Roboto', sans-serif;
 }
 
-/* --- Style de la Carte de Connexion --- */
+/* Style de la Carte de Connexion */
 .login-card {
   background-color: #FFFFFF;
   padding: 2.5rem; /* 40px */

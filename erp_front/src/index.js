@@ -3,6 +3,8 @@ import LoginPage from './components/LoginPage.vue';
 import RessourcePage from './components/RessourcePage.vue';
 import HomePage from './components/HomePage.vue';
 import HistoryPage from './components/HistoryPage.vue';
+import DashboardAdminPage from './components/DashboardAdminPage.vue';
+import CreateNewUserPage from './components/CreateNewUser.vue';
 
 const routes = [
     {
@@ -24,6 +26,21 @@ const routes = [
         path:'/history',
         name: 'History',
         component: HistoryPage
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: LoginPage
+    },
+    {
+        path: '/dashboard-admin',
+        name: 'DashboardAdmin',
+        component: DashboardAdminPage
+    },
+    {
+        path: '/new-user',
+        name: 'CreateNewUserPage',
+        component: CreateNewUserPage
     }
 ];
 
