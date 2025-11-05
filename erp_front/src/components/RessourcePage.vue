@@ -12,8 +12,6 @@
       <div class="container-nom">
         <img src="../assets/uploads/Logo_unilim.png"><p>Choix ressources</p>
       </div>
-      <div class="contact">Contact</div>
-      <div class="date">00/00/00 <br> 12:00:00</div>
       <div class="quitter">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -54,7 +52,7 @@
 <style scoped>
 /* header */
 .page-header {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 172px;
   left: 0px;
@@ -100,52 +98,17 @@
   top: 64px;
 }
 
-.contact {
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 25%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-
-.date {
-  position: absolute;
-  width: 100px;
-  height: 70px;
-  right: 18%;
-  top: 51px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-
 
 /* main */
+.main-content{
+  position: relative;
+}
 .choisir-ressource {
-  position: absolute;
   width: 672px;
   height: 66px;
-  left: 38px;
-  top: 196px;
+  margin-top: 20px;
+  margin-left: 20px;
+
 
   font-family: 'Roboto', sans-serif;
   font-style: normal;
@@ -157,6 +120,7 @@
 }
 
 .container-button {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto auto;
   padding: 10px;
