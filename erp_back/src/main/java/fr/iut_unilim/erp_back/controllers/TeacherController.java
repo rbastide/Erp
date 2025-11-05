@@ -21,11 +21,11 @@ public class TeacherController {
 
     @GetMapping
     public List<Teacher> getAllTeachers() {
-        return teacherService.getAllProfesseurs();
+        return teacherService.getAllTeachers();
     }
 
     @GetMapping("/search")
     public List<Teacher> search(@RequestParam String name) {
-        return teacherService.searchByFirstName(name);
+        return teacherService.findByLastname(name);
     }
 }

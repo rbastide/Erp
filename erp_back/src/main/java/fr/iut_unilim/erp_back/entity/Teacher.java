@@ -9,7 +9,7 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacherID")
-    private Long id;
+    private Long teacherID;
 
     @Column(name = "lastname")
     private String lastname;
@@ -25,8 +25,8 @@ public class Teacher {
         this.firstname = firstname;
     }
 
-    public Long id() {
-        return id;
+    public Long teacherID() {
+        return teacherID;
     }
 
     public String lastname() {
