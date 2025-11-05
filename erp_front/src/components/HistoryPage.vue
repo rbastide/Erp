@@ -1,7 +1,3 @@
-<script setup>
-
-</script>
-
 <template>
   <header class="page-header">
     <div class="container-nom">
@@ -20,31 +16,31 @@
       <ul class="version-list">
         <li class="version-item">
           <span class="version-code">R1.01</span>
-          <span class="version-date">30/10/2012</span>
+          <span class="version-date">30/10/2022</span>
         </li>
         <li class="version-item">
           <span class="version-code">R1.02</span>
-          <span class="version-date">15/11/2013</span>
+          <span class="version-date">15/11/2019</span>
         </li>
         <li class="version-item">
           <span class="version-code">R1.03</span>
-          <span class="version-date">01/01/2014</span>
+          <span class="version-date">01/01/2018</span>
         </li>
         <li class="version-item">
           <span class="version-code">R2.01</span>
-          <span class="version-date">05/08/2014</span>
+          <span class="version-date">05/08/2017</span>
         </li>
         <li class="version-item">
           <span class="version-code">R2.02</span>
-          <span class="version-date">06/05/2015</span>
+          <span class="version-date">06/06/2017</span>
         </li>
         <li class="version-item">
           <span class="version-code">R2.04</span>
-          <span class="version-date">08/09/2015</span>
+          <span class="version-date">08/05/2017</span>
         </li>
         <li class="version-item">
           <span class="version-code">R2.05</span>
-          <span class="version-date">01/10/2015</span>
+          <span class="version-date">01/12/2016</span>
         </li>
         <li class="version-item">
           <span class="version-code">R3.02</span>
@@ -52,16 +48,29 @@
         </li>
         <li class="version-item">
           <span class="version-code">R3.03</span>
-          <span class="version-date">18/07/2017</span>
+          <span class="version-date">18/04/2016</span>
         </li>
         <li class="version-item last-item">
           <span class="version-code">R4.01</span>
-          <span class="version-date">14/12/2017</span>
+          <span class="version-date">14/02/2016</span>
         </li>
+        <div @click="handleRetour" class="btn-quitter">Quitter</div>
       </ul>
     </div>
   </div>
 </template>
+
+<script setup>
+
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
+
+  const handleRetour = () => {
+    router.push('/home');
+  };
+
+</script>
 
 <style scoped>
 
@@ -151,6 +160,7 @@
   font-size: 32px;
   line-height: 38px;
   color: #E92533;
+  margin-bottom: 20px;
 }
 
 .version-list-container {
@@ -196,7 +206,7 @@
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 510;
-  font-size: 20px;
+  font-size: 40px;
   line-height: normal;
   color: #B51621;
   padding: 0 10px;
@@ -208,5 +218,31 @@
 
 .version-date {
   text-align: right;
+}
+
+.btn-quitter{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 16px;
+  width: 360px;
+  height: 100px;
+  background: #D9D9D9;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 15px;
+  margin: 20px auto;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 510;
+  font-size: 40px;
+  color: #B51621;
+}
+
+.btn-quitter:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 </style>
