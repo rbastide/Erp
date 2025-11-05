@@ -5,6 +5,8 @@ import HomePage from './components/HomePage.vue';
 import HistoryPage from './components/HistoryPage.vue';
 import DashboardAdminPage from './components/DashboardAdminPage.vue';
 import CreateNewUserPage from './components/CreateNewUser.vue';
+import ServicesPage from './components/ServiceAidePage.vue';
+import DeconnexionPage from './components/DeconnexionPage.vue';
 
 const routes = [
     {
@@ -41,6 +43,16 @@ const routes = [
         path: '/new-user',
         name: 'CreateNewUserPage',
         component: CreateNewUserPage
+    },
+    {
+        path: '/aide',
+        name: 'ServicePage',
+        component: ServicesPage
+    },
+    {
+        path: '/deconnexion',
+        name: 'DeconnexionPage',
+        component: DeconnexionPage
     }
 ];
 

@@ -3,7 +3,7 @@
     <div class="container-connexion">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Connexion</p>
     </div>
-    <div class="contact">Service d'aide</div>
+    <div @click="handleAide" class="aide">Service d'aide</div>
   </header>
    <main class="main-content">
          <form class="login-card">
@@ -60,6 +60,11 @@ const handleLogin = () => {
     alert("Identifiants incorrects.");
   }
 };
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
 </script>
 
 <style scoped>
@@ -103,7 +108,7 @@ const handleLogin = () => {
     color: #FFFFFF;
   }
 
-  .contact{
+  .aide{
     position: absolute;
     width: 126px;
     height: 52px;
@@ -120,6 +125,10 @@ const handleLogin = () => {
     letter-spacing: -0.005em;
     text-transform: capitalize;
     color: #FFFFFF;
+  }
+
+  .aide:hover{
+    cursor: pointer;
   }
 
 /* Style du Contenu Principal */
