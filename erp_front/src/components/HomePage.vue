@@ -3,8 +3,7 @@
     <div class="container-nom">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Bonjour, <br>NOM Prénom</p>
     </div>
-    <div class="contact">Contact</div>
-    <div class="date">00/00/00 <br> 12:00:00</div>
+    <div class="contact">Service d'aide</div>
     <div class="quitter">
       <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -55,12 +54,12 @@
   color: #FFFFFF;
 }
 
-.quitter{
+.quitter {
 
   position: absolute;
   width: 48px;
   height: 48px;
-  left: 1192px;
+  right: 5%;
   top: 64px;
 }
 
@@ -68,31 +67,12 @@
   position: absolute;
   width: 126px;
   height: 52px;
-  left: 774px;
+  right: 15%;
   top: 60px;
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 500;
   font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-
-.date{
-  position: absolute;
-  width: 100px;
-  height: 70px;
-  left: 940px;
-  top: 51px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
   line-height: 145%;
   display: flex;
   align-items: center;
@@ -153,15 +133,15 @@
 </style>
 
 <script setup>
-  import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-  const router = useRouter();
+const router = useRouter();
 
-  const handleRemplir = () => {
-      router.push('/ressource');
-  };
+const handleRemplir = () => {
+  router.push('/ressource');
+};
 
-  const handleAfficher = () => {
-    router.push('/history');
-  }
+const handleAfficher = () => {
+  router.push('/history');
+}
 </script>

@@ -3,8 +3,7 @@
     <div class="container-connexion">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Connexion</p>
     </div>
-    <div class="contact">Contact</div>
-    <div class="date">00/00/00 <br> 12:00:00</div>
+    <div class="contact">Service d'aide</div>
   </header>
    <main class="main-content">
          <form class="login-card">
@@ -104,13 +103,11 @@ const handleLogin = () => {
     color: #FFFFFF;
   }
 
-
-
   .contact{
     position: absolute;
     width: 126px;
     height: 52px;
-    left: 1500px;
+    right: 15%;
     top: 60px;
     font-family: 'Roboto', sans-serif;
     font-style: normal;
@@ -124,26 +121,6 @@ const handleLogin = () => {
     text-transform: capitalize;
     color: #FFFFFF;
   }
-
-  .date{
-    position: absolute;
-    width: 100px;
-    height: 70px;
-    left: 1750px;
-    top: 51px;
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 24px;
-    line-height: 145%;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    letter-spacing: -0.005em;
-    text-transform: capitalize;
-    color: #FFFFFF;
-  }
-
 
 /* --- Style du Contenu Principal --- */
 .main-content {
