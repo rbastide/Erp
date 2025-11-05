@@ -14,7 +14,7 @@
       </svg>
     </div>
   </header>
-  <body>
+  <div class="main-content">
     <p class="description">Voici l'historique des fiches de ressource : </p>
     <div class="version-list-container">
       <ul class="version-list">
@@ -60,7 +60,7 @@
         </li>
       </ul>
     </div>
-  </body>
+  </div>
 </template>
 
 <style scoped>
@@ -130,8 +130,11 @@
 
 /* Contenue de la page */
 
-body {
+.main-content {
   display: flex;
+  width: 90%;
+  margin: auto;
+  margin-top: 254px;
   justify-content: center;
   align-items: center;
 }
@@ -155,7 +158,7 @@ body {
   align-items: center;
   justify-content: center;
   margin: auto;
-  width: 800px;
+  width: 500px;
   font-family: 'Roboto', sans-serif;
   padding: 10px;
 }
@@ -168,9 +171,10 @@ body {
 }
 
 .version-item {
-  /* Auto layout */
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
   padding: 10px 16px;
   isolation: isolate;
   margin-bottom: 15px;
@@ -178,9 +182,7 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.25);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 6px;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: row;
+  min-height: 80px;
 }
 
 .version-item.last-item {
@@ -188,43 +190,23 @@ body {
   margin-bottom: 0;
 }
 
+.version-code, .version-date {
+  width: auto;
+  height: auto;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 510;
+  font-size: 20px;
+  line-height: normal;
+  color: #B51621;
+  padding: 0 10px;
+}
+
 .version-code {
-
-  width: 943px;
-  height: 137px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 510;
-  font-size: 64px;
-  line-height: 16px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #B51621;
-  flex: none;
-  order: 1;
-  align-self: stretch;
-  flex-grow: 1;
-  z-index: 1;
+  text-align: left;
 }
 
-.version-date{
-  width: 943px;
-  height: 137px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 510;
-  font-size: 64px;
-  line-height: 16px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #B51621;
-  flex: none;
-  order: 1;
-  align-self: stretch;
-  flex-grow: 1;
-  z-index: 1;
+.version-date {
+  text-align: right;
 }
-
 </style>
