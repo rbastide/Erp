@@ -9,7 +9,7 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacherID")
-    private Long teacherID;
+    private Long id;
 
     @Column(name = "lastname")
     private String lastname;
@@ -17,23 +17,22 @@ public class Teacher {
     @Column(name = "firstname")
     private String firstname;
 
-    public Teacher() {
-    }
+    public Teacher() {}
 
     public Teacher(String lastname, String firstname) {
         this.lastname = lastname;
         this.firstname = firstname;
     }
 
-    public Long teacherID() {
-        return teacherID;
+    public Long getId() {
+        return id;
     }
 
-    public String lastname() {
+    public String getLastname() {
         return lastname;
     }
 
-    public String firstname() {
+    public String getFirstname() {
         return firstname;
     }
 }

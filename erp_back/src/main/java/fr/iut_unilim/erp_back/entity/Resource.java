@@ -37,4 +37,16 @@ public class Resource {
     public String name(){
         return name;
     }
+
+    public Long getResourceID() {
+        return resourceID;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

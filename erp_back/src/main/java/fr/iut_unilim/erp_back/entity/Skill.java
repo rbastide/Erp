@@ -25,7 +25,15 @@ public class Skill {
         this.skillLearning = skillLearning;
     }
 
-    public Long skillID() {
+    public Long getSkillID() {
         return skillID;
+    }
+
+    public String getSkillName() {
+        return skillName;
+    }
+
+    public String getSkillLearning() {
+        return skillLearning;
     }
 }
