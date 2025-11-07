@@ -7,17 +7,15 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.logging.Logger;
+
 @SpringBootApplication
 public class ErpBackApplication {
 
-    public static void main(String[] args) throws Exception {
-        Dotenv dotenv = Dotenv.load();
+    private static final Logger logger = Logger.getLogger(ErpBackApplication.class.getName());
 
-        updateEnvironmentVariables(dotenv);
-
-        connectSSH(dotenv);
-
-        SpringApplication.run(ErpBackApplication.class, args);
+    public static void main(String[] args) {
+        startApplication(args);
     }
 
     private static void updateEnvironmentVariables(Dotenv dotenv) {
@@ -35,6 +33,29 @@ public class ErpBackApplication {
         session.setConfig("StrictHostKeyChecking", "no");
         session.setPortForwardingL(3307, dotenv.get("DB_HOST"), 3306);
         session.connect();
+    }
+
+    private static void connectToDatabase() throws JSchException {
+        Dotenv dotenv = Dotenv.load();
+
+        updateEnvironmentVariables(dotenv);
+        connectSSH(dotenv);
+    }
+
+    private static void startApplication(String[] args) {
+        boolean errorWhileConnectingDatabase = false;
+        try {
+            connectToDatabase();
+        } catch (JSchException e) {
+            logger.severe("Error while connecting in SSH : " + e.getMessage());
+            errorWhileConnectingDatabase = true;
+        }
+
+        if (!errorWhileConnectingDatabase) {
+            SpringApplication.run(ErpBackApplication.class, args);
+        } else {
+            logger.info("Application did not start correctly. Please refer to the upper logs for more information.");
+        }
     }
 
 }
