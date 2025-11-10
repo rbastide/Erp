@@ -13,14 +13,19 @@ public class EnvironmentVariablesManager {
     public static Map<String, String> retrieveEnvironmentVariablesValues(Dotenv dotenv, String[] args) throws UndefinedEnvironmentVariable {
         Map<String, String> envVariables = new HashMap<>();
         for (String arg : args) {
-            String envVariableValue = dotenv.get(arg);
-            if (envVariableValue == null) {
-                throw new UndefinedEnvironmentVariable("The environment variable " + arg + " is not defined !");
-            }
+            String envVariableValue = retrieveEnvironmentVariable(dotenv, arg);
             envVariables.put(arg, envVariableValue);
         }
 
         return envVariables;
+    }
+
+    public static String retrieveEnvironmentVariable(Dotenv dotenv, String key) throws UndefinedEnvironmentVariable {
+        String envVariableValue = dotenv.get(key);
+        if (envVariableValue == null) {
+            throw new UndefinedEnvironmentVariable("The environment variable " + key + " is not defined !");
+        }
+        return envVariableValue;
     }
 
     public static void updateSystemEnvironmentVariables(Dotenv dotenv, String[] args) throws UndefinedEnvironmentVariable {
