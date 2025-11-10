@@ -33,7 +33,9 @@ public class DatabaseConnectionManager {
 
         Map<String, String> loginsSSH = retrieveEnvironmentVariablesValues(dotenv, SSH_ENVIRONMENT_VARIABLES);
 
-        connectSSH(loginsSSH);
+        boolean needToConnectSSH = "true".equals(dotenv.get("IS_SSH"));
+
+        if (needToConnectSSH) connectSSH(loginsSSH);
     }
 
 }
