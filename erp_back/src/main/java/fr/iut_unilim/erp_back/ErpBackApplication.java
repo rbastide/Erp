@@ -19,6 +19,16 @@ public class ErpBackApplication {
     }
 
     private static void startApplication(String[] args) {
+        boolean errorWhileConnectingDatabase = connectingDatabase();
+
+        if (!errorWhileConnectingDatabase) {
+            SpringApplication.run(ErpBackApplication.class, args);
+        } else {
+            LOGGER.info("Application did not start correctly. Please refer to the upper logs for more information.");
+        }
+    }
+
+    private static boolean connectingDatabase() {
         boolean errorWhileConnectingDatabase = false;
         try {
             connectToDatabase();
@@ -29,12 +39,7 @@ public class ErpBackApplication {
             LOGGER.severe("Error while retrieving environment variables : " + e.getMessage());
             errorWhileConnectingDatabase = true;
         }
-
-        if (!errorWhileConnectingDatabase) {
-            SpringApplication.run(ErpBackApplication.class, args);
-        } else {
-            LOGGER.info("Application did not start correctly. Please refer to the upper logs for more information.");
-        }
+        return errorWhileConnectingDatabase;
     }
 
 }
