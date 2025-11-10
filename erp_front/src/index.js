@@ -4,7 +4,7 @@ import RessourcePage from './components/RessourcePage.vue';
 import HomePage from './components/HomePage.vue';
 import HistoryPage from './components/HistoryPage.vue';
 import DashboardAdminPage from './components/DashboardAdminPage.vue';
-import CreateNewUserPage from './components/CreateNewUser.vue';
+import CreateNewUserPagePage from './components/CreateNewUserPage.vue';
 import ServicesPage from './components/ServiceAidePage.vue';
 import DeconnexionPage from './components/DeconnexionPage.vue';
 
@@ -42,7 +42,7 @@ const routes = [
     {
         path: '/new-user',
         name: 'CreateNewUserPage',
-        component: CreateNewUserPage
+        component: CreateNewUserPagePage
     },
     {
         path: '/aide',
