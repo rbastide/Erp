@@ -24,8 +24,8 @@ public class ResourceController {
         return resourceService.getAllResources();
     }
 
-    @GetMapping("search")
+    @GetMapping("/search")
     public List<Resource> search(@RequestParam String name){
-        return resourceService.getAllResources();
+        return resourceService.findByName(name);
     }
 }

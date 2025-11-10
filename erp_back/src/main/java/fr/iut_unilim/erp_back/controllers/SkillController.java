@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/skills")
+@RequestMapping("/api/skills")
 public class SkillController {
 
     private final SkillService skillService;
@@ -24,8 +24,9 @@ public class SkillController {
         return skillService.getAllSkills();
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public List<Skill> search(@RequestParam String name) {
-        return skillService.getAllSkills();
+        return skillService.findByName(name);
     }
+
 }

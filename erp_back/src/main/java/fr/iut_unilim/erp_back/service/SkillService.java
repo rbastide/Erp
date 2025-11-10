@@ -20,6 +20,6 @@ public class SkillService {
     }
 
     public List<Skill> findByName(String name){
-        return skillRepository.findByName(name);
+        return skillRepository.findBySkillName(name);
     }
 }

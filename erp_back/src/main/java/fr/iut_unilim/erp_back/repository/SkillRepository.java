@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long>{
-    List<Skill> findByName(String name);
+    List<Skill> findBySkillName(String skillName);
 }
