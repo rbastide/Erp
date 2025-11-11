@@ -1,3 +1,24 @@
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const handleLogin = () => {
+  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
+
+  if (loginSuccessful) {
+    router.push('/home');
+  } else {
+    alert("Identifiants incorrects.");
+  }
+};
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+</script>
+
 <template>
   <header class="page-header">
     <div class="container-connexion">
@@ -45,27 +66,6 @@
          </form>
        </main>
 </template>
-
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const handleLogin = () => {
-  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
-
-  if (loginSuccessful) {
-    router.push('/home');
-  } else {
-    alert("Identifiants incorrects.");
-  }
-};
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
-</script>
 
 <style scoped>
 

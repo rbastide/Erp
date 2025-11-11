@@ -1,3 +1,21 @@
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+const handleNon = () => {
+  router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
+}
+
+const handleOui = () => {
+  router.push('/login');
+}
+</script>
+
 <template>
   <header class="page-header">
     <div class="container-nom">
@@ -142,20 +160,3 @@
   transform: translateY(-4px);
 }
 </style>
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleNon = () => {
-  router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
-}
-
-const handleOui = () => {
-  router.push('/login');
-}
-</script>

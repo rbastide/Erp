@@ -1,3 +1,29 @@
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const handleRemplir = () => {
+  router.push('/ressource');
+};
+
+const handleAfficher = () => {
+  router.push('/history');
+};
+
+const handleInscrire = () => {
+  router.push('/new-user');
+};
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+const handleDeconnexion = () => {
+  router.push('/deconnexion');
+};
+</script>
+
 <template>
   <header class="page-header">
     <div class="container-nom">
@@ -143,28 +169,3 @@
 }
 </style>
 
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const handleRemplir = () => {
-  router.push('/ressource');
-};
-
-const handleAfficher = () => {
-  router.push('/history');
-};
-
-const handleInscrire = () => {
-  router.push('/new-user');
-};
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-</script>

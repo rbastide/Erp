@@ -1,5 +1,35 @@
-<script setup lang="ts">
+<script setup>
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+
+const handleRetour = () => {
+  router.push('/home');
+};
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+const handleLogin = () => {
+  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
+
+  if (loginSuccessful) {
+    router.push('/home');
+  } else {
+    alert("Identifiants incorrects.");
+  }
+};
+
+const handleConfirm = () => {
+  const confirmSucessful = false;
+
+  const mdp = document.getElementById("password").value;
+  const verif_mdp = document.getElementById("confirm_password").value;
+  if (mdp.equals(verif_mdp)) {
+    const confirmSucessful = true;
+  }
+};
 </script>
 
 <template>
@@ -7,7 +37,7 @@
     <div class="container-connexion">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Inscription</p>
     </div>
-    <div class="contact">Service d'aide</div>
+    <div @click="handleAide" class="aide">Service d'aide</div>
   </header>
   <main class="main-content">
     <form class="login-card">
@@ -63,36 +93,11 @@
       <!-- Bouton de soumission -->
       <button @click="handleLogin" class="login-button">S'inscrire</button>
     </form>
-    <button onclick="history.back()" class="leave">Quitter</button>
   </main>
+  <footer>
+    <div @click="handleRetour" class="btn-quitter">Quitter</div>
+  </footer>
 </template>
-
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const handleLogin = () => {
-  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
-
-  if (loginSuccessful) {
-    router.push('/home');
-  } else {
-    alert("Identifiants incorrects.");
-  }
-};
-
-const handleConfirm = () => {
-  const confirmSucessful = false;
-
-  const mdp = document.getElementById("password").value;
-  const verif_mdp = document.getElementById("confirm_password").value;
-  if (mdp.equals(verif_mdp)) {
-    const confirmSucessful = true;
-  }
-};
-
-</script>
 
 <style scoped>
 
@@ -135,7 +140,7 @@ const handleConfirm = () => {
   color: #FFFFFF;
 }
 
-.contact{
+.aide{
   position: absolute;
   width: 126px;
   height: 52px;
@@ -222,21 +227,35 @@ const handleConfirm = () => {
 .main-content {
 
   min-height: 100vh;
-  padding-top: 172px;
+  padding-top: 10%;
   box-sizing: border-box;
 }
 
-.leave {
-  background-color: #3498db;
-  color: grey;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s ease;
+.btn-quitter{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 16px;
+  width: 360px;
+  height: 100px;
+  background: #D9D9D9;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 15px;
+  margin: 20px auto;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 510;
+  font-size: 40px;
+  color: #B51621;
+  position: relative;
+
 }
-.leave:hover {
-  background-color: #2980b9;
+
+.btn-quitter:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 </style>

@@ -1,3 +1,22 @@
+<script setup>
+
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const handleRetour = () => {
+  router.push('/home');
+};
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+const handleDeconnexion = () => {
+  router.push('/deconnexion');
+};
+</script>
+
 <template>
   <header class="page-header">
     <div class="container-nom">
@@ -59,26 +78,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-
-  import { useRouter } from 'vue-router';
-
-  const router = useRouter();
-
-  const handleRetour = () => {
-    router.push('/home');
-  };
-
-  const handleAide = () => {
-    router.push('/aide');
-  };
-
-  const handleDeconnexion = () => {
-    router.push('/deconnexion');
-  };
-
-</script>
 
 <style scoped>
 
