@@ -7,6 +7,8 @@ import DashboardAdminPage from './components/DashboardAdminPage.vue';
 import CreateNewUserPagePage from './components/CreateNewUserPage.vue';
 import ServicesPage from './components/ServiceAidePage.vue';
 import DeconnexionPage from './components/DeconnexionPage.vue';
+import ErrorSave from "@/components/ErrorSave.vue";
+import SuccessfullySaved from "@/components/SuccessfullySaved.vue";
 
 const routes = [
     {
@@ -53,6 +55,16 @@ const routes = [
         path: '/deconnexion',
         name: 'DeconnexionPage',
         component: DeconnexionPage
+    },
+    {
+        path: '/errorSave',
+        name: 'ErrorSavePage',
+        component: ErrorSave
+    },
+    {
+        path: '/successfullySaved',
+        name: 'SucessfullySavedPage',
+        component: SuccessfullySaved
     }
 ];
 
