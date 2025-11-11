@@ -55,6 +55,7 @@
           <p class = "text-button">RX.XX</p>
         </div>
       </div>
+      <div @click="handleRetour" class="btn-quitter">Quitter</div>
     </main>
 
   </div>
@@ -191,6 +192,34 @@
   text-align: center;         /* Texte centré à l'intérieur */
   color: #B51621;
   margin: 0;
+}
+
+.btn-quitter{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 16px;
+  width: 360px;
+  height: 100px;
+  background: #D9D9D9;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 15px;
+  margin: 20px auto;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 510;
+  font-size: 40px;
+  color: #B51621;
+  position: relative;
+  margin-top: 5%;
+}
+
+.btn-quitter:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 
 </style>
