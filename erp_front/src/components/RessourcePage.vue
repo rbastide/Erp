@@ -3,6 +3,10 @@
 
   const router = useRouter();
 
+  const handleRetour = () => {
+    router.push('/home');
+  };
+
   const handleAide = () => {
     router.push('/aide');
   };
