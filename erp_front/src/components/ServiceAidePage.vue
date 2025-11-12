@@ -119,25 +119,20 @@ const handleDeconnexion = () => {
 }
 
 .btn-quitter{
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0px 16px;
-  width: 360px;
-  height: 100px;
-  background: #D9D9D9;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 15px;
-  margin: 20px auto;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 510;
-  font-size: 40px;
-  color: #B51621;
+  width: 150px;
+  padding: 0.8rem; /* 13px */
+  border: none;
+  text-align: center;
+  border-radius: 4px;
+  background-color: #B51621;
+  color: #FFFFFF;
+  font-size: 1rem; /* 16px */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
   position: relative;
-  margin-top: 5%;
+  margin: 5% auto;
+
 }
 
 .btn-quitter:hover{
