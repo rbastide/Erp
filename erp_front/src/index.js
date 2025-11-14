@@ -9,6 +9,7 @@ import ServicesPage from './components/ServiceAidePage.vue';
 import DeconnexionPage from './components/DeconnexionPage.vue';
 import ErrorSave from "@/components/ErrorSave.vue";
 import SuccessfullySaved from "@/components/SuccessfullySaved.vue";
+import FillRessourcePage from "@/components/FillRessourcePage.vue";
 
 const routes = [
     {
@@ -65,6 +66,11 @@ const routes = [
         path: '/successfullySaved',
         name: 'SucessfullySavedPage',
         component: SuccessfullySaved
+    },
+    {
+        path: '/filRessourcePage',
+        name: 'FilRessourcePage',
+        component: FillRessourcePage
     }
 ];
 
