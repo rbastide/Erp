@@ -11,6 +11,7 @@ import ErrorSave from "./components/ErrorSave.vue";
 import SuccessfullySaved from "./components/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/FillRessourcePage.vue";
 import UserSavePage from "./components/UserSavePage.vue";
+import CancelPage from "./components/CancelPage.vue";
 
 const routes = [
     {
@@ -77,6 +78,11 @@ const routes = [
         path: '/userSave',
         name: 'UserSavePage',
         component: UserSavePage
+    },
+    {
+        path: '/cancel',
+        name: 'CancelPage',
+        component: CancelPage
     }
 ];
 
