@@ -29,7 +29,7 @@
     </div>
   </header>
   <main class="main-content">
-    <p class="text">Une erreur est survenu !</p>
+    <p class="text">Une erreur est survenue !</p>
   </main>
   <footer>
     <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
@@ -118,6 +118,7 @@
   margin-top: 5%;
   color: #B51621;
   font-size: 40px;
+  font-family: 'Roboto', sans-serif;
 }
 
 /*Footer*/
@@ -131,6 +132,7 @@
   color: #FFFFFF;
   font-size: 1rem; /* 16px */
   font-weight: bold;
+  font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;

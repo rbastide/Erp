@@ -7,9 +7,10 @@ import DashboardAdminPage from './components/DashboardAdminPage.vue';
 import CreateNewUserPagePage from './components/CreateNewUserPage.vue';
 import ServicesPage from './components/ServiceAidePage.vue';
 import DeconnexionPage from './components/DeconnexionPage.vue';
-import ErrorSave from "@/components/ErrorSave.vue";
-import SuccessfullySaved from "@/components/SuccessfullySaved.vue";
-import FillRessourcePage from "@/components/FillRessourcePage.vue";
+import ErrorSave from "./components/ErrorSave.vue";
+import SuccessfullySaved from "./components/SuccessfullySaved.vue";
+import FillRessourcePage from "./components/FillRessourcePage.vue";
+import UserSavePage from "./components/UserSavePage.vue";
 
 const routes = [
     {
@@ -71,6 +72,11 @@ const routes = [
         path: '/filRessourcePage',
         name: 'FilRessourcePage',
         component: FillRessourcePage
+    },
+    {
+        path: '/userSave',
+        name: 'UserSavePage',
+        component: UserSavePage
     }
 ];
 
