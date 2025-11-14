@@ -106,6 +106,7 @@ const handleDeconnexion = () => {
   justify-content: center;
   gap: 30%;
   margin-top: 2%;
+  font-family: 'Roboto', sans-serif;
 }
 
 .title{
