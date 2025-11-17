@@ -14,7 +14,7 @@ public class DatabaseConnectionManager {
 
     private DatabaseConnectionManager() {}
 
-    private static final String[] DATABASE_ENVIRONMENT_VARIABLES = {"DB_HOST", "DB_PORT", "DB_NAME", "DB_USERNAME", "DB_PASSWORD"};
+    private static final String[] DATABASE_ENVIRONMENT_VARIABLES = {"DB_HOST", "DB_PORT", "DB_NAME", "DB_USERNAME", "DB_PASSWORD", "SGBD"};
     private static final String[] SSH_ENVIRONMENT_VARIABLES = {"SSL_USERNAME", "SSL_PASSWORD", "DB_IP", "DB_HOST", "DB_PORT"};
 
     private static void connectSSH(Map<String, String> envVariables) throws JSchException {
