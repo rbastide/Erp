@@ -3,7 +3,7 @@ import LoginPage from './components/LoginPage.vue';
 import RessourcePage from './components/RessourcePage.vue';
 import HomePage from './components/HomePage.vue';
 import HistoryPage from './components/HistoryPage.vue';
-import DashboardAdminPage from './components/DashboardAdminPage.vue';
+import HomeAdminPage from './components/HomeAdminPage.vue';
 import CreateNewUserPagePage from './components/CreateNewUserPage.vue';
 import ServicesPage from './components/ServiceAidePage.vue';
 import DeconnexionPage from './components/DeconnexionPage.vue';
@@ -43,9 +43,9 @@ const routes = [
         component: LoginPage
     },
     {
-        path: '/dashboard-admin',
-        name: 'DashboardAdmin',
-        component: DashboardAdminPage
+        path: '/home-admin',
+        name: 'HomeAdmin',
+        component: HomeAdminPage
     },
     {
         path: '/new-user',
