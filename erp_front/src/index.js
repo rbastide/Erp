@@ -12,6 +12,9 @@ import SuccessfullySaved from "./components/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/FillRessourcePage.vue";
 import UserSavePage from "./components/UserSavePage.vue";
 import CancelPage from "./components/CancelPage.vue";
+import MCCCPage from "./components/MCCCPage.vue";
+import HistoryAdminPage from "./components/HistoryAdminPage.vue";
+import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
 
 const routes = [
     {
@@ -83,6 +86,21 @@ const routes = [
         path: '/cancel',
         name: 'CancelPage',
         component: CancelPage
+    },
+    {
+        path: '/mccc',
+        name: 'MCCCPage',
+        component: MCCCPage
+    },
+    {
+        path: '/history-admin',
+        name: 'HistoryAdminPage',
+        component: HistoryAdminPage
+    },
+    {
+        path: '/supp-fiche',
+        name: 'SuccessfullyDeletePage',
+        component: SuccessfullyDeletePage
     }
 ];
 

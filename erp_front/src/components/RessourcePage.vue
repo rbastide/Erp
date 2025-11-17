@@ -209,6 +209,7 @@
   font-size: 1rem; /* 16px */
   font-weight: bold;
   cursor: pointer;
+  font-family: 'Roboto', sans-serif;
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;

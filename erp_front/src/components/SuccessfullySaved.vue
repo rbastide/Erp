@@ -112,6 +112,7 @@ const handleDeconnexion = () => {
 /*Main*/
 .main-content{
   position: relative;
+  font-family: 'Roboto', sans-serif;
 }
 .text{
   text-align: center;
@@ -131,6 +132,7 @@ const handleDeconnexion = () => {
   color: #FFFFFF;
   font-size: 1rem; /* 16px */
   font-weight: bold;
+  font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;
