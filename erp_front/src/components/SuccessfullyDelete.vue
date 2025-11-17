@@ -7,6 +7,10 @@ const handleRetour = () => {
   router.push('/dashboard-admin');
 };
 
+const handleAutreFiche = () => {
+  router.push('/history-admin');
+};
+
 const handleAide = () => {
   router.push('/aide');
 };
@@ -32,7 +36,10 @@ const handleDeconnexion = () => {
     <p class="text">La fiche ressource a bien été supprimée !</p>
   </main>
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
+    <div class="btn-container">
+      <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
+      <div @click="handleAutreFiche" class="btn-quitter">Supprimer une nouvelle fiche</div>
+    </div>
   </footer>
 </template>
 
@@ -122,25 +129,31 @@ const handleDeconnexion = () => {
 }
 
 /*Footer*/
-.btn-quitter{
-  width: 150px;
+
+.btn-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-quitter, .btn-retour{
+  width: fit-content;
   padding: 0.8rem; /* 13px */
   border: none;
   text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
-
 }
 
-.btn-quitter:hover{
+.btn-quitter:hover, .btn-retour:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;

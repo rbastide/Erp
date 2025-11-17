@@ -15,7 +15,7 @@ const handleLogin = () => {
   const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
 
   if (loginSuccessful) {
-    router.push('/home');
+    router.push('/userSave');
   } else {
     alert("Identifiants incorrects.");
   }
@@ -91,7 +91,7 @@ const handleConfirm = () => {
       </div>
 
       <!-- Bouton de soumission -->
-      <button @click="handleLogin" class="login-button">S'inscrire</button>
+      <button @click="handleLogin" class="login-button">Inscrire</button>
     </form>
   </main>
   <footer>
@@ -169,7 +169,7 @@ const handleConfirm = () => {
   font-family: 'Roboto', sans-serif;
 }
 
-/* --- Style de la Carte de Connexion --- */
+
 .login-card {
   background-color: #FFFFFF;
   padding: 2.5rem; /* 40px */

@@ -36,8 +36,10 @@ const handleNewUser = () => {
     <p class="text">Votre ajout d’utilisateur a bien été effectué !</p>
   </main>
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
-    <div @click="handleNewUser" class="btn-new-user">Ajouter un autre utilisateur</div>
+    <div class="btn-container">
+      <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
+      <div @click="handleNewUser" class="btn-new-user">Ajouter un autre utilisateur</div>
+    </div>
   </footer>
 </template>
 
@@ -127,17 +129,15 @@ const handleNewUser = () => {
 }
 
 /*Footer*/
-footer{
+
+.btn-container{
   display: flex;
-  width: 90%;
-  margin: auto;
-  margin-top: 254px;
   justify-content: center;
   align-items: center;
 }
 
 .btn-quitter, .btn-new-user{
-  width: 150px;
+  width: fit-content;
   padding: 0.8rem; /* 13px */
   border: none;
   text-align: center;
@@ -151,7 +151,6 @@ footer{
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
-
 }
 
 .btn-quitter:hover, .btn-new-user:hover{
