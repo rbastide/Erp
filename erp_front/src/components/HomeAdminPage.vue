@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleRemplir = () => {
-  router.push('/mccc');
+  router.push('/mccc-menu');
 };
 
 const handleAfficher = () => {
