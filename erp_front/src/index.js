@@ -15,6 +15,7 @@ import CancelPage from "./components/CancelPage.vue";
 import McccMenuPage from "./components/McccMenuPage.vue";
 import HistoryAdminPage from "./components/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
+import McccRessourcePage from "./components/McccRessourcePage.vue"
 
 const routes = [
     {
@@ -101,6 +102,11 @@ const routes = [
         path: '/supp-fiche',
         name: 'SuccessfullyDeletePage',
         component: SuccessfullyDeletePage
+    },
+    {
+        path: '/mccc-resource',
+        name: 'McccRessourcePage',
+        component: McccRessourcePage
     }
 ];
 
