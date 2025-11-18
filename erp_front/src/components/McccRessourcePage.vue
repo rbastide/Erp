@@ -36,7 +36,7 @@ const handleDeconnexion = () => {
 
     <main class = "main-content">
       <div class = "choisir-ressource">
-        Veuillez choisir votre ressource pour modifier les MCCC
+        Veuillez choisir la ressource pour laquelle vous voulez modifier les MCCC
       </div>
 
       <div class = "container-button">
