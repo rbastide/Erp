@@ -18,15 +18,4 @@ public class SkillController {
     public SkillController(SkillService skillService) {
         this.skillService = skillService;
     }
-
-    @GetMapping
-    public List<Skill> getAllSkills() {
-        return skillService.getAllSkills();
-    }
-
-    @GetMapping("/search")
-    public List<Skill> search(@RequestParam String name) {
-        return skillService.findByName(name);
-    }
-
 }

@@ -26,18 +26,6 @@ public class Resource {
         this.name = name;
     }
 
-    public Long resourceID(){
-        return resourceID;
-    }
-
-    public String num(){
-        return num;
-    }
-
-    public String name(){
-        return name;
-    }
-
     public Long getResourceID() {
         return resourceID;
     }

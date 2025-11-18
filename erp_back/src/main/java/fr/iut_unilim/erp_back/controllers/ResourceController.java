@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 @RestController
@@ -17,15 +16,5 @@ public class ResourceController {
 
     public ResourceController(ResourceService resourceService) {
         this.resourceService = resourceService;
-    }
-
-    @GetMapping
-    public List<Resource> getAllResources(){
-        return resourceService.getAllResources();
-    }
-
-    @GetMapping("/search")
-    public List<Resource> search(@RequestParam String name){
-        return resourceService.findByName(name);
     }
 }
