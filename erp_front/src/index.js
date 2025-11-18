@@ -19,7 +19,7 @@ import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
 const routes = [
     {
         path: '/',
-        name: 'Login',
+        name: 'Default',
         component: LoginPage // La page par défaut
     },
     {
@@ -69,7 +69,7 @@ const routes = [
     },
     {
         path: '/successfullySaved',
-        name: 'SucessfullySavedPage',
+        name: 'SuccessfullySavedPage',
         component: SuccessfullySaved
     },
     {
