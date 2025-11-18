@@ -14,12 +14,4 @@ public class SkillService {
     public SkillService(SkillRepository skillRepository) {
         this.skillRepository = skillRepository;
     }
-
-    public List<Skill> getAllSkills() {
-        return skillRepository.findAll();
-    }
-
-    public List<Skill> findByName(String name){
-        return skillRepository.findBySkillName(name);
-    }
 }

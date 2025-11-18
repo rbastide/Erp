@@ -1,9 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -13,13 +11,5 @@ public class ResourceService {
 
     public ResourceService(ResourceRepository resourceRepository) {
         this.resourceRepository = resourceRepository;
-    }
-
-    public List<Resource> getAllResources() {
-        return resourceRepository.findAll();
-    }
-
-    public List<Resource> findByName(String name){
-        return resourceRepository.findByName(name);
     }
 }

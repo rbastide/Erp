@@ -22,4 +22,8 @@ public class TeacherService {
     public List<Teacher> findByLastname(String lastname) {
         return teacherRepository.findByLastnameContaining(lastname);
     }
+
+    public List<Teacher> findByFirstname(String firstname) {
+        return teacherRepository.findByFirstnameContaining(firstname);
+    }
 }
