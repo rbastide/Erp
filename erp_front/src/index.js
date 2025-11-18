@@ -104,7 +104,7 @@ const routes = [
         component: SuccessfullyDeletePage
     },
     {
-        path: '/mccc-resource',
+        path: '/mccc-ressource',
         name: 'McccRessourcePage',
         component: McccRessourcePage
     }
