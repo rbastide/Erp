@@ -15,7 +15,8 @@ import CancelPage from "./components/CancelPage.vue";
 import McccMenuPage from "./components/McccMenuPage.vue";
 import HistoryAdminPage from "./components/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
-import McccRessourcePage from "./components/McccRessourcePage.vue"
+import McccRessourcePage from "./components/McccRessourcePage.vue";
+import McccFillHourPage from "./components/McccFillHour.vue";
 
 const routes = [
     {
@@ -107,6 +108,11 @@ const routes = [
         path: '/mccc-ressource',
         name: 'McccRessourcePage',
         component: McccRessourcePage
+    },
+    {
+        path: '/mccc-hour',
+        name: 'McccFillHourPage',
+        component: McccFillHourPage
     }
 ];
 
