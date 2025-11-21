@@ -136,11 +136,11 @@ const handleDeconnexion = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   width: 360px;
   height: 200px;
   background: #D9D9D9;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   margin: 50px;
 }
