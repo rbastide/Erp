@@ -17,6 +17,7 @@ import HistoryAdminPage from "./components/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
 import McccRessourcePage from "./components/McccRessourcePage.vue";
 import McccFillHourPage from "./components/McccFillHour.vue";
+import ModifSaved from "./components/ModifSaved.vue";
 
 const routes = [
     {
@@ -113,6 +114,11 @@ const routes = [
         path: '/mccc-hour',
         name: 'McccFillHourPage',
         component: McccFillHourPage
+    },
+    {
+        path: '/modif-saved',
+        name: 'ModifSaved',
+        component: ModifSaved
     }
 ];
 

@@ -3,8 +3,8 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const handleRetour = () => {
-  router.push('/home');
+const handleValider = () => {
+  router.push('/modif-saved');
 };
 
 const handleAide = () => {
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p>Total :</p>
       </div>
 
-      <div @click="handleRetour" class="btn-valider">Valider</div>
+      <div @click="handleValider" class="btn-valider">Valider</div>
     </main>
 
   </div>
