@@ -63,19 +63,16 @@ const handleValider = () => {
     </div>
   </header>
   <main class="main-content">
-    <div class="description-container">
       <div class="description">
         Veuillez saisir le/les Référents pour cette ressource :
       </div>
-    </div>
-
-    <div class="teachers-list">
-      <div v-for="(teacher, index) in teachers" :key="teacher.id" class="teacher-display-card">
-        Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
-      </div>
-    </div>
 
     <div class="container">
+      <div class="teachers-list">
+        <div v-for="(teacher, index) in teachers" :key="teacher.id" class="teacher-display-card">
+          Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
+        </div>
+      </div>
       <form class="teacher-card" @submit.prevent>
         <div class="form-group">
           <label for="lastname">Nom</label>
@@ -236,13 +233,6 @@ const handleValider = () => {
   margin:auto;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
 }
 
 .description {
@@ -252,8 +242,10 @@ const handleValider = () => {
   font-size: 32px;
   color: #E92533;
   margin-top: 20px;
-  margin-bottom: 0;
+  margin-bottom: 40px;
 }
+
+/* Style de la Carte de Connexion */
 
 .container{
   position: relative;
@@ -267,13 +259,12 @@ const handleValider = () => {
 
 .teacher-card {
   width: 100%;
-  max-width: 400px;
   background-color: #FFFFFF;
   padding: 2.5rem; /* 40px */
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
-  margin-bottom: 0;
+  margin-bottom: 20px;
 }
 
 .form-group {
@@ -303,9 +294,12 @@ const handleValider = () => {
   box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
 }
 
+.plus-icon{
+  margin: 20px;
+}
+
 .submit-btn {
   width: 100%;
-  max-width: 400px;
   padding: 0.8rem; /* 13px */
   border: none;
   border-radius: 4px;
@@ -321,4 +315,10 @@ const handleValider = () => {
   background-color: #9c121b;
 }
 
+.main-content {
+
+  min-height: 100vh;
+  padding-top: 172px;
+  box-sizing: border-box;
+}
 </style>
