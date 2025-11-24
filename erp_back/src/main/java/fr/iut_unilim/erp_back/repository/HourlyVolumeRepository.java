@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface HourlyVolumeRepository extends JpaRepository<HourlyVolume, Long> {
-    List<HourlyVolume> findByID(Long hourlyVolumeID);
+    List<HourlyVolume> findByHourlyVolID(Long hourlyVolumeID);
 }
