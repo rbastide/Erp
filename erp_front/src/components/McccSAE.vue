@@ -14,6 +14,31 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+function duplicateGreySquare(){
+  // Récupérer le conteneur
+  const container = document.getElementById('sae-text');
+
+  if (!container) {
+    console.error("Conteneur 'sae-text' introuvable.");
+    return;
+  }
+
+  const originalObject = container.querySelector('.grey-square:last-child');
+
+  if (originalObject) {
+    const newObject = originalObject.cloneNode(true);
+
+    newObject.textContent = '';
+
+    container.appendChild(newObject);
+
+    newObject.focus();
+  }
+  else{
+    console.error("Impossible de trouver le carré gris à dupliquer.");
+  }
+}
 </script>
 <template>
   <!-- Conteneur principal de RessourcePage -->
@@ -34,14 +59,18 @@ const handleDeconnexion = () => {
 
     <main>
       <div class="sae">
-        <p class="titre">Veuillez saisir la/les SAÉ(s) concernée(s) :</p>
-        <div class = "grey-square" contenteditable="true"></div>
+        <p class="title">Veuillez saisir la/les SAÉ(s) concernée(s) :</p>
+        <div id="sae-text">
+          <div class = "grey-square" contenteditable="true"></div>
+        </div>
+        <button class = "add-button" @click="duplicateGreySquare">Dupliquer la Zone de Texte</button>
 
       </div>
       <div class="competence">
-        <p class="titre">Veuillez saisir la/les compétence(s) concernée(s) :</p>
+        <p class="title">Veuillez saisir la/les compétence(s) concernée(s) :</p>
         <div class = "grey-square" contenteditable="true"></div>
       </div>
+      <button class = "add-button" @click="duplicateGreySquare">Dupliquer la Zone de Texte</button>
 
       <div @click="handleValider" class="btn-valider">Valider</div>
     </main>
@@ -123,7 +152,7 @@ const handleDeconnexion = () => {
 }
 
 /*Main*/
-.titre{
+.title{
   width: 100%;
   height: 66px;
   margin-top: 20px;
