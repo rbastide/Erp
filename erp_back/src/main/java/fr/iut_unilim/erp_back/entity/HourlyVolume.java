@@ -39,10 +39,10 @@ public class HourlyVolume {
         this.nbHoursTD = nbHoursTD;
     }
 
-    public Long getHourlyVolID() { return hourlyVolID; }
-    public int getNbHoursCM() { return nbHoursCM; }
-    public int getNbHoursDSTP() { return nbHoursDSTP; }
-    public int getNbHoursDS() { return nbHoursDS; }
-    public int getNbHoursTP() { return nbHoursTP; }
-    public int getNbHoursTD() { return nbHoursTD; }
+    public Long hourlyVolID() { return hourlyVolID; }
+    public int nbHoursCM() { return nbHoursCM; }
+    public int nbHoursDSTP() { return nbHoursDSTP; }
+    public int nbHoursDS() { return nbHoursDS; }
+    public int nbHoursTP() { return nbHoursTP; }
+    public int nbHoursTD() { return nbHoursTD; }
 }
