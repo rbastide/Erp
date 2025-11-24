@@ -8,7 +8,6 @@ const firstname = ref('');
 const teachers = ref([]);
 
 
-// Fonctions de navigation
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
@@ -30,17 +29,14 @@ const handleAdd = () => {
     id: Date.now()
   };
 
-  // 3. VÉRIFICATION AVEC some() :
-  // Recherche si un référent existe déjà avec ce nom ET ce prénom
+
   const isDuplicate = teachers.value.some(teacher => {
     return teacher.lastname.toLowerCase() === lastname.value.toLowerCase() &&
         teacher.firstname.toLowerCase() === firstname.value.toLowerCase()
   });
 
   if (isDuplicate) {
-    console.warn(`Le référent ${firstname} ${lastname} est déjà dans la liste.`);
-    console.error("ce référent existe déjà");
-    // Empêcher l'ajout en doublon
+    console.error(`Le référent ${firstname} ${lastname} est déjà dans la liste.`);
     return;
   }
   teachers.value.push(newTeacher);
@@ -50,12 +46,7 @@ const handleAdd = () => {
 };
 
 const handleValider = () => {
-  if (teachers.value.length === 0) {
-    console.error("Veuillez ajouter au moins un référent avant de valider.");
-    return;
-  }
-  console.log("Liste des référents validée :", teachers.value);
-  // Ici, vous ajouteriez la logique pour envoyer les données au backend ou naviguer
+  router.push('/mccc-menu')
 };
 </script>
 
@@ -78,17 +69,14 @@ const handleValider = () => {
       </div>
     </div>
 
-    <!-- Zone d'affichage des référents ajoutés -->
     <div class="teachers-list">
-      <!-- Itération sur la liste des référents -->
       <div v-for="(teacher, index) in teachers" :key="teacher.id" class="teacher-display-card">
         Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
       </div>
     </div>
 
-    <!-- Container du formulaire d'ajout et du bouton de validation -->
     <div class="container">
-      <form class="teacher-card" @submit.prevent> <!-- On utilise @submit.prevent pour éviter le rechargement -->
+      <form class="teacher-card" @submit.prevent>
         <div class="form-group">
           <label for="lastname">Nom</label>
           <input
@@ -109,8 +97,6 @@ const handleValider = () => {
         </div>
       </form>
 
-      <!-- Changement de click="handleAdd" en @click="handleAdd" -->
-      <!-- Rendu du SVG sous forme de bouton d'ajout -->
       <button @click="handleAdd" class="add-teacher-button" title="Ajouter ce référent">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -126,7 +112,6 @@ const handleValider = () => {
 
 <style scoped>
 
-/* --- Styles spécifiques aux nouvelles fonctionnalités --- */
 
 .teachers-list {
   margin-bottom: 30px;
@@ -134,7 +119,7 @@ const handleValider = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 450px; /* Align with teacher-card max-width */
+  max-width: 450px;
 }
 
 .teacher-display-card {
@@ -147,7 +132,7 @@ const handleValider = () => {
   font-size: 1rem;
   font-weight: 500;
   color: #1E1E1E;
-  border-left: 5px solid #E92533; /* Barre de couleur pour distinguer */
+  border-left: 5px solid #E92533;
 }
 
 .add-teacher-button {
@@ -169,8 +154,6 @@ const handleValider = () => {
 .plus-icon {
   margin: 0;
 }
-
-/* --- Le reste de vos styles existants --- */
 
 .page-header {
   position: absolute;
@@ -256,17 +239,10 @@ const handleValider = () => {
   min-height: 100vh;
   padding-top: 172px;
   box-sizing: border-box;
-
-  /* Ajout pour centrer le contenu comme demandé précédemment */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-}
-
-.description-container {
-  margin-bottom: 20px;
-  text-align: center;
 }
 
 .description {
@@ -276,10 +252,9 @@ const handleValider = () => {
   font-size: 32px;
   color: #E92533;
   margin-top: 20px;
-  margin-bottom: 0; /* Supprimé car le conteneur gère déjà la marge */
+  margin-bottom: 0;
 }
 
-/* Style de la Carte de Connexion */
 .container{
   position: relative;
   width: 25%;
@@ -298,7 +273,7 @@ const handleValider = () => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
-  margin-bottom: 0; /* La marge est maintenant autour du bouton d'ajout */
+  margin-bottom: 0;
 }
 
 .form-group {
