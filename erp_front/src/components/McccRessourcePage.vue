@@ -40,9 +40,7 @@ const handleMccc = () => {
     </header>
 
     <main class = "main-content">
-      <div class = "choisir-ressource">
-        Veuillez choisir la ressource pour laquelle vous voulez modifier les MCCC
-      </div>
+      <div class = "choisir-ressource">Veuillez choisir la ressource pour laquelle vous voulez modifier les MCCC</div>
 
       <div class = "container-button">
         <div @click="handleMccc" class ="push-button">

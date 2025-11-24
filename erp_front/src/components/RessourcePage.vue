@@ -143,6 +143,7 @@
 .main-content{
   position: relative;
 }
+
 .choisir-ressource {
   width: 672px;
   height: 66px;

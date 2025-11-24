@@ -18,6 +18,7 @@ import McccRessourcePage from "./components/McccRessourcePage.vue";
 import McccFillHourPage from "./components/McccFillHour.vue";
 import ModifSaved from "./components/ModifSaved.vue";
 import McccMenuPage from "./components/McccMenuPage.vue";
+import McccTeachersPage from "./components/McccTeachersPage.vue";
 
 const routes = [
     {
@@ -119,6 +120,11 @@ const routes = [
         path: '/modif-saved',
         name: 'ModifSaved',
         component: ModifSaved
+    },
+    {
+        path: '/mccc-teachers',
+        name: 'McccTeachersPage',
+        component: McccTeachersPage
     }
 ];
 
