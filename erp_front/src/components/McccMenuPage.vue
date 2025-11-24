@@ -26,6 +26,11 @@ const handleTeachers = () => {
 const handleValider = () => {
   router.push('/modif-saved');
 };
+
+const handleSae = () => {
+  router.push('/mccc-sae');
+};
+
 </script>
 
 <template>
@@ -46,18 +51,18 @@ const handleValider = () => {
       </div>
     </header>
 
-    <main class = "main-content">
+    <main class= "main-content">
       <div @click="handleHours" class ="heure">
-        <p class = "text-button">Heures</p>
+        <p class= "text-button">Heures</p>
       </div>
       <div class ="competence">
-        <p class = "text-button">Objectif / Compétences</p>
+        <p class= "text-button">Objectif / Compétences</p>
       </div>
-      <div class ="sae">
-        <p class = "text-button">SAE / n° Compétences</p>
+      <div @click="handleSae" class ="sae">
+        <p class= "text-button">SAE / n° Compétences</p>
       </div>
       <div @click="handleTeachers" class ="referent">
-        <p class = "text-button">Référent(s)</p>
+        <p class= "text-button">Référent(s)</p>
       </div>
     </main>
     <div class="container-btn">

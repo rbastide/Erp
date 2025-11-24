@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="adcb340a-a930-42f8-9a90-931873169749" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/erp_front/src/components/McccTeachersPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/erp_front/src/components/McccTeachersPage.vue" afterDir="false" />
-    </list>
+    <list default="true" id="adcb340a-a930-42f8-9a90-931873169749" name="Changes" comment="pour de vrai" />
     <list id="081eec1a-fb1d-4e0d-a3a8-4a6d08431359" name="ignore" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_classic_1_5_18.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__ch_qos_logback_logback_core_1_5_18.xml" beforeDir="false" />
@@ -239,7 +236,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763998973306</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="pour de vrai">
+      <option name="closed" value="true" />
+      <created>1763999602827</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1763999602827</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,6 +260,7 @@
     <MESSAGE value="test resolving" />
     <MESSAGE value="ajout du footer et de reférents MCCC" />
     <MESSAGE value="fin du teacherMccc" />
-    <option name="LAST_COMMIT_MESSAGE" value="fin du teacherMccc" />
+    <MESSAGE value="pour de vrai" />
+    <option name="LAST_COMMIT_MESSAGE" value="pour de vrai" />
   </component>
 </project>

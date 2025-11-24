@@ -238,8 +238,7 @@ const handleValider = () => {
   font-weight: 400;
   font-size: 32px;
   color: #E92533;
-  margin-top: 20px;
-  margin-bottom: 40px;
+  margin: 40px;
 }
 
 /* Style de la Carte teacher */
