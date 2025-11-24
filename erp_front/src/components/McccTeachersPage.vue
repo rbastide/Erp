@@ -52,7 +52,7 @@ const handleValider = () => {
 
 <template>
   <header class="page-header">
-    <div class="container-connexion">
+    <div class="container-card">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Référents pour RX.XX</p>
     </div>
     <div @click="handleAide" class="aide">Service d'aide</div>
@@ -102,7 +102,7 @@ const handleValider = () => {
         </svg>
       </button>
 
-      <button @click="handleValider" class="submit-btn">Valider</button>
+      <button @click="handleValider" class="submit-btn">Valider les référents</button>
     </div>
   </main>
 </template>
@@ -146,10 +146,7 @@ const handleValider = () => {
 }
 .add-teacher-button:hover {
   transform: scale(1.1);
-}
-
-.plus-icon {
-  margin: 0;
+  color: green;
 }
 
 .page-header {
@@ -162,14 +159,14 @@ const handleValider = () => {
   box-sizing: border-box;
 }
 
-.container-connexion img {
+.container-card img {
   position: absolute;
   width: 127px;
   height: 127px;
   left: 64px;
   top: 22.5px;
 }
-.container-connexion p{
+.container-card p{
 
   position: absolute;
   width: 723px;
@@ -229,10 +226,10 @@ const handleValider = () => {
 /* Style du Contenu Principal */
 
 .main-content {
-  background-color: #FFFFFF;
-  margin:auto;
-  padding: 20px;
   font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  padding-top: 172px;
+  box-sizing: border-box;
 }
 
 .description {
@@ -245,7 +242,7 @@ const handleValider = () => {
   margin-bottom: 40px;
 }
 
-/* Style de la Carte de Connexion */
+/* Style de la Carte teacher */
 
 .container{
   position: relative;
@@ -294,10 +291,6 @@ const handleValider = () => {
   box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
 }
 
-.plus-icon{
-  margin: 20px;
-}
-
 .submit-btn {
   width: 100%;
   padding: 0.8rem; /* 13px */
@@ -313,12 +306,5 @@ const handleValider = () => {
 
 .submit-btn:hover {
   background-color: #9c121b;
-}
-
-.main-content {
-
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
 }
 </style>
