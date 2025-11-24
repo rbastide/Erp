@@ -1,12 +1,18 @@
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const username = ref('');
+const password = ref('');
+
 
 const handleLogin = () => {
-  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
+  const loginSuccessful = true;
 
-  if (loginSuccessful) {
+  if (password.value === "a" && username.value === "admin") {
+    router.push("/home-admin");
+  } else if (loginSuccessful) {
     router.push('/home');
   } else {
     alert("Identifiants incorrects.");
