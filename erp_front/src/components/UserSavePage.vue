@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/dashboard-admin');
+  router.push('/home-admin');
 };
 
 const handleAide = () => {
