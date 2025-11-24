@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home');
+  router.push('/mccc-ressource');
 };
 
 const handleAide = () => {
@@ -13,6 +13,14 @@ const handleAide = () => {
 
 const handleDeconnexion = () => {
   router.push('/deconnexion');
+};
+
+const handleHours = () => {
+  router.push('/mccc-hours');
+};
+
+const handleValider = () => {
+  router.push('/modif-saved');
 };
 </script>
 
@@ -35,7 +43,7 @@ const handleDeconnexion = () => {
     </header>
 
     <main class = "main-content">
-      <div class ="heure">
+      <div @click="handleHours" class ="heure">
         <p class = "text-button">Heures</p>
       </div>
       <div class ="competence">

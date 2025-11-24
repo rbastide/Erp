@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleValider = () => {
-  router.push('/modif-saved');
+  router.push('/mccc-menu');
 };
 
 const handleAide = () => {

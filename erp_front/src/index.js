@@ -12,12 +12,12 @@ import SuccessfullySaved from "./components/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/FillRessourcePage.vue";
 import UserSavePage from "./components/UserSavePage.vue";
 import CancelPage from "./components/CancelPage.vue";
-import McccMenuPage from "./components/McccMenuPage.vue";
 import HistoryAdminPage from "./components/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
 import McccRessourcePage from "./components/McccRessourcePage.vue";
 import McccFillHourPage from "./components/McccFillHour.vue";
 import ModifSaved from "./components/ModifSaved.vue";
+import McccMenuPage from "./components/McccMenuPage.vue";
 
 const routes = [
     {
@@ -111,7 +111,7 @@ const routes = [
         component: McccRessourcePage
     },
     {
-        path: '/mccc-hour',
+        path: '/mccc-hours',
         name: 'McccFillHourPage',
         component: McccFillHourPage
     },
