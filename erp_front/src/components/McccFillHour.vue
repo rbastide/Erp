@@ -7,6 +7,10 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
+const handleRetour = () => {
+  router.push('/mccc-menu');
+};
+
 const handleAide = () => {
   router.push('/aide');
 };
@@ -95,8 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <p>Total :</p>
       </div>
 
-      <div @click="handleValider" class="btn-valider">Valider</div>
-    </main>
+      <div class="container-btn">
+        <div @click="handleValider" class="btn-sys">Valider</div>
+        <div @click="handleRetour" class="btn-sys">Quitter</div>
+      </div>    </main>
 
   </div>
 </template>
@@ -243,12 +249,20 @@ document.addEventListener("DOMContentLoaded", () => {
   margin-left: 40%;
   font-size: 50px;
   font-family: 'Roboto', sans-serif;
+  margin-bottom: 80px;
 }
 
 
-.btn-valider{
+.container-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sys{
   width: 150px;
-  padding: 0.8rem; /* 13px */
+  padding: 13px;
   border: none;
   text-align: center;
   border-radius: 4px;
@@ -260,11 +274,10 @@ document.addEventListener("DOMContentLoaded", () => {
   font-family: 'Roboto', sans-serif;
   transition: background-color 0.2s ease;
   position: relative;
-  margin: 5% auto;
-
+  margin : 1%;
 }
 
-.btn-valider:hover{
+.btn-sys:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
