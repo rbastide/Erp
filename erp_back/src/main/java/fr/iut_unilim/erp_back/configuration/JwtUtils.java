@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.configuration;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,9 +67,10 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser() // TODO : remove deprecated use of deprecated features
+        JwtParser parser = Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .build();
+
+        return parser.parseClaimsJws(token).getBody();
     }
 }
