@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ConnectionRepository extends JpaRepository<Connection, Long> {
-    List<Connection> findByIdentifier(String identifier);
+    Connection findByIdentifier(String identifier);
 }

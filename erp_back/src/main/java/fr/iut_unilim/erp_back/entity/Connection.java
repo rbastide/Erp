@@ -17,15 +17,15 @@ public class Connection {
     @Column(name = "hashedPassword")
     private String hashedPassword;
 
-    @Column(name = "isAdmin")
-    private boolean isAdmin;
+    @Column(name = "role")
+    private String role;
 
     public Connection() {}
 
-    public Connection(String identifier, String hashedPassword, boolean isAdmin) {
+    public Connection(String identifier, String hashedPassword, String role) {
         this.identifier = identifier;
         this.hashedPassword = hashedPassword;
-        this.isAdmin = isAdmin;
+        this.role = role;
     }
 
     public Long getId() {
@@ -40,7 +40,11 @@ public class Connection {
         return hashedPassword;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    public String getRole() {
+        return role;
+    }
+
+    public void setPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
     }
 }
