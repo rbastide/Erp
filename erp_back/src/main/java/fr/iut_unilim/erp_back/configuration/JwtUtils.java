@@ -66,7 +66,7 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
+        return Jwts.parser() // TODO : remove deprecated use of deprecated features
                 .setSigningKey(getSignKey())
                 .parseClaimsJws(token)
                 .getBody();
