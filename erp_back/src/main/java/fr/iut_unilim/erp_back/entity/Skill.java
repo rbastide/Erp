@@ -2,6 +2,8 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Skill")
 public class Skill {
@@ -17,6 +19,14 @@ public class Skill {
 
     @Column(name = "skillLearning")
     private String skillLearning;
+
+    @ManyToMany
+    @JoinTable(
+            name = "ResourceSheetSkills",
+            joinColumns = @JoinColumn(name = "skillID"),
+            inverseJoinColumns = @JoinColumn(name = "sheetID")
+    )
+    private List<ResourceSheet> resourceSheets;
 
     public Skill() {}
 

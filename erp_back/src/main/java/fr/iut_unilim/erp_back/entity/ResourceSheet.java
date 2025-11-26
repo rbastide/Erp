@@ -2,6 +2,8 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "ResourceSheet")
 public class ResourceSheet {
@@ -47,6 +49,12 @@ public class ResourceSheet {
 
     @Column(name = "creationDate")
     private String creationDate;
+
+    @ManyToMany(mappedBy = "resourceSheets")
+    private List<Teacher> teachers;
+
+    @ManyToMany(mappedBy = "resourceSheets")
+    private List<Skill> skills;
 
     public ResourceSheet() {
     }
