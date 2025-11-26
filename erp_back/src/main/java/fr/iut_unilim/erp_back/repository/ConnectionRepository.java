@@ -4,9 +4,7 @@ import fr.iut_unilim.erp_back.entity.Connection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface ConnectionRepository extends JpaRepository<Connection, Long> {
-    List<Connection> findByIdentifier(String identifier);
+    Connection findByIdentifier(String identifier);
 }
