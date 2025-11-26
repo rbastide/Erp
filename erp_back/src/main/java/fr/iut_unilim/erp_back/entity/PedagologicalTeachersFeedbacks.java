@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "PedagologicalTeachersFeedback")
-public class PedagologicalTeachersFeedback {
+public class PedagologicalTeachersFeedbacks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +15,10 @@ public class PedagologicalTeachersFeedback {
     @Column(name = "content")
     private String content;
 
-    public PedagologicalTeachersFeedback() {
+    public PedagologicalTeachersFeedbacks() {
     }
 
-    public PedagologicalTeachersFeedback(Long teachersFeedbackID, String content) {
+    public PedagologicalTeachersFeedbacks(Long teachersFeedbackID, String content) {
         this.teachersFeedbackID = teachersFeedbackID;
         this.content = content;
     }
