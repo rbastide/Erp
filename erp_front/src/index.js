@@ -20,11 +20,8 @@ import ModifSaved from "./components/ModifSaved.vue";
 import McccMenuPage from "./components/McccMenuPage.vue";
 import McccTeachersPage from "./components/McccTeachersPage.vue";
 import McccSAE from "./components/McccSAE.vue";
-<<<<<<< HEAD
 import McccCompetences from "./components/McccCompetences.vue";
-=======
 import McccSummaryPage from "./components/McccSummary.vue"
->>>>>>> origin/debut_front
 
 const routes = [
     {
@@ -138,15 +135,14 @@ const routes = [
         component: McccSAE
     },
     {
-<<<<<<< HEAD
         path: '/mccc-competences',
         name: 'McccCompetencesPage',
         component: McccCompetences
-=======
+    },
+    {
         path: '/mccc-summary',
         name: 'McccSummaryPage',
         component: McccSummaryPage
->>>>>>> origin/debut_front
     }
 ];
 
