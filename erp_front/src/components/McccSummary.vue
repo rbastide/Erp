@@ -29,6 +29,51 @@ const handleDeconnexion = () => {
       Récapitulatif de la ressource : RX.XX
     </div>
     <div class = "hour-summary">
+      <div class = "title">
+        Heures :
+      </div>
+      <div class = "top-grid">
+        <div class = "type-of-hour">
+          <p class = "title-hour">CM</p>
+          <p class="grey-square" type="number">4H </p>
+        </div>
+        <div class = "type-of-hour">
+          <p class = "title-hour">TD</p>
+          <p class="grey-square" type="number">5H </p>
+        </div>
+        <div class = "type-of-hour">
+          <p class = "title-hour">DS</p>
+          <p class="grey-square" type="number">7H </p>
+        </div>
+      </div>
+      <div class= "bottom-grid">
+        <div class= "type-of-hour">
+          <p class= "title-hour">TP</p>
+          <p class="grey-square" type="number">5H </p>
+        </div>
+        <div class= "type-of-hour">
+          <p class= "title-hour">DS TP</p>
+          <p class="grey-square" type="number">3H </p>
+        </div>
+      </div>
+      <div class= "total"><p>Total : <span id="tot">0</span></p></div>
+    </div>
+    <div class = "sae-summary">
+      <p class = "title-centered">
+        SAE(s) concernées :
+      </p>
+      <p class="grey-square">SX.XX </p>
+      <p class = "title-centered">
+        Compétence(s) concernée(s) :
+      </p>
+      <p class="grey-square">UE1.1</p>
+      <p class = "title-centered">
+        Version fiche ressource :
+      </p>
+      <p class="grey-square">V1</p>
+    </div>
+    <p class="title-centered" id="comp">Compétences / Objectifs</p>
+    <div class="big-square">
 
     </div>
   </main>
@@ -111,9 +156,7 @@ const handleDeconnexion = () => {
 /* main */
 .main-content{
   align-items: center;
-  display: flex;
 }
-
 .summary {
   width: 100%;
   height: 66px;
@@ -127,5 +170,109 @@ const handleDeconnexion = () => {
 
   color: #E92533;
 }
+
+/* Hour */
+.title{
+  width: 100%;
+  height: 66px;
+  margin-top: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 38px;
+  text-align: left;
+  margin-left: 100px;
+
+  color: #E92533;
+}
+.top-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 10px;
+}
+
+.type-of-hour{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 16px;
+  isolation: isolate;
+}
+
+.title-hour{
+  font-size: 30px;
+  margin-bottom: 10px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.grey-square{
+  box-sizing: border-box;
+  width: 200px;
+  background: #D9D9D9;
+  padding: 30px 60px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 15px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.bottom-grid {
+  margin-top: 40px;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 10px;
+}
+
+.total{
+  margin-top: 50px;
+  margin-left: 40%;
+  font-size: 50px;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 80px;
+}
+
+/* SAE */
+.sae-summary{
+  text-align: center;
+}
+.title-centered{
+  width: 100%;
+  height: 66px;
+  margin-top: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 38px;
+  text-align: left;
+  margin-left: 100px;
+
+  color: #E92533;
+
+  text-align: center;
+  margin: 0;
+}
+
+.sae-summary p{
+  display: inline-block;
+  margin-bottom: 40px;
+}
+
+
+/* Compétences / Objectifs */
+#comp{
+  margin-top: 40px;
+}
+
+.big-square{
+  border: black 1px solid;
+}
+
 
 </style>
