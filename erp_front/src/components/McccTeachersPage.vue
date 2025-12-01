@@ -16,6 +16,10 @@ const handleAide = () => {
   router.push('/aide');
 };
 
+const handleRetour = () => {
+  router.push('/mccc-menu');
+};
+
 const handleAdd = () => {
 
   if (lastname.value.trim() === '' || firstname.value.trim() === '') {
@@ -63,9 +67,9 @@ const handleValider = () => {
     </div>
   </header>
   <main class="main-content">
-      <div class="description">
-        Veuillez saisir le/les Référents pour cette ressource :
-      </div>
+    <div class="description">
+      Veuillez saisir le/les Référents pour cette ressource :
+    </div>
 
     <div class="container">
       <div class="teachers-list">
@@ -102,7 +106,10 @@ const handleValider = () => {
         </svg>
       </button>
 
-      <button @click="handleValider" class="submit-btn">Valider les référents</button>
+      <div class="container-btn">
+        <div @click="handleValider" class="btn-sys">Valider les référents</div>
+        <div @click="handleRetour" class="btn-sys">Annuler</div>
+      </div>
     </div>
   </main>
 </template>
@@ -290,20 +297,33 @@ const handleValider = () => {
   box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
 }
 
-.submit-btn {
-  width: 100%;
-  padding: 0.8rem; /* 13px */
+.container-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sys{
+  width: 150px;
+  padding: 13px;
   border: none;
+  text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
   font-size: 1rem; /* 16px */
   font-weight: bold;
   cursor: pointer;
+  font-family: 'Roboto', sans-serif;
   transition: background-color 0.2s ease;
+  position: relative;
+  margin : 1%;
 }
 
-.submit-btn:hover {
-  background-color: #9c121b;
+.btn-sys:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 </style>

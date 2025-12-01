@@ -12,6 +12,14 @@ const handleAide = () => {
   router.push('/aide');
 };
 
+const handleValider = () => {
+  router.push('/mccc-menu');
+};
+
+const handleRetour = () => {
+  router.push('/mccc-menu');
+}
+
 // Logique de Compétences
 
 const currentCompetence = ref({
@@ -19,10 +27,6 @@ const currentCompetence = ref({
   niveaux: [''],
   acs: [''],
 });
-
-const handleValider = () => {
-  router.push('/mccc-menu');
-}
 
 const competencesFinalisees = ref([]);
 
@@ -155,7 +159,10 @@ const handleSaveCompetence = () => {
           </svg>
         </button>
       </div>
-      <button @click="handleValider" class="submit-btn">Valider les compétences</button>
+      <div class="container-btn">
+        <div @click="handleValider" class="btn-sys">Valider les compétences</div>
+        <div @click="handleRetour" class="btn-sys">Annuler</div>
+      </div>
     </div>
   </main>
 </template>
@@ -364,27 +371,39 @@ const handleSaveCompetence = () => {
 .card-ok svg {
   height: 50px;
   width: 50px;
-  stroke: #B51621;
 }
 .card-ok:hover {
   transform: translateX(-50%) scale(1.1);
   color: green;
 }
 
-.submit-btn {
-  width: 100%;
-  padding: 0.8rem; /* 13px */
+.container-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sys{
+  width: 150px;
+  padding: 13px;
   border: none;
+  text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
   font-size: 1rem; /* 16px */
   font-weight: bold;
   cursor: pointer;
+  font-family: 'Roboto', sans-serif;
   transition: background-color 0.2s ease;
+  position: relative;
+  margin : 1%;
 }
 
-.submit-btn:hover {
-  background-color: #9c121b;
+.btn-sys:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 </style>
