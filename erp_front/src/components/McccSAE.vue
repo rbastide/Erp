@@ -133,7 +133,7 @@ function duplicateGreySquare(containerId){
   overflow-x: hidden;
 }
 
-/* header a*/
+/* header */
 .page-header {
   position: relative;
   width: 100%;
