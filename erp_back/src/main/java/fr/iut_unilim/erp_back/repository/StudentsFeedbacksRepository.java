@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface StudentsFeedbacksRepository extends JpaRepository<StudentsFeedbacks, Long>{
-    List<StudentsFeedbacks> findByPedagologicalTeachersFeedbackID (Long id);
+    List<StudentsFeedbacks> findByStudentFeedbackID (Long id);
 }
