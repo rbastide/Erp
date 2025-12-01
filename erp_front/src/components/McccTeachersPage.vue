@@ -196,7 +196,7 @@ const handleValider = () => {
   cursor: pointer;
 }
 .quitter:hover{
-  opacity: 0.8;
+  cursor: pointer;
 }
 
 .aide{
@@ -220,7 +220,7 @@ const handleValider = () => {
 }
 
 .aide:hover{
-  opacity: 0.8;
+  cursor: pointer;
 }
 
 /* Style du Contenu Principal */

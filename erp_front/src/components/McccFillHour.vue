@@ -22,10 +22,23 @@ const handleDeconnexion = () => {
 document.addEventListener("DOMContentLoaded", () => {
   const boxes = document.querySelectorAll('.grey-square');
   const maxChars = 5;
+  let total = 0;
+  let contentTotal = document.getElementById("tot");
+
+  const calculerTotal = () => {
+    let total = 0;
+
+    boxes.forEach(box => {
+      const valeur = parseFloat(box.value) || 0;
+      total = total + valeur;
+    });
+    contentTotal.textContent = total.toFixed(2).toString(); // Utiliser toFixed(2) pour 2 décimales si besoin
+  }
 
   boxes.forEach(box => {
     box.addEventListener('input', () => {
       let text = box.textContent;
+      calculerTotal();
 
       if (text.length > maxChars) {
         box.textContent = text.substring(0, maxChars);
@@ -40,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // Pour empêcher d'étendre les bloc.
     box.addEventListener('keydown', e => {
       if (e.key === "Enter") e.preventDefault();
     });
@@ -73,31 +87,28 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class = "top-grid">
         <div class = "type-of-hour">
           <p class = "title-hour">CM</p>
-          <div class = "grey-square" contenteditable="true">
-          </div>
+          <input class="grey-square" type="number">
         </div>
         <div class = "type-of-hour">
           <p class = "title-hour">TD</p>
-          <div class = "grey-square" contenteditable="true"></div>
+          <input class="grey-square" type="number">
         </div>
         <div class = "type-of-hour">
           <p class = "title-hour">DS</p>
-          <div class = "grey-square" contenteditable="true"></div>
+          <input class="grey-square" type="number">
         </div>
       </div>
-      <div class = "bottom-grid">
-        <div class = "type-of-hour">
-          <p class = "title-hour">TP</p>
-          <div class = "grey-square" contenteditable="true"></div>
+      <div class= "bottom-grid">
+        <div class= "type-of-hour">
+          <p class= "title-hour">TP</p>
+          <input class="grey-square" type="number">
         </div>
-        <div class = "type-of-hour">
-          <p class = "title-hour">DS TP</p>
-          <div class = "grey-square" contenteditable="true"></div>
+        <div class= "type-of-hour">
+          <p class= "title-hour">DS TP</p>
+          <input class="grey-square" type="number">
         </div>
       </div>
-      <div class = "total">
-        <p>Total :</p>
-      </div>
+      <div class= "total"><p>Total : <span id="tot">0</span></p></div>
 
       <div class="container-btn">
         <div @click="handleValider" class="btn-sys">Valider</div>
