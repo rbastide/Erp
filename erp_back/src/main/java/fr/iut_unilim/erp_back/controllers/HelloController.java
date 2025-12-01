@@ -1,4 +1,4 @@
-package org.example.erp_back;
+package fr.iut_unilim.erp_back.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +12,7 @@ public class HelloController {
     }
 
     @GetMapping("/non")
-    public String sayNo(){
+    public String sayNo() {
         return "no";
     }
 }

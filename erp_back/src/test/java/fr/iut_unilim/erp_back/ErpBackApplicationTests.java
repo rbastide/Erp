@@ -1,4 +1,4 @@
-package org.example.erp_back;
+package fr.iut_unilim.erp_back;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
