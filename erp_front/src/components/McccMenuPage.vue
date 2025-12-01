@@ -31,6 +31,10 @@ const handleSae = () => {
   router.push('/mccc-sae');
 };
 
+const handleCompetences = () => {
+  router.push('/mccc-competences');
+}
+
 </script>
 
 <template>
@@ -55,11 +59,11 @@ const handleSae = () => {
       <div @click="handleHours" class ="heure">
         <p class= "text-button">Heures</p>
       </div>
-      <div class ="competence">
+      <div @click="handleCompetences" class ="competence">
         <p class= "text-button">Objectif / Compétences</p>
       </div>
       <div @click="handleSae" class ="sae">
-        <p class= "text-button">SAE / n° Compétences</p>
+        <p class= "text-button">SAE</p>
       </div>
       <div @click="handleTeachers" class ="referent">
         <p class= "text-button">Référent(s)</p>

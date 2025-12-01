@@ -20,6 +20,7 @@ import ModifSaved from "./components/ModifSaved.vue";
 import McccMenuPage from "./components/McccMenuPage.vue";
 import McccTeachersPage from "./components/McccTeachersPage.vue";
 import McccSAE from "./components/McccSAE.vue";
+import McccCompetences from "./components/McccCompetences.vue";
 
 const routes = [
     {
@@ -131,6 +132,11 @@ const routes = [
         path: '/mccc-sae',
         name: 'McccSaePage',
         component: McccSAE
+    },
+    {
+        path: '/mccc-competences',
+        name: 'McccCompetencesPage',
+        component: McccCompetences
     }
 ];
 
