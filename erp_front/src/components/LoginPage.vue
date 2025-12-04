@@ -1,28 +1,43 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import AuthService from '../services/AuthService';
 
 const router = useRouter();
 const username = ref('');
 const password = ref('');
+const errorMessage = ref('');
 
+const handleLogin = async () => {
+  errorMessage.value = '';
 
-const handleLogin = () => {
-  const loginSuccessful = true;
+  const credentials = {
+    identifier: username.value,
+    hashedPassword: password.value
+  };
 
-  if (password.value === "a" && username.value === "admin") {
-    router.push("/home-admin");
-  } else if (loginSuccessful) {
-    router.push('/home');
-  } else {
-    alert("Identifiants incorrects.");
-  }
+  try {
+      await AuthService.login(credentials);
+
+      if (credentials.identifier === 'admin') {
+        router.push('/home-admin');
+      } else {
+        router.push('/home');
+      }
+
+    } catch (error) {
+      console.error("Erreur API:", error);
+      if (error.response && error.response.status === 401) {
+        errorMessage.value = "Identifiant ou mot de passe incorrect.";
+      } else {
+        errorMessage.value = "Impossible de contacter le serveur.";
+      }
+    }
 };
 
 const handleAide = () => {
   router.push('/aide');
 };
-
 </script>
 
 <template>
@@ -32,89 +47,144 @@ const handleAide = () => {
     </div>
     <div @click="handleAide" class="aide">Service d'aide</div>
   </header>
-   <main class="main-content">
-         <form class="login-card">
 
-           <!-- Groupe pour l'identifiant -->
-           <div class="form-group">
-             <label for="username">Identifiant</label>
-             <!--
-               v-model="username" lie cet input à la variable 'username'
-               dans notre script.
-             -->
-             <input
-               type="text"
-               id="username"
-               placeholder="Identifiant"
-               v-model="username"
-               required
-             />
-           </div>
+  <main class="main-content">
+    <form class="login-card" @submit.prevent="handleLogin">
 
-           <!-- Groupe pour le mot de passe -->
-           <div class="form-group">
-             <label for="password">Mot de passe</label>
-             <!--
-               v-model="password" lie cet input à la variable 'password'
-               dans notre script.
-             -->
-             <input
-               type="password"
-               id="password"
-               placeholder="Mot de passe"
-               v-model="password"
-               required
-             />
-           </div>
+      <div class="form-group">
+        <label for="username">Identifiant</label>
+        <input
+          type="text"
+          id="username"
+          placeholder="Identifiant"
+          v-model="username"
+          required
+        />
+      </div>
 
-           <!-- Bouton de soumission -->
-           <button @click="handleLogin" class="login-button">Se connecter</button>
-         </form>
-       </main>
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Mot de passe"
+          v-model="password"
+          required
+        />
+      </div>
+
+      <p v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </p>
+
+      <button type="submit" class="login-button">Se connecter</button>
+    </form>
+  </main>
 </template>
 
 <style scoped>
 
-  .page-header {
+.error-message {
+  color: #B51621;
+  background-color: #ffe6e6;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.page-header {
     position: absolute;
-    width: 100%; /* Modifié de 1280px à 100% pour prendre toute la largeur */
+    width: 100%;
     height: 172px;
     left: 0px;
     top: 0px;
     background: #B51621;
-    /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
     box-sizing: border-box;
-  }
+}
 
-  .container-connexion img {
+.login-card {
+  background-color: #FFFFFF;
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #dcdcdc;
+}
+.form-group {
+  margin-bottom: 1.5rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: black;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: #B51621;
+  box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
+}
+.login-button {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #B51621;
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.login-button:hover {
+  background-color: #9c121b;
+}
+.main-content {
+  background-color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  padding-top: 172px;
+  box-sizing: border-box;
+}
+.container-connexion img {
     position: absolute;
     width: 127px;
     height: 127px;
     left: 64px;
     top: 22.5px;
-  }
-  .container-connexion p{
-
+}
+.container-connexion p{
     position: absolute;
     width: 723px;
     height: 124px;
     left: 209px;
     top: 24px;
-
     font-family: 'Roboto', sans-serif;
     font-style: normal;
     font-weight: 900;
     font-size: 56px;
     line-height: 110%;
-
     display: flex;
     align-items: center;
     letter-spacing: -0.03em;
-
     color: #FFFFFF;
-  }
-
-  .aide{
+}
+.aide{
     position: absolute;
     width: 126px;
     height: 52px;
@@ -131,81 +201,8 @@ const handleAide = () => {
     letter-spacing: -0.005em;
     text-transform: capitalize;
     color: #FFFFFF;
-  }
-
-  .aide:hover{
+}
+.aide:hover{
     cursor: pointer;
-  }
-
-/* Style du Contenu Principal */
-.main-content {
-  background-color: #FFFFFF;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  font-family: 'Roboto', sans-serif;
 }
-
-/* Style de la Carte de Connexion */
-.login-card {
-  background-color: #FFFFFF;
-  padding: 2.5rem; /* 40px */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #dcdcdc;
-
-}
-
-.form-group {
-  margin-bottom: 1.5rem; /* 24px */
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem; /* 8px */
-  font-weight: bold;
-  font-size: 0.9rem; /* 14px */
-  color: black;
-
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem; /* 12px */
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1rem; /* 16px */
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #B51621;
-  box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
-}
-
-.login-button {
-  width: 100%;
-  padding: 0.8rem; /* 13px */
-  border: none;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem; /* 16px */
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.login-button:hover {
-  background-color: #9c121b;
-}
-
-.main-content {
-
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
-  }
 </style>
