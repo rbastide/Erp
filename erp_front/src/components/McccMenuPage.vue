@@ -24,7 +24,7 @@ const handleTeachers = () => {
 }
 
 const handleValider = () => {
-  router.push('/modif-saved');
+  router.push('/mccc-summary');
 };
 
 const handleSae = () => {

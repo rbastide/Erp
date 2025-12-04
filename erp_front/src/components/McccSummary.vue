@@ -10,6 +10,11 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+const handleValider = () => {
+  router.push('/modif-saved');
+};
+
 </script>
 
 <template>
@@ -76,6 +81,9 @@ const handleDeconnexion = () => {
     <div class="big-square">
 
     </div>
+    <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
+    <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
+    <div @click="handleValider" class="btn-sys">Valider</div>
   </main>
 </template>
 
@@ -274,5 +282,29 @@ const handleDeconnexion = () => {
   border: black 1px solid;
 }
 
+
+/* Date de création */
+#creation{
+  color: black;
+}
+
+.btn-sys{
+  width: 150px;
+  padding: 13px;
+  border: none;
+  text-align: center;
+  border-radius: 4px;
+  background-color: #B51621;
+  color: #FFFFFF;
+  font-size: 1rem; /* 16px */
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.2s ease;
+  position: relative;
+  margin : auto;
+  margin-bottom: 30px;
+  margin-top: 40px;
+}
 
 </style>
