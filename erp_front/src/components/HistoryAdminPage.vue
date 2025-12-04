@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home');
+  router.push('/home-admin');
 };
 
 const handleSupprimer = () => {

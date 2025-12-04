@@ -43,10 +43,12 @@
   </header>
 
   <div class="main-content">
-    <div @click="handleRemplir" class="btn"><p>Remplir les MCCC</p></div>
-    <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
-    <div @click="handleInscrire" class="btn"><p>Ajouter des utilisateurs</p></div>
-    <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
+    <div class="btn-container">
+      <div @click="handleRemplir" class="btn"><p>Remplir les MCCC</p></div>
+      <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
+      <div @click="handleInscrire" class="btn"><p>Ajouter des utilisateurs</p></div>
+      <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
+    </div>
   </div>
 </template>
 
@@ -132,6 +134,17 @@
   align-items: center;
 }
 
+.btn-container{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+}
+
 .btn {
   box-sizing: border-box;
   display: flex;
@@ -144,7 +157,7 @@
   background: #D9D9D9;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
-  margin: 50px;
+  margin: 0 50px 100px;
 }
 
 .btn:hover {

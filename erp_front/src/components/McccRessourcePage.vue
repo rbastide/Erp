@@ -62,7 +62,7 @@ const handleMccc = () => {
           <p class = "text-button">RX.XX</p>
         </div>
       </div>
-      <div @click="handleRetour" class="btn-quitter">Quitter</div>
+      <div @click="handleRetour" class="btn-quitter">Retour</div>
     </main>
 
   </div>
