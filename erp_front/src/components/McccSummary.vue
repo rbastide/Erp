@@ -79,7 +79,47 @@ const handleValider = () => {
     </div>
     <p class="title-centered" id="comp">Compétences / Objectifs</p>
     <div class="big-square">
+      <div class="grid-split-in-two">
+        <p class = "title">Numéro de l'UE : </p>
+        <p class="grey-square">1</p>
+      </div>
+      <div class="grid-split-in-two">
+        <p class = "title">Intitulé de l'UE : </p>
+        <p class="grey-square" id="intitule">Ceci est l'intitulé de l'UE : c'est une description qui nous permet de voire le bon fonctionnement</p>
+      </div>
+      <div class="container">
+        <div class="tabs">
+          <button class="tab-button active" data-tab="1">1</button>
+          <button class="tab-button" data-tab="2">2</button>
+          <button class="tab-button" data-tab="3">3</button>
+        </div>
 
+        <div class="content-panel">
+          <div id="content-1" class="tab-content active">
+            <p class="title-label">Veuillez saisir l'intitulé du niveau :</p>
+            <p class="description">Concevoir et mettre en place une base de données à partir d'un cahier des charges client</p>
+
+            <p class="title-label">Veuillez ajouter les apprentissages critiques pour le niveau :</p>
+            <p class="description">Mettre à jour une base de données relationnelles (en requêtes directes ou à travers une application)</p>
+          </div>
+
+          <div id="content-2" class="tab-content">
+            <p class="title-label">Veuillez saisir l'intitulé du niveau :</p>
+            <p class="description">Établir des scénarios d'utilisation pour des tests d'acceptance.</p>
+
+            <p class="title-label">Veuillez ajouter les apprentissages critiques pour le niveau :</p>
+            <p class="description">Rédiger des spécifications fonctionnelles détaillées.</p>
+          </div>
+
+          <div id="content-3" class="tab-content">
+            <p class="title-label">Veuillez saisir l'intitulé du niveau :</p>
+            <p class="description">Organiser l'architecture d'une application web en Microservices.</p>
+
+            <p class="title-label">Veuillez ajouter les apprentissages critiques pour le niveau :</p>
+            <p class="description">Créer des conteneurs Docker pour chaque Microservice.</p>
+          </div>
+        </div>
+      </div>
     </div>
     <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
     <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
@@ -280,6 +320,20 @@ const handleValider = () => {
 
 .big-square{
   border: black 1px solid;
+}
+
+.grid-split-in-two{
+  margin-top: 30px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: 40px;
+}
+
+#intitule{
+  width: 700px;
 }
 
 
