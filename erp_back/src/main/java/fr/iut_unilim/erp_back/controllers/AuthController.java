@@ -1,6 +1,9 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
+import fr.iut_unilim.erp_back.dto.AuthResponse;
+import fr.iut_unilim.erp_back.dto.LoginRequest;
+import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import org.springframework.http.HttpStatus;
@@ -10,15 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "https://localhost:5173")
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -35,23 +34,30 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Connection user) {
-        if (connectionRepository.findByIdentifier(user.getIdentifier()) != null) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+        if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
         }
-        user.setPassword(passwordEncoder.encode(user.getHashedPassword()));
-        return ResponseEntity.ok(connectionRepository.save(user));
+        Connection user = new Connection();
+        user.setIdentifier(req.getIdentifier());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setRole("ROLE_USER");
+        connectionRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Connection user) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getIdentifier(), user.getHashedPassword()));
-            if (authentication.isAuthenticated()) {
-                Map<String, Object> authData = new HashMap<>();
-                authData.put("token", jwtUtils.generateToken(user.getIdentifier()));
-                authData.put("type", "Bearer");
-                return ResponseEntity.ok(authData);
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.getIdentifier(), req.getPassword())
+            );
+            if (auth.isAuthenticated()) {
+                String subject = auth.getName();
+                String token = jwtUtils.generateToken(subject);
+                AuthResponse resp = new AuthResponse();
+                resp.setToken(token);
+                return ResponseEntity.ok(resp);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         } catch (AuthenticationException e) {

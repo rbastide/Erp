@@ -47,4 +47,7 @@ public class Connection {
     public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
+
+    public void setIdentifier(String identifier) { this.identifier = identifier; }
+    public void setRole(String role) { this.role = role; }
 }
