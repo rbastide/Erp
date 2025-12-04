@@ -10,7 +10,7 @@ const password = ref('');
 const handleLogin = () => {
   const loginSuccessful = true;
 
-  if (password.value === "a" && username.value === "admin") {
+  if (password.value === "secret" && username.value === "admin") {
     router.push("/home-admin");
   } else if (loginSuccessful) {
     router.push('/home');
