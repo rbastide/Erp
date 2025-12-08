@@ -4,12 +4,16 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home');
+  router.push('/home-admin');
 };
 
 const handleAide = () => {
   router.push('/aide');
 };
+
+const handleDeconnexion = () => {
+  router.push('/deconnexion');
+}
 
 const handleLogin = () => {
   const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
@@ -38,6 +42,11 @@ const handleConfirm = () => {
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Inscription</p>
     </div>
     <div @click="handleAide" class="aide">Service d'aide</div>
+    <div @click="handleDeconnexion" class="quitter">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
   </header>
   <main class="main-content">
     <form class="login-card">
@@ -89,6 +98,16 @@ const handleConfirm = () => {
             required
         />
       </div>
+      <div class="form-group">
+        <label for="role">Rôle de l'utilisateur</label>
+        <select id="role" required>
+          <option value="h" selected disabled>-- Veuillez choisir un rôle --</option>
+          <option value="Superadmin">Superadmin</option>
+          <option value="Administrateur">Administrateur</option>
+          <option value="Vacataire">Vacataire</option>
+          <option value="Professeur">Professeur</option>
+        </select>
+      </div>
 
       <!-- Bouton de soumission -->
       <button @click="handleLogin" class="login-button">Inscrire</button>
@@ -103,12 +122,11 @@ const handleConfirm = () => {
 
 .page-header {
   position: absolute;
-  width: 100%; /* Modifié de 1280px à 100% pour prendre toute la largeur */
+  width: 100%;
   height: 172px;
   left: 0px;
   top: 0px;
   background: #B51621;
-  /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
   box-sizing: border-box;
 }
 
@@ -158,6 +176,20 @@ const handleConfirm = () => {
   text-transform: capitalize;
   color: #FFFFFF;
 }
+.aide:hover{
+  cursor: pointer;
+}
+
+.quitter {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  right: 5%;
+  top: 64px;
+}
+.quitter:hover{
+  cursor: pointer;
+}
 
 /* --- Style du Contenu Principal --- */
 .main-content {
@@ -201,10 +233,21 @@ const handleConfirm = () => {
   font-size: 1rem; /* 16px */
 }
 
-.form-group input:focus {
+.form-group input:focus, .form-group select:focus {
   outline: none;
   border-color: #B51621;
   box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
+}
+
+.form-group select{
+  appearance: menulist-button;
+  width: 100%;
+  max-width: 280px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.4);
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
 }
 
 .login-button {
@@ -245,6 +288,7 @@ const handleConfirm = () => {
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
+  font-family: 'Roboto', sans-serif;
 
 }
 
