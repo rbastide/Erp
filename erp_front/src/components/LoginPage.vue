@@ -16,15 +16,6 @@ const handleLogin = async () => {
     hashedPassword: password.value
   };
 
-<<<<<<< HEAD
-  if (password.value === "secret" && username.value === "admin") {
-    router.push("/home-admin");
-  } else if (loginSuccessful) {
-    router.push('/home');
-  } else {
-    alert("Identifiants incorrects.");
-  }
-=======
   try {
       await AuthService.login(credentials);
 
@@ -42,7 +33,6 @@ const handleLogin = async () => {
         errorMessage.value = "Impossible de contacter le serveur.";
       }
     }
->>>>>>> origin/2ème_partie_front
 };
 
 const handleAide = () => {
