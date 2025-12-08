@@ -14,6 +14,10 @@
   const handleDeconnexion = () => {
     router.push('/deconnexion');
   };
+
+  const handleFill = () => {
+    router.push('/fillressourcepage');
+  }
 </script>
 
 <template>
@@ -40,22 +44,22 @@
       </div>
 
       <div class = "container-button">
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
-        <div class ="push-button">
+        <div @click="handleFill" class ="push-button">
           <p class = "text-button">RX.XX</p>
         </div>
       </div>
@@ -168,26 +172,25 @@
 }
 
 .push-button {
-  /* Push Button */
-
   box-sizing: border-box;
-
-  /* Auto layout */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 0px 16px;
   isolation: isolate;
-
   margin : 10px;
   font-size: 30px;
   text-align: center;
-
   background: #D9D9D9;
   border: 1px solid rgba(0, 0, 0, 0.25);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
+}
+.push-button:hover {
+  cursor: pointer;
+  background: #999999;
+  transform: translateY(-4px);
 }
 
 .text-button {
