@@ -43,143 +43,144 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-nom">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Récapitulatif</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
-  <main class = "main-content">
-    <div class = "summary">
-      Récapitulatif de la ressource : RX.XX
-    </div>
-    <div class = "hour-summary">
-      <div class = "title">
-        Heures :
+  <div class = "ressource-page" >
+    <header class="page-header">
+      <div class="container-nom">
+        <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Récapitulatif</p>
       </div>
-      <div class = "top-grid">
-        <div class = "type-of-hour">
-          <p class = "title-hour">CM</p>
-          <p class="grey-square" type="number">4H </p>
-        </div>
-        <div class = "type-of-hour">
-          <p class = "title-hour">TD</p>
-          <p class="grey-square" type="number">5H </p>
-        </div>
-        <div class = "type-of-hour">
-          <p class = "title-hour">DS</p>
-          <p class="grey-square" type="number">7H </p>
-        </div>
+      <div @click="handleAide" class="aide">Service d'aide</div>
+      <div @click="handleDeconnexion" class="quitter">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <div class= "bottom-grid">
-        <div class= "type-of-hour">
-          <p class= "title-hour">TP</p>
-          <p class="grey-square" type="number">5H </p>
-        </div>
-        <div class= "type-of-hour">
-          <p class= "title-hour">DS TP</p>
-          <p class="grey-square" type="number">3H </p>
-        </div>
-      </div>
-      <div class= "total"><p>Total : <span id="tot">0</span></p></div>
-    </div>
-    <div class = "sae-summary">
-      <p class = "title-centered">
-        SAE(s) concernées :
-      </p>
-      <p class="grey-square">SX.XX </p>
-      <p class = "title-centered">
-        Compétence(s) concernée(s) :
-      </p>
-      <p class="grey-square">UE1.1</p>
-    </div>
-    <p class="title-centered" id="comp">Compétences / Objectifs</p>
-    <div class="big-square">
-      <div class="grid-split-in-two">
-        <p class = "title">Numéro de l'UE : </p>
-        <p class="grey-square">1</p>
-      </div>
-      <div class="grid-split-in-two">
-        <p class = "title">Intitulé de l'UE : </p>
-        <p class="grey-square" id="intitule">Ceci est l'intitulé de l'UE : c'est une description qui nous permet de voire le bon fonctionnement</p>
-      </div>
-      <div class="container">
-        <div class="tabs">
-          <button class="tab-button active" data-tab="1">1</button>
-          <button class="tab-button" data-tab="2">2</button>
-          <button class="tab-button" data-tab="3">3</button>
-        </div>
+    </header>
 
-        <div class="content-panel">
-          <div id="content-1" class="tab-content active">
-            <p class="title-label">Intitulé du niveau :</p>
-            <p class="description">Concevoir et mettre en place une base de données à partir d'un cahier des charges client</p>
-
-            <p class="title-label">Apprentissages critiques pour le niveau :</p>
-            <p class="description">Mettre à jour une base de données relationnelles (en requêtes directes ou à travers une application)</p>
+    <main class = "main-content">
+      <div class = "summary">
+        Récapitulatif de la ressource : RX.XX
+      </div>
+      <div class="grid">
+        <div class = "hour-summary">
+          <div class = "title">
+            Heures
           </div>
-
-          <div id="content-2" class="tab-content">
-            <p class="title-label">Intitulé du niveau :</p>
-            <p class="description">Établir des scénarios d'utilisation pour des tests d'acceptance.</p>
-
-            <p class="title-label">Apprentissages critiques pour le niveau :</p>
-            <p class="description">Rédiger des spécifications fonctionnelles détaillées.</p>
-          </div>
-
-          <div id="content-3" class="tab-content">
-            <p class="title-label">Intitulé du niveau :</p>
-            <p class="description">Organiser l'architecture d'une application web en Microservices.</p>
-
-            <p class="title-label">Apprentissages critiques pour le niveau :</p>
-            <p class="description">Créer des conteneurs Docker pour chaque Microservice.</p>
+          <div class = "listing-hours">
+            <div class = "type-of-hour" id="cm">
+              <p class = "title-hour">CM</p>
+              <p class="grey-square" type="number">4H </p>
+            </div>
+            <div class = "type-of-hour">
+              <p class = "title-hour">TD</p>
+              <p class="grey-square" type="number">5H </p>
+            </div>
+            <div class = "type-of-hour">
+              <p class = "title-hour">DS</p>
+              <p class="grey-square" type="number">7H </p>
+            </div>
+            <div class= "type-of-hour">
+              <p class= "title-hour">TP</p>
+              <p class="grey-square" type="number">5H </p>
+            </div>
+            <div class= "type-of-hour" id="ds_tp">
+              <p class= "title-hour">DS/TP</p>
+              <p class="grey-square" type="number">3H </p>
+            </div>
+            <div class= "total"><p>Total : <span id="tot">0</span></p></div>
           </div>
         </div>
+        <div class = "sae-summary">
+          <p class = "title-centered" >
+            SAE(s) concernées :
+          </p>
+          <p class="grey-square" id="sae_conc">SX.XX </p>
+          <p class = "title-centered">
+            Compétence(s) concernée(s) :
+          </p>
+          <p class="grey-square" id="comp_conc">UE1.1</p>
+        </div>
       </div>
-    </div>
-    <div class="sae-summary">
-      <p class = "title-centered">
-        Version fiche ressource :
-      </p>
-      <p class="grey-square">V1</p>
-    </div>
-    <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
-    <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
-    <div @click="handleValider" class="btn-sys">Valider</div>
-  </main>
+
+      <p class="title-centered" id="comp">Compétences / Objectifs</p>
+      <div class="big-square">
+        <div class="grid-split-in-two">
+          <p class = "title">Intitulé de l'UE 1 : </p>
+          <p class="grey-square" id="intitule">Ceci est l'intitulé de l'UE : c'est une description qui nous permet de voire le bon fonctionnement</p>
+        </div>
+        <div class="container">
+          <div class="tabs">
+            <button class="tab-button active" data-tab="1">1</button>
+            <button class="tab-button" data-tab="2">2</button>
+            <button class="tab-button" data-tab="3">3</button>
+          </div>
+
+          <div class="content-panel">
+            <div id="content-1" class="tab-content active">
+              <p class="title-label">Intitulé du niveau :</p>
+              <p class="description">Concevoir et mettre en place une base de données à partir d'un cahier des charges client</p>
+
+              <p class="title-label">Apprentissages critiques pour le niveau :</p>
+              <p class="description">Mettre à jour une base de données relationnelles (en requêtes directes ou à travers une application)</p>
+            </div>
+
+            <div id="content-2" class="tab-content">
+              <p class="title-label">Intitulé du niveau :</p>
+              <p class="description">Établir des scénarios d'utilisation pour des tests d'acceptance.</p>
+
+              <p class="title-label">Apprentissages critiques pour le niveau :</p>
+              <p class="description">Rédiger des spécifications fonctionnelles détaillées.</p>
+            </div>
+
+            <div id="content-3" class="tab-content">
+              <p class="title-label">Intitulé du niveau :</p>
+              <p class="description">Organiser l'architecture d'une application web en Microservices.</p>
+
+              <p class="title-label">Apprentissages critiques pour le niveau :</p>
+              <p class="description">Créer des conteneurs Docker pour chaque Microservice.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class= "title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
+      <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
+      <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
+      <div @click="handleValider" class="btn-sys">Valider</div>
+    </main>
+  </div>
 </template>
 
-<style scoped>
+<style>
+.ressource-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 /* header */
 .page-header {
   position: relative;
   width: 100%;
   height: 172px;
-  left: 0px;
-  top: 0px;
   background: #B51621;
 }
 
-.container-nom img {
+.container-nom {
+  display: flex;
+  align-items: center;
   position: absolute;
-  width: 127px;
-  height: 127px;
   left: 64px;
   top: 22.5px;
 }
 
-.container-nom p {
+.container-nom img {
+  width: 127px;
+  height: 127px;
+}
 
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
+.container-nom p {
+  margin-left: 15px;
+  width: auto;
+  max-width: 600px;
+  height: 120px;
 
   font-family: 'Roboto', sans-serif;
   font-style: normal;
@@ -227,7 +228,6 @@ onMounted(() => {
   cursor: pointer;
 }
 
-
 /* main */
 .main-content{
   align-items: center;
@@ -256,26 +256,35 @@ onMounted(() => {
   font-weight: 400;
   font-size: 32px;
   line-height: 38px;
-  text-align: left;
-  margin-left: 100px;
+  text-align: center;
+  margin-left: 30px;
 
   color: #E92533;
 }
-.top-grid {
+.grid {
   position: relative;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 20% 30%;
   padding: 10px;
+  justify-content: center;
+  gap: 150px;
 }
 
 .type-of-hour{
   box-sizing: border-box;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 30px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 0px 16px;
   isolation: isolate;
+  margin-bottom: 40px;
+}
+
+.listing-hours{
+  padding: 20px;
 }
 
 .title-hour{
@@ -296,20 +305,21 @@ onMounted(() => {
   text-align: center;
 }
 
-.bottom-grid {
-  margin-top: 40px;
-  position: relative;
-  display: grid;
-  grid-template-columns: auto auto;
-  padding: 10px;
+#cm{
+  margin-left: -10px;
+}
+
+#ds_tp{
+  margin-left: -50px;
 }
 
 .total{
   margin-top: 50px;
-  margin-left: 40%;
   font-size: 50px;
   font-family: 'Roboto', sans-serif;
   margin-bottom: 80px;
+  text-align: center;
+  margin-left: 70px;
 }
 
 /* SAE */
@@ -325,18 +335,17 @@ onMounted(() => {
   font-weight: 400;
   font-size: 32px;
   line-height: 38px;
-  text-align: left;
-  margin-left: 100px;
-
   color: #E92533;
-
   text-align: center;
-  margin: 0;
+}
+
+#sae_conc, #comp_conc, #vers_f{
+  margin-bottom: 65px;
 }
 
 .sae-summary p{
   display: inline-block;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 
@@ -346,7 +355,11 @@ onMounted(() => {
 }
 
 .big-square{
-  border: black 1px solid;
+  margin: auto;
+  margin-bottom: 50px;
+  padding: 20px;
+  width: 1100px;
+  border: black 3px solid;
 }
 
 .grid-split-in-two{
@@ -366,6 +379,7 @@ onMounted(() => {
 .container {
   max-width: 900px;
   margin: 20px auto;
+  margin-top: 60px;
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -407,15 +421,15 @@ onMounted(() => {
 }
 
 .title-label {
-  color: #D0202E;
+  color: black;
   font-weight: bold;
   margin-top: 15px;
   margin-bottom: 5px;
-  font-size: 1.1em;
+  font-size: 1.3em;
 }
 
 .description {
-  font-size: 1em;
+  font-size: 1.1em;
   line-height: 1.5;
   margin-bottom: 20px;
 }
