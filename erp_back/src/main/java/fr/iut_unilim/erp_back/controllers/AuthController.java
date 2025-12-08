@@ -41,7 +41,7 @@ public class AuthController {
         Connection user = new Connection();
         user.setIdentifier(req.getIdentifier());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setRole("ROLE_USER");
+        user.setRole(req.getRole());
         connectionRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
