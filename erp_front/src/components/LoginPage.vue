@@ -13,7 +13,7 @@ const handleLogin = async () => {
 
   const credentials = {
     identifier: username.value,
-    hashedPassword: password.value
+    password: password.value
   };
 
   try {
