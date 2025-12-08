@@ -21,7 +21,7 @@ const handleDeconnexion = () => {
 <template>
   <header class="page-header">
     <div class="container-nom">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Remplir votre fiche <br>ressource</p>
+      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Remplir votre fiche ressource</p>
     </div>
     <div @click="handleAide" class="aide">Service d'aide</div>
     <div @click="handleDeconnexion" class="quitter">
@@ -35,12 +35,11 @@ const handleDeconnexion = () => {
 <style scoped>
 .page-header {
   position: absolute;
-  width: 100%; /* Modifié de 1280px à 100% pour prendre toute la largeur */
+  width: 100%;
   height: 172px;
   left: 0px;
   top: 0px;
   background: #B51621;
-  /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
   box-sizing: border-box;
 }
 

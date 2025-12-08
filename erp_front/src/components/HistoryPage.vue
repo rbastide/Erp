@@ -15,6 +15,11 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+const handleShow = () => {
+  router.push('/ressource-sheet-history');
+};
+
 </script>
 
 <template>
@@ -33,43 +38,43 @@ const handleDeconnexion = () => {
     <p class="description">Voici l'historique des fiches de ressource : </p>
     <div class="version-list-container">
       <ul class="version-list">
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R1.01</span>
           <span class="version-date">30/10/2022</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R1.02</span>
           <span class="version-date">15/11/2019</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R1.03</span>
           <span class="version-date">01/01/2018</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R2.01</span>
           <span class="version-date">05/08/2017</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R2.02</span>
           <span class="version-date">06/06/2017</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R2.04</span>
           <span class="version-date">08/05/2017</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R2.05</span>
           <span class="version-date">01/12/2016</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R3.02</span>
           <span class="version-date">15/05/2016</span>
         </li>
-        <li class="version-item">
+        <li @click="handleShow" class="version-item">
           <span class="version-code">R3.03</span>
           <span class="version-date">18/04/2016</span>
         </li>
-        <li class="version-item last-item">
+        <li @click="handleShow" class="version-item last-item">
           <span class="version-code">R4.01</span>
           <span class="version-date">14/02/2016</span>
         </li>
@@ -193,6 +198,11 @@ const handleDeconnexion = () => {
   margin: 0;
 }
 
+.version-item.last-item {
+  background-color: #dcdcdc;
+  margin-bottom: 0;
+}
+
 .version-item {
   display: flex;
   align-items: center;
@@ -206,11 +216,12 @@ const handleDeconnexion = () => {
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 6px;
   min-height: 80px;
+  z-index: 2;
 }
-
-.version-item.last-item {
-  background-color: #dcdcdc;
-  margin-bottom: 0;
+.version-item:hover {
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 
 .version-code, .version-date {

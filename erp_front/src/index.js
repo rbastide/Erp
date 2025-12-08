@@ -23,6 +23,7 @@ import McccSAE from "./components/McccSAE.vue";
 import McccCompetences from "./components/McccCompetences.vue";
 import McccSummaryPage from "./components/McccSummary.vue";
 import CompetencesCreatingPage from "./components/CompetencesCreatingPage.vue";
+import RessourceSheetHistory from "./components/RessourceSheetHistory.vue";
 
 const routes = [
     {
@@ -81,7 +82,7 @@ const routes = [
         component: SuccessfullySaved
     },
     {
-        path: '/filRessourcePage',
+        path: '/fillRessourcePage',
         name: 'FilRessourcePage',
         component: FillRessourcePage
     },
@@ -149,6 +150,11 @@ const routes = [
         path: '/competence-creating',
         name: 'CompetencesCreatingPage',
         component: CompetencesCreatingPage
+    },
+    {
+        path: '/ressource-sheet-history',
+        name: 'RessourceSheetHistory',
+        component: RessourceSheetHistory
     }
 ];
 
