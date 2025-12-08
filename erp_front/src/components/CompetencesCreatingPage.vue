@@ -13,87 +13,103 @@ const handleAide = () => {
 };
 
 const handleValider = () => {
-  router.push('/mccc-menu');
+  router.push('/modif-saved');
 };
 
 const handleRetour = () => {
-  router.push('/mccc-menu');
-}
+  router.push('/home-admin');
+};
 
 const currentCompetence = ref({
-  ue: '',
+  ueNum: '',
+  ueIntitule: '',
   niveaux: [{
-    niveau: '',
-    acs: ['']
+    intitule: '',
+    acs: [{ num: '', intitule: '' }]
   }],
 });
 
 const competencesFinalisees = ref([]);
 
+const generateNiveauNum = (index) => {
+  return `Niveau ${index + 1}`;
+};
+
 const handleAddNiveau = () => {
   const lastNiveauIndex = currentCompetence.value.niveaux.length - 1;
   const lastNiveau = currentCompetence.value.niveaux[lastNiveauIndex];
 
-  const hasValidAc = lastNiveau.acs.some(ac => ac !== '');
+  const hasValidAC = lastNiveau.acs.some(ac => ac.num.trim() && ac.intitule.trim());
 
-  if (lastNiveau.niveau !== '' && hasValidAc) {
+  if (lastNiveau.intitule.trim() !== '' && hasValidAC) {
     currentCompetence.value.niveaux.push({
-      niveau: '',
-      acs: ['']
+      intitule: '',
+      acs: [{ num: '', intitule: '' }]
     });
   } else {
-    alert("Veuillez choisir le niveau actuel ET au moins un AC associé avant d'en ajouter un autre.");
+    alert("Veuillez saisir l'intitulé du niveau actuel ET au moins un AC complet avant d'en ajouter un autre.");
   }
 };
 
 const handleAddAc = (niveauIndex) => {
   const niveau = currentCompetence.value.niveaux[niveauIndex];
+  const lastAcIndex = niveau.acs.length - 1;
+  const lastAc = niveau.acs[lastAcIndex];
 
-  if (niveau.acs[niveau.acs.length - 1] !== '') {
-    niveau.acs.push('');
+  if (lastAc.num.trim() !== '' && lastAc.intitule.trim() !== '') {
+    niveau.acs.push({
+      num: '',
+      intitule: ''
+    });
   } else {
-    alert("Veuillez choisir l'AC actuel avant d'en ajouter un autre.");
+    alert("Veuillez saisir le numéro ET l'intitulé de l'AC actuel avant d'en ajouter un autre.");
   }
 };
 
 const handleSaveCompetence = () => {
-  if (!currentCompetence.value.ue) {
-    alert('Veuillez sélectionner une UE.');
+  if (!currentCompetence.value.ueNum.trim() || !currentCompetence.value.ueIntitule.trim()) {
+    alert('Veuillez saisir le numéro et l\'intitulé de l\'UE.');
+    return;
+  }
+  const ueComplete = `${currentCompetence.value.ueNum.trim()}. ${currentCompetence.value.ueIntitule.trim()}`;
+
+  const niveauxFiltres = currentCompetence.value.niveaux
+      .filter(n => n.intitule.trim() !== '');
+
+  if (niveauxFiltres.length === 0) {
+    alert('Veuillez saisir au moins un Niveau.');
     return;
   }
 
-  const niveauxFinalises = currentCompetence.value.niveaux
-      .filter(n => n.niveau !== '')
-      .map(n => ({
-        niveau: n.niveau,
-        acs: n.acs.filter(ac => ac !== '')
-      }))
-      .filter(n => n.acs.length > 0);
+  const niveauxResume = niveauxFiltres.map((n, index) => {
+    const acsFiltres = n.acs.filter(ac => ac.num.trim() !== '' && ac.intitule.trim() !== '');
 
-  if (niveauxFinalises.length === 0) {
-    alert('Veuillez sélectionner au moins un Niveau avec au moins un AC associé.');
+    return {
+      num: generateNiveauNum(index),
+      intitule: n.intitule.trim(),
+      acs: acsFiltres.map(ac => `AC${ac.num}: ${ac.intitule.trim()}`)
+    };
+  }).filter(n => n.acs.length > 0);
+
+  if (niveauxResume.length === 0) {
+    alert('Chaque niveau doit avoir au moins un AC associé.');
     return;
   }
 
-  const acsForSimpleResume = niveauxFinalises.flatMap(n => n.acs);
-
-  competencesFinalisees.value.push({
-    ue: currentCompetence.value.ue,
-    niveaux: niveauxFinalises.map(n => n.niveau),
-    acs: acsForSimpleResume,
-    acsGrouped: niveauxFinalises.map(n => ({ niveau: n.niveau, acs: n.acs }))
-  });
-
-  currentCompetence.value = {
-    ue: '',
-    niveaux: [{ niveau: '', acs: [''] }],
+  const nouvelleCompetence = {
+    ue: ueComplete,
+    niveaux: niveauxResume,
   };
 
-  console.log('Compétence validée et ajoutée :', {
-    ue: currentCompetence.value.ue,
-    niveaux: niveauxFinalises.map(n => n.niveau),
-    acsGrouped: niveauxFinalises.map(n => ({ niveau: n.niveau, acs: n.acs }))
-  });
+  competencesFinalisees.value.push(nouvelleCompetence);
+
+  currentCompetence.value = {
+    ueNum: '',
+    ueIntitule: '',
+    niveaux: [{ intitule: '', acs: [{ num: '', intitule: '' }] }],
+  };
+
+  console.log('Compétence validée et ajoutée :', nouvelleCompetence);
 };
 
 </script>
@@ -111,7 +127,7 @@ const handleSaveCompetence = () => {
     </div>
   </header>
   <main class="main-div">
-    <div class="description">Veuillez saisir la/les compétences pour cette ressource :</div>
+    <div class="description">Veuillez saisir la/les compétences :</div>
 
     <div class="container-global">
 
@@ -120,54 +136,41 @@ const handleSaveCompetence = () => {
         <div class="resume-item"><strong>UE :</strong> {{ comp.ue }}</div>
 
         <div class="resume-item">
-          <strong>Structure des Niveaux/ACs :</strong>
+          <strong>Structure des niveaux/ACs :</strong>
           <ul class="resume-list main-level">
-            <li v-for="(niveauGroup, nIndex) in comp.acsGrouped" :key="'n-g-' + index + '-' + nIndex">
-              <p style="font-weight: bold; margin-bottom: 5px;">Niveau : {{ niveauGroup.niveau }}</p>
+            <li v-for="(niveau, nIndex) in comp.niveaux" :key="'n-' + index + '-' + nIndex">
+              <p style="font-weight: bold; margin-bottom: 5px;">{{ niveau.num }}: {{ niveau.intitule }}</p>
 
               <ul class="resume-list sub-level">
-                <li v-for="(ac, aIndex) in niveauGroup.acs" :key="'a-' + index + '-' + nIndex + '-' + aIndex">
+                <li v-for="(ac, aIndex) in niveau.acs" :key="'a-' + index + '-' + nIndex + '-' + aIndex">
                   {{ ac }}
                 </li>
               </ul>
             </li>
           </ul>
         </div>
-
-        <div class="resume-item"><strong>Niveaux sélectionnés :</strong> {{ comp.niveaux.join(' / ') }}</div>
       </div>
 
       <div class="skill-card">
         <p id="card-title">Ajouter une compétence</p>
 
-        <div class="form-item container-ue">
-          <label for="ue">Veuillez choisir une UE associée à RX.XX </label>
-          <select name="ue" id="ue" v-model="currentCompetence.ue">
-            <option value="" selected disabled>Rien de sélectionné</option>
-            <option value="UE 1 : Réaliser">UE 1 : Réaliser</option>
-            <option value="UE 2 : Optimiser">UE 2 : Optimiser</option>
-            <option value="UE 3 : Administrer">UE 3 : Administrer</option>
-            <option value="UE 4 : Gérer">UE 4 : Gérer</option>
-            <option value="UE 5 : Conduire">UE 5 : Conduire</option>
-            <option value="UE 6 : Collaborer">UE 6 : Collaborer</option>
-          </select>
+        <div class="form-item container-ue-num">
+          <label for="ue-num">Veuillez **saisir le numéro** de l'UE </label>
+          <input type="text" name="ue-num" id="ue-num" v-model="currentCompetence.ueNum" placeholder="Ex: 1">
+        </div>
+        <div class="form-item container-ue-intitule">
+          <label for="ue-intitule">Veuillez **saisir l'intitulé** de l'UE </label>
+          <input type="text" name="ue-intitule" id="ue-intitule" v-model="currentCompetence.ueIntitule" placeholder="Ex: Réaliser">
         </div>
 
         <hr class="separator"/>
         <p class="section-title">Définir les Niveaux et leurs ACs associés</p>
 
-        <div v-for="(niveauGroup, nIndex) in currentCompetence.niveaux" :key="'niv-' + nIndex" class="form-item container-niv-group">
+        <div v-for="(niveau, nIndex) in currentCompetence.niveaux" :key="'niv-' + nIndex" class="form-item container-niv-group">
           <div class="niveau-group">
-
-            <label :for="'niv-' + nIndex">**Niveau {{ nIndex + 1 }}** attendu </label>
+            <label :for="'niv-' + nIndex">Intitulé du **Niveau {{ nIndex + 1 }}** attendu </label>
             <div class="input-with-plus">
-              <select :name="'niv-select-' + nIndex" :id="'niv-select-' + nIndex" v-model="niveauGroup.niveau">
-                <option value="" selected disabled>Rien de sélectionné</option>
-                <option value="Niveau 1">Niveau 1 : Lorem Ipsum</option>
-                <option value="Niveau 2">Niveau 2 : Lorem Ipsum</option>
-                <option value="Niveau 3">Niveau 3 : Lorem Ipsum</option>
-              </select>
-
+              <input type="text" :name="'niv-' + nIndex" :id="'niv-' + nIndex" v-model="currentCompetence.niveaux[nIndex].intitule" placeholder="Ex: Comprendre et utiliser les bases...">
               <svg
                   v-if="nIndex === currentCompetence.niveaux.length - 1"
                   @click="handleAddNiveau"
@@ -179,28 +182,22 @@ const handleSaveCompetence = () => {
             <div class="nested-acs">
 
               <div class="ac-title-with-plus">
-                <p class="nested-title">ACs pour {{ niveauGroup.niveau || `Niveau ${nIndex + 1}` }} :</p>
+                <p class="nested-title">ACs pour Niveau {{ nIndex + 1 }} :</p>
+                <svg
+                    v-if="niveau.acs.length > 0 && niveau.acs[niveau.acs.length - 1].num.trim() && niveau.acs[niveau.acs.length - 1].intitule.trim()"
+                    @click="handleAddAc(nIndex)"
+                    width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
+                  <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
 
-              <div v-for="(ac, aIndex) in niveauGroup.acs" :key="'ac-' + nIndex + '-' + aIndex" class="form-item container-ac ac-input-group">
-                <label :for="'ac-select-' + nIndex + '-' + aIndex" class="nested-label">AC {{ aIndex + 1 }} associé</label>
+              <div v-for="(ac, aIndex) in niveau.acs" :key="'ac-' + nIndex + '-' + aIndex" class="form-item container-ac ac-input-group">
 
-                <div class="select-with-plus">
-                  <select :name="'ac-select-' + nIndex + '-' + aIndex" :id="'ac-select-' + nIndex + '-' + aIndex" v-model="niveauGroup.acs[aIndex]">
-                    <option value="" selected disabled>Rien de sélectionné</option>
-                    <option value="AC 11.01">AC 11.01 : Lorem Ipsum</option>
-                    <option value="AC 11.02">AC 11.02 : Lorem Ipsum</option>
-                    <option value="AC 11.03">AC 11.03 : Lorem Ipsum</option>
-                    <option value="AC 11.04">AC 11.04 : Lorem Ipsum</option>
-                  </select>
+                <label :for="'ac-num-' + nIndex + '-' + aIndex" class="nested-label">Numéro de l'**AC {{ aIndex + 1 }}**</label>
+                <input type="text" :name="'ac-num-' + nIndex + '-' + aIndex" :id="'ac-num-' + nIndex + '-' + aIndex" v-model="niveau.acs[aIndex].num" placeholder="Ex: 11.01">
 
-                  <svg
-                      v-if="aIndex === niveauGroup.acs.length - 1"
-                      @click="handleAddAc(nIndex)"
-                      width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
-                    <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
+                <label :for="'ac-intitule-' + nIndex + '-' + aIndex" class="nested-label" style="margin-top: 0.5rem;">Intitulé de l'**AC {{ aIndex + 1 }}**</label>
+                <input type="text" :name="'ac-intitule-' + nIndex + '-' + aIndex" :id="'ac-intitule-' + nIndex + '-' + aIndex" v-model="niveau.acs[aIndex].intitule" placeholder="Ex: Déployer une application...">
               </div>
             </div>
           </div>
@@ -383,48 +380,6 @@ const handleSaveCompetence = () => {
   margin-bottom: 1.5rem;
 }
 
-.form-item label{
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: black;
-  font-size: 20px;
-}
-
-.select-with-plus {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.form-item select{
-  appearance: menulist-button;
-  width: 100%;
-  max-width: 280px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.4);
-  border: 2px solid rgb(0,0,0);
-  font-size: 16px;
-}
-
-.select-with-plus svg {
-  stroke: black;
-  transition: stroke 0.2s, transform 0.2s;
-  flex-shrink: 0;
-}
-.input-with-plus svg {
-  stroke: black;
-  margin: 5px;
-  transition: stroke 0.2s, transform 0.2s;
-}
-
-.select-with-plus .svg-active:hover, .input-with-plus .svg-active:hover {
-  cursor: pointer;
-  stroke: green;
-  transform: scale(1.1);
-}
-
 .section-title {
   font-size: 24px;
   font-weight: 700;
@@ -440,8 +395,16 @@ const handleSaveCompetence = () => {
   margin: 30px 0;
 }
 
+.form-item label{
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: black;
+  font-size: 20px;
+}
+
 .niveau-group {
-  padding: 15px 15px 20px 15px;
+  padding: 15px 15px 5px 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fcfcfc;
@@ -451,7 +414,7 @@ const handleSaveCompetence = () => {
 }
 
 .nested-acs {
-  padding: 15px 15px 5px 15px;
+  padding: 10px 10px 5px 10px;
   border-left: 3px solid #B51621;
   margin-top: 15px;
   background-color: #fff5f5;
@@ -476,6 +439,54 @@ const handleSaveCompetence = () => {
   font-weight: 500 !important;
 }
 
+.input-with-plus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.input-with-plus svg {
+  stroke: black; /* Correction : assure la visibilité du SVG Niveau+ */
+  margin: 5px;
+  transition: stroke 0.2s, transform 0.2s;
+}
+.input-with-plus .svg-active:hover {
+  cursor: pointer;
+  stroke: green;
+  transform: scale(1.1);
+}
+
+.container-ue-num input,
+.container-ue-intitule input {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.form-item input[type="text"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.4);
+  border: 2px solid rgb(0,0,0);
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.container-ac input[type="text"] {
+  max-width: none;
+}
+
+.ac-title-with-plus svg {
+  stroke: black;
+  transition: stroke 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.ac-title-with-plus .svg-active:hover {
+  cursor: pointer;
+  stroke: green;
+  transform: scale(1.1);
+}
+
 .ac-input-group {
   border-top: 1px dashed #ccc;
   padding-top: 15px;
@@ -483,10 +494,9 @@ const handleSaveCompetence = () => {
 }
 .nested-acs .ac-input-group:first-child {
   border-top: none;
-  padding-top: 0;
+  padding-top: 5px;
   margin-bottom: 20px;
 }
-
 
 .card-ok {
   position: relative;

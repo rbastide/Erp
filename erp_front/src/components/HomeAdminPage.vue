@@ -1,27 +1,31 @@
 <script setup>
-import { useRouter } from 'vue-router';
+  import { useRouter } from 'vue-router';
 
-const router = useRouter();
+  const router = useRouter();
 
-const handleRemplir = () => {
-  router.push('/mccc-ressource');
-};
+  const handleRemplir = () => {
+    router.push('/mccc-ressource');
+  };
 
-const handleAfficher = () => {
-  router.push('/history-admin');
-};
+  const handleAfficher = () => {
+    router.push('/history-admin');
+  };
 
-const handleInscrire = () => {
-  router.push('/new-user');
-};
+  const handleInscrire = () => {
+    router.push('/new-user');
+  };
 
-const handleAide = () => {
-  router.push('/aide');
-};
+  const handleAide = () => {
+    router.push('/aide');
+  };
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
+  const handleDeconnexion = () => {
+    router.push('/deconnexion');
+  };
+
+  const handleCompetenceCreating = () => {
+    router.push('/competence-creating');
+  };
 </script>
 
 <template>
@@ -39,9 +43,12 @@ const handleDeconnexion = () => {
   </header>
 
   <div class="main-content">
-    <div @click="handleRemplir" class="remplir"><p>Remplir les MCCC</p></div>
-    <div @click="handleAfficher" class="afficher"><p>Afficher les fiches ressource</p></div>
-    <div @click="handleInscrire" class="inscrire"><p>Ajouter des utilisateurs</p></div>
+    <div class="btn-container">
+      <div @click="handleRemplir" class="btn"><p>Remplir les MCCC</p></div>
+      <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
+      <div @click="handleInscrire" class="btn"><p>Ajouter des utilisateurs</p></div>
+      <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
+    </div>
   </div>
 </template>
 
@@ -54,7 +61,6 @@ const handleDeconnexion = () => {
   left: 0px;
   top: 0px;
   background: #B51621;
-  /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
   box-sizing: border-box;
 }
 
@@ -128,9 +134,18 @@ const handleDeconnexion = () => {
   align-items: center;
 }
 
-.remplir,
-.afficher,
-.inscrire {
+.btn-container{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -142,18 +157,16 @@ const handleDeconnexion = () => {
   background: #D9D9D9;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
-  margin: 50px;
+  margin: 0 50px 100px;
 }
 
-.remplir:hover,
-.afficher:hover,
-.inscrire:hover {
+.btn:hover {
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
 }
 
-.remplir, .afficher, .inscrire p {
+.btn p {
   width: 328px;
   height: 200px;
   font-family: 'Roboto', sans-serif;

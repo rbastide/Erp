@@ -10,6 +10,36 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+const handleValider = () => {
+  router.push('/modif-saved');
+};
+
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  const buttons = document.querySelectorAll('.tab-button');
+  const contents = document.querySelectorAll('.tab-content');
+
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabId = button.getAttribute('data-tab');
+
+      // Retirer la classe active sur tous les boutons
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      // Ajouter la classe active sur le bouton cliqué
+      button.classList.add('active');
+
+      // Masquer toutes les zones de contenu
+      contents.forEach(content => content.classList.remove('active'));
+
+      // Afficher le contenu correspondant
+      document.querySelector(`#content-${tabId}`)?.classList.add('active');
+    });
+  });
+});
+
 </script>
 
 <template>
@@ -67,15 +97,60 @@ const handleDeconnexion = () => {
         Compétence(s) concernée(s) :
       </p>
       <p class="grey-square">UE1.1</p>
+    </div>
+    <p class="title-centered" id="comp">Compétences / Objectifs</p>
+    <div class="big-square">
+      <div class="grid-split-in-two">
+        <p class = "title">Numéro de l'UE : </p>
+        <p class="grey-square">1</p>
+      </div>
+      <div class="grid-split-in-two">
+        <p class = "title">Intitulé de l'UE : </p>
+        <p class="grey-square" id="intitule">Ceci est l'intitulé de l'UE : c'est une description qui nous permet de voire le bon fonctionnement</p>
+      </div>
+      <div class="container">
+        <div class="tabs">
+          <button class="tab-button active" data-tab="1">1</button>
+          <button class="tab-button" data-tab="2">2</button>
+          <button class="tab-button" data-tab="3">3</button>
+        </div>
+
+        <div class="content-panel">
+          <div id="content-1" class="tab-content active">
+            <p class="title-label">Intitulé du niveau :</p>
+            <p class="description">Concevoir et mettre en place une base de données à partir d'un cahier des charges client</p>
+
+            <p class="title-label">Apprentissages critiques pour le niveau :</p>
+            <p class="description">Mettre à jour une base de données relationnelles (en requêtes directes ou à travers une application)</p>
+          </div>
+
+          <div id="content-2" class="tab-content">
+            <p class="title-label">Intitulé du niveau :</p>
+            <p class="description">Établir des scénarios d'utilisation pour des tests d'acceptance.</p>
+
+            <p class="title-label">Apprentissages critiques pour le niveau :</p>
+            <p class="description">Rédiger des spécifications fonctionnelles détaillées.</p>
+          </div>
+
+          <div id="content-3" class="tab-content">
+            <p class="title-label">Intitulé du niveau :</p>
+            <p class="description">Organiser l'architecture d'une application web en Microservices.</p>
+
+            <p class="title-label">Apprentissages critiques pour le niveau :</p>
+            <p class="description">Créer des conteneurs Docker pour chaque Microservice.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sae-summary">
       <p class = "title-centered">
         Version fiche ressource :
       </p>
       <p class="grey-square">V1</p>
     </div>
-    <p class="title-centered" id="comp">Compétences / Objectifs</p>
-    <div class="big-square">
-
-    </div>
+    <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
+    <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
+    <div @click="handleValider" class="btn-sys">Valider</div>
   </main>
 </template>
 
@@ -274,5 +349,108 @@ const handleDeconnexion = () => {
   border: black 1px solid;
 }
 
+.grid-split-in-two{
+  margin-top: 30px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: 40px;
+}
+
+#intitule{
+  width: 700px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: -1px;
+}
+
+.tab-button {
+  padding: 15px 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: background-color 0.3s, color 0.3s;
+  flex-grow: 1;
+  background-color: #e0e0e0;
+  color: black;
+}
+
+
+.tab-button.active {
+  background-color: #888;
+  color: white;
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+
+.content-panel {
+  background-color: #888;
+  color: white;
+  padding: 30px;
+  min-height: 250px;
+  border-radius: 0 5px 5px 5px;
+}
+
+.title-label {
+  color: #D0202E;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 1.1em;
+}
+
+.description {
+  font-size: 1em;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+
+/* Date de création */
+#creation{
+  color: black;
+}
+
+.btn-sys{
+  width: 150px;
+  padding: 13px;
+  border: none;
+  text-align: center;
+  border-radius: 4px;
+  background-color: #B51621;
+  color: #FFFFFF;
+  font-size: 1rem; /* 16px */
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.2s ease;
+  position: relative;
+  margin : auto;
+  margin-bottom: 30px;
+  margin-top: 40px;
+}
 
 </style>

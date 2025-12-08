@@ -24,7 +24,7 @@ const handleTeachers = () => {
 }
 
 const handleValider = () => {
-  router.push('/modif-saved');
+  router.push('/mccc-summary');
 };
 
 const handleSae = () => {
@@ -71,7 +71,7 @@ const handleCompetences = () => {
     </main>
     <div class="container-btn">
       <div @click="handleValider" class="btn-sys">Valider</div>
-      <div @click="handleRetour" class="btn-sys">Quitter</div>
+      <div @click="handleRetour" class="btn-sys">Retour</div>
     </div>
   </div>
 </template>

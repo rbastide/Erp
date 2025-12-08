@@ -21,7 +21,8 @@ import McccMenuPage from "./components/McccMenuPage.vue";
 import McccTeachersPage from "./components/McccTeachersPage.vue";
 import McccSAE from "./components/McccSAE.vue";
 import McccCompetences from "./components/McccCompetences.vue";
-import McccSummaryPage from "./components/McccSummary.vue"
+import McccSummaryPage from "./components/McccSummary.vue";
+import CompetencesCreatingPage from "./components/CompetencesCreatingPage.vue";
 
 const routes = [
     {
@@ -143,6 +144,11 @@ const routes = [
         path: '/mccc-summary',
         name: 'McccSummaryPage',
         component: McccSummaryPage
+    },
+    {
+        path: '/competence-creating',
+        name: 'CompetencesCreatingPage',
+        component: CompetencesCreatingPage
     }
 ];
 
