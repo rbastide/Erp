@@ -1,5 +1,7 @@
 <script setup>
+import { onMounted } from "vue";
 import { useRouter } from 'vue-router';
+import AuthService from "../services/AuthService";
 
 const router = useRouter();
 
@@ -8,10 +10,12 @@ const handleAide = () => {
 };
 
 const handleNon = () => {
-  router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
+  router.back();
 }
 
 const handleOui = () => {
+  AuthService.logout();
+
   router.push('/login');
 }
 </script>

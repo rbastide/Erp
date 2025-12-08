@@ -1,7 +1,16 @@
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import AuthService from '../services/AuthService';
 
 const router = useRouter();
+
+// Variables du formulaire
+const username = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const role = ref('');
+const errorMessage = ref('');
 
 const handleRetour = () => {
   router.push('/home-admin');
@@ -13,25 +22,37 @@ const handleAide = () => {
 
 const handleDeconnexion = () => {
   router.push('/deconnexion');
-}
-
-const handleLogin = () => {
-  const loginSuccessful = true; // Simuler une connexion réussie le temps qu'on puisse vérifier les connexions
-
-  if (loginSuccessful) {
-    router.push('/userSave');
-  } else {
-    alert("Identifiants incorrects.");
-  }
 };
 
-const handleConfirm = () => {
-  const confirmSucessful = false;
+const handleRegister = async () => {
+  errorMessage.value = '';
 
-  const mdp = document.getElementById("password").value;
-  const verif_mdp = document.getElementById("confirm_password").value;
-  if (mdp.equals(verif_mdp)) {
-    const confirmSucessful = true;
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = "Les mots de passe ne correspondent pas.";
+    return;
+  }
+
+  if (!username.value || !password.value || !role.value) {
+    errorMessage.value = "Veuillez remplir tous les champs.";
+    return;
+  }
+
+  const userPayload = {
+    identifier: username.value,
+    password: password.value,
+    role: role.value
+  };
+
+  try {
+    await AuthService.register(userPayload);
+    router.push('/userSave');
+  } catch (error) {
+    console.error("Erreur Inscription:", error);
+    if (error.response && error.response.data) {
+      errorMessage.value = error.response.data;
+    } else {
+      errorMessage.value = "Une erreur est survenue lors de l'inscription.";
+    }
   }
 };
 </script>
@@ -48,16 +69,12 @@ const handleConfirm = () => {
       </svg>
     </div>
   </header>
-  <main class="main-content">
-    <form class="login-card">
 
-      <!-- Groupe pour l'identifiant -->
+  <main class="main-content">
+    <form class="login-card" @submit.prevent="handleRegister">
+
       <div class="form-group">
         <label for="username">Identifiant</label>
-        <!--
-          v-model="username" lie cet input à la variable 'username'
-          dans notre script.
-        -->
         <input
             type="text"
             id="username"
@@ -67,13 +84,8 @@ const handleConfirm = () => {
         />
       </div>
 
-      <!-- Groupe pour le mot de passe -->
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <!--
-          v-model="password" lie cet input à la variable 'password'
-          dans notre script.
-        -->
         <input
             type="password"
             id="password"
@@ -83,43 +95,53 @@ const handleConfirm = () => {
         />
       </div>
 
-      <!-- Groupe pour le mot de passe -->
       <div class="form-group">
-        <label for="password">Confirmer le mot de passe</label>
-        <!--
-          v-model="password" lie cet input à la variable 'password'
-          dans notre script.
-        -->
+        <label for="confirm_password">Confirmer le mot de passe</label>
         <input
             type="password"
             id="confirm_password"
-            placeholder="Mot de passe"
-            v-model="password"
+            placeholder="Confirmer le mot de passe"
+            v-model="confirmPassword"
             required
         />
       </div>
+
       <div class="form-group">
         <label for="role">Rôle de l'utilisateur</label>
-        <select id="role" required>
-          <option value="h" selected disabled>-- Veuillez choisir un rôle --</option>
-          <option value="Superadmin">Superadmin</option>
-          <option value="Administrateur">Administrateur</option>
-          <option value="Vacataire">Vacataire</option>
-          <option value="Professeur">Professeur</option>
+        <select id="role" v-model="role" required>
+          <option value="" disabled selected>-- Veuillez choisir un rôle --</option>
+          <option value="SUPER_ADMIN">Superadmin</option>
+          <option value="ADMIN">Administrateur</option>
+          <option value="TEMP_TEACHER">Vacataire</option>
+          <option value="TEACHER">Professeur</option>
         </select>
       </div>
 
-      <!-- Bouton de soumission -->
-      <button @click="handleLogin" class="login-button">Inscrire</button>
+      <p v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </p>
+
+      <button type="submit" class="login-button">Inscrire</button>
     </form>
   </main>
+
   <footer>
     <div @click="handleRetour" class="btn-quitter">Quitter</div>
   </footer>
 </template>
 
 <style scoped>
+.error-message {
+  color: #B51621;
+  background-color: #ffe6e6;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
 
+/* Vos styles originaux */
 .page-header {
   position: absolute;
   width: 100%;
@@ -129,7 +151,6 @@ const handleConfirm = () => {
   background: #B51621;
   box-sizing: border-box;
 }
-
 .container-connexion img {
   position: absolute;
   width: 127px;
@@ -137,28 +158,23 @@ const handleConfirm = () => {
   left: 64px;
   top: 22.5px;
 }
-.container-connexion p{
-
+.container-connexion p {
   position: absolute;
   width: 723px;
   height: 124px;
   left: 209px;
   top: 24px;
-
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 900;
   font-size: 56px;
   line-height: 110%;
-
   display: flex;
   align-items: center;
   letter-spacing: -0.03em;
-
   color: #FFFFFF;
 }
-
-.aide{
+.aide {
   position: absolute;
   width: 126px;
   height: 52px;
@@ -175,23 +191,16 @@ const handleConfirm = () => {
   letter-spacing: -0.005em;
   text-transform: capitalize;
   color: #FFFFFF;
-}
-.aide:hover{
   cursor: pointer;
 }
-
 .quitter {
   position: absolute;
   width: 48px;
   height: 48px;
   right: 5%;
   top: 64px;
-}
-.quitter:hover{
   cursor: pointer;
 }
-
-/* --- Style du Contenu Principal --- */
 .main-content {
   background-color: #FFFFFF;
   display: flex;
@@ -199,47 +208,41 @@ const handleConfirm = () => {
   align-items: center;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  padding-top: 10%;
+  box-sizing: border-box;
 }
-
-
 .login-card {
   background-color: #FFFFFF;
-  padding: 2.5rem; /* 40px */
+  padding: 2.5rem;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
-
 }
-
 .form-group {
-  margin-bottom: 1.5rem; /* 24px */
+  margin-bottom: 1.5rem;
 }
-
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem; /* 8px */
+  margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 0.9rem; /* 14px */
+  font-size: 0.9rem;
   color: black;
-
 }
-
 .form-group input {
   width: 100%;
-  padding: 0.75rem; /* 12px */
+  padding: 0.75rem;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
 }
-
 .form-group input:focus, .form-group select:focus {
   outline: none;
   border-color: #B51621;
   box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
 }
-
-.form-group select{
+.form-group select {
   appearance: menulist-button;
   width: 100%;
   max-width: 280px;
@@ -249,52 +252,39 @@ const handleConfirm = () => {
   border: 1px solid #dcdcdc;
   border-radius: 4px;
 }
-
 .login-button {
   width: 100%;
-  padding: 0.8rem; /* 13px */
+  padding: 0.8rem;
   border: none;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
 .login-button:hover {
   background-color: #9c121b;
 }
-
-.main-content {
-
-  min-height: 100vh;
-  padding-top: 10%;
-  box-sizing: border-box;
-}
-
-.btn-quitter{
+.btn-quitter {
   width: 150px;
-  padding: 0.8rem; /* 13px */
+  padding: 0.8rem;
   border: none;
   text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
   font-family: 'Roboto', sans-serif;
-
 }
-
-.btn-quitter:hover{
+.btn-quitter:hover {
   background: #999999;
   transform: translateY(-4px);
-  cursor: pointer;
 }
 </style>
