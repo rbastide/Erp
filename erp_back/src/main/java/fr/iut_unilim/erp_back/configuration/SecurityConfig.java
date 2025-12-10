@@ -56,14 +56,11 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         var config = new org.springframework.web.cors.CorsConfiguration();
-        config.setAllowedOrigins(java.util.List.of(
-                "http://localhost:5173",
-                "https://localhost:5173"
-        ));
+        config.setAllowedOrigins(java.util.List.of("*"));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(java.util.List.of("Authorization"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
 
         var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
