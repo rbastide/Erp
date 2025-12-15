@@ -238,4 +238,5 @@ const handleCompetences = () => {
   cursor: pointer;
 }
 
+
 </style>
