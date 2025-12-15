@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 
@@ -24,6 +25,8 @@ import { onMounted } from 'vue';
 onMounted(() => {
   const buttons = document.querySelectorAll('.tab-button');
   const contents = document.querySelectorAll('.tab-content');
+
+  mcccStore.loadMcccStore();
 
   buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -62,7 +65,7 @@ onMounted(() => {
 
     <main class = "main-content">
       <div class = "summary">
-        Récapitulatif de la ressource : RX.XX
+        Récapitulatif de la ressource : {{mcccStore.resourceCode}}
       </div>
       <div class="grid">
         <div class = "hour-summary">
@@ -72,32 +75,34 @@ onMounted(() => {
           <div class = "listing-hours">
             <div class = "type-of-hour" id="cm">
               <p class = "title-hour">CM</p>
-                    <p class="grey-square" type="number">4H </p>
+                    <p class="grey-square" type="number">{{mcccStore.hoursCM}} </p>
             </div>
             <div class = "type-of-hour">
               <p class = "title-hour">TD</p>
-              <p class="grey-square" type="number">5H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
             </div>
             <div class = "type-of-hour">
               <p class = "title-hour">DS</p>
-              <p class="grey-square" type="number">7H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
             </div>
             <div class= "type-of-hour">
               <p class= "title-hour">TP</p>
-              <p class="grey-square" type="number">5H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTP}}</p>
             </div>
             <div class= "type-of-hour" id="ds_tp">
               <p class= "title-hour">DS/TP</p>
-              <p class="grey-square" type="number">3H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursDSTP}} </p>
             </div>
-            <div class= "total"><p>Total : <span id="tot">0</span></p></div>
+            <div class= "total"><p>Total : <span id="tot">{{mcccStore.hoursTotal}}</span></p></div>
           </div>
         </div>
         <div class = "sae-summary">
           <p class = "title-centered" >
             SAE(s) concernées :
           </p>
-          <p class="grey-square" id="sae_conc">SX.XX </p>
+          <p class="grey-square" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
+            {{ saeCode }}
+          </p>
           <p class = "title-centered">
             Compétence(s) concernée(s) :
           </p>

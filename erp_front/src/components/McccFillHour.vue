@@ -1,14 +1,31 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { mcccStore } from '@/services/mcccStore';
 
+
+mcccStore.loadMcccStore();
 const router = useRouter();
 
+const totalHeures = computed(() => {
+  return (mcccStore.hoursCM || 0) +
+      (mcccStore.hoursTD || 0) +
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursTP || 0) +
+      (mcccStore.hoursDSTP || 0);
+});
+
+
+
+
 const handleValider = () => {
+  mcccStore.hoursTotal = totalHeures.value;
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
 const handleRetour = () => {
-  router.push('/mccc-menu');
+  router.back();
 };
 
 const handleAide = () => {
@@ -18,56 +35,10 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  const boxes = document.querySelectorAll('.grey-square');
-  const maxChars = 5;
-  let total = 0;
-  let contentTotal = document.getElementById("tot");
-
-  const calculerTotal = () => {
-    let total = 0;
-
-    boxes.forEach(box => {
-      const valeur = parseFloat(box.value) || 0;
-      total = total + valeur;
-    });
-    contentTotal.textContent = total.toFixed(2).toString(); // Utiliser toFixed(2) pour 2 décimales si besoin
-  }
-
-  boxes.forEach(box => {
-    box.addEventListener('input', () => {
-      let text = box.textContent;
-      calculerTotal();
-
-      if (text.length > maxChars) {
-        box.textContent = text.substring(0, maxChars);
-
-        // replacer le curseur à la fin
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(box);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    });
-
-    // Pour empêcher d'étendre les bloc.
-    box.addEventListener('keydown', e => {
-      if (e.key === "Enter") e.preventDefault();
-    });
-  });
-});
-
 </script>
 
 <template>
-
-  <!-- Conteneur principal de RessourcePage -->
-  <div class = "ressource-page" >
-
-    <!-- Header de la page contenant la bande rouge -->
+  <div class="ressource-page">
     <header class="page-header">
       <div class="container-nom">
         <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Bonjour, <br>ADMIN</p>
@@ -80,35 +51,40 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </header>
 
-    <main class = "main-content">
-      <div class = "choisir-ressource">
+    <main class="main-content">
+      <div class="choisir-ressource">
         Veuillez saisir les heures à remplir automatiquement :
       </div>
-      <div class = "top-grid">
-        <div class = "type-of-hour">
-          <p class = "title-hour">CM</p>
-          <input class="grey-square" type="number">
+
+      <div class="top-grid">
+        <div class="type-of-hour">
+          <p class="title-hour">CM</p>
+          <input class="grey-square" type="number" v-model="mcccStore.hoursCM" placeholder="0">
         </div>
-        <div class = "type-of-hour">
-          <p class = "title-hour">TD</p>
-          <input class="grey-square" type="number">
+        <div class="type-of-hour">
+          <p class="title-hour">TD</p>
+          <input class="grey-square" type="number" v-model="mcccStore.hoursTD" placeholder="0">
         </div>
-        <div class = "type-of-hour">
-          <p class = "title-hour">DS</p>
-          <input class="grey-square" type="number">
-        </div>
-      </div>
-      <div class= "bottom-grid">
-        <div class= "type-of-hour">
-          <p class= "title-hour">TP</p>
-          <input class="grey-square" type="number">
-        </div>
-        <div class= "type-of-hour">
-          <p class= "title-hour">DS TP</p>
-          <input class="grey-square" type="number">
+        <div class="type-of-hour">
+          <p class="title-hour">DS</p>
+          <input class="grey-square" type="number" v-model="mcccStore.hoursDS" placeholder="0">
         </div>
       </div>
-      <div class= "total"><p>Total : <span id="tot">0</span></p></div>
+
+      <div class="bottom-grid">
+        <div class="type-of-hour">
+          <p class="title-hour">TP</p>
+          <input class="grey-square" type="number" v-model="mcccStore.hoursTP" placeholder="0">
+        </div>
+        <div class="type-of-hour">
+          <p class="title-hour">DS TP</p>
+          <input class="grey-square" type="number" v-model="mcccStore.hoursDSTP" placeholder="0">
+        </div>
+      </div>
+
+      <div class="total">
+        <p>Total : <span id="tot">{{ totalHeures }}</span></p>
+      </div>
 
       <div class="container-btn">
         <div @click="handleValider" class="btn-sys">Valider</div>
@@ -119,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </template>
 
 <style scoped>
-/* header */
+/* Votre style reste 100% identique */
 .page-header {
   position: relative;
   width: 100%;
@@ -138,23 +114,19 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 .container-nom p {
-
   position: absolute;
   width: 723px;
   height: 124px;
   left: 209px;
   top: 24px;
-
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 900;
   font-size: 56px;
   line-height: 110%;
-
   display: flex;
   align-items: center;
   letter-spacing: -0.03em;
-
   color: #FFFFFF;
 }
 
@@ -191,8 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cursor: pointer;
 }
 
-
-/* main */
 .main-content{
   position: relative;
 }
@@ -201,14 +171,11 @@ document.addEventListener("DOMContentLoaded", () => {
   height: 66px;
   margin-top: 20px;
   margin-left: 20px;
-
-
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 32px;
   line-height: 38px;
-
   color: #E92533;
 }
 
@@ -263,7 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
   margin-bottom: 80px;
 }
 
-
 .container-btn{
   display: flex;
   flex-direction: row;
@@ -293,5 +259,4 @@ document.addEventListener("DOMContentLoaded", () => {
   transform: translateY(-4px);
   cursor: pointer;
 }
-
 </style>

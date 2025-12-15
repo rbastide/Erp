@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { onMounted, nextTick } from 'vue'; // Importation nécessaire
+import { onMounted, nextTick } from 'vue';
+import {mcccStore} from "@/services/mcccStore.js"; // Importation nécessaire
 
 const router = useRouter();
 
@@ -9,6 +10,21 @@ const handleRetour = () => {
 };
 
 const handleValider = () => {
+  const boxes = document.querySelectorAll('.grey-square');
+
+  const uniqueSaeCodes = new Set();
+
+  boxes.forEach(box => {
+    const saeText = box.textContent.trim();
+
+    if (box.textContent.length !== 0) {
+      uniqueSaeCodes.add(saeText);
+    }
+  });
+
+  mcccStore.saeCodes = Array.from(uniqueSaeCodes);
+  mcccStore.registerMcccStore();
+
   router.push('/mccc-menu');
 };
 
@@ -60,8 +76,9 @@ const setupInputLimits = () => {
 };
 
 onMounted(() => {
-  // Le DOM est garanti d'être prêt ici
   setupInputLimits();
+
+  mcccStore.loadMcccStore();
 });
 
 function duplicateGreySquare(containerId){
@@ -109,6 +126,9 @@ function duplicateGreySquare(containerId){
       <div class="sae">
         <p class="title">Veuillez saisir la/les SAÉ(s) concernée(s) :</p>
         <div id="sae-text">
+          <div id="sae-test" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
+            <div class = "grey-square" contenteditable="true">{{ saeCode }}</div>
+          </div>
           <div class = "grey-square" contenteditable="true"></div>
         </div>
         <svg class = "add-button" @click="duplicateGreySquare('sae-text')" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">

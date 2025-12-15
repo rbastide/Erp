@@ -12,9 +12,10 @@ export const mcccStore = reactive({
     hoursTP: 0,
     hoursDS: 0,
     hoursDSTP: 0,
+    hoursTotal: 0,
 
 
-    saeCode: '',
+    saeCodes: [],
     competenceCode: '' ,
     competence : [],
 
@@ -29,9 +30,6 @@ export const mcccStore = reactive({
             Object.assign(this, parsedData);
         }
     },
-
-
-
 
 });
 
