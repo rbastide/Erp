@@ -21,9 +21,9 @@ const handleLogin = async () => {
       await AuthService.login(credentials);
 
       if (credentials.identifier === 'admin') {
-        router.push('/home-admin');
+        await router.push('/home-admin');
       } else {
-        router.push('/home');
+        await router.push('/home');
       }
 
     } catch (error) {
@@ -100,8 +100,8 @@ const handleAide = () => {
     position: absolute;
     width: 100%;
     height: 172px;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     background: #B51621;
     box-sizing: border-box;
 }
