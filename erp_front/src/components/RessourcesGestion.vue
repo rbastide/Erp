@@ -40,18 +40,15 @@ const handleDelete = (index) => {
   resources.splice(index, 1);
 };
 
-// Nouvelle fonction pour annuler l'ajout ou la modification
 const handleCancel = () => {
   showAddForm.value = false;
   editingIndex.value = null;
-  // Optionnel : réinitialiser les champs de saisie/modification
   newResource.id = '';
   newResource.title = '';
   editedResource.id = '';
   editedResource.title = '';
 };
 
-// --- Logique d'Ajout ---
 const handleAddResource = () => {
   showAddForm.value = true;
   editingIndex.value = null;
