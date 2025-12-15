@@ -50,7 +50,7 @@ const handleAdd = () => {
 };
 
 const handleValider = () => {
-  router.push('/mccc-menu')
+  router.push('/modif-saved')
 };
 </script>
 
@@ -174,23 +174,19 @@ const handleValider = () => {
   top: 22.5px;
 }
 .container-card p{
-
   position: absolute;
   width: 723px;
   height: 124px;
   left: 209px;
   top: 24px;
-
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 900;
   font-size: 56px;
   line-height: 110%;
-
   display: flex;
   align-items: center;
   letter-spacing: -0.03em;
-
   color: #FFFFFF;
 }
 
