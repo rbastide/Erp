@@ -113,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="container-btn">
         <div @click="handleValider" class="btn-sys">Valider</div>
         <div @click="handleRetour" class="btn-sys">Annuler</div>
-      </div>    </main>
-
+      </div>
+    </main>
   </div>
 </template>
 
