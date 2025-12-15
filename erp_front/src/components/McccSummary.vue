@@ -71,25 +71,25 @@ onMounted(() => {
           <div class = "listing-hours">
             <div class = "type-of-hour" id="cm">
               <p class = "title-hour">CM</p>
-                    <p class="grey-square" type="number">4H </p>
+                    <p class="grey-square" type="number">{{mcccStore.hoursCM}} </p>
             </div>
             <div class = "type-of-hour">
               <p class = "title-hour">TD</p>
-              <p class="grey-square" type="number">5H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
             </div>
             <div class = "type-of-hour">
               <p class = "title-hour">DS</p>
-              <p class="grey-square" type="number">7H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
             </div>
             <div class= "type-of-hour">
               <p class= "title-hour">TP</p>
-              <p class="grey-square" type="number">5H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursTP}}</p>
             </div>
             <div class= "type-of-hour" id="ds_tp">
               <p class= "title-hour">DS/TP</p>
-              <p class="grey-square" type="number">3H </p>
+              <p class="grey-square" type="number">{{mcccStore.hoursDSTP}} </p>
             </div>
-            <div class= "total"><p>Total : <span id="tot">0</span></p></div>
+            <div class= "total"><p>Total : <span id="tot">{{mcccStore.hoursTotal}}</span></p></div>
           </div>
         </div>
         <div class = "sae-summary">

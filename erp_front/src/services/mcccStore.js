@@ -12,6 +12,7 @@ export const mcccStore = reactive({
     hoursTP: 0,
     hoursDS: 0,
     hoursDSTP: 0,
+    hoursTotal: 0,
 
 
     saeCodes: [],
