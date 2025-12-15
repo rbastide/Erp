@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 
@@ -20,6 +21,8 @@ import { onMounted } from 'vue';
 onMounted(() => {
   const buttons = document.querySelectorAll('.tab-button');
   const contents = document.querySelectorAll('.tab-content');
+
+  mcccStore.loadMcccStore();
 
   buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -93,7 +96,9 @@ onMounted(() => {
           <p class = "title-centered" >
             SAE(s) concernées :
           </p>
-          <p class="grey-square" id="sae_conc">SX.XX </p>
+          <p class="grey-square" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
+            {{ saeCode }}
+          </p>
           <p class = "title-centered">
             Compétence(s) concernée(s) :
           </p>
