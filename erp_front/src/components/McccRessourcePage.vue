@@ -17,7 +17,9 @@ const handleDeconnexion = () => {
 };
 
 const handleMccc = (code: string) => {
+  mcccStore.loadMcccStore();
   mcccStore.resourceCode = code;
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
 </script>

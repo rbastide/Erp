@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
-
+mcccStore.loadMcccStore();
 const handleRetour = () => {
   router.push('/mccc-ressource');
 };
@@ -45,7 +46,8 @@ const handleCompetences = () => {
     <!-- Header de la page contenant la bande rouge -->
     <header class="page-header">
       <div class="container-nom">
-        <img src="../assets/uploads/Logo_unilim.png"><p>RX.XX</p>
+        <img src="../assets/uploads/Logo_unilim.png">
+        <p> {{ mcccStore.resourceCode }}</p>
       </div>
       <div @click="handleAide" class="aide">Service d'aide</div>
       <div @click="handleDeconnexion" class="quitter">
