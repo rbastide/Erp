@@ -71,7 +71,7 @@ onMounted(() => {
           <div class = "listing-hours">
             <div class = "type-of-hour" id="cm">
               <p class = "title-hour">CM</p>
-              <p class="grey-square" type="number">4H </p>
+                    <p class="grey-square" type="number">4H </p>
             </div>
             <div class = "type-of-hour">
               <p class = "title-hour">TD</p>

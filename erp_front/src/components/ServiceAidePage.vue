@@ -38,7 +38,7 @@ const handleDeconnexion = () => {
     <div class="box">
       <div class="title">Email :</div>
       <div class="text">svp-dsi@unilim.fr <br>
-        Nous nous efforcons de vous répondre sous 48h
+        Nous nous efforcerons de vous répondre sous 48h
       </div>
     </div>
   </main>
