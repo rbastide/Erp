@@ -15,6 +15,10 @@ const handleValider = () => {
   router.push('/modif-saved');
 };
 
+const handleRetour = () => {
+  router.push('/mccc-menu');
+};
+
 import { onMounted } from 'vue';
 
 onMounted(() => {
@@ -144,7 +148,10 @@ onMounted(() => {
       <div class= "title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
       <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
       <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
-      <div @click="handleValider" class="btn-sys">Valider</div>
+      <div class="container-btn">
+        <div @click="handleValider" class="btn-sys">Valider</div>
+        <div @click="handleRetour" class="btn-sys">Annuler</div>
+      </div>
     </main>
   </div>
 </template>
@@ -465,6 +472,19 @@ onMounted(() => {
   margin : auto;
   margin-bottom: 30px;
   margin-top: 40px;
+}
+
+.container-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.container-btn div:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
 }
 
 </style>
