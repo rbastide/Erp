@@ -61,7 +61,7 @@ onMounted(() => {
 
     <main class = "main-content">
       <div class = "summary">
-        Récapitulatif de la ressource : RX.XX
+        Récapitulatif de la ressource : {{mcccStore.resourceCode}}
       </div>
       <div class="grid">
         <div class = "hour-summary">
