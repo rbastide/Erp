@@ -86,9 +86,6 @@ function duplicateGreySquare(containerId){
       setupInputLimits();
     });
   }
-  else{
-    console.error("Impossible de trouver le carré gris à dupliquer.");
-  }
 }
 </script>
 
