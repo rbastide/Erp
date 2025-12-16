@@ -1,12 +1,12 @@
 import { reactive } from 'vue';
 
-const teacher = {
-    lastname: '',
-    firstname: ''
-};
 
 export const mcccStore = reactive({
     resourceCode: '',
+    resourceName: '',
+    mainGoal: '',
+    year: null,
+    semester: null,
 
     hoursCM: 0,
     hoursTD: 0,
@@ -17,7 +17,7 @@ export const mcccStore = reactive({
 
 
     saeCodes: [],
-    competences: [],
+    competence : [],
 
     referents : [],
 
@@ -33,5 +33,22 @@ export const mcccStore = reactive({
         }
     },
 
-});
+    clearMcccStore(){
+        this.resourceCode = '';
+        this.resourceName = '';
+        this.mainGoal = '';
+        this.year = null;
+        this.semester = null;
 
+        this.hoursCM = 0;
+        this.hoursTD = 0;
+        this.hoursTP = 0;
+        this.hoursDS = 0;
+        this.hoursDSTP = 0;
+        this.hoursTotal = 0;
+
+        this.saeCodes = [];
+        this.competence = [];
+        this.referents = [];
+    },
+});
