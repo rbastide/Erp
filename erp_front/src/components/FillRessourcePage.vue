@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const handleRetour = () => router.push('/home')
+const handleRetour = () => router.push('/cancel')
 const handleAide = () => router.push('/aide')
 const handleValider = () => {router.push('/home');
 };
