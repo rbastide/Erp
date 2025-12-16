@@ -168,7 +168,6 @@ export default {
   left: 0px;
   top: 0px;
   background: #B51621;
-  /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
   box-sizing: border-box;
 }
 

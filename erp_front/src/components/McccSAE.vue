@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { onMounted, nextTick } from 'vue'; // Importation nécessaire
+import { onMounted, nextTick } from 'vue';
 
 const router = useRouter();
 
@@ -25,11 +25,9 @@ const setupInputLimits = () => {
   const maxChars = 5;
 
   boxes.forEach(box => {
-    // Supprime les écouteurs existants pour éviter la duplication lors de la réexécution
     box.removeEventListener('input', handleInput);
     box.removeEventListener('keydown', handleKeydown);
 
-    // Ajout des nouveaux écouteurs
     box.addEventListener('input', handleInput);
     box.addEventListener('keydown', handleKeydown);
   });
@@ -44,7 +42,6 @@ const setupInputLimits = () => {
       const range = document.createRange();
       const sel = window.getSelection();
 
-      // Assurez-vous qu'il y a des nœuds enfants avant d'essayer de les sélectionner
       if (box.firstChild) {
         range.setStart(box.firstChild, box.textContent.length);
         range.collapse(true);
@@ -60,7 +57,6 @@ const setupInputLimits = () => {
 };
 
 onMounted(() => {
-  // Le DOM est garanti d'être prêt ici
   setupInputLimits();
 });
 

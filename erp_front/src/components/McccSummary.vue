@@ -25,16 +25,12 @@ onMounted(() => {
     button.addEventListener('click', () => {
       const tabId = button.getAttribute('data-tab');
 
-      // Retirer la classe active sur tous les boutons
       buttons.forEach(btn => btn.classList.remove('active'));
 
-      // Ajouter la classe active sur le bouton cliqué
       button.classList.add('active');
 
-      // Masquer toutes les zones de contenu
       contents.forEach(content => content.classList.remove('active'));
 
-      // Afficher le contenu correspondant
       document.querySelector(`#content-${tabId}`)?.classList.add('active');
     });
   });

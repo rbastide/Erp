@@ -38,11 +38,8 @@ const handleCompetences = () => {
 </script>
 
 <template>
-
-  <!-- Conteneur principal de RessourcePage -->
   <div class = "ressource-page" >
 
-    <!-- Header de la page contenant la bande rouge -->
     <header class="page-header">
       <div class="container-nom">
         <img src="../assets/uploads/Logo_unilim.png"><p>RX.XX</p>
