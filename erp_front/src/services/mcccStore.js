@@ -1,5 +1,10 @@
 import { reactive } from 'vue';
 
+const teacher = {
+    lastname: '',
+    firstname: ''
+};
+
 export const mcccStore = reactive({
     resourceCode: '',
     resourceName: '',
@@ -18,6 +23,8 @@ export const mcccStore = reactive({
     saeCodes: [],
     competenceCode: '' ,
     competence : [],
+
+    referents : [],
 
     registerMcccStore(){
         localStorage.setItem("mcccStore",JSON.stringify(this));
