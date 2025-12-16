@@ -133,7 +133,7 @@ const addStudentFeedback = async () => {
             :ref="el => { if (el) cmRefs[index] = el as HTMLTextAreaElement }"
             rows="4"
         ></textarea>
-        <svg class="add-button" @click="addCM" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="add-button" @click="addCM" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
           <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
           <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
         </svg>
@@ -149,7 +149,7 @@ const addStudentFeedback = async () => {
             :ref="el => { if (el) tdRefs[index] = el as HTMLTextAreaElement }"
             rows="4"
         ></textarea>
-        <svg class="add-button" @click="addTD" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="add-button" @click="addTD" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
           <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
           <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
         </svg>
@@ -165,7 +165,7 @@ const addStudentFeedback = async () => {
             :ref="el => { if (el) tpRefs[index] = el as HTMLTextAreaElement }"
             rows="4"
         ></textarea>
-        <svg class="add-button" @click="addTP" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="add-button" @click="addTP" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
           <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
           <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
         </svg>
@@ -181,7 +181,7 @@ const addStudentFeedback = async () => {
             :ref="el => { if (el) dsRefs[index] = el as HTMLTextAreaElement }"
             rows="4"
         ></textarea>
-        <svg class="add-button" @click="addDS" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="add-button" @click="addDS" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
           <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
           <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
         </svg>
@@ -198,7 +198,7 @@ const addStudentFeedback = async () => {
           :ref="el => { if (el) educationalFeedbackRefs[index] = el as HTMLTextAreaElement }"
           rows="4"
       ></textarea>
-      <svg class="add-button" @click="addEducationalFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="add-button" @click="addEducationalFeedback" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
         <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
         <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
       </svg>
@@ -214,7 +214,7 @@ const addStudentFeedback = async () => {
           :ref="el => { if (el) studentFeedbackRefs[index] = el as HTMLTextAreaElement }"
           rows="4"
       ></textarea>
-      <svg class="add-button" @click="addStudentFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="add-button" @click="addStudentFeedback" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
         <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
         <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
       </svg>
@@ -230,7 +230,7 @@ const addStudentFeedback = async () => {
           :ref="el => { if (el) upgradesRefs[index] = el as HTMLTextAreaElement }"
           rows="4"
       ></textarea>
-      <svg class="add-button" @click="addUpgrades" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="add-button" @click="addUpgrades" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
         <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
         <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
       </svg>
@@ -302,7 +302,7 @@ const addStudentFeedback = async () => {
   background: #D9D9D9;
   padding: 30px 60px;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   font-size: 30px;
   text-align: center;
@@ -361,7 +361,7 @@ const addStudentFeedback = async () => {
   background: #D9D9D9;
   padding: 20px;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   font-size: 24px;
   text-align: left;
@@ -377,12 +377,9 @@ const addStudentFeedback = async () => {
   border: none;
   cursor: pointer;
   padding: 0;
-  margin-top: 30px;
   transition: transform 0.2s;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 50px;
+  margin: 30px auto 50px;
 }
 .add-button svg {
   height: 50px;
