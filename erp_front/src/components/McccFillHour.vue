@@ -41,7 +41,7 @@ const handleDeconnexion = () => {
   <div class="ressource-page">
     <header class="page-header">
       <div class="container-nom">
-        <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Bonjour, <br>ADMIN</p>
+        <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Heures pour <br>{{mcccStore.resourceCode}}</p>
       </div>
       <div @click="handleAide" class="aide">Service d'aide</div>
       <div @click="handleDeconnexion" class="quitter">
