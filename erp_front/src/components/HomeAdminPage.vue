@@ -26,6 +26,11 @@
   const handleCompetenceCreating = () => {
     router.push('/competence-creating');
   };
+
+  const handleResources = () => {
+    router.push('/resources-gestion');
+  }
+
 </script>
 
 <template>
@@ -48,6 +53,7 @@
       <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
       <div @click="handleInscrire" class="btn"><p>Ajouter des utilisateurs</p></div>
       <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
+      <div @click="handleResources" class="btn"><p>Gestion des ressources</p></div>
     </div>
   </div>
 </template>

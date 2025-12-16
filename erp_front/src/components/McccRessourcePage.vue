@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { mcccStore } from '../services/mcccStore';
 
 const router = useRouter();
 
@@ -15,10 +16,12 @@ const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
 
-const handleMccc = () => {
+const handleMccc = (code: string) => {
+  mcccStore.loadMcccStore();
+  mcccStore.resourceCode = code;
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
-
 </script>
 
 <template>
@@ -37,34 +40,28 @@ const handleMccc = () => {
       </div>
     </header>
 
-    <main class = "main-content">
-      <div class = "choisir-ressource">Veuillez choisir la ressource pour laquelle vous voulez modifier les MCCC</div>
+    <main class="main-content">
+      <div class="choisir-ressource">Veuillez choisir la ressource : </div>
 
-      <div class = "container-button">
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
+      <div class="container-button">
+        <div @click="handleMccc('R1.01')" class="push-button">
+          <p class="text-button">R1.01</p>
         </div>
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
+        <div @click="handleMccc('R1.02')" class="push-button">
+          <p class="text-button">R1.02</p>
         </div>
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
+        <div @click="handleMccc('R2.01')" class="push-button">
+          <p class="text-button">R2.01</p>
         </div>
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
-        </div>
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
-        </div>
-        <div @click="handleMccc" class ="push-button">
-          <p class = "text-button">RX.XX</p>
+        <div @click="handleMccc('R2.02')" class="push-button">
+          <p class="text-button">R2.02</p>
         </div>
       </div>
+
       <div @click="handleRetour" class="btn-quitter">Retour</div>
     </main>
 
-  </div>
-</template>
+  </div> </template>
 
 <style scoped>
 /* header */
@@ -221,5 +218,6 @@ const handleMccc = () => {
   transform: translateY(-4px);
   cursor: pointer;
 }
+
 
 </style>
