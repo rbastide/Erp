@@ -7,10 +7,6 @@ const teacher = {
 
 export const mcccStore = reactive({
     resourceCode: '',
-    resourceName: '',
-    mainGoal: '',
-    year: null,
-    semester: null,
 
     hoursCM: 0,
     hoursTD: 0,
@@ -21,8 +17,7 @@ export const mcccStore = reactive({
 
 
     saeCodes: [],
-    competenceCode: '' ,
-    competence : [],
+    competences: [],
 
     referents : [],
 

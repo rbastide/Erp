@@ -109,7 +109,7 @@ function duplicateGreySquare(containerId){
     <header class="page-header">
       <div class="container-nom">
         <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
-        <p>SAÉ/Compétences <br> pour RX.XX</p>
+        <p>SAÉ/Compétences <br> pour {{mcccStore.resourceCode}}</p>
       </div>
       <div @click="handleAide" class="aide">Service d'aide</div>
       <div @click="handleDeconnexion" class="quitter">
