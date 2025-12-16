@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import AuthService from "../services/AuthService";
 import AppHeader from "./Header.vue";
@@ -37,8 +36,7 @@ const handleOui = () => {
   display: flex;
   flex-direction: column;
   width: 90%;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
@@ -68,11 +66,11 @@ const handleOui = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   width: 360px;
   height: 200px;
   background: #D9D9D9;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   margin: 50px;
   /* Police */
