@@ -4,11 +4,11 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const handleRetour = () => router.push('/home')
-const handleAide = () => router.push('/aide')
-const handleValider = () => {router.push('/home');
-};
-const handleDeconnexion = () => router.push('/deconnexion')
+const handleRetour = () =>{ router.push('/home')};
+const handleAide = () => {router.push('/aide')};
+const handleValider = () => {router.push('/home')};
+
+const handleDeconnexion = () => {router.push('/deconnexion')};
 
 // CM
 const cmContents = ref<string[]>([''])
