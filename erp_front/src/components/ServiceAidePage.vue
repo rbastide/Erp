@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 
@@ -7,23 +8,10 @@ const handleRetour = () => {
   router.push('/login');
 };
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-nom">
-      <img src="../assets/uploads/Logo_unilim.png"><p>Service d'aide</p>
-    </div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
+  <AppHeader title="Service d'aide" :aide="false"/>
   <main class="main-content">
 
     <div class="box">
@@ -49,63 +37,14 @@ const handleDeconnexion = () => {
 </template>
 
 <style scoped>
-/* header */
-.page-header {
-  position: relative;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-}
-
-.container-nom img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-
-.container-nom p {
-
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-
+.main-content{
   display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-}
-
-.quitter:hover{
-  cursor: pointer;
-}
-
-/*main*/
-.main-content {
-  display: flex;
+  width: 90%;
+  margin: auto;
+  margin-top: 254px;
   justify-content: center;
+  align-items: center;
   gap: 30%;
-  margin-top: 2%;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -121,19 +60,19 @@ const handleDeconnexion = () => {
 
 .btn-quitter{
   width: 150px;
-  padding: 0.8rem; /* 13px */
+  padding: 0.8rem;
   border: none;
   text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
-
+  font-family: 'Roboto', sans-serif;
 }
 
 .btn-quitter:hover{

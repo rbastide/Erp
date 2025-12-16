@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import AppHeader from './Header.vue';
 
 const router = useRouter()
 
-const handleRetour = () => router.push('/cancel')
-const handleAide = () => router.push('/aide')
-const handleValider = () => {router.push('/home');
-};
-const handleDeconnexion = () => router.push('/deconnexion')
+const handleRetour = () =>{ router.push('/home')};
+const handleAide = () => {router.push('/aide')};
+const handleValider = () => {router.push('/home')};
+
+const handleDeconnexion = () => {router.push('/deconnexion')};
 
 // CM
 const cmContents = ref<string[]>([''])
@@ -75,273 +76,173 @@ const addStudentFeedback = async () => {
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-nom">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Remplir votre fiche ressource</p>
+  <AppHeader title="Fiche ressource" inline="RX.XX"/>
+  <main class = "main-content">
+    <div class="required_file">
+      <p id="star">* </p>
+      <p>champs obligatoires</p>
     </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <p class = "title">Veuillez saisir vos heures de CM, TD et TP : *</p>
+    <div class = "hour-summary">
+      <div class = "listing-hours">
+        <div class="grid">
+          <div class = "type-of-hour">
+            <p class = "title-hour">CM</p>
+            <input class="grey-square" type="number">
+          </div>
+          <div class = "type-of-hour">
+            <p class = "title-hour">TD</p>
+            <input class="grey-square" type="number">
+          </div>
+          <div class = "type-of-hour">
+            <p class = "title-hour">DS</p>
+            <input class="grey-square" type="number">
+          </div>
+        </div>
+        <div class="grid">
+          <div class= "type-of-hour">
+            <p class= "title-hour">TP</p>
+            <input class="grey-square" type="number">
+          </div>
+          <div class= "type-of-hour">
+            <p class= "title-hour">DS/TP</p>
+            <input class="grey-square" type="number">
+          </div>
+          <div class= "type-of-hour">
+            <p class= "title-hour">Total</p>
+            <input class="grey-square" type="number">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hour-per-students">
+      <p class = "title">Veuillez saisir le nombre d'heures par étudiant : *</p>
+      <input class="grey-square" type="number">
+    </div>
+    <p class="title">Veuillez saisir le contenu pédagogique : *</p>
+
+    <div class="pedagogic-contents">
+
+      <div class="hour-type">
+        <p class="title">CM</p>
+        <textarea
+            v-for="(content, index) in cmContents"
+            :key="index"
+            v-model="cmContents[index]"
+            class="grey-big-square"
+            :ref="el => { if (el) cmRefs[index] = el as HTMLTextAreaElement }"
+            rows="4"
+        ></textarea>
+        <svg class="add-button" @click="addCM" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="hour-type">
+        <p class="title">TD</p>
+        <textarea
+            v-for="(content, index) in tdContents"
+            :key="index"
+            v-model="tdContents[index]"
+            class="grey-big-square"
+            :ref="el => { if (el) tdRefs[index] = el as HTMLTextAreaElement }"
+            rows="4"
+        ></textarea>
+        <svg class="add-button" @click="addTD" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="hour-type">
+        <p class="title">TP</p>
+        <textarea
+            v-for="(content, index) in tpContents"
+            :key="index"
+            v-model="tpContents[index]"
+            class="grey-big-square"
+            :ref="el => { if (el) tpRefs[index] = el as HTMLTextAreaElement }"
+            rows="4"
+        ></textarea>
+        <svg class="add-button" @click="addTP" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="hour-type">
+        <p class="title">DS</p>
+        <textarea
+            v-for="(content, index) in dsContents"
+            :key="index"
+            v-model="dsContents[index]"
+            class="grey-big-square"
+            :ref="el => { if (el) dsRefs[index] = el as HTMLTextAreaElement }"
+            rows="4"
+        ></textarea>
+        <svg class="add-button" @click="addDS" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="educational-feedback">
+      <p class = "title">Veuillez saisir le retour pédagogique des professeurs :</p>
+      <textarea
+          v-for="(content, index) in educationalFeedbackContents"
+          :key="index"
+          v-model="educationalFeedbackContents[index]"
+          class="grey-big-square"
+          :ref="el => { if (el) educationalFeedbackRefs[index] = el as HTMLTextAreaElement }"
+          rows="4"
+      ></textarea>
+      <svg class="add-button" @click="addEducationalFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+        <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
       </svg>
     </div>
-  </header>
 
-  <div class = "ressource-page">
-    <main class = "main-content">
-      <div class="required_file">
-        <p id="star">* </p>
-        <p>champs obligatoires</p>
-      </div>
-      <p class = "title">Veuillez saisir vos heures de CM, TD et TP : *</p>
-      <div class = "hour-summary">
-        <div class = "listing-hours">
-          <div class="grid">
-            <div class = "type-of-hour">
-              <p class = "title-hour">CM</p>
-              <input class="grey-square" type="number">
-            </div>
-            <div class = "type-of-hour">
-              <p class = "title-hour">TD</p>
-              <input class="grey-square" type="number">
-            </div>
-            <div class = "type-of-hour">
-              <p class = "title-hour">DS</p>
-              <input class="grey-square" type="number">
-            </div>
-          </div>
-          <div class="grid">
-            <div class= "type-of-hour">
-              <p class= "title-hour">TP</p>
-              <input class="grey-square" type="number">
-            </div>
-            <div class= "type-of-hour">
-              <p class= "title-hour">DS/TP</p>
-              <input class="grey-square" type="number">
-            </div>
-            <div class= "type-of-hour">
-              <p class= "title-hour">Total</p>
-              <input class="grey-square" type="number">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="hour-per-students">
-        <p class = "title">Veuillez saisir le nombre d'heures par étudiant : *</p>
-        <input class="grey-square" type="number">
-      </div>
-      <p class="title">Veuillez saisir le contenu pédagogique : *</p>
+    <div class="student-feedback">
+      <p class = "title">Veuillez saisir le retour des étudiants :</p>
+      <textarea
+          v-for="(content, index) in studentFeedbackContents"
+          :key="index"
+          v-model="studentFeedbackContents[index]"
+          class="grey-big-square"
+          :ref="el => { if (el) studentFeedbackRefs[index] = el as HTMLTextAreaElement }"
+          rows="4"
+      ></textarea>
+      <svg class="add-button" @click="addStudentFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+        <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
 
-      <div class="pedagogic-contents">
-
-        <div class="hour-type">
-          <p class="title">CM</p>
-          <textarea
-              v-for="(content, index) in cmContents"
-              :key="index"
-              v-model="cmContents[index]"
-              class="grey-big-square"
-              :ref="el => { if (el) cmRefs[index] = el as HTMLTextAreaElement }"
-              rows="4"
-          ></textarea>
-          <svg class="add-button" @click="addCM" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-            <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <div class="hour-type">
-          <p class="title">TD</p>
-          <textarea
-              v-for="(content, index) in tdContents"
-              :key="index"
-              v-model="tdContents[index]"
-              class="grey-big-square"
-              :ref="el => { if (el) tdRefs[index] = el as HTMLTextAreaElement }"
-              rows="4"
-          ></textarea>
-          <svg class="add-button" @click="addTD" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-            <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <div class="hour-type">
-          <p class="title">TP</p>
-          <textarea
-              v-for="(content, index) in tpContents"
-              :key="index"
-              v-model="tpContents[index]"
-              class="grey-big-square"
-              :ref="el => { if (el) tpRefs[index] = el as HTMLTextAreaElement }"
-              rows="4"
-          ></textarea>
-          <svg class="add-button" @click="addTP" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-            <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <div class="hour-type">
-          <p class="title">DS</p>
-          <textarea
-              v-for="(content, index) in dsContents"
-              :key="index"
-              v-model="dsContents[index]"
-              class="grey-big-square"
-              :ref="el => { if (el) dsRefs[index] = el as HTMLTextAreaElement }"
-              rows="4"
-          ></textarea>
-          <svg class="add-button" @click="addDS" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-            <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-          </svg>
-        </div>
-      </div>
-
-      <div class="educational-feedback">
-        <p class = "title">Veuillez saisir le retour pédagogique des professeurs :</p>
-        <textarea
-            v-for="(content, index) in educationalFeedbackContents"
-            :key="index"
-            v-model="educationalFeedbackContents[index]"
-            class="grey-big-square"
-            :ref="el => { if (el) educationalFeedbackRefs[index] = el as HTMLTextAreaElement }"
-            rows="4"
-        ></textarea>
-        <svg class="add-button" @click="addEducationalFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <div class="student-feedback">
-        <p class = "title">Veuillez saisir le retour des étudiants :</p>
-        <textarea
-            v-for="(content, index) in studentFeedbackContents"
-            :key="index"
-            v-model="studentFeedbackContents[index]"
-            class="grey-big-square"
-            :ref="el => { if (el) studentFeedbackRefs[index] = el as HTMLTextAreaElement }"
-            rows="4"
-        ></textarea>
-        <svg class="add-button" @click="addStudentFeedback" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <div class="upgrades">
-        <p class = "title">Veuillez saisir les améliorations à apporter :</p>
-        <textarea
-            v-for="(content, index) in upgradesContents"
-            :key="index"
-            v-model="upgradesContents[index]"
-            class="grey-big-square"
-            :ref="el => { if (el) upgradesRefs[index] = el as HTMLTextAreaElement }"
-            rows="4"
-        ></textarea>
-        <svg class="add-button" @click="addUpgrades" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
-          <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="container-btn">
-        <div @click="handleValider" class="btn-sys">Valider</div>
-        <div @click="handleRetour" class="btn-sys">Annuler</div>
-      </div>
-    </main>
-  </div>
-
+    <div class="upgrades">
+      <p class = "title">Veuillez saisir les améliorations à apporter :</p>
+      <textarea
+          v-for="(content, index) in upgradesContents"
+          :key="index"
+          v-model="upgradesContents[index]"
+          class="grey-big-square"
+          :ref="el => { if (el) upgradesRefs[index] = el as HTMLTextAreaElement }"
+          rows="4"
+      ></textarea>
+      <svg class="add-button" @click="addUpgrades" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="35" r="34.5" fill="#E92533" stroke="#B51621"/>
+        <path d="M35.617 19.3333V51.4074M19.5393 35.3704H51.6133" stroke="white" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="container-btn">
+      <div @click="handleValider" class="btn-sys">Valider</div>
+      <div @click="handleRetour" class="btn-sys">Annuler</div>
+    </div>
+  </main>
 </template>
 
 <style scoped>
-
-.ressource-page {
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.main-content{
-  width: 100%;
-}
-
-/* header */
-.page-header {
-  position: relative;
-  width: 100%;
-  height: 172px;
-  background: #B51621;
-}
-
-.container-nom {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  left: 64px;
-  top: 22.5px;
-}
-
-.container-nom img {
-  width: 127px;
-  height: 127px;
-}
-
-.container-nom p {
-  margin-left: 15px;
-  width: auto;
-  max-width: 600px;
-  height: 120px;
-
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-}
-.quitter:hover{
-  cursor: pointer;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-.aide:hover{
-  cursor: pointer;
-}
-
-
-
-/* Hour */
 .required_file{
   text-align: right;
   margin-right: 20px;
@@ -418,14 +319,12 @@ const addStudentFeedback = async () => {
 }
 
 
-/* Hour students */
 .hour-per-students input{
   margin-left: 750px;
   margin-bottom: 50px;
 
 }
 
-/* Pedagogic content */
 .pedagogic-contents{
   display: flex;
   flex-direction: column;
@@ -450,15 +349,10 @@ const addStudentFeedback = async () => {
 }
 
 
-/* Educational-feedback, Student-feedback, Upgrades */
 .educational-feedback, .student-feedback, .upgrades {
   display: block;
   width: 100%;
   margin-top: 50px;
-}
-
-.educational-feedback .title, .student-feedback .title, .upgrades .title {
-  /* Le style général .title s'applique ici et assure l'alignement à gauche */
 }
 
 .grey-big-square{

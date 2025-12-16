@@ -16,7 +16,6 @@ export default {
 </script>
 
 <style scoped>
-/* Styles de base pour le footer */
 .app-footer {
   font-family: 'Roboto', sans-serif;
   width: 100%;
