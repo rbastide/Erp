@@ -71,7 +71,7 @@ onMounted(() => {
 <template>
   <header class="page-header">
     <div class="container-card">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Référents pour RX.XX</p>
+      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Référents pour {{mcccStore.resourceCode}}</p>
     </div>
     <div @click="handleAide" class="aide">Service d'aide</div>
     <div @click="handleDeconnexion" class="quitter">

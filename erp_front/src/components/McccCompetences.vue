@@ -1,6 +1,14 @@
 <script setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+  if (!mcccStore.competences) {
+    mcccStore.competences = [];
+  }
+});
 
 const router = useRouter();
 
@@ -13,6 +21,7 @@ const handleAide = () => {
 };
 
 const handleValider = () => {
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
@@ -28,7 +37,6 @@ const currentCompetence = ref({
   }],
 });
 
-const competencesFinalisees = ref([]);
 
 const handleAddNiveau = () => {
   const lastNiveauIndex = currentCompetence.value.niveaux.length - 1;
@@ -77,7 +85,7 @@ const handleSaveCompetence = () => {
 
   const acsForSimpleResume = niveauxFinalises.flatMap(n => n.acs);
 
-  competencesFinalisees.value.push({
+  mcccStore.competences.push({
     ue: currentCompetence.value.ue,
     niveaux: niveauxFinalises.map(n => n.niveau),
     acs: acsForSimpleResume,
@@ -115,7 +123,7 @@ const handleSaveCompetence = () => {
 
     <div class="container-global">
 
-      <div v-for="(comp, index) in competencesFinalisees" :key="index" class="skill-card skill-card-resume">
+      <div v-for="(comp, index) in mcccStore.competences" :key="index" class="skill-card skill-card-resume">
         <p id="card-title">Compétence {{ index + 1 }}</p>
         <div class="resume-item"><strong>UE :</strong> {{ comp.ue }}</div>
 
