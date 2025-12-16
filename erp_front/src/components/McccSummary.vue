@@ -150,6 +150,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
+      <div class= "title"><p>Professeur(s) référent : <span id="creation">Mr Test</span></p></div>
       <div class= "title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
       <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
       <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
