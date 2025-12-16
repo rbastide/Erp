@@ -1,6 +1,6 @@
 <script setup>
-
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 
@@ -20,55 +20,10 @@ const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
 
-
-/* Une fois que le back sera lié et qu'on aura des vrais exemples de fiches ressources : il faudra faire une logique en for each
- // Exemple dans un composant Vue.js
-
-export default {
-  data() {
-    return {
-      items: [
-        { id: 1, name: 'Tâche A' },
-        { id: 2, name: 'Tâche B' },
-        { id: 3, name: 'Tâche C' }
-      ]
-    };
-  },
-  methods: {
-    handleSupprimer(itemId) {
-      // **itemId** contient l'ID de l'élément sur lequel on a cliqué
-
-      console.log(`Suppression de l'élément avec l'ID : ${itemId}`);
-
-      // La logique de suppression : on filtre le tableau pour exclure l'élément
-      this.items = this.items.filter(item => item.id !== itemId);
-    }
-  }
-};
-
-
-<div v-for="item in items" :key="item.id">
-  <p>{{ item.name }}</p>
-  <button @click="handleSupprimer(item.id)">
-    Supprimer
-  </button>
-</div>
- */
-
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-nom">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Bonjour, <br>NOM Prénom</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
+  <AppHeader title="Bonjour, " inline="ADMIN"/>
   <div class="main-content">
     <p class="description">Voici l'historique des fiches de ressource : </p>
     <div class="version-list-container">
@@ -153,85 +108,13 @@ export default {
             <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
           </svg>
         </li>
-        <div @click="handleRetour" class="btn-quitter">Quitter</div>
+        <div @click="handleRetour" class="btn-quitter">Retour</div>
       </ul>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.page-header {
-  position: absolute;
-  width: 100%; /* Modifié de 1280px à 100% pour prendre toute la largeur */
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-  /* J'ajoute box-sizing pour éviter des problèmes de padding/border qui affectent la largeur totale */
-  box-sizing: border-box;
-}
-
-.container-nom img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-.container-nom p{
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.quitter {
-
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-}
-.quitter:hover{
-  cursor: pointer;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-.aide:hover{
-  cursor: pointer;
-}
-
-/* Contenue de la page */
-
 .main-content {
   display: flex;
   width: 90%;
