@@ -26,8 +26,8 @@ const handleRetour = () => {
 };
 
 const handleValider = () => {
-  router.push('/modif-saved');
-}
+  router.push('/modif-saved')
+};
 
 const handleAide = () => {
   router.push('/aide');
