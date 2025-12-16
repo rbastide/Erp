@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../services/AuthService';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 const username = ref('');
@@ -42,13 +43,7 @@ const handleAide = () => {
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-connexion">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Connexion</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-  </header>
-
+  <AppHeader title="Connexion" :deconnexion="false"/>
   <main class="main-content">
     <form class="login-card" @submit.prevent="handleLogin">
 
@@ -84,6 +79,17 @@ const handleAide = () => {
 </template>
 
 <style scoped>
+.main-content {
+  background-color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  padding-top: 172px;
+  box-sizing: border-box;
+}
 
 .error-message {
   color: #B51621;
@@ -94,16 +100,6 @@ const handleAide = () => {
   font-weight: bold;
   text-align: center;
   font-size: 0.9rem;
-}
-
-.page-header {
-    position: absolute;
-    width: 100%;
-    height: 172px;
-    left: 0;
-    top: 0;
-    background: #B51621;
-    box-sizing: border-box;
 }
 
 .login-card {
@@ -150,60 +146,5 @@ const handleAide = () => {
 }
 .login-button:hover {
   background-color: #9c121b;
-}
-.main-content {
-  background-color: #FFFFFF;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  font-family: 'Roboto', sans-serif;
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
-}
-.container-connexion img {
-    position: absolute;
-    width: 127px;
-    height: 127px;
-    left: 64px;
-    top: 22.5px;
-}
-.container-connexion p{
-    position: absolute;
-    width: 723px;
-    height: 124px;
-    left: 209px;
-    top: 24px;
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 900;
-    font-size: 56px;
-    line-height: 110%;
-    display: flex;
-    align-items: center;
-    letter-spacing: -0.03em;
-    color: #FFFFFF;
-}
-.aide{
-    position: absolute;
-    width: 126px;
-    height: 52px;
-    right: 15%;
-    top: 60px;
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 36px;
-    line-height: 145%;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    letter-spacing: -0.005em;
-    text-transform: capitalize;
-    color: #FFFFFF;
-}
-.aide:hover{
-    cursor: pointer;
 }
 </style>

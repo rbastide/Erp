@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 
+
 export const mcccStore = reactive({
     resourceCode: '',
     resourceName: '',
@@ -16,8 +17,9 @@ export const mcccStore = reactive({
 
 
     saeCodes: [],
-    competenceCode: '' ,
     competence : [],
+
+    referents : [],
 
     registerMcccStore(){
         localStorage.setItem("mcccStore",JSON.stringify(this));
@@ -31,5 +33,22 @@ export const mcccStore = reactive({
         }
     },
 
-});
+    clearMcccStore(){
+        this.resourceCode = '';
+        this.resourceName = '';
+        this.mainGoal = '';
+        this.year = null;
+        this.semester = null;
 
+        this.hoursCM = 0;
+        this.hoursTD = 0;
+        this.hoursTP = 0;
+        this.hoursDS = 0;
+        this.hoursDSTP = 0;
+        this.hoursTotal = 0;
+
+        this.saeCodes = [];
+        this.competence = [];
+        this.referents = [];
+    },
+});

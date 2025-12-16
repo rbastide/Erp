@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 
@@ -115,17 +116,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-card">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Compétences RX.XX</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
+  <AppHeader title="Ajout compétences"/>
   <main class="main-div">
     <div class="description">Veuillez saisir la/les compétences :</div>
 
@@ -174,7 +165,7 @@ const handleSaveCompetence = () => {
               <svg
                   v-if="nIndex === currentCompetence.niveaux.length - 1"
                   @click="handleAddNiveau"
-                  width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
+                  width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
                 <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
@@ -186,7 +177,7 @@ const handleSaveCompetence = () => {
                 <svg
                     v-if="niveau.acs.length > 0 && niveau.acs[niveau.acs.length - 1].num.trim() && niveau.acs[niveau.acs.length - 1].intitule.trim()"
                     @click="handleAddAc(nIndex)"
-                    width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
+                    width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
                   <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
@@ -205,7 +196,7 @@ const handleSaveCompetence = () => {
 
 
         <button @click="handleSaveCompetence" class="card-ok" title="Valider cette compétence">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
             <polyline points="9 12 12 15 15 9"/>
@@ -221,78 +212,6 @@ const handleSaveCompetence = () => {
 </template>
 
 <style scoped>
-.page-header {
-  position: absolute;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-  box-sizing: border-box;
-}
-
-.container-card img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-.container-card p{
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-  cursor: pointer;
-}
-.quitter:hover{
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-  cursor: pointer;
-}
-
-.aide:hover{
-  cursor: pointer;
-  opacity: 0.8;
-}
-
 .main-div{
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;

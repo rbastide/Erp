@@ -1,11 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 const lastname = ref('');
 const firstname = ref('');
-const teachers = ref([]);
+const errorMessage = ref('');
 
 
 const handleDeconnexion = () => {
@@ -21,51 +23,54 @@ const handleRetour = () => {
 };
 
 const handleAdd = () => {
+  const trimmedLastname = lastname.value.trim();
+  const trimmedFirstname = firstname.value.trim();
 
-  if (lastname.value.trim() === '' || firstname.value.trim() === '') {
+  if (trimmedLastname === '' || trimmedFirstname === '') {
     console.error("Veuillez saisir le nom et le prénom.");
     return;
   }
 
-  const newTeacher = {
-    lastname: lastname.value.trim(),
-    firstname: firstname.value.trim(),
-    id: Date.now()
-  };
+  const teacherExists = mcccStore.referents.some(teacher => {
+    const existingLastname = teacher.lastname.trim().toLowerCase();
+    const existingFirstname = teacher.firstname.trim().toLowerCase();
 
+    const newLastname = trimmedLastname.toLowerCase();
+    const newFirstname = trimmedFirstname.toLowerCase();
 
-  const isDuplicate = teachers.value.some(teacher => {
-    return teacher.lastname.toLowerCase() === lastname.value.toLowerCase() &&
-        teacher.firstname.toLowerCase() === firstname.value.toLowerCase()
+    return (existingLastname === newLastname) && (existingFirstname === newFirstname);
   });
 
-  if (isDuplicate) {
-    console.error(`Le référent ${firstname} ${lastname} est déjà dans la liste.`);
+  if (teacherExists) {
+    errorMessage.value = `Le professeur ${trimmedLastname} ${trimmedFirstname} existe déjà.`;
     return;
   }
-  teachers.value.push(newTeacher);
+
+  const newTeacher = {
+    lastname: trimmedLastname,
+    firstname: trimmedFirstname
+  };
+
+  mcccStore.referents.push(newTeacher);
 
   lastname.value = '';
   firstname.value = '';
+
+  mcccStore.registerMcccStore();
 };
 
 const handleValider = () => {
-  router.push('/modif-saved')
+  router.push('/mccc-menu')
 };
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+});
+
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-card">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Référents pour RX.XX</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
+  <AppHeader title="Référents"/>
   <main class="main-content">
     <div class="description">
       Veuillez saisir le/les Référents pour cette ressource :
@@ -73,7 +78,7 @@ const handleValider = () => {
 
     <div class="container">
       <div class="teachers-list">
-        <div v-for="(teacher, index) in teachers" :key="teacher.id" class="teacher-display-card">
+        <div v-for="(teacher, index) in mcccStore.referents" :key="teacher" class="teacher-display-card">
           Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
         </div>
       </div>
@@ -106,6 +111,8 @@ const handleValider = () => {
         </svg>
       </button>
 
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
       <div class="container-btn">
         <div @click="handleValider" class="btn-sys">Valider les référents</div>
         <div @click="handleRetour" class="btn-sys">Annuler</div>
@@ -115,7 +122,23 @@ const handleValider = () => {
 </template>
 
 <style scoped>
+.main-content {
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  padding-top: 172px;
+  box-sizing: border-box;
+}
 
+.description {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  color: #E92533;
+  margin: 40px;
+}
+
+/* Style de la Carte teacher */
 
 .teachers-list {
   margin-bottom: 30px;
@@ -155,96 +178,6 @@ const handleValider = () => {
   transform: scale(1.1);
   color: green;
 }
-
-.page-header {
-  position: absolute;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-  box-sizing: border-box;
-}
-
-.container-card img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-.container-card p{
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-  cursor: pointer;
-}
-.quitter:hover{
-  cursor: pointer;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-  cursor: pointer;
-}
-
-.aide:hover{
-  cursor: pointer;
-}
-
-/* Style du Contenu Principal */
-
-.main-content {
-  font-family: 'Roboto', sans-serif;
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
-}
-
-.description {
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  color: #E92533;
-  margin: 40px;
-}
-
-/* Style de la Carte teacher */
 
 .container{
   position: relative;
@@ -321,5 +254,13 @@ const handleValider = () => {
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
+}
+
+.error-message {
+  color: #E92533;
+  font-weight: bold;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 </style>

@@ -1,6 +1,15 @@
 <script setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
+import {mcccStore} from "@/services/mcccStore.js";
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+  if (!mcccStore.competences) {
+    mcccStore.competences = [];
+  }
+});
 
 const router = useRouter();
 
@@ -13,6 +22,7 @@ const handleAide = () => {
 };
 
 const handleValider = () => {
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
@@ -28,7 +38,6 @@ const currentCompetence = ref({
   }],
 });
 
-const competencesFinalisees = ref([]);
 
 const handleAddNiveau = () => {
   const lastNiveauIndex = currentCompetence.value.niveaux.length - 1;
@@ -77,7 +86,7 @@ const handleSaveCompetence = () => {
 
   const acsForSimpleResume = niveauxFinalises.flatMap(n => n.acs);
 
-  competencesFinalisees.value.push({
+  mcccStore.competences.push({
     ue: currentCompetence.value.ue,
     niveaux: niveauxFinalises.map(n => n.niveau),
     acs: acsForSimpleResume,
@@ -99,23 +108,13 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
-  <header class="page-header">
-    <div class="container-card">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Compétences RX.XX</p>
-    </div>
-    <div @click="handleAide" class="aide">Service d'aide</div>
-    <div @click="handleDeconnexion" class="quitter">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-  </header>
+  <AppHeader title="Compétences RX.XX"/>
   <main class="main-div">
     <div class="description">Veuillez saisir la/les compétences pour cette ressource :</div>
 
     <div class="container-global">
 
-      <div v-for="(comp, index) in competencesFinalisees" :key="index" class="skill-card skill-card-resume">
+      <div v-for="(comp, index) in mcccStore.competences" :key="index" class="skill-card skill-card-resume">
         <p id="card-title">Compétence {{ index + 1 }}</p>
         <div class="resume-item"><strong>UE :</strong> {{ comp.ue }}</div>
 
@@ -159,7 +158,7 @@ const handleSaveCompetence = () => {
         <div v-for="(niveauGroup, nIndex) in currentCompetence.niveaux" :key="'niv-' + nIndex" class="form-item container-niv-group">
           <div class="niveau-group">
 
-            <label :for="'niv-' + nIndex">**Niveau {{ nIndex + 1 }}** attendu </label>
+            <label :for="'niv-' + nIndex">Niveau {{ nIndex + 1 }} attendu </label>
             <div class="input-with-plus">
               <select :name="'niv-select-' + nIndex" :id="'niv-select-' + nIndex" v-model="niveauGroup.niveau">
                 <option value="" selected disabled>Rien de sélectionné</option>
@@ -224,78 +223,6 @@ const handleSaveCompetence = () => {
 </template>
 
 <style scoped>
-.page-header {
-  position: absolute;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-  box-sizing: border-box;
-}
-
-.container-card img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-.container-card p{
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-  cursor: pointer;
-}
-.quitter:hover{
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-  cursor: pointer;
-}
-
-.aide:hover{
-  cursor: pointer;
-  opacity: 0.8;
-}
-
 .main-div{
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;

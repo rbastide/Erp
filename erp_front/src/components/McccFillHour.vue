@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
 import { mcccStore } from '@/services/mcccStore';
-
 
 mcccStore.loadMcccStore();
 const router = useRouter();
@@ -14,9 +14,6 @@ const totalHeures = computed(() => {
       (mcccStore.hoursTP || 0) +
       (mcccStore.hoursDSTP || 0);
 });
-
-
-
 
 const handleValider = () => {
   mcccStore.hoursTotal = totalHeures.value;
@@ -35,134 +32,88 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+  const boxes = document.querySelectorAll('.grey-square');
+  const maxChars = 5;
+  let total = 0;
+  let contentTotal = document.getElementById("tot");
+
+  const calculerTotal = () => {
+    let total = 0;
+
+    boxes.forEach(box => {
+      const valeur = parseFloat(box.value) || 0;
+      total = total + valeur;
+    });
+    contentTotal.textContent = total.toFixed(2).toString();
+  }
+
+  boxes.forEach(box => {
+    box.addEventListener('input', () => {
+      let text = box.textContent;
+      calculerTotal();
+
+      if (text.length > maxChars) {
+        box.textContent = text.substring(0, maxChars);
+
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(box);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    });
+
+    box.addEventListener('keydown', e => {
+      if (e.key === "Enter") e.preventDefault();
+    });
+  });
+});
+
 </script>
 
 <template>
-  <div class="ressource-page">
-    <header class="page-header">
-      <div class="container-nom">
-        <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim"><p>Heures pour <br>{{mcccStore.resourceCode}}</p>
+  <AppHeader title="Bonjour, " inline="ADMIN"/>
+  <main class = "main-content">
+    <div class = "choisir-ressource">
+      Veuillez saisir les heures à remplir automatiquement :
+    </div>
+    <div class = "top-grid">
+      <div class = "type-of-hour">
+        <p class = "title-hour">CM</p>
+        <input class="grey-square" type="number">
       </div>
-      <div @click="handleAide" class="aide">Service d'aide</div>
-      <div @click="handleDeconnexion" class="quitter">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <div class = "type-of-hour">
+        <p class = "title-hour">TD</p>
+        <input class="grey-square" type="number">
       </div>
-    </header>
-
-    <main class="main-content">
-      <div class="choisir-ressource">
-        Veuillez saisir les heures à remplir automatiquement :
+      <div class = "type-of-hour">
+        <p class = "title-hour">DS</p>
+        <input class="grey-square" type="number">
       </div>
-
-      <div class="top-grid">
-        <div class="type-of-hour">
-          <p class="title-hour">CM</p>
-          <input class="grey-square" type="number" v-model="mcccStore.hoursCM" placeholder="0">
-        </div>
-        <div class="type-of-hour">
-          <p class="title-hour">TD</p>
-          <input class="grey-square" type="number" v-model="mcccStore.hoursTD" placeholder="0">
-        </div>
-        <div class="type-of-hour">
-          <p class="title-hour">DS</p>
-          <input class="grey-square" type="number" v-model="mcccStore.hoursDS" placeholder="0">
-        </div>
+    </div>
+    <div class= "bottom-grid">
+      <div class= "type-of-hour">
+        <p class= "title-hour">TP</p>
+        <input class="grey-square" type="number">
       </div>
-
-      <div class="bottom-grid">
-        <div class="type-of-hour">
-          <p class="title-hour">TP</p>
-          <input class="grey-square" type="number" v-model="mcccStore.hoursTP" placeholder="0">
-        </div>
-        <div class="type-of-hour">
-          <p class="title-hour">DS TP</p>
-          <input class="grey-square" type="number" v-model="mcccStore.hoursDSTP" placeholder="0">
-        </div>
+      <div class= "type-of-hour">
+        <p class= "title-hour">DS TP</p>
+        <input class="grey-square" type="number">
       </div>
+    </div>
+    <div class= "total"><p>Total : <span id="tot">0</span>h</p></div>
 
-      <div class="total">
-        <p>Total : <span id="tot">{{ totalHeures }}</span></p>
-      </div>
-
-      <div class="container-btn">
-        <div @click="handleValider" class="btn-sys">Valider</div>
-        <div @click="handleRetour" class="btn-sys">Annuler</div>
-      </div>    </main>
-
-  </div>
+    <div class="container-btn">
+      <div @click="handleValider" class="btn-sys">Valider</div>
+      <div @click="handleRetour" class="btn-sys">Annuler</div>
+    </div>
+  </main>
 </template>
 
 <style scoped>
-/* Votre style reste 100% identique */
-.page-header {
-  position: relative;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-}
-
-.container-nom img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-
-.container-nom p {
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.quitter {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  right: 5%;
-  top: 64px;
-}
-.quitter:hover{
-  cursor: pointer;
-}
-
-.aide{
-  position: absolute;
-  width: 126px;
-  height: 52px;
-  right: 15%;
-  top: 60px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 145%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  letter-spacing: -0.005em;
-  text-transform: capitalize;
-  color: #FFFFFF;
-}
-.aide:hover{
-  cursor: pointer;
-}
-
 .main-content{
   position: relative;
 }

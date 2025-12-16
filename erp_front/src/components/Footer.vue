@@ -6,7 +6,6 @@
 
 <script>
 export default {
-  // Le nom du composant
   name: 'AppFooter',
   data() {
     return {
@@ -17,15 +16,13 @@ export default {
 </script>
 
 <style scoped>
-/* Styles de base pour le footer */
 .app-footer {
   font-family: 'Roboto', sans-serif;
   width: 100%;
   padding: 15px 0;
   text-align: center;
-  background-color: #f0f0f0; /* Exemple de couleur de fond */
+  background-color: #f0f0f0;
   border-top: 1px solid #ccc;
-  /* Assurez-vous qu'il reste en bas de la page si nécessaire */
   margin-top: auto;
 }
 .app-footer nav a {
