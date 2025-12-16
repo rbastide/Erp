@@ -22,9 +22,9 @@ const handleLogin = async () => {
       await AuthService.login(credentials);
 
       if (credentials.identifier === 'admin') {
-        router.push('/home-admin');
+        await router.push('/home-admin');
       } else {
-        router.push('/home');
+        await router.push('/home');
       }
 
     } catch (error) {

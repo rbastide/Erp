@@ -1,15 +1,28 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import { mcccStore } from '@/services/mcccStore';
 
+mcccStore.loadMcccStore();
 const router = useRouter();
 
+const totalHeures = computed(() => {
+  return (mcccStore.hoursCM || 0) +
+      (mcccStore.hoursTD || 0) +
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursTP || 0) +
+      (mcccStore.hoursDSTP || 0);
+});
+
 const handleValider = () => {
+  mcccStore.hoursTotal = totalHeures.value;
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
 const handleRetour = () => {
-  router.push('/mccc-menu');
+  router.back();
 };
 
 const handleAide = () => {
@@ -109,14 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
   height: 66px;
   margin-top: 20px;
   margin-left: 20px;
-
-
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 32px;
   line-height: 38px;
-
   color: #E92533;
 }
 
@@ -171,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
   margin-bottom: 80px;
 }
 
-
 .container-btn{
   display: flex;
   flex-direction: row;
@@ -201,5 +210,4 @@ document.addEventListener("DOMContentLoaded", () => {
   transform: translateY(-4px);
   cursor: pointer;
 }
-
 </style>

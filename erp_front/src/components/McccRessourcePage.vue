@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { mcccStore } from '../services/mcccStore';
 import AppHeader from './Header.vue';
 
 const router = useRouter();
@@ -16,43 +17,38 @@ const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
 
-const handleMccc = () => {
+const handleMccc = (code: string) => {
+  mcccStore.loadMcccStore();
+  mcccStore.resourceCode = code;
+  mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
-
 </script>
 
 <template>
-  <AppHeader title="Choix ressource"/>
-  <main class = "main-content">
-    <div class = "choisir-ressource">Veuillez choisir la ressource pour laquelle vous voulez modifier les MCCC</div>
+  <AppHeader title="Choix ressources"/>
+  <main class="main-content">
+    <div class="choisir-ressource">Veuillez choisir la ressource : </div>
 
-    <div class = "container-button">
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
+    <div class="container-button">
+      <div @click="handleMccc('R1.01')" class="push-button">
+        <p class="text-button">R1.01</p>
       </div>
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
+      <div @click="handleMccc('R1.02')" class="push-button">
+        <p class="text-button">R1.02</p>
       </div>
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
+      <div @click="handleMccc('R2.01')" class="push-button">
+        <p class="text-button">R2.01</p>
       </div>
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
-      </div>
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
-      </div>
-      <div @click="handleMccc" class ="push-button">
-        <p class = "text-button">RX.XX</p>
+      <div @click="handleMccc('R2.02')" class="push-button">
+        <p class="text-button">R2.02</p>
       </div>
     </div>
+
     <div @click="handleRetour" class="btn-quitter">Retour</div>
   </main>
 </template>
-
 <style scoped>
-
 .main-content{
   position: relative;
 }
@@ -61,11 +57,14 @@ const handleMccc = () => {
   height: 66px;
   margin-top: 20px;
   margin-left: 20px;
+
+
   font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 32px;
   line-height: 38px;
+
   color: #E92533;
 }
 
@@ -77,6 +76,7 @@ const handleMccc = () => {
 }
 
 .push-button {
+  /* Push Button */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -108,7 +108,7 @@ const handleMccc = () => {
 
 .btn-quitter{
   width: 150px;
-  padding: 0.8rem;
+  padding: 0.8rem; /* 13px */
   border: none;
   text-align: center;
   border-radius: 4px;

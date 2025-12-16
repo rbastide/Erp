@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from './Header.vue';
 
 const router = useRouter();
@@ -16,11 +17,17 @@ const handleValider = () => {
   router.push('/modif-saved');
 };
 
+const handleRetour = () => {
+  router.push('/mccc-menu');
+};
+
 import { onMounted } from 'vue';
 
 onMounted(() => {
   const buttons = document.querySelectorAll('.tab-button');
   const contents = document.querySelectorAll('.tab-content');
+
+  mcccStore.loadMcccStore();
 
   buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -40,8 +47,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <AppHeader title="Récapitulatif de" inline="RX.XX"/>
+  <AppHeader title="Récapitulatif"/>
   <main class = "main-content">
+    <div class = "summary">
+      Récapitulatif de la ressource : {{mcccStore.resourceCode}}
+    </div>
     <div class="grid">
       <div class = "hour-summary">
         <div class = "title">
@@ -50,32 +60,34 @@ onMounted(() => {
         <div class = "listing-hours">
           <div class = "type-of-hour" id="cm">
             <p class = "title-hour">CM</p>
-            <p class="grey-square" type="number">4H </p>
+            <p class="grey-square" type="number">{{mcccStore.hoursCM}} </p>
           </div>
           <div class = "type-of-hour">
             <p class = "title-hour">TD</p>
-            <p class="grey-square" type="number">5H </p>
+            <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
           </div>
           <div class = "type-of-hour">
             <p class = "title-hour">DS</p>
-            <p class="grey-square" type="number">7H </p>
+            <p class="grey-square" type="number">{{mcccStore.hoursTD}}</p>
           </div>
           <div class= "type-of-hour">
             <p class= "title-hour">TP</p>
-            <p class="grey-square" type="number">5H </p>
+            <p class="grey-square" type="number">{{mcccStore.hoursTP}}</p>
           </div>
           <div class= "type-of-hour" id="ds_tp">
             <p class= "title-hour">DS/TP</p>
-            <p class="grey-square" type="number">3H </p>
+            <p class="grey-square" type="number">{{mcccStore.hoursDSTP}} </p>
           </div>
-          <div class= "total"><p>Total : <span id="tot">0</span></p></div>
+          <div class= "total"><p>Total : <span id="tot">{{mcccStore.hoursTotal}}</span></p></div>
         </div>
       </div>
       <div class = "sae-summary">
         <p class = "title-centered" >
           SAE(s) concernées :
         </p>
-        <p class="grey-square" id="sae_conc">SX.XX </p>
+        <p class="grey-square" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
+          {{ saeCode }}
+        </p>
         <p class = "title-centered">
           Compétence(s) concernée(s) :
         </p>
@@ -123,10 +135,14 @@ onMounted(() => {
         </div>
       </div>
     </div>
+    <div class= "title"><p>Professeur(s) référent : <span id="creation">Mr Test</span></p></div>
     <div class= "title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
     <div class= "title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
     <div class= "title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
-    <div @click="handleValider" class="btn-sys">Valider</div>
+    <div class="container-btn">
+      <div @click="handleValider" class="btn-sys">Valider</div>
+      <div @click="handleRetour" class="btn-sys">Annuler</div>
+    </div>
   </main>
 </template>
 
@@ -138,6 +154,19 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
+}
+.summary {
+  width: 100%;
+  height: 66px;
+  margin-top: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 38px;
+  text-align: center;
+
+  color: #E92533;
 }
 
 .title{
@@ -249,9 +278,7 @@ onMounted(() => {
   margin-bottom: 50px;
   padding: 20px;
   width: 1100px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  border: 1px solid #dcdcdc;
-  border-radius: 10px;
+  border: black 3px solid;
 }
 
 .grid-split-in-two{
@@ -334,8 +361,6 @@ onMounted(() => {
   display: block;
 }
 
-
-/* Date de création */
 #creation{
   color: black;
 }
@@ -359,4 +384,16 @@ onMounted(() => {
   margin-top: 40px;
 }
 
+.container-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.container-btn div:hover{
+  background: #999999;
+  transform: translateY(-4px);
+  cursor: pointer;
+}
 </style>

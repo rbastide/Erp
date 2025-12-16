@@ -6,7 +6,6 @@
 
 <script>
 export default {
-  // Le nom du composant
   name: 'AppFooter',
   data() {
     return {

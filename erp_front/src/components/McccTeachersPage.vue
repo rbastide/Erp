@@ -1,12 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 const lastname = ref('');
 const firstname = ref('');
-const teachers = ref([]);
+const errorMessage = ref('');
 
 
 const handleDeconnexion = () => {
@@ -22,37 +23,50 @@ const handleRetour = () => {
 };
 
 const handleAdd = () => {
+  const trimmedLastname = lastname.value.trim();
+  const trimmedFirstname = firstname.value.trim();
 
-  if (lastname.value.trim() === '' || firstname.value.trim() === '') {
+  if (trimmedLastname === '' || trimmedFirstname === '') {
     console.error("Veuillez saisir le nom et le prénom.");
     return;
   }
 
-  const newTeacher = {
-    lastname: lastname.value.trim(),
-    firstname: firstname.value.trim(),
-    id: Date.now()
-  };
+  const teacherExists = mcccStore.referents.some(teacher => {
+    const existingLastname = teacher.lastname.trim().toLowerCase();
+    const existingFirstname = teacher.firstname.trim().toLowerCase();
 
+    const newLastname = trimmedLastname.toLowerCase();
+    const newFirstname = trimmedFirstname.toLowerCase();
 
-  const isDuplicate = teachers.value.some(teacher => {
-    return teacher.lastname.toLowerCase() === lastname.value.toLowerCase() &&
-        teacher.firstname.toLowerCase() === firstname.value.toLowerCase()
+    return (existingLastname === newLastname) && (existingFirstname === newFirstname);
   });
 
-  if (isDuplicate) {
-    console.error(`Le référent ${firstname} ${lastname} est déjà dans la liste.`);
+  if (teacherExists) {
+    errorMessage.value = `Le professeur ${trimmedLastname} ${trimmedFirstname} existe déjà.`;
     return;
   }
-  teachers.value.push(newTeacher);
+
+  const newTeacher = {
+    lastname: trimmedLastname,
+    firstname: trimmedFirstname
+  };
+
+  mcccStore.referents.push(newTeacher);
 
   lastname.value = '';
   firstname.value = '';
+
+  mcccStore.registerMcccStore();
 };
 
 const handleValider = () => {
-  router.push('/modif-saved')
+  router.push('/mccc-menu')
 };
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+});
+
 </script>
 
 <template>
@@ -64,7 +78,7 @@ const handleValider = () => {
 
     <div class="container">
       <div class="teachers-list">
-        <div v-for="(teacher, index) in teachers" :key="teacher.id" class="teacher-display-card">
+        <div v-for="(teacher, index) in mcccStore.referents" :key="teacher" class="teacher-display-card">
           Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
         </div>
       </div>
@@ -96,6 +110,8 @@ const handleValider = () => {
           <polyline points="9 12 12 15 15 9"/>
         </svg>
       </button>
+
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
       <div class="container-btn">
         <div @click="handleValider" class="btn-sys">Valider les référents</div>
@@ -238,5 +254,13 @@ const handleValider = () => {
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
+}
+
+.error-message {
+  color: #E92533;
+  font-weight: bold;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 </style>

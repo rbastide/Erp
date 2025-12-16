@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
-
+mcccStore.loadMcccStore();
 const handleRetour = () => {
   router.push('/mccc-ressource');
 };
@@ -147,5 +148,6 @@ const handleCompetences = () => {
   transform: translateY(-4px);
   cursor: pointer;
 }
+
 
 </style>
