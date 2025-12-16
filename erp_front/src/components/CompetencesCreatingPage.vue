@@ -165,7 +165,7 @@ const handleSaveCompetence = () => {
               <svg
                   v-if="nIndex === currentCompetence.niveaux.length - 1"
                   @click="handleAddNiveau"
-                  width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
+                  width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
                 <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
@@ -177,7 +177,7 @@ const handleSaveCompetence = () => {
                 <svg
                     v-if="niveau.acs.length > 0 && niveau.acs[niveau.acs.length - 1].num.trim() && niveau.acs[niveau.acs.length - 1].intitule.trim()"
                     @click="handleAddAc(nIndex)"
-                    width="35" height="35" viewBox="0 0 57 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-active">
+                    width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
                   <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
@@ -196,7 +196,7 @@ const handleSaveCompetence = () => {
 
 
         <button @click="handleSaveCompetence" class="card-ok" title="Valider cette compétence">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
             <polyline points="9 12 12 15 15 9"/>

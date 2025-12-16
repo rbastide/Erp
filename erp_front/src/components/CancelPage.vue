@@ -38,8 +38,7 @@ const handleDeconnexion = () => {
   display: flex;
   flex-direction: column;
   width: 90%;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
