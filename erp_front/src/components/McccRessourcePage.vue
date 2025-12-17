@@ -1,20 +1,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { mcccStore } from '../services/mcccStore';
+import { mcccStore } from '@/services/mcccStore';
 import AppHeader from './Header.vue';
 
 const router = useRouter();
 
 const handleRetour = () => {
   router.push('/home-admin');
-};
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
 };
 
 const handleMccc = (code: string) => {
@@ -51,6 +43,7 @@ const handleMccc = (code: string) => {
 <style scoped>
 .main-content{
   position: relative;
+  padding-top: 172px;
 }
 .choisir-ressource {
   width: 100%;
