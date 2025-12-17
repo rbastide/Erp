@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import AppHeader from './Header.vue';
 import { mcccStore } from '@/services/mcccStore';
+import AppHeader from './Header.vue';
+
 
 mcccStore.loadMcccStore();
 const router = useRouter();
@@ -33,45 +34,6 @@ const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  const boxes = document.querySelectorAll('.grey-square');
-  const maxChars = 5;
-  let total = 0;
-  let contentTotal = document.getElementById("tot");
-
-  const calculerTotal = () => {
-    let total = 0;
-
-    boxes.forEach(box => {
-      const valeur = parseFloat(box.value) || 0;
-      total = total + valeur;
-    });
-    contentTotal.textContent = total.toFixed(2).toString();
-  }
-
-  boxes.forEach(box => {
-    box.addEventListener('input', () => {
-      let text = box.textContent;
-      calculerTotal();
-
-      if (text.length > maxChars) {
-        box.textContent = text.substring(0, maxChars);
-
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(box);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    });
-
-    box.addEventListener('keydown', e => {
-      if (e.key === "Enter") e.preventDefault();
-    });
-  });
-});
-
 </script>
 
 <template>
@@ -83,28 +45,28 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class = "top-grid">
       <div class = "type-of-hour">
         <p class = "title-hour">CM</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursCM">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">TD</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTD">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">DS</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDS">
       </div>
     </div>
     <div class= "bottom-grid">
       <div class= "type-of-hour">
         <p class= "title-hour">TP</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTP">
       </div>
       <div class= "type-of-hour">
         <p class= "title-hour">DS TP</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDSTP">
       </div>
     </div>
-    <div class= "total"><p>Total : <span id="tot">0</span>h</p></div>
+    <div class= "total"><p>Total : <span id="tot">{{ totalHeures }}</span>h</p></div>
 
     <div class="container-btn">
       <div @click="handleValider" class="btn-sys">Valider</div>
