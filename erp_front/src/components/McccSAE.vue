@@ -1,10 +1,11 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { onMounted, nextTick } from 'vue';
+import {onMounted, nextTick, ref} from 'vue';
 import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from './Header.vue';
 
 const router = useRouter();
+const errorMessage = ref('');
 
 const handleRetour = () => {
   router.push('/mccc-menu');
@@ -27,14 +28,6 @@ const handleValider = () => {
   mcccStore.registerMcccStore();
 
   router.push('/mccc-menu');
-};
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
 };
 
 const setupInputLimits = () => {
@@ -81,13 +74,19 @@ onMounted(() => {
 
 function duplicateGreySquare(containerId){
   const container = document.getElementById(containerId);
+  errorMessage.value = '';
 
   if (!container) {
-    console.error(`Conteneur '${containerId}' introuvable.`);
+    errorMessage.value = `Conteneur '${containerId}' introuvable.`;
     return;
   }
 
   const originalObject = container.querySelector('.grey-square:last-child');
+
+  if (originalObject.textContent === '') {
+    errorMessage.value = "Veuillez saisir la SAE.";
+    return;
+  }
 
   if (originalObject) {
     const newObject = originalObject.cloneNode(true);
@@ -118,6 +117,8 @@ function duplicateGreySquare(containerId){
             stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
+
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
     <div class="container-btn">
       <div @click="handleValider" class="btn-sys">Valider</div>
@@ -213,5 +214,13 @@ function duplicateGreySquare(containerId){
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
+}
+
+.error-message {
+  color: #E92533;
+  font-weight: bold;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 </style>
