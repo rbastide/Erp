@@ -51,8 +51,7 @@
 .main-content{
   display: flex;
   width: 90%;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
 }

@@ -78,8 +78,7 @@ const handleShow = () => {
 .main-content {
   display: flex;
   width: 90%;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
 }
@@ -131,7 +130,7 @@ const handleShow = () => {
   margin-bottom: 15px;
   background: #D9D9D9;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 6px;
   min-height: 80px;
   z-index: 2;

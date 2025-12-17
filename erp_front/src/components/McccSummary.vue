@@ -16,7 +16,6 @@ const handleDeconnexion = () => {
 const handleValider = () => {
   router.push('/modif-saved');
   mcccStore.clearMcccStore();
-  localStorage.removeItem("mcccStore");
 };
 
 const handleRetour = () => {
