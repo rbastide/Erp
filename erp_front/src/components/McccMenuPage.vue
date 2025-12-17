@@ -68,8 +68,7 @@ const handleCompetences = () => {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
   width: fit-content;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
