@@ -113,7 +113,9 @@ function duplicateGreySquare(containerId){
         <div class = "grey-square" contenteditable="true"></div>
       </div>
       <svg class = "add-button" @click="duplicateGreySquare('sae-text')" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
-        <path d="M36 23.3333V46.6667M24 35H48M15 8.75H57C60.3137 8.75 63 11.3617 63 14.5833V55.4167C63 58.6383 60.3137 61.25 57 61.25H15C11.6863 61.25 9 58.6383 9 55.4167V14.5833C9 11.3617 11.6863 8.75 15 8.75Z" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+            d="M36 23.3333V46.6667M24 35H48M15 8.75H57C60.3137 8.75 63 11.3617 63 14.5833V55.4167C63 58.6383 60.3137 61.25 57 61.25H15C11.6863 61.25 9 58.6383 9 55.4167V14.5833C9 11.3617 11.6863 8.75 15 8.75Z"
+            stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
 

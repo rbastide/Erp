@@ -15,8 +15,6 @@ onMounted(() => {
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
 });
 
-const handleDeconnexion = () => router.push('/deconnexion');
-const handleAide = () => router.push('/aide');
 const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
@@ -99,7 +97,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
-  <AppHeader title="Compétences RX.XX"/>
+  <AppHeader :title="'Compétences ' + mcccStore.resourceCode"/>
   <main class="main-div">
     <div class="description">Veuillez saisir la/les compétences pour cette ressource :</div>
 
@@ -139,7 +137,7 @@ const handleSaveCompetence = () => {
         <p id="card-title">Ajouter une compétence</p>
 
         <div class="form-item container-ue">
-          <label for="ue">Veuillez choisir une UE associée à RX.XX </label>
+          <label for="ue">Veuillez choisir une UE associée à {{ mcccStore.resourceCode }} </label>
           <select name="ue" id="ue" v-model="currentCompetence.ue">
             <option value="" selected disabled>Rien de sélectionné</option>
             <option value="UE 1 : Réaliser">UE 1 : Réaliser</option>
@@ -170,14 +168,14 @@ const handleSaveCompetence = () => {
                   v-if="nIndex === currentCompetence.niveaux.length - 1"
                   @click="handleAddNiveau"
                   width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
-                <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z"  stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
             </div>
 
             <div class="nested-acs">
 
               <div class="ac-title-with-plus">
-                <p class="nested-title">ACs pour {{ niveauGroup.niveau || `Niveau ${nIndex + 1}` }} :</p>
+                <p class="nested-title">ACs pour {{ niveauGroup.niveau || `Niveau ${nIndex + 1}` }}</p>
               </div>
 
               <div v-for="(ac, aIndex) in niveauGroup.acs" :key="'ac-' + nIndex + '-' + aIndex" class="form-item container-ac ac-input-group">
@@ -196,7 +194,7 @@ const handleSaveCompetence = () => {
                       v-if="aIndex === niveauGroup.acs.length - 1"
                       @click="handleAddAc(nIndex)"
                       width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
-                    <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                   </svg>
                 </div>
               </div>
@@ -206,7 +204,7 @@ const handleSaveCompetence = () => {
 
         <button @click="handleSaveCompetence" class="card-ok" title="Valider cette compétence">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
-               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
             <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
             <polyline points="9 12 12 15 15 9"/>
           </svg>
@@ -221,24 +219,8 @@ const handleSaveCompetence = () => {
 </template>
 
 <style scoped>
-/* Votre CSS reste inchangé, copiez-le ici */
-/* header */
-.page-header {
-  position: absolute;
-  width: 100%;
-  height: 172px;
-  left: 0px;
-  top: 0px;
-  background: #B51621;
-  box-sizing: border-box;
-}
-/* ... tout le reste de votre style ... */
 .container-card img { position: absolute; width: 127px; height: 127px; left: 64px; top: 22.5px; }
 .container-card p{ position: absolute; width: 723px; height: 124px; left: 209px; top: 24px; font-family: 'Roboto', sans-serif; font-style: normal; font-weight: 900; font-size: 56px; line-height: 110%; display: flex; align-items: center; letter-spacing: -0.03em; color: #FFFFFF; }
-.quitter { position: absolute; width: 48px; height: 48px; right: 5%; top: 64px; cursor: pointer; }
-.quitter:hover{ cursor: pointer; opacity: 0.8; }
-.aide{ position: absolute; width: 126px; height: 52px; right: 15%; top: 60px; font-family: 'Roboto', sans-serif; font-style: normal; font-weight: 500; font-size: 36px; line-height: 145%; display: flex; align-items: center; text-align: center; letter-spacing: -0.005em; text-transform: capitalize; color: #FFFFFF; cursor: pointer; }
-.aide:hover{ cursor: pointer; opacity: 0.8; }
 .main-div{ font-family: 'Roboto', sans-serif; min-height: 100vh; padding-top: 172px; box-sizing: border-box; background-color: #f7f7f7; }
 .container-global { position: relative; width: 450px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-direction: column; padding-bottom: 50px; }
 .description { font-family: 'Roboto', sans-serif; font-style: normal; font-weight: 400; font-size: 32px; color: #B51621; margin: 40px; text-align: center; }
