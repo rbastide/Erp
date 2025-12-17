@@ -47,66 +47,66 @@ const handleDeconnexion = () => {
 </template>
 
 <style scoped>
-  .page-header {
-    position: absolute;
-    width: 100%;
-    height: 172px;
-    left: 0;
-    top: 0;
-    background: #B51621;
-    box-sizing: border-box;
-  }
+.page-header {
+  position: absolute;
+  width: 100%;
+  height: 172px;
+  left: 0;
+  top: 0;
+  background: #B51621;
+  box-sizing: border-box;
+}
 
-  .container-connexion img {
-    position: absolute;
-    width: 127px;
-    height: 127px;
-    left: 64px;
-    top: 22.5px;
-  }
-  .container-connexion p{
-    position: absolute;
-    width: 723px;
-    height: 124px;
-    left: 209px;
-    top: 24px;
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 900;
-    font-size: 56px;
-    line-height: 110%;
-    display: flex;
-    align-items: center;
-    letter-spacing: -0.03em;
-    color: #FFFFFF;
-  }
+.container-connexion img {
+  position: absolute;
+  width: 127px;
+  height: 127px;
+  left: 64px;
+  top: 22.5px;
+}
+.container-connexion p{
+  position: absolute;
+  width: 723px;
+  height: 124px;
+  left: 209px;
+  top: 24px;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 56px;
+  line-height: 110%;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+}
 
-  .aide{
-    position: absolute;
-    width: 126px;
-    height: 52px;
-    right: 15%;
-    top: 60px;
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 36px;
-    line-height: 145%;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    letter-spacing: -0.005em;
-    text-transform: capitalize;
-    color: #FFFFFF;
-    cursor: pointer;
-  }
+.aide{
+  position: absolute;
+  width: 126px;
+  height: 52px;
+  right: 15%;
+  top: 60px;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 145%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  letter-spacing: -0.005em;
+  text-transform: capitalize;
+  color: #FFFFFF;
+  cursor: pointer;
+}
 
-  .quitter {
-    position: absolute;
-    width: 48px;
-    height: 48px;
-    right: 5%;
-    top: 64px;
-    cursor: pointer;
-  }
+.quitter {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  right: 5%;
+  top: 64px;
+  cursor: pointer;
+}
 </style>
