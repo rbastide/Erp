@@ -49,7 +49,7 @@ const handleAfficher = () => {
   align-items: center;
   gap: 40px;
   padding: 40px 20px;
-  margin-top: 180px;
+  margin-top: 175px;
 }
 
 .card-action {
