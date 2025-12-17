@@ -96,7 +96,7 @@ const saveModification = (index) => {
 </script>
 
 <template>
-  <AppHeader title="Bonjour," inline="Prénom NOM"/>
+  <AppHeader title="Gestion des ressources"/>
   <div class="main-content">
     <p class="description">Voici la liste des ressources </p>
     <div class="version-list-container">
