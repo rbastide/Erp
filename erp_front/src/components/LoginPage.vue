@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../services/AuthService';
 import AppHeader from './Header.vue';
+import '../assets/css/variable.css';
 
 const router = useRouter();
 const username = ref('');
@@ -79,8 +80,8 @@ const handleAide = () => {
 </template>
 
 <style scoped>
+
 .main-content {
-  background-color: #FFFFFF;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -68,7 +68,7 @@ onMounted(() => {
   height: 172px;
   left: 0;
   top: 0;
-  background: var(--gradient-red-orange);
+  background: var(--gradient-red-orange, #B51621);
   box-sizing: border-box;
 }
 
