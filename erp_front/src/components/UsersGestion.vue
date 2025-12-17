@@ -6,19 +6,19 @@ import AppHeader from './Header.vue';
 const router = useRouter();
 
 const resources = reactive([
-  { id: 'R1.01', title: 'Intitulé de la ressource' },
-  { id: 'R1.02', title: 'Intitulé' }
+  { id: 'Reia', role: 'Professeur' },
+  { id: 'admin', role: 'Admin' }
 ]);
 
 const showAddForm = ref(false);
 const editingIndex = ref(null);
 const newResource = reactive({
   id: '',
-  title: ''
+  role: ''
 });
 const editedResource = reactive({
   id: '',
-  title: ''
+  role: ''
 });
 
 const handleRetour = () => {
@@ -45,9 +45,9 @@ const handleCancel = () => {
   showAddForm.value = false;
   editingIndex.value = null;
   newResource.id = '';
-  newResource.title = '';
+  newResource.role = '';
   editedResource.id = '';
-  editedResource.title = '';
+  editedResource.role = '';
 };
 
 const handleAddUser = () => {
@@ -55,10 +55,10 @@ const handleAddUser = () => {
 };
 
 const addResourceToList = () => {
-  if (newResource.id.trim() !== '' && newResource.title.trim() !== '') {
+  if (newResource.id.trim() !== '' && newResource.role.trim() !== '') {
     resources.push({
       id: newResource.id.trim(),
-      title: newResource.title.trim()
+      role: newResource.role.trim()
     });
     showAddForm.value = false;
   } else {
@@ -77,13 +77,13 @@ const handleModif = (index) => {
   showAddForm.value = false;
 
   editedResource.id = resources[index].id;
-  editedResource.title = resources[index].title;
+  editedResource.role = resources[index].role;
 };
 
 const saveModification = (index) => {
-  if (editedResource.id.trim() !== '' && editedResource.title.trim() !== '') {
+  if (editedResource.id.trim() !== '' && editedResource.role.trim() !== '') {
     resources[index].id = editedResource.id.trim();
-    resources[index].title = editedResource.title.trim();
+    resources[index].role = editedResource.role.trim();
 
     editingIndex.value = null;
   } else {
@@ -101,7 +101,7 @@ const saveModification = (index) => {
 
         <template v-for="(resource, index) in resources" :key="index">
           <li class="version-item">
-            <span class="resource">{{ resource.id }} : {{ resource.title }}</span>
+            <span class="resource">{{ resource.id }} : {{ resource.role }}</span>
             <span class="icon-container">
               <svg @click="handleDelete(index)" class="del-icon" width="40" height="40" viewBox="0 0 50 63" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M44.2307 5.90283H5.7691C2.58794 5.90283 0 8.55077 0 11.8057V19.6764C0 20.7647 0.861309 21.6438 1.92282 21.6438H3.84563V57.0612C3.84563 60.3155 6.43409 62.964 9.61474 62.964H40.3842C43.5649 62.964 46.1533 60.3155 46.1533 57.0612L46.1539 21.6438H48.0767C49.1382 21.6438 49.9995 20.7641 49.9995 19.6764L50 11.8057C50 8.55077 47.4115 5.90283 44.2309 5.90283H44.2307ZM42.3073 57.0622C42.3073 58.1484 41.444 59.0296 40.3845 59.0296H9.615C8.55546 59.0296 7.69218 58.1483 7.69218 57.0622L7.69167 21.6449H42.3065L42.3073 57.0622ZM46.1536 17.7091H3.84538V11.8062C3.84538 10.72 4.70871 9.83881 5.76819 9.83881H44.2297C45.2893 9.83881 46.1526 10.7201 46.1526 11.8062L46.1536 17.7091Z" fill="black"/>
@@ -116,18 +116,34 @@ const saveModification = (index) => {
           </span>
           </li>
 
-          <li v-if="editingIndex === index" class="add-resource-item">
+          <li v-if="editingIndex === index" class="add-user-item">
             <svg @click="handleCancel" class="cancel-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M30 30L70 70M70 30L30 70" stroke="black" stroke-width="5" stroke-linecap="round"/>
             </svg>
             <div class="input-container">
               <div class="input-group-field">
-                <label for="edit-resource-id">Numéro de la ressource</label>
+                <label for="edit-resource-id">Identifiant</label>
                 <input id="edit-resource-id" type="text" v-model="editedResource.id" :class="{ 'input-field': true }">
               </div>
               <div class="input-group-field">
-                <label for="edit-resource-title">Intitulé</label>
-                <input id="edit-resource-title" type="text" v-model="editedResource.title" :class="{ 'input-field': true }">
+                <label for="edit-resource-title">Ancien mot de passe</label>
+                <input id="edit-resource-title" type="text" v-model="editedResource.role" :class="{ 'input-field': true }">
+              </div>
+              <div class="input-group-field">
+                <label for="edit-resource-title">Nouveau mot de passe</label>
+                <input id="new-pwd" type="text" v-model="editedResource.role" :class="{ 'input-field': true }">
+              </div>
+              <div class="input-group-field">
+                <div class="select-wrapper">
+                  <select name="role" id="role" class="custom-select">
+                    <option value="" disabled selected>Sélectionnez un rôle</option>
+                    <option value="admin">Admin</option>
+                    <option value="professeur">Professeur</option>
+                    <option value="superadmin">Super Admin</option>
+                    <option value="co-intervenant">Co-intervenant</option>
+                  </select>
+                  <span class="select-arrow"></span>
+                </div>
               </div>
             </div>
             <svg @click="saveModification(index)" class="add-arrow-icon" width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -136,26 +152,6 @@ const saveModification = (index) => {
             </svg>
           </li>
         </template>
-
-        <li v-if="showAddForm" class="add-resource-item">
-          <svg @click="handleCancel" class="cancel-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M30 30L70 70M70 30L30 70" stroke="black" stroke-width="5" stroke-linecap="round"/>
-          </svg>
-          <div class="input-container">
-            <div class="input-group-field">
-              <label for="resource-id">Numéro de la ressource</label>
-              <input id="resource-id" type="text" v-model="newResource.id" :class="{ 'input-field': true }">
-            </div>
-            <div class="input-group-field">
-              <label for="resource-title">Intitulé</label>
-              <input id="resource-title" type="text" v-model="newResource.title" :class="{ 'input-field': true }">
-            </div>
-          </div>
-          <svg @click="addResourceToList" class="add-arrow-icon" width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="45" stroke="black" stroke-width="3"/>
-            <path d="M40 30L65 50L40 70" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </li>
 
         <div class="btn-container">
           <svg @click="handleAddUser" class="plus-icon" width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -293,7 +289,7 @@ const saveModification = (index) => {
   cursor: pointer;
 }
 
-.add-resource-item {
+.add-user-item {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -317,6 +313,7 @@ const saveModification = (index) => {
 .input-group-field {
   display: flex;
   align-items: center;
+  justify-content: right;
   gap: 10px;
 }
 
@@ -363,10 +360,11 @@ const saveModification = (index) => {
   padding: 2px;
   position: relative;
   left: -5px;
-  top: -40px;
+  top: -80px;
 }
 .cancel-icon:hover {
   transform: scale(1.1);
+  cursor: pointer;
 }
 
 .container-btn{
@@ -397,5 +395,63 @@ const saveModification = (index) => {
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
+}
+
+/* Conteneur pour positionner la flèche personnalisée */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px; /* À ajuster selon votre besoin */
+}
+
+.custom-select {
+  width: 100%;
+  padding: 12px 40px 12px 16px; /* Espace à droite pour la flèche */
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  background-color: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+
+  /* Supprime le style par défaut du navigateur */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* État au survol et focus */
+.custom-select:hover {
+  border-color: #B51621; /* Rappel du rouge de votre header */
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #B51621;
+  box-shadow: 0 0 0 3px rgba(181, 22, 33, 0.1);
+}
+
+/* Design de la flèche personnalisée (SVG ou triangle CSS) */
+.select-arrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #B51621; /* Couleur de la flèche */
+  pointer-events: none; /* Pour que le clic traverse la flèche */
+}
+
+/* Style des options (limité car géré par l'OS) */
+.custom-select option {
+  padding: 10px;
+  background-color: white;
+  color: #333;
 }
 </style>

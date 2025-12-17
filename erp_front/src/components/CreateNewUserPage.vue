@@ -13,7 +13,7 @@ const role = ref('');
 const errorMessage = ref('');
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.push('/users-gestion');
 };
 
 const handleAide = () => {
@@ -115,7 +115,7 @@ const handleRegister = async () => {
   </main>
 
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Quitter</div>
+    <div @click="handleRetour" class="btn-quitter">Retour</div>
   </footer>
 </template>
 
