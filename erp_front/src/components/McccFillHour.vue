@@ -37,25 +37,25 @@ const handleRetour = () => {
     <div class = "top-grid">
       <div class = "type-of-hour">
         <p class = "title-hour">CM</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursCM">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursCM" min="0">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">TD</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTD">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTD" min="0">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">DS</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDS">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDS" min="0">
       </div>
     </div>
     <div class= "bottom-grid">
       <div class= "type-of-hour">
         <p class= "title-hour">TP</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTP">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTP" min="0">
       </div>
       <div class= "type-of-hour">
         <p class= "title-hour">DS TP</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDSTP">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDSTP" min="0">
       </div>
     </div>
     <div class= "total"><p>Total : <span id="tot">{{ totalHeures }}</span>h</p></div>
