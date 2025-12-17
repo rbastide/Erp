@@ -50,5 +50,7 @@ export const mcccStore = reactive({
         this.saeCodes = [];
         this.competence = [];
         this.referents = [];
+
+        localStorage.removeItem("mcccStore");
     },
 });

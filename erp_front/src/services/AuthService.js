@@ -18,6 +18,5 @@ export default {
   logout() {
     localStorage.removeItem('user_token');
     mcccStore.clearMcccStore();
-    localStorage.removeItem('mcccStore');
   }
 };

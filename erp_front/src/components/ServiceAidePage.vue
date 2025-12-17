@@ -5,7 +5,11 @@ import AppHeader from './Header.vue';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/login');
+  if (localStorage.getItem('user_token') === null) {
+    router.push('/login');
+  } else {
+    router.back();
+  }
 };
 
 </script>
@@ -31,7 +35,7 @@ const handleRetour = () => {
     </div>
   </main>
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Quitter</div>
+    <div @click="handleRetour" class="btn-quitter">Retour</div>
   </footer>
 
 </template>
