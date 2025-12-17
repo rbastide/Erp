@@ -7,14 +7,6 @@
   const handleRetour = () => {
     router.push('/home');
   };
-
-  const handleAide = () => {
-    router.push('/aide');
-  };
-
-  const handleDeconnexion = () => {
-    router.push('/deconnexion');
-  };
 </script>
 
 <template>
