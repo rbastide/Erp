@@ -51,6 +51,7 @@ export const mcccStore = reactive({
         this.niveaux = [];
         this.ue = [];
         this.acs = [];
+        this.acsGrouped = [];
 
         this.referents = [];
 
