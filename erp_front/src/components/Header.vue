@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import {onMounted, ref} from "vue";
 
 // Déclaration des props
 const props = defineProps({
@@ -20,6 +21,8 @@ const props = defineProps({
   }
 });
 
+const hasToken = ref(false);
+
 const router = useRouter();
 
 const handleAide = () => {
@@ -29,16 +32,20 @@ const handleAide = () => {
 const handleDeconnexion = () => {
   router.push('/deconnexion');
 };
+
+onMounted(() => {
+  hasToken.value = !!localStorage.getItem('user_token');
+})
 </script>
 
 <template>
-  <header class="page-header">
+  <header class="page-header" title="">
     <div class="container-connexion">
       <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
       <p>{{ title }} <br> {{inline}}</p>
     </div>
     <div v-if="aide" @click="handleAide" class="aide">Service d'aide</div>
-    <div v-if="deconnexion" @click="handleDeconnexion" class="quitter">
+    <div v-if="deconnexion && hasToken" @click="handleDeconnexion" class="quitter">
       <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <path d="M18 42H10C8.93913 42 7.92172 41.5786 7.17157 40.8284C6.42143 40.0783 6 39.0609 6 38V10C6 8.93913 6.42143 7.92172 7.17157 7.17157C7.92172 6.42143 8.93913 6 10 6H18M32 34L42 24M42 24L32 14M42 24H18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
