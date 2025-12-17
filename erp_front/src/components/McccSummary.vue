@@ -3,13 +3,51 @@ import { useRouter } from 'vue-router';
 import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from './Header.vue';
 import { onMounted } from 'vue';
+import api from '@/services/api'; // <--- 1. Import de l'API
 
 const router = useRouter();
 
-const handleRetour = () => router.push('/mccc-menu');
+const handleRetour = () => router.back();
 
-const handleValider = () => {
-  router.push('/modif-saved');
+const handleValider = async () => {
+  try {
+    const payload = {
+      resourceCode: mcccStore.resourceCode,
+      creationDate: mcccStore.creationDate,
+      editDate: mcccStore.editDate,
+
+      hoursCM: mcccStore.hoursCM,
+      hoursTD: mcccStore.hoursTD,
+      hoursTP: mcccStore.hoursTP,
+      hoursDS: mcccStore.hoursDS,
+      hoursDSTP: mcccStore.hoursDSTP,
+      hoursTotal: mcccStore.hoursTotal,
+
+      saeCodes: mcccStore.saeCodes,
+
+      ue: mcccStore.ue,
+      niveaux: mcccStore.niveaux,
+      acs: mcccStore.acs,
+
+      acsGrouped: mcccStore.acsGrouped,
+
+      referents: mcccStore.referents
+    };
+
+    console.log("Envoi des données au back ", payload);
+
+    const response = await api.post('/mccc/mcccResponse', payload);
+
+    if (response.status === 200 || response.status === 201) {
+      console.log("Sauvegarde réussie !");
+      mcccStore.clearMcccStore();
+      await router.push('/modif-saved');
+    }
+
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde des MCCC :", error);
+    alert("Une erreur est survenue lors de l'enregistrement.");
+  }
 };
 
 onMounted(() => {
