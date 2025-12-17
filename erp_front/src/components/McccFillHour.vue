@@ -70,6 +70,7 @@ const handleRetour = () => {
 <style scoped>
 .main-content{
   position: relative;
+  padding-top: 172px;
 }
 .choisir-ressource {
   width: 100%;
