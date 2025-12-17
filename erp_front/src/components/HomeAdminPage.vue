@@ -1,106 +1,167 @@
 <script setup>
-  import { useRouter } from 'vue-router';
-  import AppHeader from './Header.vue';
+import { useRouter } from 'vue-router';
+import AppHeader from './Header.vue';
 
-  const router = useRouter();
+const router = useRouter();
 
-  const handleRemplir = () => {
-    router.push('/mccc-ressource');
-  };
+const handleRemplir = () => {
+  router.push('/mccc-ressource');
+};
 
-  const handleAfficher = () => {
-    router.push('/history-admin');
-  };
+const handleAfficher = () => {
+  router.push('/history-admin');
+};
 
-  const handleInscrire = () => {
-    router.push('/users-gestion');
-  };
+const handleInscrire = () => {
+  router.push('/users-gestion');
+};
 
-  const handleAide = () => {
-    router.push('/aide');
-  };
+const handleCompetenceCreating = () => {
+  router.push('/competence-creating');
+};
 
-  const handleDeconnexion = () => {
-    router.push('/deconnexion');
-  };
-
-  const handleCompetenceCreating = () => {
-    router.push('/competence-creating');
-  };
-
-  const handleResources = () => {
-    router.push('/resources-gestion');
-  }
-
+const handleResources = () => {
+  router.push('/resources-gestion');
+}
 </script>
 
 <template>
-  <AppHeader title="Bonjour, " inline="ADMIN"/>
-  <div class="main-content">
-    <div class="btn-container">
-      <div @click="handleRemplir" class="btn"><p>Remplir les MCCC</p></div>
-      <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
-      <div @click="handleInscrire" class="btn"><p>Gestion des utilisateurs</p></div>
-      <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
-      <div @click="handleResources" class="btn"><p>Gestion des ressources</p></div>
-    </div>
+  <div class="page-container">
+    <AppHeader title="Bonjour, " inline="ADMIN"/>
+
+    <main class="main-content">
+      <div class="grid-container">
+
+        <div class="card-action" @click="handleRemplir">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <p>Remplir les MCCC</p>
+        </div>
+
+        <div class="card-action" @click="handleAfficher">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+          </div>
+          <p>Afficher les fiches ressource</p>
+        </div>
+
+        <div class="card-action" @click="handleInscrire">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <p>Gestion des utilisateurs</p>
+        </div>
+
+        <div class="card-action" @click="handleCompetenceCreating">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <p>Ajouter les compétences</p>
+        </div>
+
+        <div class="card-action" @click="handleResources">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+          <p>Gestion des ressources</p>
+        </div>
+
+      </div>
+    </main>
   </div>
 </template>
 
 <style scoped>
-.main-content{
+.page-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Roboto', sans-serif;
+}
+
+.main-content {
   display: flex;
-  width: 90%;
-  margin: 254px auto auto;
   justify-content: center;
-  align-items: center;
+  padding: 40px 20px;
+  margin-top: 200px;
 }
 
-.btn-container{
+.grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-  justify-content: center;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+  justify-items: center;
 }
 
-.btn {
-  box-sizing: border-box;
+.card-action {
+  cursor: pointer;
+  background: #ffffff;
+  width: 340px;
+  height: 220px;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0 16px;
-  width: 360px;
-  height: 200px;
-  background: #D9D9D9;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 15px;
-  margin: 0 50px 100px;
+  text-align: center;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(181, 22, 33, 0.1);
 }
 
-.btn:hover {
-  background: #999999;
-  transform: translateY(-4px);
-  cursor: pointer;
+.card-action:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(181, 22, 33, 0.15);
+  border-color: #B51621;
 }
 
-.btn p {
-  width: 328px;
-  height: 200px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 36px;
-  line-height: 50px;
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  background: rgba(181, 22, 33, 0.05);
+  border-radius: 50%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: #E92533;
-  z-index: 1;
+  align-items: center;
+  margin-bottom: 15px;
+  color: #B51621;
+  transition: all 0.3s ease;
+}
+
+.card-action:hover .icon-circle {
+  background: #B51621;
+  color: #ffffff;
+}
+
+.card-action p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #333333;
+  transition: color 0.3s ease;
+}
+
+.card-action:hover p {
+  color: #B51621;
+}
+
+@media (max-width: 1100px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 750px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+  .main-content {
+    margin-top: 150px;
+  }
 }
 </style>
-
