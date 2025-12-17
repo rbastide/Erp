@@ -26,14 +26,6 @@ const handleRetour = () => {
   router.back();
 };
 
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-
 </script>
 
 <template>
@@ -105,7 +97,7 @@ const handleDeconnexion = () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   isolation: isolate;
 }
 
@@ -121,7 +113,7 @@ const handleDeconnexion = () => {
   background: #D9D9D9;
   padding: 30px 60px;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   font-size: 30px;
   text-align: center;
