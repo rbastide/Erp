@@ -15,7 +15,7 @@ const handleAfficher = () => {
 
 <template>
   <div class="page-container">
-    <AppHeader title="Bonjour," subtitle="Prénom NOM" />
+    <AppHeader title="Bonjour," inline="Prénom NOM" />
 
     <main class="main-content">
       <div class="card-action" @click="handleRemplir">
