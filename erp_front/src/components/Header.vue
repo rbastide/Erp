@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import {onMounted, ref} from "vue";
+import '../assets/css/variable.css';
 
 // Déclaration des props
 const props = defineProps({
@@ -67,7 +68,7 @@ onMounted(() => {
   height: 172px;
   left: 0;
   top: 0;
-  background: linear-gradient(90deg, #96111a 0%, #b51621 40%, #E05000 100%);
+  background: var(--gradient-red-orange);
   box-sizing: border-box;
 }
 
