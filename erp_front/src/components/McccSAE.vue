@@ -112,7 +112,7 @@ function duplicateGreySquare(containerId){
         </div>
         <div class = "grey-square" contenteditable="true"></div>
       </div>
-      <svg class = "add-button" @click="duplicateGreySquare('sae-text')" width="72" height="70" viewBox="0 0 72 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class = "add-button" @click="duplicateGreySquare('sae-text')" width="72" height="70" viewBox="0 0 72 70" xmlns="http://www.w3.org/2000/svg">
         <path d="M36 23.3333V46.6667M24 35H48M15 8.75H57C60.3137 8.75 63 11.3617 63 14.5833V55.4167C63 58.6383 60.3137 61.25 57 61.25H15C11.6863 61.25 9 58.6383 9 55.4167V14.5833C9 11.3617 11.6863 8.75 15 8.75Z" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
@@ -157,7 +157,7 @@ function duplicateGreySquare(containerId){
   background: #D9D9D9;
   padding: 30px 60px;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   font-size: 30px;
   text-align: center;
@@ -170,12 +170,9 @@ function duplicateGreySquare(containerId){
   border: none;
   cursor: pointer;
   padding: 0;
-  margin-top: 30px;
   transition: transform 0.2s;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 50px;
+  margin: 30px auto 50px;
 }
 .add-button svg {
   height: 50px;

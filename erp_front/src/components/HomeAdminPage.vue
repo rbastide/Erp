@@ -13,7 +13,7 @@
   };
 
   const handleInscrire = () => {
-    router.push('/new-user');
+    router.push('/users-gestion');
   };
 
   const handleAide = () => {
@@ -40,7 +40,7 @@
     <div class="btn-container">
       <div @click="handleRemplir" class="btn"><p>Remplir les MCCC</p></div>
       <div @click="handleAfficher" class="btn"><p>Afficher les fiches ressource</p></div>
-      <div @click="handleInscrire" class="btn"><p>Ajouter des utilisateurs</p></div>
+      <div @click="handleInscrire" class="btn"><p>Gestion des utilisateurs</p></div>
       <div @click="handleCompetenceCreating" class="btn"><p>Ajouter les compétences</p></div>
       <div @click="handleResources" class="btn"><p>Gestion des ressources</p></div>
     </div>
@@ -51,8 +51,7 @@
 .main-content{
   display: flex;
   width: 90%;
-  margin: auto;
-  margin-top: 254px;
+  margin: 254px auto auto;
   justify-content: center;
   align-items: center;
 }

@@ -13,7 +13,7 @@ const role = ref('');
 const errorMessage = ref('');
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.push('/users-gestion');
 };
 
 const handleAide = () => {
@@ -115,7 +115,7 @@ const handleRegister = async () => {
   </main>
 
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Quitter</div>
+    <div @click="handleRetour" class="btn-quitter">Retour</div>
   </footer>
 </template>
 
@@ -135,9 +135,7 @@ const handleRegister = async () => {
   justify-content: center;
   align-items: center;
   font-family: 'Roboto', sans-serif;
-  min-height: 100vh;
-  padding: 10% 20px 20px;
-  box-sizing: border-box;
+  padding: 0 20px 20px;
 }
 .login-card {
   background-color: #FFFFFF;

@@ -84,9 +84,8 @@ const handleAide = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   font-family: 'Roboto', sans-serif;
-  padding-top: 172px;
+  padding: 172px 20px 20px;
   box-sizing: border-box;
 }
 
