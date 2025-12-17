@@ -25,6 +25,8 @@ import McccSummaryPage from "./components/McccSummary.vue";
 import CompetencesCreatingPage from "./components/CompetencesCreatingPage.vue";
 import RessourceSheetHistory from "./components/RessourceSheetHistory.vue";
 import RessourcesGestion from "./components/RessourcesGestion.vue";
+import UsersGestion from "./components/UsersGestion.vue";
+
 
 const routes = [
     {
@@ -161,6 +163,11 @@ const routes = [
         path: '/resources-gestion',
         name: 'RessourcesGestion',
         component: RessourcesGestion
+    },
+    {
+        path: '/users-gestion',
+        name: 'UsersGestion',
+        component: UsersGestion
     }
 ];
 
