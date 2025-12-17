@@ -86,6 +86,7 @@ const handleAide = () => {
   align-items: center;
   font-family: 'Roboto', sans-serif;
   padding: 172px 20px 20px;
+  min-height: 100vh;
   box-sizing: border-box;
 }
 
