@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import AppHeader from './Header.vue';
 import { mcccStore } from '@/services/mcccStore';
+import AppHeader from './Header.vue';
+
 
 mcccStore.loadMcccStore();
 const router = useRouter();
@@ -25,53 +26,6 @@ const handleRetour = () => {
   router.back();
 };
 
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const boxes = document.querySelectorAll('.grey-square');
-  const maxChars = 5;
-  let total = 0;
-  let contentTotal = document.getElementById("tot");
-
-  const calculerTotal = () => {
-    let total = 0;
-
-    boxes.forEach(box => {
-      const valeur = parseFloat(box.value) || 0;
-      total = total + valeur;
-    });
-    contentTotal.textContent = total.toFixed(2).toString();
-  }
-
-  boxes.forEach(box => {
-    box.addEventListener('input', () => {
-      let text = box.textContent;
-      calculerTotal();
-
-      if (text.length > maxChars) {
-        box.textContent = text.substring(0, maxChars);
-
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(box);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
-    });
-
-    box.addEventListener('keydown', e => {
-      if (e.key === "Enter") e.preventDefault();
-    });
-  });
-});
-
 </script>
 
 <template>
@@ -83,28 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class = "top-grid">
       <div class = "type-of-hour">
         <p class = "title-hour">CM</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursCM" min="0">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">TD</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTD" min="0">
       </div>
       <div class = "type-of-hour">
         <p class = "title-hour">DS</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDS" min="0">
       </div>
     </div>
     <div class= "bottom-grid">
       <div class= "type-of-hour">
         <p class= "title-hour">TP</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTP" min="0">
       </div>
       <div class= "type-of-hour">
         <p class= "title-hour">DS TP</p>
-        <input class="grey-square" type="number">
+        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDSTP" min="0">
       </div>
     </div>
-    <div class= "total"><p>Total : <span id="tot">0</span>h</p></div>
+    <div class= "total"><p>Total : <span id="tot">{{ totalHeures }}</span>h</p></div>
 
     <div class="container-btn">
       <div @click="handleValider" class="btn-sys">Valider</div>
@@ -143,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   isolation: isolate;
 }
 
@@ -159,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   background: #D9D9D9;
   padding: 30px 60px;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
   font-size: 30px;
   text-align: center;

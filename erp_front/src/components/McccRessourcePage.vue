@@ -82,14 +82,14 @@ const handleMccc = (code: string) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   isolation: isolate;
   margin : 10px;
   font-size: 30px;
   text-align: center;
   background: #D9D9D9;
   border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
 }
 .push-button:hover {
