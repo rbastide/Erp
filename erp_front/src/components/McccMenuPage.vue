@@ -7,6 +7,7 @@ const router = useRouter();
 mcccStore.loadMcccStore();
 const handleRetour = () => {
   router.push('/mccc-ressource');
+  mcccStore.clearMcccStore();
 };
 
 const handleAide = () => {
