@@ -29,7 +29,7 @@ const handleRetour = () => {
 </script>
 
 <template>
-  <AppHeader title="Bonjour, " inline="ADMIN"/>
+  <AppHeader :title="'Heures ' + mcccStore.resourceCode"/>
   <main class = "main-content">
     <div class = "choisir-ressource">
       Veuillez saisir les heures à remplir automatiquement :
