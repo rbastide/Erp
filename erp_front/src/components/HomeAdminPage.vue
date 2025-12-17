@@ -83,7 +83,7 @@ const handleResources = () => {
   display: flex;
   justify-content: center;
   padding: 40px 20px;
-  margin-top: 200px;
+  margin-top: 175px;
 }
 
 .grid-container {
