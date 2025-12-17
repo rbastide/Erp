@@ -102,7 +102,7 @@ function duplicateGreySquare(containerId){
 </script>
 
 <template>
-  <AppHeader title="SAE / Compétences " inline="pour RX.XX"/>
+  <AppHeader title="Remplissage des SAE" :inline="mcccStore.resourceCode"/>
   <main class = "main-content">
     <div class="sae">
       <p class="title">Veuillez saisir la/les SAÉ(s) concernée(s) :</p>
@@ -127,6 +127,7 @@ function duplicateGreySquare(containerId){
 <style scoped>
 .main-content{
   position: relative;
+  padding-top: 172px;
 }
 .title{
   width: 100%;
