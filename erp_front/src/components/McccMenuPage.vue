@@ -41,7 +41,7 @@ const handleCompetences = () => {
 </script>
 
 <template>
-  <AppHeader title="RX.XX"/>
+  <AppHeader :title="mcccStore.resourceCode"/>
   <main class= "main-content">
     <div @click="handleHours" class ="heure">
       <p class= "text-button">Heures</p>
