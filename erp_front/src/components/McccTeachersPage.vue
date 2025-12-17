@@ -10,14 +10,6 @@ const firstname = ref('');
 const errorMessage = ref('');
 
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-
-const handleAide = () => {
-  router.push('/aide');
-};
-
 const handleRetour = () => {
   router.push('/mccc-menu');
 };
@@ -26,8 +18,10 @@ const handleAdd = () => {
   const trimmedLastname = lastname.value.trim();
   const trimmedFirstname = firstname.value.trim();
 
+  errorMessage.value = '';
+
   if (trimmedLastname === '' || trimmedFirstname === '') {
-    console.error("Veuillez saisir le nom et le prénom.");
+    errorMessage.value = "Veuillez saisir le nom et le prénom."
     return;
   }
 

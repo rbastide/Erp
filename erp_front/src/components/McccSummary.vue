@@ -6,8 +6,6 @@ import { onMounted } from 'vue';
 
 const router = useRouter();
 
-const handleAide = () => router.push('/aide');
-const handleDeconnexion = () => router.push('/deconnexion');
 const handleRetour = () => router.push('/mccc-menu');
 
 const handleValider = () => {
@@ -16,12 +14,24 @@ const handleValider = () => {
 
 onMounted(() => {
   mcccStore.loadMcccStore();
+
+  const today = new Date().toLocaleDateString('fr-FR');
+
+  if (!mcccStore.creationDate) {
+    mcccStore.creationDate = today;
+  }
+
+  mcccStore.editDate = today;
+
+  mcccStore.registerMcccStore();
 });
 
 const getGroupsForUE = (ueName) => {
   if (!mcccStore.acsGrouped) return [];
   return mcccStore.acsGrouped.filter(group => group.ue === ueName);
 };
+
+
 </script>
 
 <template>
@@ -120,8 +130,8 @@ const getGroupsForUE = (ueName) => {
         </span>
       </p></div>
       <div class="title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
-      <div class="title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
-      <div class="title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
+      <div class="title"><p>Date de création : <span id="creation">{{mcccStore.creationDate}}</span></p></div>
+      <div class="title"><p>Date de modification : <span id="creation">{{mcccStore.editDate}}</span></p></div>
     </div>
 
     <div class="container-btn">
