@@ -3,10 +3,6 @@ import { reactive } from 'vue';
 
 export const mcccStore = reactive({
     resourceCode: '',
-    resourceName: '',
-    mainGoal: '',
-    year: null,
-    semester: null,
 
     hoursCM: 0,
     hoursTD: 0,
@@ -15,9 +11,10 @@ export const mcccStore = reactive({
     hoursDSTP: 0,
     hoursTotal: 0,
 
-
     saeCodes: [],
-    competence : [],
+    ue: [],
+    niveaux: [],
+    acs: [],
 
     referents : [],
 
@@ -35,10 +32,6 @@ export const mcccStore = reactive({
 
     clearMcccStore(){
         this.resourceCode = '';
-        this.resourceName = '';
-        this.mainGoal = '';
-        this.year = null;
-        this.semester = null;
 
         this.hoursCM = 0;
         this.hoursTD = 0;
@@ -48,7 +41,10 @@ export const mcccStore = reactive({
         this.hoursTotal = 0;
 
         this.saeCodes = [];
-        this.competence = [];
+        this.niveaux = [];
+        this.ue = [];
+        this.acs = [];
+
         this.referents = [];
 
         localStorage.removeItem("mcccStore");
