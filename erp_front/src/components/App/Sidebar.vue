@@ -39,6 +39,7 @@ onMounted(() => {
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </div>
+      <span class="nav-text" style="font-size: x-large; font-weight: bold;">Menu</span>
     </div>
 
     <nav class="sidebar-nav">
@@ -129,7 +130,7 @@ onMounted(() => {
   transition: color 0.3s ease;
 }
 
-.sidebar.expanded .hamburger-icon {
+.sidebar.expanded .hamburger-icon, .sidebar.expanded .nav-text {
   color: #96111a;
 }
 
