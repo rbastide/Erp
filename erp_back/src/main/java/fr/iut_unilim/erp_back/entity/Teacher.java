@@ -29,6 +29,11 @@ public class Teacher {
 
     public Teacher() {}
 
+    public Teacher(fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher) {
+        this.lastname = teacher.lastname();
+        this.firstname = teacher.firstname();
+    }
+
     public Teacher(String lastname, String firstname) {
         this.lastname = lastname;
         this.firstname = firstname;
