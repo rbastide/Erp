@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import Sidebar from './Sidebar.vue';
 
 const router = useRouter();
 
@@ -14,6 +15,7 @@ const handleAfficher = () => {
 </script>
 
 <template>
+  <Sidebar :dashboard="true"/>
   <div class="page-container">
     <AppHeader title="Bonjour," inline="Prénom NOM" />
 
