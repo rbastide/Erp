@@ -3,6 +3,8 @@ package fr.iut_unilim.erp_back.entity;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "MCCC")
 public class Mccc {
@@ -17,9 +19,13 @@ public class Mccc {
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
 
-    @ManyToOne
-    @JoinColumn(name = "saeID")
-    private Sae saeId;
+    @ManyToMany
+    @JoinTable(
+            name = "McccSaes",
+            joinColumns = @JoinColumn(name = "saeID"),
+            inverseJoinColumns = @JoinColumn(name = "saeID")
+    )
+    private Set<Sae> saeId;
 
     @ManyToOne
     @JoinColumn(name = "skillID")
@@ -29,7 +35,7 @@ public class Mccc {
     @JoinColumn(name = "referencialTeacher")
     private Teacher referencialTeacherId;
 
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Sae saeId, Skill skillId, Teacher referencialTeacherId) {
+    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Skill skillId, Teacher referencialTeacherId) {
         this.mcccId = mcccId;
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
@@ -65,11 +71,11 @@ public class Mccc {
         this.resourceId = resourceId;
     }
 
-    public Sae getSaeId() {
+    public Set<Sae> getSaeId() {
         return saeId;
     }
 
-    public void setSaeId(Sae saeId) {
+    public void setSaeId(Set<Sae> saeId) {
         this.saeId = saeId;
     }
 
