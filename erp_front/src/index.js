@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
 import RessourcePage from './components/RessourcePage/RessourcePage.vue';
 import HomePage from './components/User/HomePage.vue';
@@ -10,7 +10,7 @@ import DeconnexionPage from './components/App/DeconnexionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
-import UserSavePage from "./components/Information/UserSavePage.vue";
+import UserSavePage from "./components/User/UserSavePage.vue";
 import CancelPage from "./components/Information/CancelPage.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/Information/SuccessfullyDelete.vue";
@@ -25,7 +25,7 @@ import McccSummaryPage from "./components/Mccc/McccSummary.vue";
 import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.vue";
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
 import RessourcesGestion from "./components/RessourcePage/RessourcesGestion.vue";
-import UsersGestion from "./components/User/UsersGestion.vue";
+import UsersGestion from "./components/Mccc/UsersGestion.vue";
 
 
 const routes = [
