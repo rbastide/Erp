@@ -53,7 +53,6 @@ const blockNegative = (evt: KeyboardEvent) => {
 /** * NAVIGATION
  */
 const handleValider = () => {
-  mcccStore.hoursTotal = totalHeures.value;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
