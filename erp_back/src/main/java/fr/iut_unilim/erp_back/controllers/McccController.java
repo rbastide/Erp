@@ -34,7 +34,7 @@ public class McccController {
         Mccc mccc = new Mccc();
 
         List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
-        if (resources.size() == 1) {
+        if (!resources.isEmpty()) {
             Resource resource = resources.get(0);
             mccc.setResourceId(resource);
         }
@@ -50,17 +50,17 @@ public class McccController {
     @NotNull
     private HourlyVolume getHourlyVolumeFromDto(McccResponse dto) {
         List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
-        if (hourlyVolumes.size() == 1) {
-            HourlyVolume hourlyVolume = hourlyVolumes.get(0);
-            hourlyVolume.setNbHoursCM(dto.getHoursCM());
-            hourlyVolume.setNbHoursTD(dto.getHoursTD());
-            hourlyVolume.setNbHoursTP(dto.getHoursTP());
-            hourlyVolume.setNbHoursDS(dto.getHoursDS());
-            hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
-            return hourlyVolume;
+        if (hourlyVolumes.isEmpty()) {
+            HourlyVolume hourlyVolume = new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
+            hourlyVolumeService.save(hourlyVolume);
+
         }
-        HourlyVolume hourlyVolume = new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
-        hourlyVolumeService.save(hourlyVolume);
+        HourlyVolume hourlyVolume = hourlyVolumes.get(0);
+        hourlyVolume.setNbHoursCM(dto.getHoursCM());
+        hourlyVolume.setNbHoursTD(dto.getHoursTD());
+        hourlyVolume.setNbHoursTP(dto.getHoursTP());
+        hourlyVolume.setNbHoursDS(dto.getHoursDS());
+        hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
         return hourlyVolume;
     }
 }
