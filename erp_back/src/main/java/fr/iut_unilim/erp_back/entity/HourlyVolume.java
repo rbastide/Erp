@@ -38,6 +38,30 @@ public class HourlyVolume {
         this.nbHoursTD = nbHoursTD;
     }
 
+    public void setHourlyVolID(Long hourlyVolID) {
+        this.hourlyVolID = hourlyVolID;
+    }
+
+    public void setNbHoursCM(int nbHoursCM) {
+        this.nbHoursCM = nbHoursCM;
+    }
+
+    public void setNbHoursDSTP(int nbHoursDSTP) {
+        this.nbHoursDSTP = nbHoursDSTP;
+    }
+
+    public void setNbHoursDS(int nbHoursDS) {
+        this.nbHoursDS = nbHoursDS;
+    }
+
+    public void setNbHoursTP(int nbHoursTP) {
+        this.nbHoursTP = nbHoursTP;
+    }
+
+    public void setNbHoursTD(int nbHoursTD) {
+        this.nbHoursTD = nbHoursTD;
+    }
+
     public Long hourlyVolID() { return hourlyVolID; }
     public int nbHoursCM() { return nbHoursCM; }
     public int nbHoursDSTP() { return nbHoursDSTP; }
