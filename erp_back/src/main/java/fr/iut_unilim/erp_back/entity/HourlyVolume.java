@@ -8,7 +8,6 @@ public class HourlyVolume {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "hourlyVolID")
     private Long hourlyVolID;
 

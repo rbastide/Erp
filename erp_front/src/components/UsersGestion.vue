@@ -6,7 +6,7 @@ import AppHeader from './Header.vue';
 const router = useRouter();
 
 const users = reactive([
-  { id: 'Reia', role: 'Professeur', mdp: 'scret' },
+  { id: 'Reia', role: 'Professeur', mdp: 'secret' },
   { id: 'admin', role: 'Admin', mdp: 'secret' }
 ]);
 
@@ -74,366 +74,346 @@ const saveModification = (index) => {
 </script>
 
 <template>
-  <AppHeader title="Gestion des utilisateurs"/>
-  <div class="main-content">
-    <p class="description">Voici la liste des utilisateurs </p>
-    <div class="version-list-container">
-      <ul class="version-list">
+  <div class="page-container">
+    <AppHeader title="Gestion des utilisateurs" />
 
-        <template v-for="(user, index) in users" :key="index">
-          <li class="version-item">
-            <span class="resource">{{ user.id }} : {{ user.role }}</span>
-            <span class="icon-container">
-              <svg @click="handleDelete(index)" class="del-icon" width="40" height="40" viewBox="0 0 50 63" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M44.2307 5.90283H5.7691C2.58794 5.90283 0 8.55077 0 11.8057V19.6764C0 20.7647 0.861309 21.6438 1.92282 21.6438H3.84563V57.0612C3.84563 60.3155 6.43409 62.964 9.61474 62.964H40.3842C43.5649 62.964 46.1533 60.3155 46.1533 57.0612L46.1539 21.6438H48.0767C49.1382 21.6438 49.9995 20.7641 49.9995 19.6764L50 11.8057C50 8.55077 47.4115 5.90283 44.2309 5.90283H44.2307ZM42.3073 57.0622C42.3073 58.1484 41.444 59.0296 40.3845 59.0296H9.615C8.55546 59.0296 7.69218 58.1483 7.69218 57.0622L7.69167 21.6449H42.3065L42.3073 57.0622ZM46.1536 17.7091H3.84538V11.8062C3.84538 10.72 4.70871 9.83881 5.76819 9.83881H44.2297C45.2893 9.83881 46.1526 10.7201 46.1526 11.8062L46.1536 17.7091Z" fill="black"/>
-                <path d="M17.3076 3.93479H32.6917C33.7532 3.93479 34.6145 3.05506 34.6145 1.96739C34.6145 0.879152 33.7532 0 32.6917 0H17.3076C16.246 0 15.3848 0.879723 15.3848 1.96739C15.3848 3.05563 16.2461 3.93479 17.3076 3.93479Z" fill="black"/>
-                <path d="M34.6152 55.0929C35.6768 55.0929 36.538 54.2132 36.538 53.1255V27.5465C36.538 26.4583 35.6767 25.5791 34.6152 25.5791C33.5536 25.5791 32.6924 26.4588 32.6924 27.5465V53.1255C32.6919 54.2138 33.5537 55.0929 34.6152 55.0929Z" fill="black"/>
-                <path d="M25 55.0929C26.0615 55.0929 26.9228 54.2132 26.9228 53.1255V27.5465C26.9228 26.4583 26.0615 25.5791 25 25.5791C23.9385 25.5791 23.0771 26.4588 23.0771 27.5465V53.1255C23.0766 54.2138 23.9385 55.0929 25 55.0929Z" fill="black"/>
-                <path d="M15.3842 55.0929C16.4458 55.0929 17.3071 54.2132 17.3071 53.1255V27.5465C17.3071 26.4583 16.4458 25.5791 15.3842 25.5791C14.3227 25.5791 13.4614 26.4588 13.4614 27.5465V53.1255C13.4609 54.2138 14.3227 55.0929 15.3842 55.0929Z" fill="black"/>
-              </svg>
-              <svg @click="handleModif(index)" class="pen-icon" width="40" height="40" viewBox="0 0 59 63" fill="none">
-                <path d="M40.0531 0.767145L5.63823 37.4929C5.44144 37.7049 5.28276 37.9536 5.1708 38.2271C5.1403 38.2993 5.11552 38.3715 5.08455 38.4503C5.05405 38.5292 5.01069 38.6141 4.99259 38.7061L0.0760928 59.6926C-0.138328 60.5916 0.10754 61.5446 0.723647 62.1995C1.33976 62.8539 2.23367 63.1127 3.0751 62.8798L22.7411 57.6332C22.8273 57.6332 22.9007 57.561 22.9807 57.5351L23.1899 57.443C23.4463 57.3236 23.6793 57.1542 23.878 56.9447L58.2928 20.219H58.2933C58.7493 19.7242 59.0038 19.0571 59 18.363C59 13.4927 57.1869 8.8217 53.9597 5.37823C50.7329 1.93425 46.3558 2.79973e-06 41.7924 2.79973e-06C41.1401 -0.00101424 40.5144 0.275098 40.0532 0.767308L40.0531 0.767145ZM9.25135 42.1752C11.8254 42.6023 14.2041 43.8939 16.0433 45.8622C17.8821 47.8306 19.0853 50.3735 19.4778 53.1209L5.84024 56.7281L9.25135 42.1752ZM23.7977 49.5991C23.2021 47.5977 22.2872 45.7208 21.0936 44.051C21.2027 43.9844 21.3071 43.9101 21.4072 43.8283L52.0247 11.1483C53.1792 12.9865 53.8754 15.1079 54.0464 17.3132L23.7977 49.5991ZM48.5516 7.44255L17.9279 40.116C17.8512 40.2223 17.7812 40.3341 17.7188 40.4501C16.154 39.1763 14.3952 38.2005 12.5198 37.5649L42.7677 5.28459C44.8362 5.46612 46.8269 6.20903 48.5509 7.44208L48.5516 7.44255Z" fill="black"/>
-              </svg>
-            </span>
-          </li>
+    <main class="main-content">
+      <div class="grid-container">
 
-          <li v-if="editingIndex === index" class="add-user-item">
-            <svg @click="handleCancel" class="cancel-icon" viewBox="0 0 100 100">
-              <path d="M30 30L70 70M70 30L30 70" stroke="black" stroke-width="5" stroke-linecap="round"/>
-            </svg>
-            <div class="input-container">
-              <div class="input-group-field">
-                <label for="edit-id">Identifiant</label>
-                <input id="edit-id" type="text" v-model="editedUser.id" class="input-field">
-              </div>
-              <div class="input-group-field">
-                <label for="old-pwd">Ancien mot de passe</label>
-                <input id="old-pwd" type="text" v-model="editedUser.oldMdp" class="input-field" readonly>
-              </div>
-              <div class="input-group-field">
-                <label for="new-pwd">Nouveau mot de passe</label>
-                <input id="new-pwd" type="password" v-model="editedUser.newMdp" class="input-field">
-              </div>
-              <div class="input-group-field">
-                <label>Rôle</label>
-                <div class="select-wrapper">
-                  <select v-model="editedUser.role" class="custom-select">
-                    <option value="" disabled>Sélectionnez un rôle</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Professeur">Professeur</option>
-                    <option value="Super Admin">Super Admin</option>
-                    <option value="Co-intervenant">Co-intervenant</option>
-                  </select>
-                  <span class="select-arrow"></span>
-                </div>
-              </div>
-              <svg @click="saveModification(index)" class="add-arrow-icon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="24" cy="24" r="20" fill="#4CAF50"/>
-                <path d="M14 24L21 31L34 18" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+        <div v-for="(user, index) in users" :key="index" class="user-card" :class="{ 'is-editing': editingIndex === index }">
+
+          <div v-if="editingIndex !== index" class="card-content view-mode">
+            <div class="icon-circle">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
-          </li>
-        </template>
+            <h3>{{ user.id }}</h3>
+            <span class="role-badge">{{ user.role }}</span>
 
-        <div class="btn-container">
-          <svg @click="handleAddUser" class="plus-icon" width="65" height="65" viewBox="0 0 65 65" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M36 23.3333V46.6667M24 35H48M15 8.75H57C60.3137 8.75 63 11.3617 63 14.5833V55.4167C63 58.6383 60.3137 61.25 57 61.25H15C11.6863 61.25 9 58.6383 9 55.4167V14.5833C9 11.3617 11.6863 8.75 15 8.75Z" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div class="container-btn">
-            <div @click="handleValider" class="btn-sys">Valider</div>
-            <div @click="handleRetour" class="btn-sys">Annuler</div>
+            <div class="card-actions">
+              <button class="action-btn edit" @click="handleModif(index)" title="Modifier">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="action-btn delete" @click="handleDelete(index)" title="Supprimer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="card-content edit-mode">
+            <div class="edit-header">
+              <h4>Modifier</h4>
+              <button class="close-icon" @click="handleCancel">✕</button>
+            </div>
+
+            <div class="input-group">
+              <input type="text" v-model="editedUser.id" placeholder="Identifiant" class="card-input">
+            </div>
+
+            <div class="input-group">
+              <input type="text" v-model="editedUser.oldMdp" class="card-input readonly" readonly title="Ancien mot de passe">
+            </div>
+
+            <div class="input-group">
+              <input type="password" v-model="editedUser.newMdp" placeholder="Nouveau Mdp" class="card-input">
+            </div>
+
+            <div class="input-group">
+              <select v-model="editedUser.role" class="card-input select-input">
+                <option value="" disabled>Rôle</option>
+                <option value="Admin">Admin</option>
+                <option value="Professeur">Professeur</option>
+                <option value="Super Admin">Super Admin</option>
+                <option value="Co-intervenant">Co-intervenant</option>
+              </select>
+            </div>
+
+            <button class="save-btn" @click="saveModification(index)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Enregistrer
+            </button>
           </div>
         </div>
-      </ul>
-    </div>
+
+        <div class="user-card add-card" @click="handleAddUser">
+          <div class="icon-circle plus">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </div>
+          <p>Ajouter un utilisateur</p>
+        </div>
+
+      </div>
+
+      <div class="global-actions">
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleRetour" class="btn-sys secondary">Retour</button>
+      </div>
+
+    </main>
   </div>
 </template>
 
 <style scoped>
+.page-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Roboto', sans-serif;
+}
+
 .main-content {
   display: flex;
-  width: 90%;
-  margin: auto;
-  margin-top: 254px;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  padding: 40px 20px;
+  margin-top: 180px;
 }
 
-.description{
-  position: absolute;
-  width: 672px;
-  height: 66px;
-  left: 38px;
-  top: 196px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 38px;
-  color: #E92533;
-  margin-bottom: 20px;
-}
-
-.version-list-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: auto;
-  width: 500px;
-  font-family: 'Roboto', sans-serif;
-  padding: 10px;
-}
-
-.version-list {
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
   width: 100%;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  max-width: 1200px;
+  margin-bottom: 50px;
+}
+
+/* --- Style des Cartes --- */
+.user-card {
+  background: #ffffff;
+  border-radius: 15px;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-
-.version-item .last-item {
-  background-color: #dcdcdc;
-  margin-bottom: 0;
-}
-
-.version-item {
-  display: inline-flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap:nowrap;
-  width: fit-content;
-  max-width: 10000%;
-  padding: 10px 20px;
-  margin: 0 0 15px 0;
-  gap: 24px;
-  background: #D9D9D9;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 6px;
-  min-height: 80px;
-}
-
-.resource{
-  white-space: nowrap;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 510;
-  font-size: 40px;
-  padding-right: 20px;
-}
-
-.icon-container{
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.pen-icon:hover, .del-icon:hover{
-  cursor: pointer;
-  transform: scale(1.1);
-}
-
-.plus-icon:hover{
-  cursor: pointer;
-  transform: scale(1.1);
-}
-
-.btn-container{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  margin-top: 40px;
-  align-self: center;
-}
-
-.btn-quitter{
-  width: 150px;
-  padding: 0.8rem;
-  border: none;
-  text-align: center;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  position: relative;
-  margin: 5% auto;
-}
-
-.btn-quitter:hover{
-  background: #999999;
-  transform: translateY(-4px);
-  cursor: pointer;
-}
-
-.add-user-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 480px;
-  padding: 15px 20px 15px 15px;
-  margin: 0 0 15px 0;
-  gap: 5px;
-  background: #FFFFFF;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  min-height: 100px;
-}
-
-.input-container {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 20px;
   padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.input-group-field {
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.user-card.is-editing {
+  border: 2px solid #B51621;
+  transform: none;
+}
+
+.card-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  justify-content: space-between;
+}
+
+/* --- Mode Affichage --- */
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  background: rgba(181, 22, 33, 0.05);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  color: #B51621;
+}
+
+h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 22px;
+}
+
+.role-badge {
+  background: #f0f0f0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: auto;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.action-btn.edit {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-btn.delete {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+/* --- Mode Édition --- */
+.edit-mode {
+  justify-content: center;
   gap: 10px;
 }
 
-.input-group-field label {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #1E1E1E;
-  text-align: right;
-  width: 150px;
-  flex-shrink: 0;
-}
-
-.input-group-field input.input-field {
-  padding: 5px;
-  border: none;
-  border-radius: 0;
-  font-size: 18px;
-  background-color: #D9D9D9;
-  height: 25px;
-  flex-grow: 1;
-}
-
-.add-arrow-icon {
-  align-self: center;
-  width: 45px;
-  height: 45px;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-  border-radius: 50%;
-  padding: 2px;
-  margin-left: 5px;
-}
-.add-arrow-icon:hover {
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
-.cancel-icon {
-  width: 30px;
-  height: 30px;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-  padding: 5px;
-  position: relative;
-  top: -135px;
-}
-.cancel-icon:hover {
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
-.container-btn{
+.edit-header {
+  width: 100%;
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  margin-bottom: 10px;
 }
 
-.btn-sys{
-  width: 150px;
-  padding: 13px;
+.edit-header h4 {
+  margin: 0;
+  color: #B51621;
+}
+
+.close-icon {
+  background: none;
   border: none;
-  text-align: center;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem; /* 16px */
-  font-weight: bold;
+  font-size: 18px;
   cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  transition: background-color 0.2s ease;
-  position: relative;
-  margin : 1%;
+  color: #999;
 }
 
-.btn-sys:hover{
-  background: #999999;
-  transform: translateY(-4px);
-  cursor: pointer;
-}
-
-/* Conteneur pour positionner la flèche personnalisée */
-.select-wrapper {
-  position: relative;
+.input-group {
   width: 100%;
-  max-width: 300px; /* À ajuster selon votre besoin */
 }
 
-.custom-select {
+.card-input {
   width: 100%;
-  padding: 12px 40px 12px 16px; /* Espace à droite pour la flèche */
-  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
-  color: #333;
-  background-color: #fff;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-
-  /* Supprime le style par défaut du navigateur */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-/* État au survol et focus */
-.custom-select:hover {
-  border-color: #B51621; /* Rappel du rouge de votre header */
-}
-
-.custom-select:focus {
+.card-input:focus {
   outline: none;
   border-color: #B51621;
-  box-shadow: 0 0 0 3px rgba(181, 22, 33, 0.1);
 }
 
-/* Design de la flèche personnalisée (SVG ou triangle CSS) */
-.select-arrow {
-  position: absolute;
-  top: 50%;
-  right: 15px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid #B51621; /* Couleur de la flèche */
-  pointer-events: none; /* Pour que le clic traverse la flèche */
+.card-input.readonly {
+  background-color: #f5f5f5;
+  color: #888;
+  cursor: not-allowed;
 }
 
-/* Style des options (limité car géré par l'OS) */
-.custom-select option {
+.save-btn {
+  margin-top: 10px;
+  width: 100%;
   padding: 10px;
-  background-color: white;
+  background: #B51621;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.save-btn:hover {
+  background: #94121b;
+}
+
+/* --- Carte Ajouter --- */
+.add-card {
+  border: 2px dashed #ccc;
+  cursor: pointer;
+  background: transparent;
+}
+
+.add-card:hover {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: #B51621;
+}
+
+.add-card p {
+  font-weight: 500;
+  color: #666;
+  font-size: 18px;
+}
+
+.add-card:hover p {
+  color: #B51621;
+}
+
+.icon-circle.plus {
+  color: #555;
+  background: #ddd;
+}
+
+.add-card:hover .icon-circle.plus {
+  background: #B51621;
+  color: white;
+}
+
+/* --- Boutons Globaux --- */
+.global-actions {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.btn-sys {
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-sys:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn-sys.primary {
+  background-color: #B51621;
+  color: white;
+}
+
+.btn-sys.secondary {
+  background-color: #e0e0e0;
   color: #333;
+}
+
+@media (max-width: 600px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
