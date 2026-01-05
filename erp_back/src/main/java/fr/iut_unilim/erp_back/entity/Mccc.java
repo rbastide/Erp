@@ -102,4 +102,20 @@ public class Mccc {
     public void setReferencialTeacherId(Set<Teacher> referencialTeacherId) {
         this.referencialTeacherId = referencialTeacherId;
     }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
 }
