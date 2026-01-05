@@ -16,6 +16,6 @@ public class ResourceService {
     }
 
     public List<Resource> getFromName(String name) {
-        return resourceRepository.findByCode(name);
+        return resourceRepository.findByNum(name);
     }
 }
