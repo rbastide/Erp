@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "ResourceSheet")
+@Table(name = "ResourceSheets")
 public class ResourceSheet {
 
     @Id
@@ -49,6 +49,9 @@ public class ResourceSheet {
 
     @Column(name = "creationDate")
     private String creationDate;
+
+    @Column(name = "lastModificationDate")
+    private String lastModificationDate;
 
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Teacher> teachers;

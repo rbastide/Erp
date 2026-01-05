@@ -18,4 +18,8 @@ public class McccService {
     public Optional<Mccc> getMcccById(McccId id) {
         return mcccRepository.findById(id);
     }
+
+    public void saveMccc(Mccc mccc) {
+        mcccRepository.save(mccc);
+    }
 }
