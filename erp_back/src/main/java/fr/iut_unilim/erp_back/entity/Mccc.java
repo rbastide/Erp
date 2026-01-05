@@ -31,11 +31,15 @@ public class Mccc {
     @JoinColumn(name = "skillID")
     private Skill skillId;
 
-    @ManyToOne
-    @JoinColumn(name = "referencialTeacher")
-    private Teacher referencialTeacherId;
+    @ManyToMany
+    @JoinTable(
+            name = "MCCCTeachers",
+            joinColumns = @JoinColumn(name = "referencialTeacher"),
+            inverseJoinColumns = @JoinColumn(name = "teacherID")
+    )
+    private Set<Teacher> referencialTeacherId;
 
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Skill skillId, Teacher referencialTeacherId) {
+    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Skill skillId, Set<Teacher> referencialTeacherId) {
         this.mcccId = mcccId;
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
@@ -87,11 +91,11 @@ public class Mccc {
         this.skillId = skillId;
     }
 
-    public Teacher getReferencialTeacherId() {
+    public Set<Teacher> getReferencialTeacherId() {
         return referencialTeacherId;
     }
 
-    public void setReferencialTeacherId(Teacher referencialTeacherId) {
+    public void setReferencialTeacherId(Set<Teacher> referencialTeacherId) {
         this.referencialTeacherId = referencialTeacherId;
     }
 }
