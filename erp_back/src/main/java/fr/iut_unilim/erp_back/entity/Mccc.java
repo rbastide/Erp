@@ -29,10 +29,6 @@ public class Mccc {
     @JoinColumn(name = "referencialTeacher")
     private Teacher referencialTeacherId;
 
-    public McccId getMcccId() {
-        return mcccId;
-    }
-
     public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Sae saeId, Skill skillId, Teacher referencialTeacherId) {
         this.mcccId = mcccId;
         this.hourlyVolId = hourlyVolId;
@@ -43,6 +39,10 @@ public class Mccc {
     }
 
     public Mccc() {
+    }
+
+    public McccId getMcccId() {
+        return mcccId;
     }
 
     public void setMcccId(McccId mcccId) {
