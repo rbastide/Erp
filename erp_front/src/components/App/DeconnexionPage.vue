@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import AuthService from "../services/AuthService";
+import AuthService from "../../services/AuthService.js";
 import AppHeader from "./Header.vue";
 
 const router = useRouter();

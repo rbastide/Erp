@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import AuthService from '../services/AuthService';
+import AuthService from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
-import '../assets/css/variable.css';
+import '../../assets/css/variable.css';
 
 const router = useRouter();
 const username = ref('');

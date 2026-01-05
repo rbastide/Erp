@@ -41,7 +41,7 @@ onMounted(() => {
       </div>
 
       <transition name="fade">
-        <img v-show="isExpanded" src="../assets/uploads/Logo_unilim.png" alt="Logo" class="logo" />
+        <img v-show="isExpanded" src="../../assets/uploads/Logo_unilim.png" alt="Logo" class="logo" />
       </transition>
     </div>
 
