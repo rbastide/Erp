@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { mcccStore } from "@/services/mcccStore.js";
-import AppHeader from './Header.vue';
+import AppHeader from '../Header.vue';
 import { onMounted } from 'vue';
 import api from '@/services/api'; // <--- 1. Import de l'API
 
