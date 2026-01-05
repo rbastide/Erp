@@ -9,7 +9,6 @@ export const mcccStore = reactive({
     hoursTP: 0,
     hoursDS: 0,
     hoursDSTP: 0,
-    hoursTotal: 0,
 
     creationDate:'',
     editDate:'',
@@ -42,7 +41,6 @@ export const mcccStore = reactive({
         this.hoursTP = 0;
         this.hoursDS = 0;
         this.hoursDSTP = 0;
-        this.hoursTotal = 0;
 
         this.creationDate = '';
         this.editDate = '';
