@@ -25,7 +25,7 @@ import McccSummaryPage from "./components/Mccc/McccSummary.vue";
 import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.vue";
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
 import RessourcesGestion from "./components/RessourcePage/RessourcesGestion.vue";
-import UsersGestion from "./components/Mccc/UsersGestion.vue";
+import UsersGestion from "./components/User/UsersGestion.vue";
 
 
 const routes = [
