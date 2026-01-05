@@ -7,7 +7,7 @@ import AppHeader from './Header.vue';
 const router = useRouter();
 const errorMessage = ref('');
 const saeList = ref([]);
-const inputRefs = ref([]); // Tableau de références pour le focus
+const inputRefs = ref([]);
 
 onMounted(() => {
   mcccStore.loadMcccStore();
