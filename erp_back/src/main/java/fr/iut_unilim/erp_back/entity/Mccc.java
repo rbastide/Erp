@@ -22,7 +22,7 @@ public class Mccc {
     @ManyToMany
     @JoinTable(
             name = "McccSaes",
-            joinColumns = @JoinColumn(name = "saeID"),
+            joinColumns = @JoinColumn(name = "mcccSaesID"),
             inverseJoinColumns = @JoinColumn(name = "saeID")
     )
     private Set<Sae> saeId;
