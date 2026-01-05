@@ -3,6 +3,7 @@ package fr.iut_unilim.erp_back.entity;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import jakarta.persistence.*;
 
+import java.sql.Date;
 import java.util.Set;
 
 @Entity
@@ -38,6 +39,9 @@ public class Mccc {
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
     private Set<Teacher> referencialTeacherId;
+
+    private Date creationDate;
+    private Date lastModificationDate;
 
     public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Skill skillId, Set<Teacher> referencialTeacherId) {
         this.mcccId = mcccId;
