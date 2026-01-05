@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
-    List<Resource> findByCode(String name);
+    List<Resource> findByName(String name);
 }

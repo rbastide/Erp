@@ -14,6 +14,7 @@ public class McccResponse {
     private int hoursTP;
     private int hoursDS;
     private int hoursDSTP;
+    private int hoursTotal;
 
     private String creationDate;
     private String editDate;
@@ -51,6 +52,9 @@ public class McccResponse {
         return hoursDSTP;
     }
 
+    public int getHoursTotal() {
+        return hoursTotal;
+    }
 
     public String getCreationDate() {
         return creationDate;

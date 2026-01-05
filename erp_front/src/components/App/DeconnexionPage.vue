@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import AppHeader from './Header.vue';
+import AuthService from "../../services/AuthService.js";
+import AppHeader from "./Header.vue";
 
 const router = useRouter();
 
@@ -9,23 +10,20 @@ const handleAide = () => {
 };
 
 const handleNon = () => {
-  router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
+  router.back();
 }
 
 const handleOui = () => {
-  router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
-}
+  AuthService.logout();
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
+  router.push('/login');
 }
 </script>
 
 <template>
-
-  <AppHeader title="Annulation à " inline="confirmer"/>
+  <AppHeader title="Déconnexion à" inline="confirmer"/>
   <div class="main-content">
-    <p>Êtes vous sûr de vouloir annuler ?</p>
+    <p>Êtes vous sûr de vouloir vous déconnecter ?</p>
     <div class="container-btn">
       <div @click="handleOui" class="btn-oui">Oui</div>
       <div @click="handleNon" class="btn-non">Non</div>

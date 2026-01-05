@@ -1,7 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import {onMounted, ref} from "vue";
-import '../assets/css/variable.css';
+import '../../assets/css/variable.css';
 
 // Déclaration des props
 const props = defineProps({
@@ -42,7 +42,7 @@ onMounted(() => {
 <template>
   <header class="page-header" title="">
     <div class="container-connexion">
-      <img src="../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
+      <img src="../../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
       <p>{{ title }} <br> {{inline}}</p>
     </div>
     <div v-if="aide" @click="handleAide" class="aide">Service d'aide</div>

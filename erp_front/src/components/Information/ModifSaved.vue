@@ -1,18 +1,26 @@
 <script setup lang="ts">
-  import { useRouter } from 'vue-router';
-  import AppHeader from './Header.vue';
+import { useRouter } from 'vue-router';
+import AppHeader from '../Header.vue';
 
-  const router = useRouter();
+const router = useRouter();
 
-  const handleRetour = () => {
-    router.push('/home');
-  };
+const handleRetour = () => {
+  router.push('/home-admin');
+};
+
+const handleAide = () => {
+  router.push('/aide');
+};
+
+const handleDeconnexion = () => {
+  router.push('/deconnexion');
+};
 </script>
 
 <template>
   <AppHeader title="Information"/>
   <main class="main-content">
-    <p class="text">Une erreur est survenue !</p>
+    <p class="text">Les modifications ont bien été sauvegardées !</p>
   </main>
   <footer>
     <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
@@ -21,14 +29,20 @@
 
 <style scoped>
 .main-content{
-  position: relative;
+  display: flex;
+  width: 90%;
+  margin: auto;
+  margin-top: 254px;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', sans-serif;
 }
+
 .text{
   text-align: center;
-  margin-top: 192px;
-  color: #B51621;
+  margin-top: 5%;
+  color: green;
   font-size: 40px;
-  font-family: 'Roboto', sans-serif;
 }
 
 /*Footer*/
@@ -47,7 +61,6 @@
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
-
 }
 
 .btn-quitter:hover{

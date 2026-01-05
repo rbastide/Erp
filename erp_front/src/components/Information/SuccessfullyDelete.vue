@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import AppHeader from './Header.vue';
+import AppHeader from '../Header.vue';
 
 const router = useRouter();
 
@@ -8,28 +8,35 @@ const handleRetour = () => {
   router.push('/home-admin');
 };
 
-const handleNewUser = () => {
-  router.push('/new-user');
-}
+const handleAutreFiche = () => {
+  router.push('/history-admin');
+};
+
 </script>
 
 <template>
-  <AppHeader title="Information"/>
+  <AppHeader title="Information" />
   <main class="main-content">
-    <p class="text">Votre ajout d’utilisateur a bien été effectué !</p>
+    <p class="text">La fiche ressource a bien été supprimée !</p>
   </main>
   <footer>
     <div class="btn-container">
       <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
-      <div @click="handleNewUser" class="btn-new-user">Ajouter un autre utilisateur</div>
+      <div @click="handleAutreFiche" class="btn-quitter">Supprimer une nouvelle fiche</div>
     </div>
   </footer>
 </template>
 
 <style scoped>
+
 .main-content{
-  margin-top: 24px;
-  position: relative;
+  display: flex;
+  width: 90%;
+  margin: auto;
+  margin-top: 254px;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', sans-serif;
 }
 
 .text{
@@ -37,8 +44,9 @@ const handleNewUser = () => {
   margin-top: 5%;
   color: green;
   font-size: 40px;
-  font-family: 'Roboto', sans-serif;
 }
+
+/*Footer*/
 
 .btn-container{
   display: flex;
@@ -46,7 +54,7 @@ const handleNewUser = () => {
   align-items: center;
 }
 
-.btn-quitter, .btn-new-user{
+.btn-quitter, .btn-retour{
   width: fit-content;
   padding: 0.8rem; /* 13px */
   border: none;
@@ -54,7 +62,7 @@ const handleNewUser = () => {
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
@@ -63,7 +71,7 @@ const handleNewUser = () => {
   margin: 5% auto;
 }
 
-.btn-quitter:hover, .btn-new-user:hover{
+.btn-quitter:hover, .btn-retour:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;

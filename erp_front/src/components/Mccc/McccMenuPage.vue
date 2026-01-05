@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import AppHeader from './Header.vue';
+import AppHeader from '../Header.vue';
 import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
