@@ -76,14 +76,14 @@ onMounted(() => {
   position: absolute;
   width: 127px;
   height: 127px;
-  left: 264px;
+  left: 364px;
   top: 22.5px;
 }
 .container-connexion p{
   position: absolute;
   width: 723px;
   height: 124px;
-  left: 409px;
+  left: 509px;
   top: 24px;
   font-family: 'Roboto', sans-serif;
   font-style: normal;

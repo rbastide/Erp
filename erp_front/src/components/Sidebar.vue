@@ -39,10 +39,6 @@ onMounted(() => {
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </div>
-
-      <transition name="fade">
-        <img v-show="isExpanded" src="../assets/uploads/Logo_unilim.png" alt="Logo" class="logo" />
-      </transition>
     </div>
 
     <nav class="sidebar-nav">
@@ -93,8 +89,8 @@ onMounted(() => {
   height: 100%;
   position: fixed;
   left: 0;
-  bottom: 0;
-  background-color: #ffffff;
+  top: 0;
+  background-color: rgba(255, 255, 255, 1);
   border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -110,7 +106,7 @@ onMounted(() => {
 }
 
 .sidebar-header {
-  height: 80px;
+  height: 172px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -118,12 +114,23 @@ onMounted(() => {
   border-bottom: 1px solid #f0f0f0;
   overflow: hidden;
   white-space: nowrap;
+  background-color: #96111a;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar.expanded .sidebar-header {
+  background-color: #ffffff;
 }
 
 .hamburger-icon {
-  color: #333;
+  color: #ffffff;
   cursor: pointer;
   min-width: 32px;
+  transition: color 0.3s ease;
+}
+
+.sidebar.expanded .hamburger-icon {
+  color: #96111a;
 }
 
 .logo {
@@ -136,7 +143,6 @@ onMounted(() => {
 
 .sidebar-nav {
   flex-grow: 1;
-  padding-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
