@@ -4,10 +4,20 @@ import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from './Header.vue';
 
-
+// Initialisation des données
 mcccStore.loadMcccStore();
 const router = useRouter();
 
+// Configuration des types d'heures pour la génération automatique de la grille
+const hourTypes = [
+  { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
+  { key: 'hoursTD', label: 'TD', color: '#7986CB' },
+  { key: 'hoursTP', label: 'TP', color: '#4FC3F7' },
+  { key: 'hoursDS', label: 'DS', color: '#FFB74D' },
+  { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
+];
+
+// Calcul du total en temps réel
 const totalHeures = computed(() => {
   return (mcccStore.hoursCM || 0) +
       (mcccStore.hoursTD || 0) +
@@ -16,6 +26,32 @@ const totalHeures = computed(() => {
       (mcccStore.hoursDSTP || 0);
 });
 
+/** * LOGIQUE DE SÉCURITÉ ET CONTRÔLE
+ */
+
+// Mise à jour via boutons + et - (bloqué à 0 minimum)
+const updateHours = (key: string, delta: number) => {
+  const current = (mcccStore as any)[key] || 0;
+  const newValue = Math.max(0, current + delta);
+  (mcccStore as any)[key] = newValue;
+};
+
+// Validation de la saisie manuelle (si l'utilisateur tape un chiffre négatif)
+const validateInput = (key: string) => {
+  if ((mcccStore as any)[key] < 0 || (mcccStore as any)[key] === null) {
+    (mcccStore as any)[key] = 0;
+  }
+};
+
+// Blocage de la touche "-" au clavier pour empêcher d'écrire un signe négatif
+const blockNegative = (evt: KeyboardEvent) => {
+  if (evt.key === '-') {
+    evt.preventDefault();
+  }
+};
+
+/** * NAVIGATION
+ */
 const handleValider = () => {
   mcccStore.hoursTotal = totalHeures.value;
   mcccStore.registerMcccStore();
@@ -25,144 +61,203 @@ const handleValider = () => {
 const handleRetour = () => {
   router.back();
 };
-
 </script>
 
 <template>
-  <AppHeader :title="'Heures ' + mcccStore.resourceCode"/>
-  <main class = "main-content">
-    <div class = "choisir-ressource">
-      Veuillez saisir les heures à remplir automatiquement :
-    </div>
-    <div class = "top-grid">
-      <div class = "type-of-hour">
-        <p class = "title-hour">CM</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursCM" min="0">
-      </div>
-      <div class = "type-of-hour">
-        <p class = "title-hour">TD</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTD" min="0">
-      </div>
-      <div class = "type-of-hour">
-        <p class = "title-hour">DS</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDS" min="0">
-      </div>
-    </div>
-    <div class= "bottom-grid">
-      <div class= "type-of-hour">
-        <p class= "title-hour">TP</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursTP" min="0">
-      </div>
-      <div class= "type-of-hour">
-        <p class= "title-hour">DS TP</p>
-        <input class="grey-square" type="number" v-model.number="mcccStore.hoursDSTP" min="0">
-      </div>
-    </div>
-    <div class= "total"><p>Total : <span id="tot">{{ totalHeures }}</span>h</p></div>
+  <AppHeader title="Veuillez saisir les " inline = "heures par élève : "/>
 
-    <div class="container-btn">
-      <div @click="handleValider" class="btn-sys">Valider</div>
-      <div @click="handleRetour" class="btn-sys">Annuler</div>
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="hours-flex-container">
+        <div v-for="type in hourTypes" :key="type.key" class="hour-card">
+          <span class="card-label" :style="{ color: type.color }">{{ type.label }}</span>
+
+          <div class="input-container">
+            <button type="button" class="step-btn" @click="updateHours(type.key, -1)">−</button>
+
+            <input
+                class="hour-input"
+                type="number"
+                v-model.number="(mcccStore as any)[type.key]"
+                min="0"
+                @input="validateInput(type.key)"
+                @keypress="blockNegative"
+            >
+
+            <button type="button" class="step-btn" @click="updateHours(type.key, 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="total-section">
+        <p>Total : <span class="total-number">{{ totalHeures }}</span> h</p>
+      </div>
+
+      <div class="actions-container">
+        <button @click="handleValider" class="btn btn-primary">Valider</button>
+        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-.main-content{
-  position: relative;
-  margin-top: 172px;
-}
-.choisir-ressource {
-  width: 100%;
-  height: 66px;
-  margin-top: 20px;
-  margin-left: 20px;
+.main-content {
+  /* Espace suffisant pour ne pas être caché par le header */
+  padding-top: 220px;
+  min-height: 100vh;
+  background-color: #fcfcfc;
   font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 38px;
-  color: #E92533;
 }
 
-.top-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto auto auto;
-  padding: 10px;
-}
-
-.type-of-hour{
-  box-sizing: border-box;
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  /* Aligne le titre à gauche tout en permettant de centrer les cartes plus bas */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0 16px;
-  isolation: isolate;
+  align-items: flex-start;
 }
 
-.title-hour{
-  font-size: 30px;
-  margin-bottom: 10px;
-  font-family: 'Roboto', sans-serif;
+.instruction-text {
+  font-size: 28px;
+  color: #E92533;
+  margin-bottom: 50px;
+  font-weight: 500;
+  text-align: left;
+  width: 100%;
 }
 
-.grey-square{
-  box-sizing: border-box;
-  width: 200px;
-  background: #D9D9D9;
-  padding: 30px 60px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 15px;
-  font-size: 30px;
-  text-align: center;
-}
-
-.bottom-grid {
-  margin-top: 40px;
-  position: relative;
-  display: grid;
-  grid-template-columns: auto auto;
-  padding: 10px;
-}
-
-.total{
-  margin-top: 50px;
-  margin-left: 40%;
-  font-size: 50px;
-  font-family: 'Roboto', sans-serif;
-  margin-bottom: 80px;
-}
-
-.container-btn{
+.hours-flex-container {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
+  /* Centre les cartes entre elles (DS et DS TP seront au milieu) */
+  justify-content: center;
+  width: 100%;
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.hour-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.hour-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.card-label {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1f3f5;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.hour-input {
+  width: 70px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2d3436;
+}
+
+/* Suppression des flèches par défaut des navigateurs */
+.hour-input::-webkit-outer-spin-button,
+.hour-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.step-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
   align-items: center;
   justify-content: center;
+  color: #B51621;
+  transition: all 0.2s;
 }
 
-.btn-sys{
-  width: 150px;
-  padding: 13px;
-  border: none;
+.step-btn:hover {
+  background: #B51621;
+  color: white;
+}
+
+.total-section {
+  width: 100%;
   text-align: center;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem; /* 16px */
-  font-weight: bold;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  transition: background-color 0.2s ease;
-  position: relative;
-  margin : 1%;
+  margin: 50px 0;
+  font-size: 40px;
 }
 
-.btn-sys:hover{
-  background: #999999;
-  transform: translateY(-4px);
+.total-number {
+  font-weight: 900;
+  color: #B51621;
+}
+
+.actions-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding-bottom: 50px;
+}
+
+.btn {
+  padding: 15px 50px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #B51621;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #8e111a;
+  transform: scale(1.05);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #B51621;
+  border: 2px solid #B51621;
+}
+
+.btn-outline:hover {
+  background-color: #fff5f5;
 }
 </style>
