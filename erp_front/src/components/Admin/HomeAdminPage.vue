@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import AppHeader from '../App/Header.vue';
+import AppHeader from '../Header.vue';
 
 const router = useRouter();
 

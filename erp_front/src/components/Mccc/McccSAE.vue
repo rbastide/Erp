@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router';
 import { onMounted, ref, nextTick } from 'vue';
 import { mcccStore } from "@/services/mcccStore.js";
-import AppHeader from '../App/Header.vue';
+import AppHeader from '../Header.vue';
 
 const router = useRouter();
 const errorMessage = ref('');
