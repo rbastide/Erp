@@ -7,14 +7,6 @@
   const handleRetour = () => {
     router.push('/home');
   };
-
-  const handleAide = () => {
-    router.push('/aide');
-  };
-
-  const handleDeconnexion = () => {
-    router.push('/deconnexion');
-  };
 </script>
 
 <template>
@@ -33,7 +25,7 @@
 }
 .text{
   text-align: center;
-  margin-top: 5%;
+  margin-top: 192px;
   color: #B51621;
   font-size: 40px;
   font-family: 'Roboto', sans-serif;

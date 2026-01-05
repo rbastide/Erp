@@ -11,6 +11,9 @@ export const mcccStore = reactive({
     hoursDSTP: 0,
     hoursTotal: 0,
 
+    creationDate:'',
+    editDate:'',
+
     saeCodes: [],
     ue: [],
     niveaux: [],
@@ -41,10 +44,14 @@ export const mcccStore = reactive({
         this.hoursDSTP = 0;
         this.hoursTotal = 0;
 
+        this.creationDate = '';
+        this.editDate = '';
+
         this.saeCodes = [];
         this.niveaux = [];
         this.ue = [];
         this.acs = [];
+        this.acsGrouped = [];
 
         this.referents = [];
 

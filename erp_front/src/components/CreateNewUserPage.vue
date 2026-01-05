@@ -130,6 +130,7 @@ const handleRegister = async () => {
   text-align: center;
 }
 .main-content {
+  margin-top: 200px;
   background-color: #FFFFFF;
   display: flex;
   justify-content: center;

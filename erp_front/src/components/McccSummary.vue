@@ -3,29 +3,73 @@ import { useRouter } from 'vue-router';
 import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from './Header.vue';
 import { onMounted } from 'vue';
+import api from '@/services/api'; // <--- 1. Import de l'API
 
 const router = useRouter();
 
-const handleAide = () => {
-  router.push('/aide');
-};
+const handleRetour = () => router.back();
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
+const handleValider = async () => {
+  try {
+    const payload = {
+      resourceCode: mcccStore.resourceCode,
+      creationDate: mcccStore.creationDate,
+      editDate: mcccStore.editDate,
 
-const handleValider = () => {
-  router.push('/modif-saved');
-  mcccStore.clearMcccStore();
-};
+      hoursCM: mcccStore.hoursCM,
+      hoursTD: mcccStore.hoursTD,
+      hoursTP: mcccStore.hoursTP,
+      hoursDS: mcccStore.hoursDS,
+      hoursDSTP: mcccStore.hoursDSTP,
+      hoursTotal: mcccStore.hoursTotal,
 
-const handleRetour = () => {
-  router.push('/mccc-menu');
+      saeCodes: mcccStore.saeCodes,
+
+      ue: mcccStore.ue,
+      niveaux: mcccStore.niveaux,
+      acs: mcccStore.acs,
+
+      acsGrouped: mcccStore.acsGrouped,
+
+      referents: mcccStore.referents
+    };
+
+    console.log("Envoi des données au back ", payload);
+
+    const response = await api.post('/mccc/mcccResponse', payload);
+
+    if (response.status === 200 || response.status === 201) {
+      console.log("Sauvegarde réussie !");
+      mcccStore.clearMcccStore();
+      await router.push('/modif-saved');
+    }
+
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde des MCCC :", error);
+    alert("Une erreur est survenue lors de l'enregistrement.");
+  }
 };
 
 onMounted(() => {
   mcccStore.loadMcccStore();
+
+  const today = new Date().toLocaleDateString('fr-FR');
+
+  if (!mcccStore.creationDate) {
+    mcccStore.creationDate = today;
+  }
+
+  mcccStore.editDate = today;
+
+  mcccStore.registerMcccStore();
 });
+
+const getGroupsForUE = (ueName) => {
+  if (!mcccStore.acsGrouped) return [];
+  return mcccStore.acsGrouped.filter(group => group.ue === ueName);
+};
+
+
 </script>
 
 <template>
@@ -40,24 +84,19 @@ onMounted(() => {
         <div class="title">Heures</div>
         <div class="listing-hours">
           <div class="type-of-hour" id="cm">
-            <p class="title-hour">CM</p>
-            <p class="grey-square">{{ mcccStore.hoursCM }}</p>
+            <p class="title-hour">CM</p><p class="grey-square">{{ mcccStore.hoursCM }}</p>
           </div>
           <div class="type-of-hour">
-            <p class="title-hour">TD</p>
-            <p class="grey-square">{{ mcccStore.hoursTD }}</p>
+            <p class="title-hour">TD</p><p class="grey-square">{{ mcccStore.hoursTD }}</p>
           </div>
           <div class="type-of-hour">
-            <p class="title-hour">DS</p>
-            <p class="grey-square">{{ mcccStore.hoursTD }}</p>
+            <p class="title-hour">DS</p><p class="grey-square">{{ mcccStore.hoursDS }}</p>
           </div>
           <div class="type-of-hour">
-            <p class="title-hour">TP</p>
-            <p class="grey-square">{{ mcccStore.hoursTP }}</p>
+            <p class="title-hour">TP</p><p class="grey-square">{{ mcccStore.hoursTP }}</p>
           </div>
           <div class="type-of-hour" id="ds_tp">
-            <p class="title-hour">DS/TP</p>
-            <p class="grey-square">{{ mcccStore.hoursDSTP }}</p>
+            <p class="title-hour">DS/TP</p><p class="grey-square">{{ mcccStore.hoursDSTP }}</p>
           </div>
           <div class="total">
             <p>Total : <span id="tot">{{ mcccStore.hoursTotal }}</span></p>
@@ -70,17 +109,16 @@ onMounted(() => {
         <p class="grey-square" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
           {{ saeCode }}
         </p>
-        <p class="title-centered">Compétence(s) concernée(s) :</p>
-        <p class="grey-square" id="comp_conc">UE1.1</p>
       </div>
     </div>
 
     <p class="title-centered" id="comp">Compétences / Objectifs</p>
 
-    <div class="big-square">
-      <div class="grid-split-in-two">
-        <p class="title">Intitulé de l'UE 1 : </p>
-        <p class="grey-square" id="intitule">Ceci est l'intitulé de l'UE : description globale du fonctionnement</p>
+    <div class="big-square" v-for="(ueItem, ueIndex) in mcccStore.ue" :key="ueIndex">
+
+      <div class="grid-split-in-two" >
+        <p class = "title">{{ ueItem.includes(':') ? ueItem.split(":")[0] : 'UE' }}</p>
+        <p class="grey-square" id="intitule">{{ ueItem.includes(':') ? ueItem.split(":")[1] : ueItem }}</p>
       </div>
 
       <div class="table-container">
@@ -92,39 +130,32 @@ onMounted(() => {
           </tr>
           </thead>
           <tbody>
-          <tr>
-            <td class="lvl-number">1</td>
+
+          <tr v-for="(group, grpIndex) in getGroupsForUE(ueItem)" :key="grpIndex">
+
+            <td class="lvl-number">{{ grpIndex + 1 }}</td>
+
             <td class="lvl-data">
-              <p class="lvl-label">Intitulé :</p>
-              <p class="lvl-desc">Concevoir et mettre en place une base de données à partir d'un cahier des charges client</p>
-              <p class="lvl-label">Apprentissages :</p>
-              <ul class="ac-list">
-                <li>Mettre à jour une base de données relationnelles (en requêtes directes ou à travers une application)</li>
-              </ul>
+              <div v-if="group.niveau">
+                <p class="lvl-label">Intitulé :</p>
+                <p class="lvl-desc">{{ group.niveau }}</p>
+              </div>
+
+              <div v-if="group.acs && group.acs.length > 0">
+                <p class="lvl-label">Apprentissages :</p>
+                <ul class="ac-list">
+                  <li v-for="(ac, acIndex) in group.acs" :key="acIndex">
+                    {{ ac }}
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
-          <tr>
-            <td class="lvl-number">2</td>
-            <td class="lvl-data">
-              <p class="lvl-label">Intitulé :</p>
-              <p class="lvl-desc">Établir des scénarios d'utilisation pour des tests d'acceptance.</p>
-              <p class="lvl-label">Apprentissages :</p>
-              <ul class="ac-list">
-                <li>Rédiger des spécifications fonctionnelles détaillées.</li>
-              </ul>
-            </td>
+
+          <tr v-if="getGroupsForUE(ueItem).length === 0">
+            <td colspan="2" style="text-align:center; padding: 20px;">Aucun niveau défini pour cette UE.</td>
           </tr>
-          <tr>
-            <td class="lvl-number">3</td>
-            <td class="lvl-data">
-              <p class="lvl-label">Intitulé :</p>
-              <p class="lvl-desc">Organiser l'architecture d'une application web en Microservices.</p>
-              <p class="lvl-label">Apprentissages :</p>
-              <ul class="ac-list">
-                <li>Créer des conteneurs Docker pour chaque Microservice.</li>
-              </ul>
-            </td>
-          </tr>
+
           </tbody>
         </table>
       </div>
@@ -133,12 +164,12 @@ onMounted(() => {
     <div class="info-footer">
       <div class="title"><p>Professeur(s) référent :
         <span id="creation" v-for="(referent, index) in mcccStore.referents" :key="referent">
-          {{ referent.firstname + " " + referent.lastname + (mcccStore.referents.length == index + 1 ? "" : ", ") }}
+          {{ referent.firstname + " " + referent.lastname + (mcccStore.referents && mcccStore.referents.length == index + 1 ? "" : ", ") }}
         </span>
       </p></div>
       <div class="title"><p>Version fiche ressource : <span id="creation">1</span></p></div>
-      <div class="title"><p>Date de création : <span id="creation">13/04/2025</span></p></div>
-      <div class="title"><p>Date de modification : <span id="creation">18/04/2025</span></p></div>
+      <div class="title"><p>Date de création : <span id="creation">{{mcccStore.creationDate}}</span></p></div>
+      <div class="title"><p>Date de modification : <span id="creation">{{mcccStore.editDate}}</span></p></div>
     </div>
 
     <div class="container-btn">
@@ -149,6 +180,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Votre style existant */
 .main-content {
   width: 90%;
   margin: 254px auto 50px;
@@ -232,7 +264,6 @@ onMounted(() => {
   margin-bottom: 40px;
 }
 
-/* STYLES DU NOUVEAU TABLEAU */
 .table-container {
   margin-top: 20px;
 }
@@ -259,6 +290,7 @@ onMounted(() => {
   text-align: center;
   border: 1px solid #333;
   background-color: #f5f5f5;
+  vertical-align: middle;
 }
 
 .lvl-data {
@@ -271,7 +303,9 @@ onMounted(() => {
   text-decoration: underline;
   margin-bottom: 5px;
   color: #333;
+  margin-top: 10px;
 }
+.lvl-label:first-child { margin-top: 0; }
 
 .lvl-desc {
   margin-bottom: 15px;

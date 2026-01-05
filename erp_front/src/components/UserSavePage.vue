@@ -28,6 +28,7 @@ const handleNewUser = () => {
 
 <style scoped>
 .main-content{
+  margin-top: 24px;
   position: relative;
 }
 

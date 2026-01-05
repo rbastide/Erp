@@ -4,9 +4,11 @@ import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from './Header.vue';
 
+// Initialisation des données
 mcccStore.loadMcccStore();
 const router = useRouter();
 
+// Configuration des types d'heures pour la génération automatique de la grille
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
   { key: 'hoursTD', label: 'TD', color: '#7986CB' },
@@ -15,6 +17,7 @@ const hourTypes = [
   { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
+// Calcul du total en temps réel
 const totalHeures = computed(() => {
   return (mcccStore.hoursCM || 0) +
       (mcccStore.hoursTD || 0) +
@@ -23,27 +26,32 @@ const totalHeures = computed(() => {
       (mcccStore.hoursDSTP || 0);
 });
 
-// Empêche de descendre sous 0 via les boutons +/-
+/** * LOGIQUE DE SÉCURITÉ ET CONTRÔLE
+ */
+
+// Mise à jour via boutons + et - (bloqué à 0 minimum)
 const updateHours = (key: string, delta: number) => {
   const current = (mcccStore as any)[key] || 0;
   const newValue = Math.max(0, current + delta);
   (mcccStore as any)[key] = newValue;
 };
 
-// Empêche la saisie manuelle de nombres négatifs
+// Validation de la saisie manuelle (si l'utilisateur tape un chiffre négatif)
 const validateInput = (key: string) => {
   if ((mcccStore as any)[key] < 0 || (mcccStore as any)[key] === null) {
     (mcccStore as any)[key] = 0;
   }
 };
 
-// Bloque physiquement la touche "-" au clavier
+// Blocage de la touche "-" au clavier pour empêcher d'écrire un signe négatif
 const blockNegative = (evt: KeyboardEvent) => {
   if (evt.key === '-') {
     evt.preventDefault();
   }
 };
 
+/** * NAVIGATION
+ */
 const handleValider = () => {
   mcccStore.hoursTotal = totalHeures.value;
   mcccStore.registerMcccStore();
@@ -56,20 +64,17 @@ const handleRetour = () => {
 </script>
 
 <template>
-  <AppHeader title="Bonjour, " inline="ADMIN"/>
+  <AppHeader title="Veuillez saisir les " inline = "heures par élève : "/>
 
   <main class="main-content">
     <div class="content-wrapper">
-      <h1 class="instruction-text">
-        Veuillez saisir les heures à remplir automatiquement :
-      </h1>
-
       <div class="hours-flex-container">
         <div v-for="type in hourTypes" :key="type.key" class="hour-card">
           <span class="card-label" :style="{ color: type.color }">{{ type.label }}</span>
 
           <div class="input-container">
             <button type="button" class="step-btn" @click="updateHours(type.key, -1)">−</button>
+
             <input
                 class="hour-input"
                 type="number"
@@ -78,6 +83,7 @@ const handleRetour = () => {
                 @input="validateInput(type.key)"
                 @keypress="blockNegative"
             >
+
             <button type="button" class="step-btn" @click="updateHours(type.key, 1)">+</button>
           </div>
         </div>
@@ -97,6 +103,7 @@ const handleRetour = () => {
 
 <style scoped>
 .main-content {
+  /* Espace suffisant pour ne pas être caché par le header */
   padding-top: 220px;
   min-height: 100vh;
   background-color: #fcfcfc;
@@ -107,7 +114,7 @@ const handleRetour = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px;
-  /* Utilisation de flex-start pour que le titre reste à gauche */
+  /* Aligne le titre à gauche tout en permettant de centrer les cartes plus bas */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -119,13 +126,13 @@ const handleRetour = () => {
   margin-bottom: 50px;
   font-weight: 500;
   text-align: left;
-  /* margin-left: -10px; // Optionnel : décaler encore plus si besoin */
+  width: 100%;
 }
 
 .hours-flex-container {
   display: flex;
   flex-wrap: wrap;
-  /* C'est ici qu'on centre les cartes entre elles */
+  /* Centre les cartes entre elles (DS et DS TP seront au milieu) */
   justify-content: center;
   width: 100%;
   gap: 30px;
@@ -136,7 +143,7 @@ const handleRetour = () => {
   background: white;
   border-radius: 16px;
   padding: 25px;
-  width: 280px;
+  width: 260px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -176,6 +183,7 @@ const handleRetour = () => {
   color: #2d3436;
 }
 
+/* Suppression des flèches par défaut des navigateurs */
 .hour-input::-webkit-outer-spin-button,
 .hour-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
