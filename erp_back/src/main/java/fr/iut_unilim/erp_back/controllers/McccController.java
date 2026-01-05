@@ -11,16 +11,12 @@ import fr.iut_unilim.erp_back.service.McccService;
 import fr.iut_unilim.erp_back.service.ResourceService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/mccc")
@@ -56,17 +52,17 @@ public class McccController {
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
 
-        ResponseEntity<Object> build = getCreationdateAndEditdateFromDto(dto, mccc);
-        if (build != null) return build;
-
+        boolean dateIsValid = getCreationdateAndEditdateFromDto(dto, mccc);
+        if (!dateIsValid) {
+            return getErrorInvalidDate();
+        }
 
         mcccService.saveMccc(mccc);
 
         return ResponseEntity.ok("MCCC sauvegardée avec succès !");
     }
 
-    @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditdateFromDto(McccResponse dto, Mccc mccc) {
+    private boolean getCreationdateAndEditdateFromDto(McccResponse dto, Mccc mccc) {
         String creationDate = dto.getCreationDate();
         String editDate = dto.getEditDate();
         try {
@@ -75,9 +71,9 @@ public class McccController {
             mccc.setCreationDate(date);
             mccc.setLastModificationDate(editableDate);
         } catch (ParseException e) {
-            return ResponseEntity.badRequest().build();
+            return false;
         }
-        return null;
+        return true;
     }
 
     @NotNull
@@ -112,5 +108,14 @@ public class McccController {
         hourlyVolume.setNbHoursDS(dto.getHoursDS());
         hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
         return hourlyVolume;
+    }
+
+    @NotNull
+    private static ResponseEntity<Map<String, String>> getErrorInvalidDate() {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "INVALID_DATE");
+        error.put("message", "Date format is not correct");
+
+        return ResponseEntity.badRequest().body(error);
     }
 }
