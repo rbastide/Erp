@@ -18,4 +18,8 @@ public class HourlyVolumeService {
     public List<HourlyVolume> getAllHourlyVolumesFromDatas(int hoursCM, int hoursTD, int hoursTP, int hoursDSTP) {
         return hourlyVolumeRepository.findByDatas(hoursCM, hoursTD, hoursTP, hoursDSTP);
     }
+
+    public void save(HourlyVolume hourlyVolume) {
+        hourlyVolumeRepository.save(hourlyVolume);
+    }
 }

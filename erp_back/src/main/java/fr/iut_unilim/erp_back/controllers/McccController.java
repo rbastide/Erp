@@ -8,6 +8,7 @@ import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.service.HourlyVolumeService;
 import fr.iut_unilim.erp_back.service.McccService;
 import fr.iut_unilim.erp_back.service.ResourceService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,33 +31,36 @@ public class McccController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveMccc(@RequestBody McccResponse dto) {
-        try {
-            Mccc mccc = new Mccc();
+        Mccc mccc = new Mccc();
 
-            List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(),dto.getHoursTD(),dto.getHoursTP(),dto.getHoursDSTP());
-            List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
-            if(resources.size()==1 ){
-                Resource resource = resources.get(0);
-                mccc.setResourceId(resource);
-            }
-
-
-
-            if (hourlyVolumes.size() == 1) {
-                HourlyVolume hourlyVolume = hourlyVolumes.get(0);
-                hourlyVolume.setNbHoursCM(dto.getHoursCM());
-                hourlyVolume.setNbHoursTD(dto.getHoursTD());
-                hourlyVolume.setNbHoursTP(dto.getHoursTP());
-                hourlyVolume.setNbHoursDS(dto.getHoursDS());
-                hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
-                mccc.setHourlyVolId(hourlyVolume);
-            }
-
-            return ResponseEntity.ok("MCCC sauvegardée avec succès !");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erreur lors de la sauvegarde : " + e.getMessage());
+        List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
+        if (resources.size() == 1) {
+            Resource resource = resources.get(0);
+            mccc.setResourceId(resource);
         }
+
+        HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
+        mccc.setHourlyVolId(hourlyVolume);
+
+        mcccService.saveMccc(mccc);
+
+        return ResponseEntity.ok("MCCC sauvegardée avec succès !");
+    }
+
+    @NotNull
+    private HourlyVolume getHourlyVolumeFromDto(McccResponse dto) {
+        List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
+        if (hourlyVolumes.size() == 1) {
+            HourlyVolume hourlyVolume = hourlyVolumes.get(0);
+            hourlyVolume.setNbHoursCM(dto.getHoursCM());
+            hourlyVolume.setNbHoursTD(dto.getHoursTD());
+            hourlyVolume.setNbHoursTP(dto.getHoursTP());
+            hourlyVolume.setNbHoursDS(dto.getHoursDS());
+            hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
+            return hourlyVolume;
+        }
+        HourlyVolume hourlyVolume = new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
+        hourlyVolumeService.save(hourlyVolume);
+        return hourlyVolume;
     }
 }

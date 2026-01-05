@@ -29,8 +29,7 @@ public class HourlyVolume {
     public HourlyVolume() {
     }
 
-    public HourlyVolume(Long hourlyVolID, int nbHoursCM, int nbHoursDS, int nbHoursDSTP, int nbHoursTP, int nbHoursTD) {
-        this.hourlyVolID = hourlyVolID;
+    public HourlyVolume(int nbHoursCM, int nbHoursDS, int nbHoursDSTP, int nbHoursTP, int nbHoursTD) {
         this.nbHoursCM = nbHoursCM;
         this.nbHoursDSTP = nbHoursDSTP;
         this.nbHoursDS = nbHoursDS;
