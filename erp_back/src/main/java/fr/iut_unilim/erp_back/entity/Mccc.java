@@ -3,9 +3,6 @@ package fr.iut_unilim.erp_back.entity;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import jakarta.persistence.*;
 
-import java.util.Date;
-import java.util.Set;
-
 @Entity
 @Table(name = "MCCC")
 public class Mccc {
@@ -20,30 +17,19 @@ public class Mccc {
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "McccSaes",
-            joinColumns = @JoinColumn(name = "mcccSaesID"),
-            inverseJoinColumns = @JoinColumn(name = "saeID")
-    )
-    private Set<Sae> saeId;
+    @ManyToOne
+    @JoinColumn(name = "saeID")
+    private Sae saeId;
 
     @ManyToOne
     @JoinColumn(name = "skillID")
     private Skill skillId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "MCCCTeachers",
-            joinColumns = @JoinColumn(name = "referencialTeacher"),
-            inverseJoinColumns = @JoinColumn(name = "teacherID")
-    )
-    private Set<Teacher> referencialTeacherId;
+    @ManyToOne
+    @JoinColumn(name = "referencialTeacher")
+    private Teacher referencialTeacherId;
 
-    private Date creationDate;
-    private Date lastModificationDate;
-
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Skill skillId, Set<Teacher> referencialTeacherId) {
+    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Sae saeId, Skill skillId, Teacher referencialTeacherId) {
         this.mcccId = mcccId;
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
@@ -79,11 +65,11 @@ public class Mccc {
         this.resourceId = resourceId;
     }
 
-    public Set<Sae> getSaeId() {
+    public Sae getSaeId() {
         return saeId;
     }
 
-    public void setSaeId(Set<Sae> saeId) {
+    public void setSaeId(Sae saeId) {
         this.saeId = saeId;
     }
 
@@ -95,27 +81,11 @@ public class Mccc {
         this.skillId = skillId;
     }
 
-    public Set<Teacher> getReferencialTeacherId() {
+    public Teacher getReferencialTeacherId() {
         return referencialTeacherId;
     }
 
-    public void setReferencialTeacherId(Set<Teacher> referencialTeacherId) {
+    public void setReferencialTeacherId(Teacher referencialTeacherId) {
         this.referencialTeacherId = referencialTeacherId;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Date getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    public void setLastModificationDate(Date lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
     }
 }

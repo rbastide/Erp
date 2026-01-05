@@ -26,13 +26,4 @@ public class TeacherService {
     public List<Teacher> findByFirstname(String firstname) {
         return teacherRepository.findByFirstnameContaining(firstname);
     }
-
-    public List<Teacher> findByFirstnameAndLastname(String lastname, String firstname) {
-        return teacherRepository.findByFirstnameAndLastname(lastname, firstname);
-    }
-
-    public void save(Teacher teacher) {
-        teacherRepository.save(teacher);
-    }
-
 }

@@ -1,7 +1,7 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
-import AppHeader from '../App/Header.vue';
+import AppHeader from './Header.vue';
 import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();

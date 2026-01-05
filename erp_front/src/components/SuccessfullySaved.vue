@@ -1,35 +1,34 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import AppHeader from '../App/Header.vue';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.push('/home');
 };
 
-const handleNewUser = () => {
-  router.push('/new-user');
-}
 </script>
 
 <template>
   <AppHeader title="Information"/>
   <main class="main-content">
-    <p class="text">Votre ajout d’utilisateur a bien été effectué !</p>
+    <p class="text">Votre fiche ressource a bien été sauvegardée !</p>
   </main>
   <footer>
-    <div class="btn-container">
-      <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
-      <div @click="handleNewUser" class="btn-new-user">Ajouter un autre utilisateur</div>
-    </div>
+    <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
   </footer>
 </template>
 
 <style scoped>
 .main-content{
-  margin-top: 24px;
-  position: relative;
+  display: flex;
+  width: 90%;
+  margin: auto;
+  margin-top: 254px;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', sans-serif;
 }
 
 .text{
@@ -37,17 +36,11 @@ const handleNewUser = () => {
   margin-top: 5%;
   color: green;
   font-size: 40px;
-  font-family: 'Roboto', sans-serif;
 }
 
-.btn-container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn-quitter, .btn-new-user{
-  width: fit-content;
+/*Footer*/
+.btn-quitter{
+  width: 150px;
   padding: 0.8rem; /* 13px */
   border: none;
   text-align: center;
@@ -61,9 +54,10 @@ const handleNewUser = () => {
   transition: background-color 0.2s ease;
   position: relative;
   margin: 5% auto;
+
 }
 
-.btn-quitter:hover, .btn-new-user:hover{
+.btn-quitter:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;

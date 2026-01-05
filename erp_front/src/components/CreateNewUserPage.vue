@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import AuthService from '../../services/AuthService.js';
-import AppHeader from '../App/Header.vue';
+import AuthService from '../services/AuthService';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 

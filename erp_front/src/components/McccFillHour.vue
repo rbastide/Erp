@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
-import AppHeader from '../App/Header.vue';
+import AppHeader from './Header.vue';
 
 // Initialisation des données
 mcccStore.loadMcccStore();

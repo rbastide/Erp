@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import AppHeader from '../App/Header.vue';
+import AppHeader from './Header.vue';
 
 const router = useRouter();
 
@@ -8,27 +8,26 @@ const handleRetour = () => {
   router.push('/home-admin');
 };
 
-const handleAutreFiche = () => {
-  router.push('/history-admin');
+const handleAide = () => {
+  router.push('/aide');
 };
 
+const handleDeconnexion = () => {
+  router.push('/deconnexion');
+};
 </script>
 
 <template>
-  <AppHeader title="Information" />
+  <AppHeader title="Information"/>
   <main class="main-content">
-    <p class="text">La fiche ressource a bien été supprimée !</p>
+    <p class="text">Les modifications ont bien été sauvegardées !</p>
   </main>
   <footer>
-    <div class="btn-container">
-      <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
-      <div @click="handleAutreFiche" class="btn-quitter">Supprimer une nouvelle fiche</div>
-    </div>
+    <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
   </footer>
 </template>
 
 <style scoped>
-
 .main-content{
   display: flex;
   width: 90%;
@@ -47,22 +46,15 @@ const handleAutreFiche = () => {
 }
 
 /*Footer*/
-
-.btn-container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn-quitter, .btn-retour{
-  width: fit-content;
+.btn-quitter{
+  width: 150px;
   padding: 0.8rem; /* 13px */
   border: none;
   text-align: center;
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem;
+  font-size: 1rem; /* 16px */
   font-weight: bold;
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
@@ -71,7 +63,7 @@ const handleAutreFiche = () => {
   margin: 5% auto;
 }
 
-.btn-quitter:hover, .btn-retour:hover{
+.btn-quitter:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;
