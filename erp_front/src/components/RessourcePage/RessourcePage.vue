@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -14,11 +15,12 @@ const ressources = ref([
   { code: 'R3.04', name: 'Management de projet' },
 ]);
 
-const handleRetour = () => router.push('/home');
+const handleRetour = () => router.back();
 const handleFill = () => router.push('/fillressourcepage');
 </script>
 
 <template>
+  <Sidebar/>
   <AppHeader title="Choix de la ressource" />
 
   <main class="main-content">
