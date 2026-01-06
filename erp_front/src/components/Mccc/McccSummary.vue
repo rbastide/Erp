@@ -22,13 +22,8 @@ const handleValider = async () => {
       hoursTP: mcccStore.hoursTP,
       hoursDS: mcccStore.hoursDS,
       hoursDSTP: mcccStore.hoursDSTP,
-      hoursTotal: mcccStore.hoursTotal,
 
       saeCodes: mcccStore.saeCodes,
-
-      ue: mcccStore.ue,
-      niveaux: mcccStore.niveaux,
-      acs: mcccStore.acs,
 
       acsGrouped: mcccStore.acsGrouped,
 
@@ -37,7 +32,7 @@ const handleValider = async () => {
 
     console.log("Envoi des données au back ", payload);
 
-    const response = await api.post('/mccc/mcccResponse', payload);
+    const response = await api.post('/mccc/save', payload);
 
     if (response.status === 200 || response.status === 201) {
       console.log("Sauvegarde réussie !");
