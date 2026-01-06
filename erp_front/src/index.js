@@ -27,6 +27,7 @@ import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHist
 import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
 import SaeGestion from "./components/Admin/SaeGestion.vue";
+import Settings from "./components/App/Settings.vue";
 
 
 const routes = [
@@ -174,6 +175,11 @@ const routes = [
         path: '/sae-gestion',
         name: 'SaeGestion',
         component: SaeGestion
+    },
+    {
+        path: '/settings',
+        name: 'Settings',
+        component: Settings
     }
 ];
 
