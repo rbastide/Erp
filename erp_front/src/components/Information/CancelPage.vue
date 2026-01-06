@@ -4,10 +4,6 @@ import AppHeader from '../App/Header.vue';
 
 const router = useRouter();
 
-const handleAide = () => {
-  router.push('/aide');
-};
-
 const handleNon = () => {
   router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
 }
@@ -16,9 +12,6 @@ const handleOui = () => {
   router.push('/home'); // TODO temporaire, je ne sais pas comment faire pour le moment
 }
 
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-}
 </script>
 
 <template>
