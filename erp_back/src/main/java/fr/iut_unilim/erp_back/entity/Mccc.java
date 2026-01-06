@@ -10,8 +10,11 @@ import java.util.Set;
 @Table(name = "MCCC")
 public class Mccc {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private McccId mcccId;
 
+    private int year;
+    private int semester;
     @ManyToOne
     @JoinColumn(name = "hourlyVolID")
     private HourlyVolume hourlyVolId;
