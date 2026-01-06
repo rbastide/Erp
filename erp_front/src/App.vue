@@ -301,4 +301,12 @@ body.dark-mode .nested-acs {
 body.dark-mode input:checked + .slider {
   background-color: #ef5350 !important;
 }
+
+body.dark-mode .hamburger-icon,
+body.dark-mode .nav-text,
+body.dark-mode .sidebar.expanded .hamburger-icon,
+body.dark-mode .sidebar.expanded .nav-text{
+  color: #ef5350 !important;
+}
+
 </style>
