@@ -5,7 +5,7 @@ import AppHeader from '../App/Header.vue';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home');
+  router.back();
 };
 
 </script>
