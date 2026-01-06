@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.dto;
 
 import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
+import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class McccResponse {
     private String creationDate;
     private String editDate;
 
-    private String[] saeCodes;
+    private List<SAE> saeCodes;
     private String[] ue;
 
     private List<LearningRank> acsGrouped;
@@ -61,7 +62,7 @@ public class McccResponse {
         return editDate;
     }
 
-    public String[] getSaeCodes() {
+    public List<SAE> getSaeCodes() {
         return saeCodes;
     }
 
