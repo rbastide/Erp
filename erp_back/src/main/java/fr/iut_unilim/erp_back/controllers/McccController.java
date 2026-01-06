@@ -2,14 +2,9 @@ package fr.iut_unilim.erp_back.controllers;
 
 
 import fr.iut_unilim.erp_back.dto.McccResponse;
-import fr.iut_unilim.erp_back.entity.HourlyVolume;
-import fr.iut_unilim.erp_back.entity.Mccc;
-import fr.iut_unilim.erp_back.entity.Resource;
-import fr.iut_unilim.erp_back.entity.Teacher;
-import fr.iut_unilim.erp_back.service.HourlyVolumeService;
-import fr.iut_unilim.erp_back.service.McccService;
-import fr.iut_unilim.erp_back.service.ResourceService;
-import fr.iut_unilim.erp_back.service.TeacherService;
+import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.service.*;
+import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +26,14 @@ public class McccController {
     private final HourlyVolumeService hourlyVolumeService;
     private final ResourceService resourceService;
     private final TeacherService teacherService;
+    private final SaeService saeService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService) {
+    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService) {
         this.mcccService = mcccService;
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
         this.teacherService = teacherService;
+        this.saeService = saeService;
     }
 
     @PostMapping("/save")
@@ -53,11 +50,15 @@ public class McccController {
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
 
+        Set<Sae> setSae = getSAEFromDto(dto);
+        mccc.setSaeId(setSae);
+
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
 
         ResponseEntity<Object> build = getCreationdateAndEditdateFromDto(dto, mccc);
         if (build != null) return build;
+
 
 
         mcccService.saveMccc(mccc);
@@ -79,6 +80,24 @@ public class McccController {
         }
         return null;
     }
+
+    @NotNull
+    private Set<Sae> getSAEFromDto(McccResponse dto) {
+        Set<Sae> setSae = new HashSet<>();
+        List<fr.iut_unilim.erp_back.tools.datastructures.SAE> saes = dto.getSaeCodes();
+        for (fr.iut_unilim.erp_back.tools.datastructures.SAE sae : saes) {
+            List<Sae> correspondedSaes = saeService.getSaeByNum(sae.saeCode());
+            if (!correspondedSaes.isEmpty()) {
+                setSae.add(correspondedSaes.get(0));
+            } else {
+                Sae newSae = new Sae(sae);
+                saeService.save(newSae);
+                setSae.add(newSae);
+            }
+        }
+        return setSae;
+    }
+
 
     @NotNull
     private Set<Teacher> getTeachersFromDto(McccResponse dto) {
