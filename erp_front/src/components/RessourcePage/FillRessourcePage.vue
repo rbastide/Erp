@@ -8,7 +8,6 @@ const router = useRouter()
 const handleRetour = () =>{ router.push('/home')};
 const handleValider = () => {router.push('/home')};
 
-// --- LOGIQUE DES HEURES ---
 const hours = ref({
   cm: 0,
   td: 0,
@@ -210,8 +209,17 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   align-items: center;
 }
 
-.container { width: 100%; max-width: 900px; margin: 0 auto; }
-.required-legend { text-align: right; color: #E92533; font-size: 0.9rem; margin-bottom: 10px; }
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.required-legend {
+  text-align: right;
+  color: #E92533;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
 
 .form-card {
   background: white;
@@ -231,10 +239,37 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   padding-left: 15px;
 }
 
-.hours-row { display: flex; justify-content: space-between; gap: 20px; }
-.mt-25 { margin-top: 25px; }
-.hour-block { flex: 1; text-align: center; }
-.hour-block label { display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; }
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.mt-25 {
+  margin-top: 25px;
+}
+.hour-block {
+  flex: 1;
+  text-align: center;
+}
+.hour-block label {
+
+
+  display: block;
+
+
+  font-size: 0.9rem;
+
+
+  font-weight: 800;
+
+
+  margin-bottom: 8px;
+
+
+  text-transform: uppercase;
+
+
+}
 
 .box-input, .wide-input {
   width: 100%;
@@ -248,7 +283,11 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   box-sizing: border-box;
 }
 
-.box-input:focus, .wide-input:focus { outline: none; border-color: #E92533; background: white; }
+.box-input:focus, .wide-input:focus {
+  outline: none;
+  border-color: #E92533;
+  background: white;
+}
 
 .box-static {
   height: 45px;
@@ -262,7 +301,11 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   border: 1px solid #e2e8f0;
 }
 
-.total-highlight { border: 2px solid #E92533; color: #E92533; background: #fff5f5; }
+.total-highlight {
+  border: 2px solid #E92533;
+  color: #E92533;
+  background: #fff5f5;
+}
 
 .student-hour-row {
   display: flex;
@@ -272,9 +315,13 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   padding-top: 25px;
 }
 
-.student-hour-row label { flex: 0 0 auto; white-space: nowrap; font-weight: 500; font-size: 1.1rem; }
+.student-hour-row label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
 
-/* STYLE ÉPURÉ */
 .pedagogic-group {
   margin-bottom: 35px;
   display: flex;
@@ -287,7 +334,7 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   align-self: flex-start;
   font-weight: 600;
   margin-bottom: 12px;
-  color: #1e293b; /* Remis en noir/gris sombre */
+  color: #1e293b;
 }
 
 .modern-textarea {
@@ -301,8 +348,13 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   resize: vertical;
 }
 
-.modern-textarea:focus { border-color: #E92533; outline: none; }
-.large { min-height: 110px; }
+.modern-textarea:focus {
+  border-color: #E92533;
+  outline: none;
+}
+.large {
+  min-height: 110px;
+}
 
 .btn-add-line {
   background: transparent;
@@ -310,11 +362,29 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   font-weight: 700;
   cursor: pointer;
   padding: 8px 15px;
-  color: #E92533; /* Bouton reste rouge pour l'action */
+  color: #E92533;
 }
 
-.actions-footer { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-.btn { padding: 15px 45px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; }
-.btn-primary { background: #E92533; color: white; }
-.btn-outline { background: white; color: #E92533; border: 2px solid #E92533; }
+.actions-footer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+.btn {
+  padding: 15px 45px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary {
+  background: #E92533;
+  color: white;
+}
+.btn-outline {
+  background: white;
+  color: #E92533;
+  border: 2px solid #E92533;
+}
 </style>

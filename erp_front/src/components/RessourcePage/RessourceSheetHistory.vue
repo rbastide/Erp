@@ -4,7 +4,15 @@ import AppHeader from '../App/Header.vue'
 
 const router = useRouter()
 
-const handleFermer = () => {router.push('/history')};
+const handleFermer = () => { router.push('/history') };
+
+const hourConfig = {
+  cm: { label: 'CM', color: '#4DB6AC' },
+  td: { label: 'TD', color: '#7986CB' },
+  tp: { label: 'TP', color: '#4FC3F7' },
+  ds: { label: 'DS', color: '#FFB74D' },
+  ds_tp: { label: 'DS/TP', color: '#BA68C8' }
+}
 </script>
 
 <template>
@@ -14,88 +22,83 @@ const handleFermer = () => {router.push('/history')};
     <div class="container">
 
       <section class="form-card">
-        <h2 class="card-title">Récapitulatif des heures</h2>
+        <h2 class="section-title">Volume horaire global</h2>
 
-        <div class="hours-grid-container">
+        <div class="hours-grid-wrapper">
           <div class="hours-row">
-            <div class="hour-item">
-              <label>CM</label>
-              <div class="value-box">0</div>
-            </div>
-            <div class="hour-item">
-              <label>TD</label>
-              <div class="value-box">0</div>
-            </div>
-            <div class="hour-item">
-              <label>DS</label>
-              <div class="value-box">0</div>
+            <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
+              <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
+              <div class="box-static">{{ 0 }}</div>
             </div>
           </div>
 
-          <div class="hours-row">
-            <div class="hour-item">
-              <label>TP</label>
-              <div class="value-box">0</div>
+          <div class="hours-row mt-25">
+            <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
+              <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
+              <div class="box-static">{{ 0 }}</div>
             </div>
-            <div class="hour-item">
-              <label>DS/TP</label>
-              <div class="value-box">0</div>
-            </div>
-            <div class="hour-item total">
-              <label>Total Global</label>
-              <div class="value-box highlight">0</div>
+            <div class="hour-block">
+              <label style="color: #64748b;">Total Global</label>
+              <div class="box-static total-highlight">{{ 0 }} h</div>
             </div>
           </div>
         </div>
 
-        <div class="student-ratio">
-          <label>Heures par étudiant :</label>
-          <span class="ratio-badge">0 h</span>
+        <div class="student-hour-row">
+          <label>Nombre d'heures par étudiant :</label>
+          <div class="box-static student-box">0 h</div>
         </div>
       </section>
 
       <section class="form-card">
-        <h2 class="card-title">Contenu pédagogique</h2>
-        <div class="text-grid">
-          <div class="text-group">
-            <label>Cours Magistraux (CM)</label>
-            <div class="read-only-box">Contenu des CM...</div>
-          </div>
-          <div class="text-group">
-            <label>Travaux Dirigés (TD)</label>
-            <div class="read-only-box">Contenu des TD...</div>
-          </div>
-          <div class="text-group">
-            <label>Travaux Pratiques (TP)</label>
-            <div class="read-only-box">Contenu des TP...</div>
-          </div>
-          <div class="text-group">
-            <label>Devoirs Surveillés (DS)</label>
-            <div class="read-only-box">Modalités d'évaluation...</div>
-          </div>
+        <h2 class="section-title">Contenu pédagogique</h2>
+
+        <div class="pedagogic-group">
+          <h3 class="group-label">CM</h3>
+          <div class="read-only-box">Contenu des CM...</div>
+        </div>
+
+        <div class="pedagogic-group">
+          <h3 class="group-label">TD</h3>
+          <div class="read-only-box">Contenu des TD...</div>
+        </div>
+
+        <div class="pedagogic-group">
+          <h3 class="group-label">TP</h3>
+          <div class="read-only-box">Contenu des TP...</div>
+        </div>
+
+        <div class="pedagogic-group">
+          <h3 class="group-label">DS</h3>
+          <div class="read-only-box">Modalités d'évaluation...</div>
+        </div>
+
+        <div class="pedagogic-group">
+          <h3 class="group-label">DS/TP</h3>
+          <div class="read-only-box">Contenu DS/TP...</div>
         </div>
       </section>
 
       <section class="form-card accent">
-        <h2 class="card-title">Feedbacks & Évolutions</h2>
+        <h2 class="section-title">Bilans et Évolutions</h2>
 
-        <div class="full-text-group">
-          <label>Retour pédagogique des professeurs</label>
+        <div class="pedagogic-group">
+          <label class="field-label">Retour pédagogique des professeurs :</label>
           <div class="read-only-box large">Points forts, points faibles du semestre...</div>
         </div>
 
-        <div class="full-text-group">
-          <label>Retour des étudiants</label>
+        <div class="pedagogic-group">
+          <label class="field-label">Retour des étudiants :</label>
           <div class="read-only-box large">Synthèse des retours...</div>
         </div>
 
-        <div class="full-text-group">
-          <label>Améliorations à apporter</label>
+        <div class="pedagogic-group">
+          <label class="field-label">Améliorations à apporter :</label>
           <div class="read-only-box large">Modifications prévues...</div>
         </div>
       </section>
 
-      <div class="sticky-actions">
+      <div class="actions-footer">
         <button @click="handleFermer" class="btn btn-primary">Fermer la fiche</button>
       </div>
 
@@ -104,172 +107,143 @@ const handleFermer = () => {router.push('/history')};
 </template>
 
 <style scoped>
-/* STRUCTURE */
 .main-content {
-  padding-top: 220px;
-  padding-bottom: 50px;
   background-color: #f4f7f9;
   min-height: 100vh;
+  padding: 240px 20px 60px;
   font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.container {
-  max-width: 1000px;
+.container { width: 100%;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-/* CARDS */
 .form-card {
   background: white;
-  border-radius: 16px;
-  padding: 30px;
+  border-radius: 12px;
+  padding: 35px;
   margin-bottom: 30px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e1e8ed;
+  border: 1px solid #e2e8f0;
 }
 
-.card-title {
-  color: #B51621;
-  font-size: 1.5rem;
-  font-weight: 700;
+.section-title {
+  color: #E92533;
+  font-size: 1.4rem;
+  font-weight: 500;
   margin-bottom: 25px;
-  border-left: 5px solid #B51621;
+  border-left: 5px solid #E92533;
   padding-left: 15px;
 }
 
-/* GRILLE D'HEURES */
-.hours-grid-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 25px;
-}
 
 .hours-row {
   display: flex;
   justify-content: space-between;
-  gap: 15px;
+  gap: 20px;
 }
-
-.hour-item {
+.mt-25 {
+  margin-top: 25px;
+}
+.hour-block {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.hour-item label {
-  font-weight: 700;
-  color: #546e7a;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
-}
-
-.value-box {
-  width: 100%;
-  background: #f8fafb;
-  border: 2px solid #cfd8dc;
-  border-radius: 10px;
-  padding: 15px;
   text-align: center;
-  font-size: 1.4rem;
+}
+.hour-block label {
+  display: block;
+  font-size: 0.9rem;
   font-weight: 800;
-  color: #263238;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
-.highlight {
-  border-color: #B51621;
-  color: #B51621;
-  background: #fff5f5;
-}
-
-.student-ratio {
+.box-static {
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  padding-top: 20px;
-  border-top: 1px dashed #cfd8dc;
+  font-size: 1.3rem;
+  font-weight: 800;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
 }
 
-.ratio-badge {
-  background: #263238;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-weight: 700;
+.total-highlight {
+  border: 2px solid #E92533;
+  color: #E92533;
+  background: #fff5f5;
 }
 
-/* AFFICHAGE TEXTE (READ-ONLY) */
-.text-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.student-hour-row {
+  display: flex;
+  align-items: center;
   gap: 20px;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 25px;
+}
+.student-hour-row label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+.student-box {
+  flex: 1;
 }
 
-.text-group, .full-text-group {
+.pedagogic-group {
+  margin-bottom: 35px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  width: 100%;
 }
 
-.text-group label, .full-text-group label {
+.group-label, .field-label {
+  align-self: flex-start;
   font-weight: 600;
-  color: #455a64;
-  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #1e293b;
 }
 
 .read-only-box {
   width: 100%;
-  min-height: 100px;
-  border: 2px solid #e1e8ed;
-  border-radius: 10px;
-  padding: 12px;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 1rem;
   background: #fdfdfd;
   color: #546e7a;
   line-height: 1.5;
-  white-space: pre-wrap; /* Conserve les sauts de ligne */
+  white-space: pre-wrap;
   cursor: default;
+  min-height: 80px;
 }
 
 .large {
-  min-height: 80px;
-  margin-bottom: 10px;
+  min-height: 110px;
 }
 
-/* BOUTONS */
-.sticky-actions {
+.actions-footer {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 40px;
+  margin-top: 20px;
 }
-
 .btn {
-  padding: 15px 40px;
-  border-radius: 12px;
+  padding: 15px 45px;
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 1.1rem;
   cursor: pointer;
-}
-
-.btn-primary {
-  background: #B51621;
-  color: white;
   border: none;
 }
-
-.btn-outline {
-  background: transparent;
-  color: #B51621;
-  border: 2px solid #B51621;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .hours-row { flex-wrap: wrap; }
-  .text-grid { grid-template-columns: 1fr; }
-  .hour-item { min-width: 45%; }
+.btn-primary {
+  background: #E92533;
+  color: white;
 }
 </style>
