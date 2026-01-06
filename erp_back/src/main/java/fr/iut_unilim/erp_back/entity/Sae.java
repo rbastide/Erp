@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
+import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +20,11 @@ public class Sae {
     }
 
     public Sae() {
+    }
+
+    public Sae(SAE sae) {
+        this.num = sae.saeCode();
+        this.title = sae.saeName();
     }
 
     public Long getSaeID() {
