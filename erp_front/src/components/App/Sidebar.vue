@@ -100,7 +100,6 @@ onMounted(() => {
   left: 0;
   top: 0;
   background-color: rgba(255, 255, 255, 1);
-  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
@@ -160,8 +159,7 @@ onMounted(() => {
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 15px 0;
-  padding-left: 28px;
+  padding: 15px 28px;
   cursor: pointer;
   color: #555;
   transition: all 0.2s ease;
