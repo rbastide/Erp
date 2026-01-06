@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-<<<<<<<< Updated upstream:erp_front/src/components/User/UserSavePage.vue
-import AppHeader from '../Header.vue';
-========
 import AppHeader from '../App/Header.vue';
->>>>>>>> Stashed changes:erp_front/src/components/Information/UserSavePage.vue
+
 
 const router = useRouter();
 

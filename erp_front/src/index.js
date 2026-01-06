@@ -10,7 +10,7 @@ import DeconnexionPage from './components/App/DeconnexionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
-import UserSavePage from "./components/User/UserSavePage.vue";
+import UserSavePage from "./components/Information/UserSavePage.vue";
 import CancelPage from "./components/Information/CancelPage.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/Information/SuccessfullyDelete.vue";
