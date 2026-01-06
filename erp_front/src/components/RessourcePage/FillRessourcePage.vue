@@ -2,6 +2,7 @@
 import { ref, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter()
 
@@ -74,7 +75,8 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
 </script>
 
 <template>
-  <AppHeader title="Remplissage Fiche Ressource" inline="RX.XX 00/00/0000" />
+  <Sidebar/>
+  <AppHeader title="Fiche Ressource RX.XX" />
 
   <main class="main-content">
     <div class="container">
