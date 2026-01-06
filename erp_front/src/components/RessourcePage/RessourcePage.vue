@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
-import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -20,7 +19,6 @@ const handleFill = () => router.push('/fillressourcepage');
 </script>
 
 <template>
-  <Sidebar/>
   <AppHeader title="Choix de la ressource" />
 
   <main class="main-content">

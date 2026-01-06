@@ -9,6 +9,4 @@ import java.util.List;
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long>{
     List<Skill> findBySkillName(String skillName);
-
-    List<Skill> findBySkillNum(int skillNum);
 }

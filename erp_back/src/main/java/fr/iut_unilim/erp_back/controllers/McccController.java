@@ -4,7 +4,7 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.service.*;
-import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
+import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
-
 @RestController
 @RequestMapping("/api/mccc")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -29,39 +27,19 @@ public class McccController {
     private final ResourceService resourceService;
     private final TeacherService teacherService;
     private final SaeService saeService;
-    private final SkillService skillService;
-    private final RankService rankService;
-    private final CriticalLearningService criticalLearningService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService) {
+    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService) {
         this.mcccService = mcccService;
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
         this.teacherService = teacherService;
         this.saeService = saeService;
-        this.skillService = skillService;
-        this.rankService = rankService;
-        this.criticalLearningService = criticalLearningService;
-    }
-
-    @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccResponse dto, Mccc mccc) {
-        String creationDate = dto.getCreationDate();
-        String editDate = dto.getEditDate();
-        try {
-            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
-            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
-            mccc.setCreationDate(date);
-            mccc.setLastModificationDate(editableDate);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
-        }
-        return null;
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> saveMccc(@RequestBody McccResponse dto) {
         Mccc mccc = new Mccc();
+
 
         List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
         if (!resources.isEmpty()) {
@@ -78,14 +56,10 @@ public class McccController {
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
 
-        ResponseEntity<Object> doDatesHasCrashed = getCreationdateAndEditDateFromDto(dto, mccc);
-        if (doDatesHasCrashed != null) return doDatesHasCrashed;
+        ResponseEntity<Object> build = getCreationdateAndEditdateFromDto(dto, mccc);
+        if (build != null) return build;
 
-        Set<CriticalLearning> setCriticalLearnings = new HashSet<>();
-        ResponseEntity<Object> doCriticalLearningHasCrashed = fillCriticalLearnings(dto, setCriticalLearnings);
-        if (doCriticalLearningHasCrashed != null) return doCriticalLearningHasCrashed;
 
-        mccc.setCriticalLearningsId(setCriticalLearnings);
 
         mcccService.saveMccc(mccc);
 
@@ -93,50 +67,18 @@ public class McccController {
     }
 
     @Nullable
-    private ResponseEntity<Object> fillCriticalLearnings(McccResponse dto, Set<CriticalLearning> setCriticalLearnings) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
-        for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
-            String ueCode = extractCodeFromSkillTitle(learningRank.ue());
-            if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
-
-            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.rank());
-            if (correspondedRank == null) return ResponseEntity.badRequest().body("Le niveau n'existe pas !");
-
-            fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
+    private static ResponseEntity<Object> getCreationdateAndEditdateFromDto(McccResponse dto, Mccc mccc) {
+        String creationDate = dto.getCreationDate();
+        String editDate = dto.getEditDate();
+        try {
+            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
+            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
+            mccc.setCreationDate(date);
+            mccc.setLastModificationDate(editableDate);
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().build();
         }
         return null;
-    }
-
-    @Nullable
-    private String extractCodeFromSkillTitle(String skillTitle) {
-        String ueCode = getFirstRegexOccurence("[0-9]+", skillTitle);
-        if (ueCode == null) return null;
-
-        if (!skillService.doSkillNumExists(Integer.parseInt(ueCode))) {
-            return null;
-        }
-        return ueCode;
-    }
-
-    @Nullable
-    private Rank extractFirstRankFromRankTitle(String rankTitle) {
-        String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
-        if (rankCode == null) return null;
-
-        if (!rankService.doRankNumExists(Integer.parseInt(rankCode))) {
-            return null;
-        }
-
-        return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
-    }
-
-    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRank learningRank, Rank correspondedRank) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
-        for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning : criticalLearnings) {
-            CriticalLearning newCriticalLearning = new CriticalLearning(criticalLearning, correspondedRank);
-            setAcs.add(newCriticalLearning);
-            criticalLearningService.save(newCriticalLearning);
-        }
     }
 
     @NotNull
@@ -155,6 +97,7 @@ public class McccController {
         }
         return setSae;
     }
+
 
     @NotNull
     private Set<Teacher> getTeachersFromDto(McccResponse dto) {

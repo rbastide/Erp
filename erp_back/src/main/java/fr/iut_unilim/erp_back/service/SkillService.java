@@ -14,12 +14,4 @@ public class SkillService {
     public SkillService(SkillRepository skillRepository) {
         this.skillRepository = skillRepository;
     }
-
-    public List<Skill> getSkillsByNum(int skillNum) {
-        return skillRepository.findBySkillNum(skillNum);
-    }
-
-    public boolean doSkillNumExists(int skillNum) {
-        return !getSkillsByNum(skillNum).isEmpty();
-    }
 }
