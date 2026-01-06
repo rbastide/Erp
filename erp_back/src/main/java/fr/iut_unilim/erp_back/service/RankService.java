@@ -20,7 +20,7 @@ public class RankService {
         return rankRepository.findByRankNum(skillNum);
     }
 
-    public boolean doSkillNumExists(int skillNum) {
+    public boolean doRankNumExists(int skillNum) {
         return !getRanksByNum(skillNum).isEmpty();
     }
 }
