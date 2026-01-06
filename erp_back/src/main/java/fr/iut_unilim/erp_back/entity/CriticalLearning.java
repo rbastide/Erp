@@ -21,10 +21,15 @@ public class CriticalLearning {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rankID")
-    private Skill rankID;
+    private Rank rankID;
 
     public CriticalLearning() {}
 
+    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rankID) {
+        this.learningNum = criticalLearning.learningNum();
+        this.learningTitle = criticalLearning.learningTitle();
+        this.rankID = rankID;
+    }
 
     public int getLearningID() {
         return learningID;
@@ -38,7 +43,7 @@ public class CriticalLearning {
         return learningTitle;
     }
 
-    public Skill getRankID() {
+    public Rank getRankID() {
         return rankID;
     }
 
@@ -54,7 +59,7 @@ public class CriticalLearning {
         this.learningTitle = learningTitle;
     }
 
-    public void setRankID(Skill rankID) {
+    public void setRankID(Rank rankID) {
         this.rankID = rankID;
     }
 }
