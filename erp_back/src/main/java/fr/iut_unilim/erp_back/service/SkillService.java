@@ -18,4 +18,8 @@ public class SkillService {
     public List<Skill> getSkillsByNum(int skillNum) {
         return skillRepository.findBySkillNum(skillNum);
     }
+
+    public boolean doSkillNumExists(int skillNum) {
+        return !getSkillsByNum(skillNum).isEmpty();
+    }
 }
