@@ -20,7 +20,7 @@ const handleRetour = () => {
 
     <div class="content-wrapper">
 
-      <Sidebar :help="true" />
+      <Sidebar :help="true" :helpActive="true"/>
 
       <main class="main-content">
 
