@@ -1,10 +1,10 @@
 package fr.iut_unilim.erp_back.dto;
 
-import fr.iut_unilim.erp_back.tools.datastructures.Skill;
+import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
+import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class McccResponse {
     private String resourceCode;
@@ -19,12 +19,10 @@ public class McccResponse {
     private String creationDate;
     private String editDate;
 
-    private String[] saeCodes;
-    private String[] niveaux;
+    private List<SAE> saeCodes;
     private String[] ue;
-    private String[] acs;
 
-    private ArrayList<HashMap<String,String>> acsGrouped;
+    private List<LearningRank> acsGrouped;
 
     private Teacher[] referents;
 
@@ -64,23 +62,15 @@ public class McccResponse {
         return editDate;
     }
 
-    public String[] getSaeCodes() {
+    public List<SAE> getSaeCodes() {
         return saeCodes;
-    }
-
-    public String[] getNiveaux() {
-        return niveaux;
     }
 
     public String[] getUe() {
         return ue;
     }
 
-    public String[] getAcs() {
-        return acs;
-    }
-
-    public ArrayList<HashMap<String, String>> getAcsGrouped() {
+    public List<LearningRank> getAcsGrouped() {
         return acsGrouped;
     }
 

@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 const router = useRouter();
 
 const handleValider = () => {
@@ -107,6 +108,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
+  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
   <AppHeader title="Ajout compétences"/>
   <main class="main-div">
     <div class="description">Veuillez saisir la/les compétences :</div>

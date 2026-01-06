@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -26,8 +27,9 @@ const handleResources = () => {
 </script>
 
 <template>
+  <Sidebar :dashboardAdmin="true" :dashboard="false" :dashboardAdminActive="true"/>
   <div class="page-container">
-    <AppHeader title="Bonjour, " inline="ADMIN"/>
+    <AppHeader title="Bonjour ADMIN"/>
 
     <main class="main-content">
       <div class="grid-container">

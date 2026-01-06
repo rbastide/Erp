@@ -47,7 +47,7 @@ onMounted(() => {
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </div>
-      <span class="nav-text" style="font-size: x-large; font-weight: bold;">Menu</span>
+      <span class="nav-text" style="font-size: x-large; font-weight: bold; color: #B51621;">Menu</span>
     </div>
 
     <nav class="sidebar-nav">
@@ -61,9 +61,9 @@ onMounted(() => {
 
       <div v-if="dashboardAdmin" class="nav-item" :class="{ active: props.dashboardAdminActive }" @click="handleAdmin">
         <div class="icon-wrapper">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
         </div>
-        <span class="nav-text">Admin</span>
+        <span class="nav-text">Dashboard</span>
       </div>
 
       <div v-if="settings" class="nav-item" :class="{ active: props.settingsActive }" @click="handleSettings">
@@ -100,7 +100,6 @@ onMounted(() => {
   left: 0;
   top: 0;
   background-color: rgba(255, 255, 255, 1);
-  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
@@ -138,7 +137,7 @@ onMounted(() => {
   transition: color 0.3s ease;
 }
 
-.sidebar.expanded .hamburger-icon, .sidebar.expanded .nav-text {
+.sidebar.expanded .hamburger-icon {
   color: #96111a;
 }
 
@@ -160,8 +159,7 @@ onMounted(() => {
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 15px 0;
-  padding-left: 28px;
+  padding: 15px 28px;
   cursor: pointer;
   color: #555;
   transition: all 0.2s ease;

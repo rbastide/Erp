@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../../services/AuthService.js';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -58,6 +59,7 @@ const handleRegister = async () => {
 </script>
 
 <template>
+  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
   <AppHeader title="Inscription"/>
   <main class="main-content">
     <form class="login-card" @submit.prevent="handleRegister">
