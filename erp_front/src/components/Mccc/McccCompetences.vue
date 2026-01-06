@@ -1,38 +1,32 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import { mcccStore } from "@/services/mcccStore.js";
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 
 onMounted(() => {
   mcccStore.loadMcccStore();
-  // Sécurités
   if (!Array.isArray(mcccStore.ue)) mcccStore.ue = [];
   if (!Array.isArray(mcccStore.niveaux)) mcccStore.niveaux = [];
   if (!Array.isArray(mcccStore.acs)) mcccStore.acs = [];
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
 });
 
-const handleDeconnexion = () => router.push('/deconnexion');
-const handleAide = () => router.push('/aide');
 const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 const handleRetour = () => router.push('/mccc-menu');
 
-// --- PROPRIÉTÉ CALCULÉE FILTRÉE ---
-// Elle ne renvoie que les compétences de la ressource actuelle
 const groupedCompetences = computed(() => {
   const groups = {};
 
   if (!mcccStore.acsGrouped) return {};
 
   mcccStore.acsGrouped.forEach(item => {
-    // FILTRE IMPORTANT : On ne garde que ce qui appartient à la ressource courante
     if (item.resourceCode === mcccStore.resourceCode) {
       if (!groups[item.ue]) {
         groups[item.ue] = [];
@@ -49,7 +43,7 @@ const groupedCompetences = computed(() => {
 
 const currentCompetence = ref({
   ue: '',
-  niveaux: [{ niveau: '', acs: [''] }],
+  niveaux: [{niveau: '', acs: []}],
 });
 
 const handleAddNiveau = () => {
@@ -58,7 +52,7 @@ const handleAddNiveau = () => {
   const hasValidAc = lastNiveau.acs.some(ac => ac !== '');
 
   if (lastNiveau.niveau !== '' && hasValidAc) {
-    currentCompetence.value.niveaux.push({ niveau: '', acs: [''] });
+    currentCompetence.value.niveaux.push({niveau: '', acs: []});
   } else {
     alert("Veuillez choisir le niveau actuel ET au moins un AC associé.");
   }
@@ -73,18 +67,28 @@ const handleAddAc = (niveauIndex) => {
   }
 };
 
-// --- SAUVEGARDE AVEC RESOURCE CODE ---
 const handleSaveCompetence = () => {
   if (!currentCompetence.value.ue) {
     alert('Veuillez sélectionner une UE.');
     return;
   }
 
+  const parseAcString = (acString) => {
+    const match = acString.match(/\.(\d+)\s*:\s*(.*)/);
+    if (match) {
+      return {
+        learningNum: parseInt(match[1], 10),
+        learningTitle: match[2].trim()
+      };
+    }
+    return {learningNum: 0, learningTitle: acString};
+  };
+
   const niveauxValides = currentCompetence.value.niveaux
       .filter(n => n.niveau !== '')
       .map(n => ({
         niveau: n.niveau,
-        acs: n.acs.filter(ac => ac !== '')
+        acs: n.acs.filter(ac => ac !== '').map(parseAcString)
       }))
       .filter(n => n.acs.length > 0);
 
@@ -93,31 +97,26 @@ const handleSaveCompetence = () => {
     return;
   }
 
-  // 1. On ajoute toujours dans les listes globales (structure plate conservée)
   if (!mcccStore.ue.includes(currentCompetence.value.ue)) {
     mcccStore.ue.push(currentCompetence.value.ue);
   }
 
   niveauxValides.forEach(nouveau => {
-    // 2. Gestion intelligente dans acsGrouped
-    // On cherche si ce groupe existe DÉJÀ pour CETTE RESSOURCE et CETTE UE
     const groupeExistant = mcccStore.acsGrouped.find(g =>
-        g.resourceCode === mcccStore.resourceCode && // Vérif Ressource
-        g.ue === currentCompetence.value.ue &&       // Vérif UE
-        g.niveau === nouveau.niveau                  // Vérif Niveau
+        g.resourceCode === mcccStore.resourceCode &&
+        g.ue === currentCompetence.value.ue &&
+        g.niveau === nouveau.niveau
     );
 
     if (groupeExistant) {
-      // Si ça existe, on fusionne juste les ACs
-      nouveau.acs.forEach(ac => {
-        if (!groupeExistant.acs.includes(ac)) {
-          groupeExistant.acs.push(ac);
+      nouveau.acs.forEach(newAc => {
+        if (!groupeExistant.acs.some(existingAc => existingAc.learningNum === newAc.learningNum)) {
+          groupeExistant.acs.push(newAc);
         }
       });
     } else {
-      // Si ça n'existe pas, on crée le bloc en ajoutant le resourceCode
       mcccStore.acsGrouped.push({
-        resourceCode: mcccStore.resourceCode, // <--- AJOUT CLÉ ICI
+        resourceCode: mcccStore.resourceCode,
         ue: currentCompetence.value.ue,
         niveau: nouveau.niveau,
         acs: [...nouveau.acs]
@@ -129,7 +128,7 @@ const handleSaveCompetence = () => {
 
   currentCompetence.value = {
     ue: '',
-    niveaux: [{ niveau: '', acs: [''] }],
+    niveaux: [{niveau: '', acs: []}],
   };
 };
 </script>
@@ -161,7 +160,9 @@ const handleSaveCompetence = () => {
               <li v-for="(group, idx) in groups" :key="idx">
                 <span style="font-weight: bold;">{{ group.niveau }}</span>
                 <ul class="resume-list sub-level">
-                  <li v-for="(ac, acIdx) in group.acs" :key="acIdx">{{ ac }}</li>
+                  <li v-for="(ac, acIdx) in group.acs" :key="acIdx">
+                    AC 0{{ ac.learningNum }} : {{ ac.learningTitle }}
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -208,7 +209,8 @@ const handleSaveCompetence = () => {
               <div class="ac-title-with-plus">
                 <p class="nested-title">ACs pour {{ niveauGroup.niveau || `Niveau ${nIndex + 1}` }}</p>
               </div>
-              <div v-for="(ac, aIndex) in niveauGroup.acs" :key="'ac-' + nIndex + '-' + aIndex" class="form-item container-ac ac-input-group">
+              <div v-for="(_, aIndex) in niveauGroup.acs" :key="'ac-' + nIndex + '-' + aIndex"
+                   class="form-item container-ac ac-input-group">
                 <label :for="'ac-select-' + nIndex + '-' + aIndex" class="nested-label">AC {{ aIndex + 1 }} associé</label>
                 <div class="select-with-plus">
                   <select :name="'ac-select-' + nIndex + '-' + aIndex" :id="'ac-select-' + nIndex + '-' + aIndex" v-model="niveauGroup.acs[aIndex]">
