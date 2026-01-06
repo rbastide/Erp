@@ -25,6 +25,11 @@ public class CriticalLearning {
 
     public CriticalLearning() {}
 
+    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Skill rankID) {
+        this.learningNum = criticalLearning.learningNum();
+        this.learningTitle = criticalLearning.learningTitle();
+        this.rankID = rankID;
+    }
 
     public int getLearningID() {
         return learningID;
