@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
 import RessourcePage from './components/RessourcePage/RessourcePage.vue';
 import HomePage from './components/User/HomePage.vue';
-import HistoryPage from './components/User/HistoryPage.vue';
+import HistoryPage from './components/RessourcePage/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import ServicesPage from './components/App/ServiceAidePage.vue';
