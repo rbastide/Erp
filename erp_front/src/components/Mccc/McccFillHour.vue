@@ -3,12 +3,11 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
-// Initialisation des données
 mcccStore.loadMcccStore();
 const router = useRouter();
 
-// Configuration des types d'heures pour la génération automatique de la grille
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
   { key: 'hoursTD', label: 'TD', color: '#7986CB' },
@@ -17,7 +16,6 @@ const hourTypes = [
   { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
-// Calcul du total en temps réel
 const totalHeures = computed(() => {
   return (mcccStore.hoursCM || 0) +
       (mcccStore.hoursTD || 0) +
@@ -26,32 +24,25 @@ const totalHeures = computed(() => {
       (mcccStore.hoursDSTP || 0);
 });
 
-/** * LOGIQUE DE SÉCURITÉ ET CONTRÔLE
- */
-
-// Mise à jour via boutons + et - (bloqué à 0 minimum)
 const updateHours = (key: string, delta: number) => {
   const current = (mcccStore as any)[key] || 0;
   const newValue = Math.max(0, current + delta);
   (mcccStore as any)[key] = newValue;
 };
 
-// Validation de la saisie manuelle (si l'utilisateur tape un chiffre négatif)
 const validateInput = (key: string) => {
   if ((mcccStore as any)[key] < 0 || (mcccStore as any)[key] === null) {
     (mcccStore as any)[key] = 0;
   }
 };
 
-// Blocage de la touche "-" au clavier pour empêcher d'écrire un signe négatif
 const blockNegative = (evt: KeyboardEvent) => {
   if (evt.key === '-') {
     evt.preventDefault();
   }
 };
 
-/** * NAVIGATION
- */
+
 const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
@@ -63,6 +54,7 @@ const handleRetour = () => {
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <AppHeader title="Veuillez saisir les " inline = "heures par élève : "/>
 
   <main class="main-content">
@@ -102,7 +94,6 @@ const handleRetour = () => {
 
 <style scoped>
 .main-content {
-  /* Espace suffisant pour ne pas être caché par le header */
   padding-top: 220px;
   min-height: 100vh;
   background-color: #fcfcfc;
@@ -113,7 +104,6 @@ const handleRetour = () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px;
-  /* Aligne le titre à gauche tout en permettant de centrer les cartes plus bas */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -131,7 +121,6 @@ const handleRetour = () => {
 .hours-flex-container {
   display: flex;
   flex-wrap: wrap;
-  /* Centre les cartes entre elles (DS et DS TP seront au milieu) */
   justify-content: center;
   width: 100%;
   gap: 30px;
@@ -182,7 +171,6 @@ const handleRetour = () => {
   color: #2d3436;
 }
 
-/* Suppression des flèches par défaut des navigateurs */
 .hour-input::-webkit-outer-spin-button,
 .hour-input::-webkit-inner-spin-button {
   -webkit-appearance: none;

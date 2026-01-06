@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
@@ -33,6 +34,7 @@ const handleCompetences = () => {
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <div class="page-container">
     <AppHeader :title="mcccStore.resourceCode" />
     <main class="main-content">

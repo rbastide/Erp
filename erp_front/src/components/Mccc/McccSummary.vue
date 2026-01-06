@@ -3,7 +3,8 @@ import { useRouter } from 'vue-router';
 import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 import { onMounted } from 'vue';
-import api from '@/services/api'; // <--- 1. Import de l'API
+import api from '@/services/api';
+import Sidebar from "../App/Sidebar.vue";
 
 const router = useRouter();
 
@@ -73,6 +74,7 @@ const getGroupsForUE = (ueName) => {
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <AppHeader title="Récapitulatif"/>
   <main class="main-content">
     <div class="summary">

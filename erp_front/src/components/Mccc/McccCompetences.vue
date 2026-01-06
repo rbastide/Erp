@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 import { mcccStore } from "@/services/mcccStore.js";
 
 const router = useRouter();
@@ -134,6 +135,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <AppHeader :title="'Compétences ' + (mcccStore.resourceCode || '')"/>
 
   <main class="main-div">

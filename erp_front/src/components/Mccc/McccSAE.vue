@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router';
 import { onMounted, ref, computed } from 'vue';
 import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 const errorMessage = ref('');
@@ -57,6 +58,7 @@ const handleValider = () => {
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <AppHeader title="SAÉs pour" :inline="mcccStore.resourceCode"/>
 
   <main class="main-content">
