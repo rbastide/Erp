@@ -96,10 +96,10 @@ public class McccController {
     private ResponseEntity<Object> fillCriticalLearnings(McccResponse dto, Set<CriticalLearning> setCriticalLearnings) {
         List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
         for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
-            String ueCode = extractSkillCode(learningRank.ue());
+            String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
-            Rank correspondedRank = extractFirstRankCodeMatching(learningRank.rank());
+            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.rank());
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le niveau n'existe pas !");
 
             fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
@@ -108,7 +108,7 @@ public class McccController {
     }
 
     @Nullable
-    private String extractSkillCode(String skillTitle) {
+    private String extractCodeFromSkillTitle(String skillTitle) {
         String ueCode = getFirstRegexOccurence("[0-9]+", skillTitle);
         if (ueCode == null) return null;
 
@@ -119,7 +119,7 @@ public class McccController {
     }
 
     @Nullable
-    private Rank extractFirstRankCodeMatching(String rankTitle) {
+    private Rank extractFirstRankFromRankTitle(String rankTitle) {
         String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
         if (rankCode == null) return null;
 
