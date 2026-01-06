@@ -14,4 +14,8 @@ public class SkillService {
     public SkillService(SkillRepository skillRepository) {
         this.skillRepository = skillRepository;
     }
+
+    public List<Skill> getSkillsByNum(int skillNum) {
+        return skillRepository.findBySkillNum(skillNum);
+    }
 }
