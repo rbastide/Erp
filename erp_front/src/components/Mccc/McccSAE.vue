@@ -1,102 +1,94 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 
 const router = useRouter();
 const errorMessage = ref('');
-const saeList = ref([]);
-const inputRefs = ref([]);
+const selectedSaeIds = ref([]);
+
+const availableSae = [
+  { id: 'S1.01', title: 'Implémenter un besoin client' },
+  { id: 'S1.02', title: 'Comparaison d\'algorithmes' },
+  { id: 'S1.03', title: 'Installation poste de travail' },
+  { id: 'S2.01', title: 'Développement d\'application' },
+  { id: 'S2.02', title: 'Exploration algorithmique' },
+  { id: 'S3.01', title: 'Développement web' },
+  { id: 'S3.02', title: 'Base de données avancées' },
+  { id: 'S4.01', title: 'Architecture logicielle' },
+  { id: 'S5.01', title: 'Management de projet' },
+  { id: 'S6.01', title: 'Entrepreneuriat' },
+  { id: 'S6.02', title: 'Droit du numérique' },
+];
 
 onMounted(() => {
   mcccStore.loadMcccStore();
-
   if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0) {
-    saeList.value = [...mcccStore.saeCodes];
-  } else {
-    saeList.value = [''];
+    selectedSaeIds.value = [...mcccStore.saeCodes];
   }
-
-  nextTick(() => {
-    if (inputRefs.value[0]) inputRefs.value[0].focus();
-  });
 });
 
-const handleValider = () => {
-  const filtered = saeList.value
-      .map(s => s.trim().toUpperCase())
-      .filter(s => s !== '');
-
-  if (filtered.length === 0) {
-    errorMessage.value = "Veuillez saisir au moins une SAÉ.";
-    return;
-  }
-
-  mcccStore.saeCodes = [...new Set(filtered)];
-  mcccStore.registerMcccStore();
-  router.push('/mccc-menu');
-};
-
-const addSaeField = () => {
-  errorMessage.value = '';
-  const lastVal = saeList.value[saeList.value.length - 1];
-
-  if (lastVal.trim() === '') {
-    errorMessage.value = "Le champ actuel est vide.";
-    if (inputRefs.value[saeList.value.length - 1]) {
-      inputRefs.value[saeList.value.length - 1].focus();
-    }
-    return;
-  }
-
-  saeList.value.push('');
-
-  nextTick(() => {
-    const newIndex = saeList.value.length - 1;
-    if (inputRefs.value[newIndex]) {
-      inputRefs.value[newIndex].focus();
-    }
+const getSaeBySemester = (semesterNumber) => {
+  return availableSae.filter(sae => {
+    const match = sae.id.match(/S?(\d)\./);
+    return match && parseInt(match[1]) === semesterNumber;
   });
 };
 
-const removeSaeField = (index) => {
-  if (saeList.value.length > 1) {
-    saeList.value.splice(index, 1);
+const toggleSae = (saeId) => {
+  errorMessage.value = '';
+  if (selectedSaeIds.value.includes(saeId)) {
+    selectedSaeIds.value = selectedSaeIds.value.filter(id => id !== saeId);
   } else {
-    saeList.value[0] = '';
+    selectedSaeIds.value.push(saeId);
   }
+};
+
+const handleValider = () => {
+  if (selectedSaeIds.value.length === 0) {
+    errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
+    return;
+  }
+  mcccStore.saeCodes = [...selectedSaeIds.value];
+  mcccStore.registerMcccStore();
+  router.push('/mccc-menu');
 };
 </script>
 
 <template>
-  <AppHeader title="Remplissage des SAÉ" :inline="mcccStore.resourceCode"/>
+  <AppHeader title="SAÉs pour" :inline="mcccStore.resourceCode"/>
 
   <main class="main-content">
     <div class="content-wrapper">
-      <div class="sae-grid">
-        <div v-for="(sae, index) in saeList" :key="index" class="sae-card">
-          <div class="input-container">
-            <input
-                v-model="saeList[index]"
-                ref="inputRefs"
-                class="sae-input"
-                placeholder="Ex: 1.01"
-                maxlength="4"
-                @keyup.enter="addSaeField"
-            />
-            <button v-if="saeList.length > 1 || saeList[0] !== ''"
-                    @click="removeSaeField(index)"
-                    class="delete-btn">
-              &times;
-            </button>
+
+      <div class="semester-board">
+        <div v-for="i in 6" :key="i" class="semester-column">
+          <h3 class="column-title">Semestre {{ i }}</h3>
+
+          <div class="cards-list">
+            <div
+                v-for="sae in getSaeBySemester(i)"
+                :key="sae.id"
+                class="sae-card"
+                :class="{ 'is-selected': selectedSaeIds.includes(sae.id) }"
+                @click="toggleSae(sae.id)"
+            >
+              <div class="sae-content">
+                <span class="sae-number">{{ sae.id }}</span>
+                <span class="sae-title">{{ sae.title }}</span>
+
+                <div class="check-indicator" v-if="selectedSaeIds.includes(sae.id)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="getSaeBySemester(i).length === 0" class="empty-placeholder">
+              Aucune SAE
+            </div>
           </div>
         </div>
-
-        <button class="add-card" @click="addSaeField">
-          <span class="plus-icon">+</span>
-          <span class="add-text">Ajouter</span>
-        </button>
       </div>
 
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
@@ -118,103 +110,123 @@ const removeSaeField = (index) => {
 }
 
 .content-wrapper {
-  max-width: 1000px;
+  width: 95%;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 40px;
-  margin-top: 50px;
+  padding-bottom: 50px;
 }
 
-.title {
-  font-size: 26px;
-  color: #E92533;
+.semester-board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
   margin-bottom: 40px;
-  font-weight: 500;
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 
-.sae-grid {
+.semester-column {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 15px 10px;
+  min-width: 160px;
+  border: 1px solid #eee;
   display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  margin-bottom: 50px;
+  flex-direction: column;
+}
+
+.column-title {
+  text-align: center;
+  color: #B51621;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(181, 22, 33, 0.1);
+  padding-bottom: 10px;
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1;
 }
 
 .sae-card {
   background: white;
-  width: 180px;
-  height: 100px;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-  border: 1px solid #eee;
-  position: relative;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.sae-card:focus-within {
-  border-color: #B51621;
-  transform: translateY(-4px);
-}
-
-.sae-input {
-  width: 80%;
-  border: none;
-  background: #f8f9fa;
-  padding: 10px;
   border-radius: 8px;
-  font-size: 24px;
-  font-weight: 800;
-  text-align: center;
-  color: #333;
-  text-transform: uppercase;
-}
-
-.sae-input:focus {
-  outline: none;
-  background: #fff;
-}
-
-.delete-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #B51621;
-  color: white;
-  border: none;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #e0e0e0;
   cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  text-align: center;
 }
 
-.add-card {
-  width: 180px;
-  height: 100px;
-  border: 2px dashed #B51621;
-  border-radius: 15px;
-  background: transparent;
+.sae-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  border-color: #ccc;
+}
+
+.sae-card.is-selected {
+  border-color: #B51621;
+  background-color: #fff5f5;
+  box-shadow: 0 0 0 1px #B51621;
+}
+
+.sae-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  gap: 5px;
+  width: 100%;
+}
+
+.sae-number {
+  font-size: 16px;
+  font-weight: 800;
+  color: #333;
+}
+
+.sae-card.is-selected .sae-number {
   color: #B51621;
-  transition: all 0.2s;
 }
 
-.add-card:hover {
-  background: #fff5f5;
-  transform: translateY(-2px);
+.sae-title {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.2;
 }
 
-.plus-icon { font-size: 30px; font-weight: bold; }
-.add-text { font-weight: 600; font-size: 14px; }
+.check-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #B51621;
+  background: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(181, 22, 33, 0.2);
+}
+
+.empty-placeholder {
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  font-style: italic;
+  margin-top: 20px;
+}
 
 .error-message {
   color: #E92533;
@@ -237,7 +249,9 @@ const removeSaeField = (index) => {
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s;
 }
+.btn-main:hover { background: #94121b; }
 
 .btn-sub {
   background: white;
@@ -247,5 +261,25 @@ const removeSaeField = (index) => {
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-sub:hover { background: #fff0f0; }
+
+@media (max-width: 1200px) {
+  .semester-board {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .semester-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .semester-board {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

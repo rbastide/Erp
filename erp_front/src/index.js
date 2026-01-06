@@ -26,6 +26,7 @@ import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
 import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
+import SaeGestion from "./components/Admin/SaeGestion.vue";
 
 
 const routes = [
@@ -168,6 +169,11 @@ const routes = [
         path: '/users-gestion',
         name: 'UsersGestion',
         component: UsersGestion
+    },
+    {
+        path: '/sae-gestion',
+        name: 'SaeGestion',
+        component: SaeGestion
     }
 ];
 
