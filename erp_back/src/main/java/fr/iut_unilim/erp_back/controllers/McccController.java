@@ -4,6 +4,7 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.service.*;
+import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
 
 @RestController
 @RequestMapping("/api/mccc")
@@ -43,10 +44,24 @@ public class McccController {
         this.criticalLearningService = criticalLearningService;
     }
 
+    @Nullable
+    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccResponse dto, Mccc mccc) {
+        String creationDate = dto.getCreationDate();
+        String editDate = dto.getEditDate();
+        try {
+            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
+            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
+            mccc.setCreationDate(date);
+            mccc.setLastModificationDate(editableDate);
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
+        }
+        return null;
+    }
+
     @PostMapping("/save")
     public ResponseEntity<?> saveMccc(@RequestBody McccResponse dto) {
         Mccc mccc = new Mccc();
-
 
         List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
         if (!resources.isEmpty()) {
@@ -63,57 +78,14 @@ public class McccController {
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
 
-        ResponseEntity<Object> build = getCreationdateAndEditdateFromDto(dto, mccc);
-        if (build != null) return build;
+        ResponseEntity<Object> doDatesHasCrashed = getCreationdateAndEditDateFromDto(dto, mccc);
+        if (doDatesHasCrashed != null) return doDatesHasCrashed;
 
+        Set<CriticalLearning> setCriticalLearnings = new HashSet<>();
+        ResponseEntity<Object> doCriticalLearningHasCrashed = fillCriticalLearnings(dto, setCriticalLearnings);
+        if (doCriticalLearningHasCrashed != null) return doCriticalLearningHasCrashed;
 
-        Set<CriticalLearning> setAcs = new HashSet<>();
-        List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
-
-        for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs ) {
-            String ueCode;
-            Pattern pattern = Pattern.compile("[0-9]+");
-            Matcher matcher = pattern.matcher(learningRank.ue());
-            if (matcher.find()) {
-                ueCode = matcher.group();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
-
-
-            if(!skillService.doSkillNumExists(Integer.parseInt(ueCode))) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            String rankCode;
-            Matcher matcher2 = pattern.matcher(learningRank.rank());
-            if (matcher2.find()) {
-                rankCode = matcher2.group();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
-            if(!rankService.doRankNumExists(Integer.parseInt(rankCode))) {
-                return ResponseEntity.badRequest().build();
-            }
-            Rank correspondedRank = rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
-
-            List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
-            for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning ac : criticalLearnings) {
-                CriticalLearning criticalLearning = new CriticalLearning(ac,correspondedRank);
-                setAcs.add(criticalLearning);
-                criticalLearningService.save(criticalLearning);
-            }
-
-        }
-
-        mccc.setCriticalLearningsId(setAcs);
-
-
-
-
-        
+        mccc.setCriticalLearningsId(setCriticalLearnings);
 
         mcccService.saveMccc(mccc);
 
@@ -121,18 +93,50 @@ public class McccController {
     }
 
     @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditdateFromDto(McccResponse dto, Mccc mccc) {
-        String creationDate = dto.getCreationDate();
-        String editDate = dto.getEditDate();
-        try {
-            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
-            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
-            mccc.setCreationDate(date);
-            mccc.setLastModificationDate(editableDate);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().build();
+    private ResponseEntity<Object> fillCriticalLearnings(McccResponse dto, Set<CriticalLearning> setCriticalLearnings) {
+        List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
+        for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
+            String ueCode = extractSkillCode(learningRank.ue());
+            if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
+
+            Rank correspondedRank = extractFirstRankCodeMatching(learningRank.rank());
+            if (correspondedRank == null) return ResponseEntity.badRequest().body("Le niveau n'existe pas !");
+
+            fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
         }
         return null;
+    }
+
+    @Nullable
+    private String extractSkillCode(String skillTitle) {
+        String ueCode = getFirstRegexOccurence("[0-9]+", skillTitle);
+        if (ueCode == null) return null;
+
+        if (!skillService.doSkillNumExists(Integer.parseInt(ueCode))) {
+            return null;
+        }
+        return ueCode;
+    }
+
+    @Nullable
+    private Rank extractFirstRankCodeMatching(String rankTitle) {
+        String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
+        if (rankCode == null) return null;
+
+        if (!rankService.doRankNumExists(Integer.parseInt(rankCode))) {
+            return null;
+        }
+
+        return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
+    }
+
+    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRank learningRank, Rank correspondedRank) {
+        List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
+        for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning : criticalLearnings) {
+            CriticalLearning newCriticalLearning = new CriticalLearning(criticalLearning, correspondedRank);
+            setAcs.add(newCriticalLearning);
+            criticalLearningService.save(newCriticalLearning);
+        }
     }
 
     @NotNull
@@ -151,7 +155,6 @@ public class McccController {
         }
         return setSae;
     }
-
 
     @NotNull
     private Set<Teacher> getTeachersFromDto(McccResponse dto) {
