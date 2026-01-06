@@ -30,11 +30,11 @@ public class Mccc {
 
     @ManyToMany
     @JoinTable(
-            name = "McccSkills",
-            joinColumns = @JoinColumn(name = "mcccSkillID"),
-            inverseJoinColumns = @JoinColumn(name = "saeID")
+            name = "McccCriticalLearning",
+            joinColumns = @JoinColumn(name = "mcccLearningID"),
+            inverseJoinColumns = @JoinColumn(name = "learningID")
     )
-    private Set<Skill> skillId;
+    private Set<CriticalLearning> criticalLearningsId;
 
     @ManyToMany
     @JoinTable(
@@ -47,12 +47,12 @@ public class Mccc {
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Set<Skill> skillId, Set<Teacher> referencialTeacherId) {
+    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
         this.mcccId = mcccId;
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
         this.saeId = saeId;
-        this.skillId = skillId;
+        this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
     }
 
@@ -91,12 +91,12 @@ public class Mccc {
         this.saeId = saeId;
     }
 
-    public Set<Skill> getSkillId() {
-        return skillId;
+    public Set<CriticalLearning> getCriticalLearningsId() {
+        return criticalLearningsId;
     }
 
-    public void setSkillId(Set<Skill> skillId) {
-        this.skillId = skillId;
+    public void setCriticalLearningsId(Set<CriticalLearning> skillId) {
+        this.criticalLearningsId = skillId;
     }
 
     public Set<Teacher> getReferencialTeacherId() {
