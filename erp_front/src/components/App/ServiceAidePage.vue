@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import Sidebar from './Sidebar.vue';
 
 const router = useRouter();
 
@@ -15,6 +16,7 @@ const handleRetour = () => {
 </script>
 
 <template>
+  <Sidebar :helpActive="true" />
   <AppHeader title="Service d'aide" :aide="false"/>
   <main class="main-content">
 

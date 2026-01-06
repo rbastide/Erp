@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import AuthService from "../../services/AuthService.js";
 import AppHeader from "./Header.vue";
+import Sidebar from "./Sidebar.vue";
 
 const router = useRouter();
 
@@ -21,6 +22,7 @@ const handleOui = () => {
 </script>
 
 <template>
+  <Sidebar :quitActive="true"/>
   <AppHeader title="Déconnexion à" inline="confirmer"/>
   <div class="main-content">
     <p>Êtes vous sûr de vouloir vous déconnecter ?</p>
