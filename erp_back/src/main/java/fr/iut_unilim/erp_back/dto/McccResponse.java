@@ -19,9 +19,7 @@ public class McccResponse {
     private String editDate;
 
     private String[] saeCodes;
-    private String[] niveaux;
     private String[] ue;
-    private String[] acs;
 
     private List<LearningRank> acsGrouped;
 
@@ -67,16 +65,8 @@ public class McccResponse {
         return saeCodes;
     }
 
-    public String[] getNiveaux() {
-        return niveaux;
-    }
-
     public String[] getUe() {
         return ue;
-    }
-
-    public String[] getAcs() {
-        return acs;
     }
 
     public List<LearningRank> getAcsGrouped() {
