@@ -4,278 +4,272 @@ import AppHeader from '../App/Header.vue'
 
 const router = useRouter()
 
-const handleRetour = () =>{ router.push('/home')};
-const handleAide = () => {router.push('/aide')};
-const handleValider = () => {router.push('/home')};
-const handleDeconnexion = () => {router.push('/deconnexion')};
-
-
+const handleFermer = () => {router.push('/history')};
 </script>
 
 <template>
+  <AppHeader title="Récapitulatif Fiche Ressource" inline="RX.XX 00/00/0000" />
 
-  <AppHeader title="Fiche ressource" inline="RX.XX 00/00/0000" />
-  <div class = "ressource-page">
-    <main class = "main-content">
-      <div class="required_file">
-        <p id="star">* </p>
-        <p>champs obligatoires</p>
-      </div>
-      <p class = "title">Voici le nombre d'heures de CM, TD et TP : *</p>
-      <div class = "hour-summary">
-        <div class = "listing-hours">
-          <div class="grid">
-            <div class = "type-of-hour">
-              <p class = "title-hour">CM</p>
-              <p class="grey-square" type="number"></p>
+  <main class="main-content">
+    <div class="container">
+
+      <section class="form-card">
+        <h2 class="card-title">Récapitulatif des heures</h2>
+
+        <div class="hours-grid-container">
+          <div class="hours-row">
+            <div class="hour-item">
+              <label>CM</label>
+              <div class="value-box">0</div>
             </div>
-            <div class = "type-of-hour">
-              <p class = "title-hour">TD</p>
-              <p class="grey-square" type="number"></p>
+            <div class="hour-item">
+              <label>TD</label>
+              <div class="value-box">0</div>
             </div>
-            <div class = "type-of-hour">
-              <p class = "title-hour">DS</p>
-              <p class="grey-square" type="number"></p>
+            <div class="hour-item">
+              <label>DS</label>
+              <div class="value-box">0</div>
             </div>
           </div>
-          <div class="grid">
-            <div class= "type-of-hour">
-              <p class= "title-hour">TP</p>
-              <p class="grey-square" type="number"></p>
+
+          <div class="hours-row">
+            <div class="hour-item">
+              <label>TP</label>
+              <div class="value-box">0</div>
             </div>
-            <div class= "type-of-hour">
-              <p class= "title-hour">DS/TP</p>
-              <p class="grey-square" type="number"></p>
+            <div class="hour-item">
+              <label>DS/TP</label>
+              <div class="value-box">0</div>
             </div>
-            <div class= "type-of-hour">
-              <p class= "title-hour">Total</p>
-              <p class="grey-square" type="number"></p>
+            <div class="hour-item total">
+              <label>Total Global</label>
+              <div class="value-box highlight">0</div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="hour-per-students">
-        <p class = "title">Voici le nombre d'heures par étudiant : *</p>
-        <p class="grey-square" id="number_of_hour" type="number"></p>
-      </div>
-      <p class="title">Voici le contenu pédagogique : *</p>
 
-      <div class="pedagogic-contents">
+        <div class="student-ratio">
+          <label>Heures par étudiant :</label>
+          <span class="ratio-badge">0 h</span>
+        </div>
+      </section>
 
-        <div class="hour-type">
-          <p class="title">CM</p>
-          <textarea class="grey-square"></textarea>
+      <section class="form-card">
+        <h2 class="card-title">Contenu pédagogique</h2>
+        <div class="text-grid">
+          <div class="text-group">
+            <label>Cours Magistraux (CM)</label>
+            <div class="read-only-box">Contenu des CM...</div>
+          </div>
+          <div class="text-group">
+            <label>Travaux Dirigés (TD)</label>
+            <div class="read-only-box">Contenu des TD...</div>
+          </div>
+          <div class="text-group">
+            <label>Travaux Pratiques (TP)</label>
+            <div class="read-only-box">Contenu des TP...</div>
+          </div>
+          <div class="text-group">
+            <label>Devoirs Surveillés (DS)</label>
+            <div class="read-only-box">Modalités d'évaluation...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="form-card accent">
+        <h2 class="card-title">Feedbacks & Évolutions</h2>
+
+        <div class="full-text-group">
+          <label>Retour pédagogique des professeurs</label>
+          <div class="read-only-box large">Points forts, points faibles du semestre...</div>
         </div>
 
-        <div class="hour-type">
-          <p class="title">TD</p>
-          <textarea class="grey-square"></textarea>
+        <div class="full-text-group">
+          <label>Retour des étudiants</label>
+          <div class="read-only-box large">Synthèse des retours...</div>
         </div>
 
-        <div class="hour-type">
-          <p class="title">TP</p>
-          <textarea class="grey-square"></textarea>
+        <div class="full-text-group">
+          <label>Améliorations à apporter</label>
+          <div class="read-only-box large">Modifications prévues...</div>
         </div>
+      </section>
 
-        <div class="hour-type">
-          <p class="title">DS</p>
-          <textarea class="grey-square"></textarea>
-        </div>
+      <div class="sticky-actions">
+        <button @click="handleFermer" class="btn btn-primary">Fermer la fiche</button>
       </div>
 
-      <div class="educational-feedback">
-        <p class = "title">Voici le retour pédagogique des professeurs :</p>
-        <textarea class="grey-square"></textarea>
-      </div>
-
-      <div class="student-feedback">
-        <p class = "title">Voici le retour des étudiants :</p>
-        <textarea class="grey-square"></textarea>
-      </div>
-
-      <div class="upgrades">
-        <p class = "title">Voici les améliorations à apporter :</p>
-        <textarea class="grey-square"></textarea>
-
-      </div>
-      <div class="container-btn">
-        <div @click="handleValider" class="btn-sys">Valider</div>
-        <div @click="handleRetour" class="btn-sys">Annuler</div>
-      </div>
-    </main>
-  </div>
-
-
+    </div>
+  </main>
 </template>
 
 <style scoped>
-
-.ressource-page {
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.main-content{
-  width: 100%;
-}
-
-/* Hour */
-.required_file{
-  text-align: right;
-  margin-right: 20px;
-  margin-top: 10px;
-}
-.required_file p{
-  display: inline;
+/* STRUCTURE */
+.main-content {
+  padding-top: 220px;
+  padding-bottom: 50px;
+  background-color: #f4f7f9;
+  min-height: 100vh;
   font-family: 'Roboto', sans-serif;
 }
 
-#star{
-  color: #E92533;
-  font-size: 25px;
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.title{
+/* CARDS */
+.form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e1e8ed;
+}
+
+.card-title {
+  color: #B51621;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  border-left: 5px solid #B51621;
+  padding-left: 15px;
+}
+
+/* GRILLE D'HEURES */
+.hours-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.hour-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hour-item label {
+  font-weight: 700;
+  color: #546e7a;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.value-box {
   width: 100%;
-  margin-top: 40px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 38px;
-  text-align: left;
-  margin-left: 30px;
-
-  color: #E92533;
+  background: #f8fafb;
+  border: 2px solid #cfd8dc;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #263238;
 }
-.grid {
-  position: relative;
+
+.highlight {
+  border-color: #B51621;
+  color: #B51621;
+  background: #fff5f5;
+}
+
+.student-ratio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px dashed #cfd8dc;
+}
+
+.ratio-badge {
+  background: #263238;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+/* AFFICHAGE TEXTE (READ-ONLY) */
+.text-grid {
   display: grid;
-  grid-template-columns: auto auto auto;
-  padding: 10px;
-  justify-content: center;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
-.listing-hours{
-  padding: 20px;
-}
-
-.type-of-hour {
+.text-group, .full-text-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.title-hour{
-  font-size: 30px;
+.text-group label, .full-text-group label {
+  font-weight: 600;
+  color: #455a64;
+  font-size: 1rem;
+}
+
+.read-only-box {
+  width: 100%;
+  min-height: 100px;
+  border: 2px solid #e1e8ed;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1rem;
+  background: #fdfdfd;
+  color: #546e7a;
+  line-height: 1.5;
+  white-space: pre-wrap; /* Conserve les sauts de ligne */
+  cursor: default;
+}
+
+.large {
+  min-height: 80px;
   margin-bottom: 10px;
-  font-family: 'Roboto', sans-serif;
 }
 
-.grey-square{
-  box-sizing: border-box;
-  width: 200px;
-  background: #D9D9D9;
-  padding: 30px 60px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 15px;
-  font-size: 30px;
-  text-align: center;
-}
-
-
-.total{
-  margin-top: 50px;
-  font-size: 50px;
-  font-family: 'Roboto', sans-serif;
-  margin-bottom: 80px;
-  text-align: center;
-  margin-left: 70px;
-}
-
-
-/* Hour students */
-#number_of_hour{
-  margin-left: 750px;
-  margin-bottom: 50px;
-
-}
-
-/* Pedagogic content */
-.pedagogic-contents{
+/* BOUTONS */
+.sticky-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.hour-type{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 900px;
-  margin-bottom: 40px;
-}
-
-.hour-type .title{
-  text-align: center;
-  margin-left: 0;
-  color: black;
-  margin-bottom: 20px;
-}
-
-
-/* Educational-feedback, Student-feedback, Upgrades */
-.educational-feedback, .student-feedback, .upgrades {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.grey-big-square{
-  box-sizing: border-box;
-  width: 800px;
-  background: #D9D9D9;
-  padding: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 15px;
-  font-size: 24px;
-  text-align: left;
-  margin-bottom: 20px;
-  resize: vertical;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.add-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-top: 30px;
-  transition: transform 0.2s;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 50px;
-}
-.add-button svg {
-  height: 50px;
-  width: 50px;
-}
-.add-button:hover {
-  transform: scale(1.1);
-}
-
-.container-btn{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.btn {
+  padding: 15px 40px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #B51621;
+  color: white;
+  border: none;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #B51621;
+  border: 2px solid #B51621;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hours-row { flex-wrap: wrap; }
+  .text-grid { grid-template-columns: 1fr; }
+  .hour-item { min-width: 45%; }
 }
 </style>
