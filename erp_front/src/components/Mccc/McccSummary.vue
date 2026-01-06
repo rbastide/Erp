@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { mcccStore } from "@/services/mcccStore.js";
+import {useRouter} from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
-import { onMounted } from 'vue';
+import {onMounted} from 'vue';
 import api from '@/services/api';
 import Sidebar from "../App/Sidebar.vue";
 
@@ -146,8 +146,8 @@ const getGroupsForUE = (ueName) => {
               <div v-if="group.acs && group.acs.length > 0">
                 <p class="lvl-label">Apprentissages :</p>
                 <ul class="ac-list">
-                  <li v-for="(ac, acIndex) in group.acs" :key="acIndex">
-                    {{ ac }}
+                  <li v-for="(ac, acIdx) in group.acs" :key="acIdx">
+                    AC 0{{ ac.learningNum }} : {{ ac.learningTitle }}
                   </li>
                 </ul>
               </div>
