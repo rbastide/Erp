@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -43,12 +44,11 @@ const clearSearch = () => {
 </script>
 
 <template>
-  <AppHeader title="Bonjour, " inline="Prénom NOM"/>
+  <Sidebar/>
+  <AppHeader title="Historique des fiches ressources"/>
 
   <main class="main-content">
     <div class="container">
-      <h2 class="description">Voici l'historique des fiches de ressource :</h2>
-
       <div class="version-list-container">
         <div v-if="filteredVersions.length === 0" class="no-result">
           <p>Aucun résultat pour "<strong>{{ searchQuery }}</strong>"</p>
