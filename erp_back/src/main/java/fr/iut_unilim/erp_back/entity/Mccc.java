@@ -15,6 +15,24 @@ public class Mccc {
 
     private int year;
     private int semester;
+
+    @ManyToMany
+    @JoinTable(
+            name = "McccSaes",
+            joinColumns = @JoinColumn(name = "mcccSaesID"),
+            inverseJoinColumns = @JoinColumn(name = "saeID")
+    )
+    private Set<Sae> saesId;
+
+    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
+        this.mcccId = mcccId;
+        this.hourlyVolId = hourlyVolId;
+        this.resourceId = resourceId;
+        this.saesId = saesId;
+        this.criticalLearningsId = criticalLearningsId;
+        this.referencialTeacherId = referencialTeacherId;
+    }
+
     @ManyToOne
     @JoinColumn(name = "hourlyVolID")
     private HourlyVolume hourlyVolId;
@@ -23,13 +41,9 @@ public class Mccc {
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "McccSaes",
-            joinColumns = @JoinColumn(name = "mcccSaesID"),
-            inverseJoinColumns = @JoinColumn(name = "saeID")
-    )
-    private Set<Sae> saeId;
+    public void setYear(int year) {
+        this.year = year;
+    }
 
     @ManyToMany
     @JoinTable(
@@ -50,13 +64,8 @@ public class Mccc {
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saeId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
-        this.mcccId = mcccId;
-        this.hourlyVolId = hourlyVolId;
-        this.resourceId = resourceId;
-        this.saeId = saeId;
-        this.criticalLearningsId = criticalLearningsId;
-        this.referencialTeacherId = referencialTeacherId;
+    public void setSemester(int semester) {
+        this.semester = semester;
     }
 
     public Mccc() {
@@ -86,12 +95,12 @@ public class Mccc {
         this.resourceId = resourceId;
     }
 
-    public Set<Sae> getSaeId() {
-        return saeId;
+    public Set<Sae> getSaesId() {
+        return saesId;
     }
 
-    public void setSaeId(Set<Sae> saeId) {
-        this.saeId = saeId;
+    public void setSaesId(Set<Sae> saeId) {
+        this.saesId = saeId;
     }
 
     public Set<CriticalLearning> getCriticalLearningsId() {

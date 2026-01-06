@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.controllers;
 
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.service.*;
@@ -73,7 +74,7 @@ public class McccController {
         mccc.setReferencialTeacherId(setTeacher);
 
         Set<Sae> setSae = getSAEFromDto(dto);
-        mccc.setSaeId(setSae);
+        mccc.setSaesId(setSae);
 
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
@@ -87,19 +88,22 @@ public class McccController {
 
         mccc.setCriticalLearningsId(setCriticalLearnings);
 
+        mccc.setYear(4);
+        mccc.setSemester(9);
         mcccService.saveMccc(mccc);
 
         return ResponseEntity.ok("MCCC sauvegardée avec succès !");
     }
 
     @Nullable
-    private ResponseEntity<Object> fillCriticalLearnings(McccResponse dto, Set<CriticalLearning> setCriticalLearnings) {
+    private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccResponse dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
         List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
+        ErpBackApplication.LOGGER.info("Acs : " + acs);
         for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
-            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.rank());
+            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.niveau());
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le niveau n'existe pas !");
 
             fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
@@ -108,7 +112,7 @@ public class McccController {
     }
 
     @Nullable
-    private String extractCodeFromSkillTitle(String skillTitle) {
+    private String extractCodeFromSkillTitle(@NotNull String skillTitle) {
         String ueCode = getFirstRegexOccurence("[0-9]+", skillTitle);
         if (ueCode == null) return null;
 
@@ -119,7 +123,7 @@ public class McccController {
     }
 
     @Nullable
-    private Rank extractFirstRankFromRankTitle(String rankTitle) {
+    private Rank extractFirstRankFromRankTitle(@NotNull String rankTitle) {
         String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
         if (rankCode == null) return null;
 
