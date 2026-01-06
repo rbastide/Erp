@@ -6,7 +6,7 @@ import HistoryPage from './components/RessourcePage/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import ServicesPage from './components/App/ServiceAidePage.vue';
-import DeconnexionPage from './components/App/DeconnexionPage.vue';
+import DeconnexionPage from './components/Information/DeconnexionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
