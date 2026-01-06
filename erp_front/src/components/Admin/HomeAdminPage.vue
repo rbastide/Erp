@@ -27,7 +27,7 @@ const handleResources = () => {
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <Sidebar :dashboardAdmin="true" :dashboard="false" :dashboardAdminActive="true"/>
   <div class="page-container">
     <AppHeader title="Bonjour ADMIN"/>
 

@@ -24,7 +24,7 @@ import McccCompetences from "./components/Mccc/McccCompetences.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
 import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.vue";
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
-import RessourcesGestion from "./components/RessourcePage/RessourcesGestion.vue";
+import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
 
 
