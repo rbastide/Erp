@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -23,9 +24,9 @@ const handleDeconnexion = () => {
 </script>
 
 <template>
-  <AppHeader title="Bonjour, " inline="ADMIN"/>
+  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <AppHeader title="Historique des fiches ressources"/>
   <div class="main-content">
-    <p class="description">Voici l'historique des fiches de ressource : </p>
     <div class="version-list-container">
       <ul class="version-list">
         <li class="version-item">
