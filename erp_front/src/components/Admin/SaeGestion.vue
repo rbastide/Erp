@@ -25,7 +25,7 @@ const editedSae = reactive({
 });
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.back();
 };
 
 const handleValider = () => {

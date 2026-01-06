@@ -14,7 +14,7 @@ const role = ref('');
 const errorMessage = ref('');
 
 const handleRetour = () => {
-  router.push('/users-gestion');
+  router.back();
 };
 
 const handleAide = () => {

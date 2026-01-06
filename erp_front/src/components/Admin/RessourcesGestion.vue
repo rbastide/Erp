@@ -26,7 +26,7 @@ const editedResource = reactive({
 const showAddForm = ref(false);
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.back();
 };
 
 const handleValider = () => {

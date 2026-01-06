@@ -28,7 +28,7 @@ const filteredVersions = computed(() => {
   );
 });
 
-const handleRetour = () => router.push('/home-admin');
+const handleRetour = () => router.back();
 const handleSupprimer = () => router.push('/supp-fiche');
 const clearSearch = () => searchQuery.value = '';
 </script>

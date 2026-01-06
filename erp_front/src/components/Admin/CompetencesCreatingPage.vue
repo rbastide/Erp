@@ -10,7 +10,7 @@ const handleValider = () => {
 };
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.back();
 };
 
 const currentCompetence = ref({
