@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import AppHeader from '../App/Header.vue'
+import Sidebar from '../App/Sidebar.vue'
 
 const router = useRouter()
 
-const handleFermer = () => { router.push('/history') };
+const handleFermer = () => { router.back() };
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -16,7 +17,8 @@ const hourConfig = {
 </script>
 
 <template>
-  <AppHeader title="Récapitulatif Fiche Ressource" inline="RX.XX 00/00/0000" />
+  <Sidebar/>
+  <AppHeader title="Fiche Ressource" inline="RX.XX du 00/00/0000" />
 
   <main class="main-content">
     <div class="container">
