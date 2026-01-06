@@ -1,7 +1,7 @@
 <script setup>
-import { useRouter } from 'vue-router';
-import { onMounted, ref, computed } from 'vue';
-import { mcccStore } from "@/services/mcccStore.js";
+import {useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 
@@ -26,7 +26,11 @@ const availableSae = [
 onMounted(() => {
   mcccStore.loadMcccStore();
   if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0) {
-    selectedSaeIds.value = [...mcccStore.saeCodes];
+    if (typeof mcccStore.saeCodes[0] === 'object') {
+      selectedSaeIds.value = mcccStore.saeCodes.map(item => item.saeCode);
+    } else {
+      selectedSaeIds.value = [...mcccStore.saeCodes];
+    }
   }
 });
 
@@ -51,7 +55,15 @@ const handleValider = () => {
     errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
     return;
   }
-  mcccStore.saeCodes = [...selectedSaeIds.value];
+
+  mcccStore.saeCodes = selectedSaeIds.value.map(id => {
+    const fullSae = availableSae.find(s => s.id === id);
+    return {
+      saeCode: id,
+      saeName: fullSae ? fullSae.title : ''
+    };
+  });
+
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
