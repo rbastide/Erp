@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -20,6 +21,7 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <div class="page-container">
     <AppHeader title="Choix ressources" />
 

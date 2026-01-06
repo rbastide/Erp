@@ -2,6 +2,7 @@
 import {onMounted, ref} from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
@@ -64,12 +65,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <AppHeader title="Référents"/>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <AppHeader title="Référents de la" :inline="mcccStore.resourceCode"/>
   <main class="main-content">
-    <div class="description">
-      Veuillez saisir le/les Référents pour cette ressource :
-    </div>
-
     <div class="container">
       <div class="teachers-list">
         <div v-for="(teacher, index) in mcccStore.referents" :key="teacher" class="teacher-display-card">

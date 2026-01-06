@@ -5,7 +5,6 @@ import AppHeader from '../App/Header.vue';
 
 const router = useRouter();
 
-// État pour la recherche
 const searchQuery = ref('');
 
 const handleRetour = () => {
@@ -16,7 +15,6 @@ const handleShow = () => {
   router.push('/ressource-sheet-history');
 };
 
-// Liste des versions
 const versions = ref([
   { code: 'R1.01', date: '30/10/2022' },
   { code: 'R1.02', date: '15/11/2019' },
@@ -30,7 +28,6 @@ const versions = ref([
   { code: 'R4.01', date: '14/02/2016' },
 ]);
 
-// LOGIQUE DE FILTRAGE DOUBLE (Code OU Date)
 const filteredVersions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
 
@@ -40,7 +37,6 @@ const filteredVersions = computed(() => {
   });
 });
 
-// Fonction pour effacer la recherche
 const clearSearch = () => {
   searchQuery.value = '';
 };
@@ -146,7 +142,6 @@ const clearSearch = () => {
   color: #64748b;
 }
 
-/* ÉTAT VIDE */
 .no-result {
   text-align: center;
   margin-top: 60px;
@@ -162,7 +157,6 @@ const clearSearch = () => {
   margin-top: 10px;
 }
 
-/* FOOTER FIXE */
 .sticky-footer {
   position: fixed;
   bottom: 0;
@@ -184,7 +178,6 @@ const clearSearch = () => {
   gap: 20px;
 }
 
-/* BARRE DE RECHERCHE */
 .search-wrapper {
   position: relative;
   flex: 1;
