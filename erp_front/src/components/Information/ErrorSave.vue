@@ -5,7 +5,7 @@
   const router = useRouter();
 
   const handleRetour = () => {
-    router.push('/home');
+    router.back();
   };
 </script>
 
