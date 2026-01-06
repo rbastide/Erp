@@ -21,7 +21,7 @@ const isExpanded = ref(false);
 
 const handleDashboard = () => router.push('/home');
 const handleAdmin = () => router.push('/home-admin');
-const handleSettings = () => router.push('/parametres');
+const handleSettings = () => router.push('/settings');
 const handleAide = () => router.push('/aide');
 const handleDeconnexion = () => {
   localStorage.removeItem('user_token');
