@@ -2,6 +2,7 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
@@ -74,6 +75,7 @@ const saveModification = (index) => {
 </script>
 
 <template>
+  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
   <div class="page-container">
     <AppHeader title="Gestion des utilisateurs" />
 
