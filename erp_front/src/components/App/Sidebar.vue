@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router';
 import { ref, onMounted } from "vue";
 
 const props = defineProps({
-  // On garde les props pour le style "active", mais la logique devient interne
   dashboardAdminActive: { type: Boolean, default: false },
   dashboardActive: { type: Boolean, default: false },
   settingsActive: { type: Boolean, default: false },
@@ -16,12 +15,10 @@ const isExpanded = ref(false);
 const userRole = ref('');
 
 onMounted(() => {
-  // On récupère le rôle stocké lors du login (ex: 'admin' ou 'user')
   userRole.value = localStorage.getItem('user_role') || 'user';
 });
 
 const handleDashboardClick = () => {
-  // La redirection se base sur le rôle réel stocké en mémoire
   if (userRole.value === 'admin') {
     router.push('/home-admin');
   } else {
