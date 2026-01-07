@@ -109,7 +109,7 @@ const handleValider = () => {
 
       <div class="footer-actions">
         <button @click="handleValider" class="btn-main">Valider</button>
-        <button @click="router.push('/mccc-menu')" class="btn-sub">Annuler</button>
+        <button @click="router.push('/cancel-mccc')" class="btn-sub">Annuler</button>
       </div>
     </div>
   </main>

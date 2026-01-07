@@ -12,7 +12,7 @@ const errorMessage = ref('');
 
 
 const handleRetour = () => {
-  router.back();
+  router.push('/cancel-mccc');
 };
 
 // Fonction pour supprimer un référent
