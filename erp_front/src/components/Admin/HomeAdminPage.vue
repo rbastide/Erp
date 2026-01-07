@@ -31,7 +31,7 @@ const handleAddSae = () => {
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false" :dashboardAdminActive="true"/>
+  <Sidebar :dashboardAdminActive="true"/>
   <div class="page-container">
     <AppHeader title="Bonjour ADMIN"/>
 

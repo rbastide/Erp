@@ -59,7 +59,7 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <Sidebar/>
   <AppHeader title="Inscription"/>
   <main class="main-content">
     <form class="login-card" @submit.prevent="handleRegister">

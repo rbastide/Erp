@@ -34,7 +34,7 @@ const clearSearch = () => searchQuery.value = '';
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <Sidebar/>
   <AppHeader title="Historique des fiches ressources" />
 
   <main class="main-content">

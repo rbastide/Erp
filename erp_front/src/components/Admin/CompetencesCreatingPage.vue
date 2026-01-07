@@ -108,7 +108,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <Sidebar/>
   <AppHeader title="Ajout compétences"/>
   <main class="main-div">
     <div class="description">Veuillez saisir la/les compétences :</div>

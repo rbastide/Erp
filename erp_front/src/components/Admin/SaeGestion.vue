@@ -89,7 +89,7 @@ const saveModification = (index) => {
 </script>
 
 <template>
-  <Sidebar :dashboardAdmin="true" :dashboard="false"/>
+  <Sidebar/>
   <div class="page-container">
     <AppHeader title="Gestion des SAE"/>
 
