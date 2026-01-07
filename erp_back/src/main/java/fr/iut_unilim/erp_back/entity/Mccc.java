@@ -13,12 +13,6 @@ public class Mccc {
     @Column(name = "mcccID")
     private int mcccId;
 
-    @Column(name = "year")
-    private int year;
-
-    @Column(name = "semester")
-    private int semester;
-
     @ManyToOne
     @JoinColumn(name = "hourlyVolID")
     private HourlyVolume hourlyVolId;
@@ -64,14 +58,6 @@ public class Mccc {
     }
 
     public Mccc() {
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public void setSemester(int semester) {
-        this.semester = semester;
     }
 
     public int getMcccId() {

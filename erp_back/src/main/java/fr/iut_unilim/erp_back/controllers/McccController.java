@@ -89,8 +89,6 @@ public class McccController {
 
         mccc.setCriticalLearningsId(setCriticalLearnings);
 
-        mccc.setYear(4);
-        mccc.setSemester(9);
         mcccService.save(mccc);
 
         return ResponseEntity.ok("MCCC sauvegardée avec succès !");
