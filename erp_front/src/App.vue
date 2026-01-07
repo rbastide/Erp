@@ -309,4 +309,92 @@ body.dark-mode .sidebar.expanded .nav-text{
   color: #ef5350 !important;
 }
 
+body.dark-mode .card,
+body.dark-mode .summary,
+body.dark-mode .info-footer {
+  background-color: #333333 !important;
+  color: #e0e0e0 !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+  border: 1px solid #444 !important;
+}
+
+body.dark-mode .section-header {
+  color: #ef5350 !important;
+  border-bottom-color: #444 !important;
+}
+body.dark-mode .section-main-title {
+  color: #ffffff !important;
+}
+body.dark-mode .summary-label,
+body.dark-mode .footer-label {
+  color: #bbbbbb !important;
+}
+body.dark-mode .summary-code,
+body.dark-mode .footer-value,
+body.dark-mode .total-number {
+  color: #ef5350 !important;
+}
+
+body.dark-mode .hour-badge {
+  background-color: #444444 !important;
+  color: #ffffff !important;
+}
+body.dark-mode .sae-chip {
+  background-color: rgba(239, 83, 80, 0.15) !important;
+  color: #ef5350 !important;
+  border-color: #ef5350 !important;
+}
+body.dark-mode .sae-chip:hover {
+  box-shadow: 0 4px 8px rgba(239, 83, 80, 0.2) !important;
+}
+
+body.dark-mode .ue-header {
+  background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%) !important;
+  color: #ffffff !important;
+}
+body.dark-mode .ue-prefix {
+  background-color: rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .competence-table th {
+  background-color: #2a2a2a !important;
+  color: #ef5350 !important;
+  border-bottom-color: #444 !important;
+}
+body.dark-mode .competence-table td {
+  border-bottom-color: #444 !important;
+  color: #cccccc !important;
+}
+body.dark-mode .lvl-number {
+  background-color: #2e2e2e !important;
+  border-right-color: #444 !important;
+}
+body.dark-mode .circle-number {
+  background-color: #ef5350 !important;
+  color: #ffffff !important;
+}
+body.dark-mode .empty-table {
+  color: #777 !important;
+}
+
+body.dark-mode .ac-tag {
+  color: #ef5350 !important;
+}
+body.dark-mode .total-separator {
+  background-color: #444 !important;
+}
+
+body.dark-mode .btn-validate {
+  background: linear-gradient(135deg, #c62828 0%, #ef5350 100%) !important;
+  color: #ffffff !important;
+}
+body.dark-mode .btn-cancel {
+  background-color: #444444 !important;
+  color: #ffffff !important;
+  border-color: #555555 !important;
+}
+body.dark-mode .btn-cancel:hover {
+  background-color: #555555 !important;
+  color: #ef5350 !important;
+}
 </style>
