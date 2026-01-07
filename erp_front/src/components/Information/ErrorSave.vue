@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { useRouter } from 'vue-router';
   import AppHeader from '../App/Header.vue';
+  import Sidebar from '../App/Sidebar.vue';
 
   const router = useRouter();
 
@@ -10,6 +11,7 @@
 </script>
 
 <template>
+  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
   <AppHeader title="Information"/>
   <main class="main-content">
     <p class="text">Une erreur est survenue !</p>
