@@ -60,6 +60,7 @@ body.dark-mode .skill-card,
 body.dark-mode .login-card,
 body.dark-mode .logout-card,
 body.dark-mode .warning-card,
+body.dark-mode .success-card,
 body.dark-mode .setting-card,
 body.dark-mode .help-card,
 body.dark-mode .sae-card,
@@ -301,6 +302,11 @@ body.dark-mode .btn-outline:hover {
 body.dark-mode .icon-circle {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ef5350 !important;
+}
+
+body.dark-mode .icon-circle.success {
+  background-color: rgba(76, 175, 80, 0.15) !important;
+  color: #66bb6a !important;
 }
 
 body.dark-mode .role-badge {
