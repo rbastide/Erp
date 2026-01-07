@@ -19,7 +19,7 @@ public class McccService {
         return mcccRepository.findById(id);
     }
 
-    public void saveMccc(Mccc mccc) {
+    public void save(Mccc mccc) {
         mcccRepository.save(mccc);
     }
 }
