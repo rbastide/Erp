@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
-import '../../assets/css/variable.css';
 
 const router = useRouter();
 const username = ref('');
@@ -20,26 +19,22 @@ const handleLogin = async () => {
   };
 
   try {
-      await AuthService.login(credentials);
+    await AuthService.login(credentials);
 
-      if (credentials.identifier === 'admin') {
-        await router.push('/home-admin');
-      } else {
-        await router.push('/home');
-      }
+    const role = credentials.identifier === 'admin' ? 'admin' : 'user';
+    localStorage.setItem('user_role', role);
 
-    } catch (error) {
-      console.error("Erreur API:", error);
-      if (error.response && error.response.status === 401) {
-        errorMessage.value = "Identifiant ou mot de passe incorrect.";
-      } else {
-        errorMessage.value = "Impossible de contacter le serveur.";
-      }
+    if (role === 'admin') {
+      await router.push('/home-admin');
+    } else {
+      await router.push('/home');
     }
-};
 
-const handleAide = () => {
-  router.push('/aide');
+  } catch (error) {
+    errorMessage.value = error.response?.status === 401
+        ? "Identifiant ou mot de passe incorrect."
+        : "Impossible de contacter le serveur.";
+  }
 };
 </script>
 
@@ -47,59 +42,28 @@ const handleAide = () => {
   <AppHeader title="Connexion" :deconnexion="false"/>
   <main class="main-content">
     <form class="login-card" @submit.prevent="handleLogin">
-
       <div class="form-group">
         <label for="username">Identifiant</label>
-        <input
-          type="text"
-          id="username"
-          placeholder="Identifiant"
-          v-model="username"
-          required
-        />
+        <input type="text" id="username" v-model="username" required />
       </div>
-
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Mot de passe"
-          v-model="password"
-          required
-        />
+        <input type="password" id="password" v-model="password" required />
       </div>
-
-      <p v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </p>
-
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <button type="submit" class="login-button">Se connecter</button>
     </form>
   </main>
 </template>
 
 <style scoped>
-
 .main-content {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Roboto', sans-serif;
-  padding: 172px 20px 20px;
   min-height: 100vh;
-  box-sizing: border-box;
-}
-
-.error-message {
-  color: #B51621;
-  background-color: #ffe6e6;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  font-weight: bold;
-  text-align: center;
-  font-size: 0.9rem;
+  padding-top: 70px;
+  background-color: #f4f7f9;
 }
 
 .login-card {
@@ -108,43 +72,53 @@ const handleAide = () => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .form-group {
   margin-bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
 .form-group label {
-  display: block;
+  align-self: flex-start;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 0.9rem;
-  color: black;
+  width: 100%;
+  max-width: 300px;
 }
+
 .form-group input {
   width: 100%;
+  max-width: 380px;
   padding: 0.75rem;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1rem;
 }
-.form-group input:focus {
-  outline: none;
-  border-color: #B51621;
-  box-shadow: 0 0 0 2px rgba(181, 22, 33, 0.2);
-}
+
 .login-button {
   width: 100%;
+  max-width: 300px;
   padding: 0.8rem;
-  border: none;
-  border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem;
-  font-weight: bold;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
-.login-button:hover {
-  background-color: #9c121b;
+.error-message {
+  color: #B51621;
+  background: #ffe6e6;
+  padding: 10px;
+  margin-bottom: 15px;
+  text-align: center;
 }
 </style>
