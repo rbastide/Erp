@@ -2,6 +2,7 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
+import fr.iut_unilim.erp_back.dto.EditUserRequest;
 import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
@@ -15,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @RestController
@@ -65,6 +68,22 @@ public class AuthController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> editUser(@RequestBody EditUserRequest user) {
+        Optional<Connection> existingUser = connectionRepository.findById(user.id());
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Connection userToEdit = existingUser.get();
+        userToEdit.setIdentifier(user.identifier());
+        userToEdit.setRole(user.role());
+        if (user.newPassword() != null) {
+            userToEdit.setPassword(passwordEncoder.encode(user.newPassword()));
+        }
+        connectionRepository.save(userToEdit);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users")
