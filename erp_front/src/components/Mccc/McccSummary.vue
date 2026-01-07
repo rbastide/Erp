@@ -42,7 +42,7 @@ const handleValider = async () => {
 
   } catch (error) {
     console.error("Erreur lors de la sauvegarde des MCCC :", error);
-    alert("Une erreur est survenue lors de l'enregistrement.");
+    router.push("/errorSave");
   }
 };
 
@@ -177,7 +177,6 @@ const getGroupsForUE = (ueName) => {
 </template>
 
 <style scoped>
-/* Votre style existant */
 .main-content {
   width: 90%;
   margin: 254px auto 50px;
