@@ -21,7 +21,7 @@ const editedUser = reactive({
 });
 
 const handleRetour = () => {
-  router.back();
+  router.push('/cancel');
 };
 
 const handleValider = () => {
