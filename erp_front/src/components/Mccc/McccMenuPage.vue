@@ -34,7 +34,7 @@ const handleCompetences = () => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <div class="page-container">
     <AppHeader :title="mcccStore.resourceCode" />
     <main class="main-content">

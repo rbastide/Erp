@@ -65,7 +65,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader title="Référents de la" :inline="mcccStore.resourceCode"/>
   <main class="main-content">
     <div class="container">

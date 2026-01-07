@@ -67,7 +67,7 @@ const getGroupsForUE = (ueName) => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader title="Récapitulatif"/>
 
   <main class="main-content">

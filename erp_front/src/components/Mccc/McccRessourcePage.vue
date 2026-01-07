@@ -21,7 +21,7 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <div class="page-container">
     <AppHeader title="Choix ressources" />
 

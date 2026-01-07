@@ -134,7 +134,7 @@ const handleSaveCompetence = () => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader :title="'Compétences ' + (mcccStore.resourceCode || '')"/>
 
   <main class="main-div">

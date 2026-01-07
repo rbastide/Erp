@@ -54,7 +54,7 @@ const handleRetour = () => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader title="Veuillez saisir les " inline = "heures par élève : "/>
 
   <main class="main-content">

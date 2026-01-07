@@ -70,7 +70,7 @@ const handleValider = () => {
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader title="SAÉs pour" :inline="mcccStore.resourceCode"/>
 
   <main class="main-content">
