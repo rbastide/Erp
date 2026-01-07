@@ -24,9 +24,11 @@ public class Resource {
     public Resource() {
     }
 
-    public Resource(String num, String name) {
+    public Resource(Long resourceID, String num, String name, int semester) {
+        this.resourceID = resourceID;
         this.num = num;
         this.name = name;
+        this.semester = semester;
     }
 
     public Long getResourceID() {
@@ -40,4 +42,6 @@ public class Resource {
     public String getName() {
         return name;
     }
+
+    public int getSemester() {return semester;}
 }
