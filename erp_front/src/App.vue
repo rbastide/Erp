@@ -74,6 +74,7 @@ body.dark-mode .push-button,
 body.dark-mode .version-item,
 body.dark-mode .card,
 body.dark-mode .summary,
+body.dark-mode .error-card,
 body.dark-mode .info-footer {
   background-color: #333333 !important;
   border-color: #444444 !important;
