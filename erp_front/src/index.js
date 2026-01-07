@@ -1,29 +1,34 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import LoginPage from './components/LoginPage.vue';
-import RessourcePage from './components/RessourcePage.vue';
-import HomePage from './components/HomePage.vue';
-import HistoryPage from './components/HistoryPage.vue';
-import HomeAdminPage from './components/HomeAdminPage.vue';
-import CreateNewUserPagePage from './components/CreateNewUserPage.vue';
-import ServicesPage from './components/ServiceAidePage.vue';
-import DeconnexionPage from './components/DeconnexionPage.vue';
-import ErrorSave from "./components/ErrorSave.vue";
-import SuccessfullySaved from "./components/SuccessfullySaved.vue";
-import FillRessourcePage from "./components/FillRessourcePage.vue";
-import UserSavePage from "./components/UserSavePage.vue";
-import CancelPage from "./components/CancelPage.vue";
-import HistoryAdminPage from "./components/HistoryAdminPage.vue";
-import SuccessfullyDeletePage from "./components/SuccessfullyDelete.vue";
-import McccRessourcePage from "./components/McccRessourcePage.vue";
-import McccFillHourPage from "./components/McccFillHour.vue";
-import ModifSaved from "./components/ModifSaved.vue";
-import McccMenuPage from "./components/McccMenuPage.vue";
-import McccTeachersPage from "./components/McccTeachersPage.vue";
-import McccSAE from "./components/McccSAE.vue";
-import McccCompetences from "./components/McccCompetences.vue";
-import McccSummaryPage from "./components/McccSummary.vue";
-import CompetencesCreatingPage from "./components/CompetencesCreatingPage.vue";
-import RessourceSheetHistory from "./components/RessourceSheetHistory.vue";
+import {createRouter, createWebHistory} from 'vue-router';
+import LoginPage from './components/App/LoginPage.vue';
+import RessourcePage from './components/RessourcePage/RessourcePage.vue';
+import HomePage from './components/User/HomePage.vue';
+import HistoryPage from './components/RessourcePage/HistoryPage.vue';
+import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
+import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
+import ServicesPage from './components/App/ServiceAidePage.vue';
+import DeconnexionPage from './components/Information/DeconnexionPage.vue';
+import ErrorSave from "./components/Information/ErrorSave.vue";
+import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
+import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
+import UserSavePage from "./components/Information/UserSavePage.vue";
+import CancelPage from "./components/Information/CancelPage.vue";
+import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
+import SuccessfullyDeletePage from "./components/Information/SuccessfullyDelete.vue";
+import McccRessourcePage from "./components/Mccc/McccRessourcePage.vue";
+import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
+import ModifSaved from "./components/Information/ModifSaved.vue";
+import McccMenuPage from "./components/Mccc/McccMenuPage.vue";
+import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
+import McccSAE from "./components/Mccc/McccSAE.vue";
+import McccCompetences from "./components/Mccc/McccCompetences.vue";
+import McccSummaryPage from "./components/Mccc/McccSummary.vue";
+import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.vue";
+import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
+import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
+import UsersGestion from "./components/Admin/UsersGestion.vue";
+import SaeGestion from "./components/Admin/SaeGestion.vue";
+import Settings from "./components/App/Settings.vue";
+
 
 const routes = [
     {
@@ -59,7 +64,7 @@ const routes = [
     {
         path: '/new-user',
         name: 'CreateNewUserPage',
-        component: CreateNewUserPagePage
+        component: CreateNewUserPage
     },
     {
         path: '/aide',
@@ -155,6 +160,26 @@ const routes = [
         path: '/ressource-sheet-history',
         name: 'RessourceSheetHistory',
         component: RessourceSheetHistory
+    },
+    {
+        path: '/resources-gestion',
+        name: 'RessourcesGestion',
+        component: RessourcesGestion
+    },
+    {
+        path: '/users-gestion',
+        name: 'UsersGestion',
+        component: UsersGestion
+    },
+    {
+        path: '/sae-gestion',
+        name: 'SaeGestion',
+        component: SaeGestion
+    },
+    {
+        path: '/settings',
+        name: 'Settings',
+        component: Settings
     }
 ];
 

@@ -12,7 +12,7 @@ import static fr.iut_unilim.erp_back.startup.DatabaseConnectionManager.connectTo
 @SpringBootApplication
 public class ErpBackApplication {
 
-    private static final Logger LOGGER = Logger.getLogger(ErpBackApplication.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(ErpBackApplication.class.getName());
 
     public static void main(String[] args) {
         startApplication(args);

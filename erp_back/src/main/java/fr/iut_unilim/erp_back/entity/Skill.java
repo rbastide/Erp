@@ -14,11 +14,13 @@ public class Skill {
     @Column(name = "skillID")
     private Long skillID;
 
+    @Column(name = "skillNum")
+    private int skillNum;
+
     @Column(name = "skillName")
     private String skillName;
 
-    @Column(name = "skillLearning")
-    private String skillLearning;
+
 
     @ManyToMany
     @JoinTable(
@@ -30,9 +32,9 @@ public class Skill {
 
     public Skill() {}
 
-    public Skill(String skillName, String skillLearning) {
+    public Skill(String skillName, int skillNum) {
         this.skillName = skillName;
-        this.skillLearning = skillLearning;
+        this.skillNum = skillNum;
     }
 
     public Long getSkillID() {
@@ -43,7 +45,7 @@ public class Skill {
         return skillName;
     }
 
-    public String getSkillLearning() {
-        return skillLearning;
+    public int getSkillLearning() {
+        return skillNum;
     }
 }

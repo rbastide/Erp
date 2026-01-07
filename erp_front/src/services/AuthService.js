@@ -1,4 +1,5 @@
 import apiClient from './api';
+import {mcccStore} from "@/services/mcccStore.js";
 
 export default {
   register(user) {
@@ -16,5 +17,6 @@ export default {
 
   logout() {
     localStorage.removeItem('user_token');
+    mcccStore.clearMcccStore();
   }
 };
