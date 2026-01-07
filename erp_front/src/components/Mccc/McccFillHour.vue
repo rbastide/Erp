@@ -49,7 +49,7 @@ const handleValider = () => {
 };
 
 const handleRetour = () => {
-  router.back();
+  router.push('/cancel-mccc');
 };
 </script>
 

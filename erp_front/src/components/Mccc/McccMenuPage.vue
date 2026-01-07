@@ -7,8 +7,7 @@ import { mcccStore } from '@/services/mcccStore';
 const router = useRouter();
 mcccStore.loadMcccStore();
 const handleRetour = () => {
-  router.push('/mccc-ressource');
-  mcccStore.clearMcccStore();
+  router.push('/cancel');
 };
 
 const handleHours = () => {
