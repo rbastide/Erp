@@ -7,7 +7,7 @@ import Sidebar from '../App/Sidebar.vue';
 const router = useRouter();
 
 const handleRetour = () => {
-  router.push('/home-admin');
+  router.back();
 };
 
 const handleMccc = (code: string) => {

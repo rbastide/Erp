@@ -19,7 +19,7 @@ const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
-const handleRetour = () => router.push('/mccc-menu');
+const handleRetour = () => router.back();
 
 const groupedCompetences = computed(() => {
   const groups = {};
