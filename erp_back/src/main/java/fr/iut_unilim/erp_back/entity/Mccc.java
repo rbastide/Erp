@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.entity;
 
-import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -11,27 +10,14 @@ import java.util.Set;
 public class Mccc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private McccId mcccId;
+    @Column(name = "mcccID")
+    private int mcccId;
 
+    @Column(name = "year")
     private int year;
+
+    @Column(name = "semester")
     private int semester;
-
-    @ManyToMany
-    @JoinTable(
-            name = "McccSaes",
-            joinColumns = @JoinColumn(name = "mcccSaesID"),
-            inverseJoinColumns = @JoinColumn(name = "saeID")
-    )
-    private Set<Sae> saesId;
-
-    public Mccc(McccId mcccId, HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
-        this.mcccId = mcccId;
-        this.hourlyVolId = hourlyVolId;
-        this.resourceId = resourceId;
-        this.saesId = saesId;
-        this.criticalLearningsId = criticalLearningsId;
-        this.referencialTeacherId = referencialTeacherId;
-    }
 
     @ManyToOne
     @JoinColumn(name = "hourlyVolID")
@@ -41,41 +27,58 @@ public class Mccc {
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
 
-    public void setYear(int year) {
-        this.year = year;
-    }
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "McccSaes",
+            joinColumns = @JoinColumn(name = "mcccID"),
+            inverseJoinColumns = @JoinColumn(name = "saeID")
+    )
+    private Set<Sae> saesId;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "McccCriticalLearning",
-            joinColumns = @JoinColumn(name = "mcccLearningID"),
+            joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "learningID")
     )
     private Set<CriticalLearning> criticalLearningsId;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "MCCCTeachers",
-            joinColumns = @JoinColumn(name = "referencialTeacher"),
+            joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
     private Set<Teacher> referencialTeacherId;
 
+
     private Date creationDate;
     private Date lastModificationDate;
 
-    public void setSemester(int semester) {
-        this.semester = semester;
+    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
+        this.hourlyVolId = hourlyVolId;
+        this.resourceId = resourceId;
+        this.saesId = saesId;
+        this.criticalLearningsId = criticalLearningsId;
+        this.referencialTeacherId = referencialTeacherId;
     }
 
     public Mccc() {
     }
 
-    public McccId getMcccId() {
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public int getMcccId() {
         return mcccId;
     }
 
-    public void setMcccId(McccId mcccId) {
+    public void setMcccId(int mcccId) {
         this.mcccId = mcccId;
     }
 

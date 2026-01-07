@@ -1,7 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.service.*;
@@ -64,10 +63,12 @@ public class McccController {
     public ResponseEntity<?> saveMccc(@RequestBody McccResponse dto) {
         Mccc mccc = new Mccc();
 
-        List<Resource> resources = resourceService.getFromName(dto.getResourceCode());
+        List<Resource> resources = resourceService.getFromNum(dto.getResourceCode());
         if (!resources.isEmpty()) {
             Resource resource = resources.get(0);
             mccc.setResourceId(resource);
+        } else {
+            return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
         }
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
@@ -90,7 +91,7 @@ public class McccController {
 
         mccc.setYear(4);
         mccc.setSemester(9);
-        mcccService.saveMccc(mccc);
+        mcccService.save(mccc);
 
         return ResponseEntity.ok("MCCC sauvegardée avec succès !");
     }
@@ -98,7 +99,6 @@ public class McccController {
     @Nullable
     private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccResponse dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
         List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
-        ErpBackApplication.LOGGER.info("Acs : " + acs);
         for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
@@ -137,9 +137,19 @@ public class McccController {
     private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRank learningRank, Rank correspondedRank) {
         List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
         for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning : criticalLearnings) {
-            CriticalLearning newCriticalLearning = new CriticalLearning(criticalLearning, correspondedRank);
+            CriticalLearning newCriticalLearning = verifyPresenceOfCriticalLearning(criticalLearning, correspondedRank);
             setAcs.add(newCriticalLearning);
-            criticalLearningService.save(newCriticalLearning);
+        }
+    }
+
+
+    @NotNull
+    private CriticalLearning verifyPresenceOfCriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rank) {
+        List<CriticalLearning> criticalLearnings = criticalLearningService.getCriticalLearningsWithNumAndTitleAndRank(criticalLearning.learningNum(), criticalLearning.learningTitle(), rank);
+        if (criticalLearnings.isEmpty()) {
+            return new CriticalLearning(criticalLearning, rank);
+        } else {
+            return criticalLearnings.get(0);
         }
     }
 
@@ -153,7 +163,6 @@ public class McccController {
                 setSae.add(correspondedSaes.get(0));
             } else {
                 Sae newSae = new Sae(sae);
-                saeService.save(newSae);
                 setSae.add(newSae);
             }
         }
@@ -170,7 +179,6 @@ public class McccController {
                 setTeacher.add(correspondedTeachers.get(0));
             } else {
                 Teacher newTeacher = new Teacher(teacher);
-                teacherService.save(newTeacher);
                 setTeacher.add(newTeacher);
             }
         }
@@ -181,9 +189,7 @@ public class McccController {
     private HourlyVolume getHourlyVolumeFromDto(McccResponse dto) {
         List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
         if (hourlyVolumes.isEmpty()) {
-            HourlyVolume hourlyVolume = new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
-            hourlyVolumeService.save(hourlyVolume);
-            return hourlyVolume;
+            return new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
         }
         HourlyVolume hourlyVolume = hourlyVolumes.get(0);
         hourlyVolume.setNbHoursCM(dto.getHoursCM());
