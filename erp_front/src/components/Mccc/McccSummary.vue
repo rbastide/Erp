@@ -185,7 +185,7 @@ const getGroupsForUE = (ueName) => {
     </div>
 
     <div class="container-btn">
-      <button @click="handleValider" class="btn-sys btn-validate">Valider la fiche</button>
+      <button @click="handleValider" class="btn-sys btn-validate">Valider</button>
       <button @click="handleRetour" class="btn-sys btn-cancel">Annuler</button>
     </div>
   </main>
