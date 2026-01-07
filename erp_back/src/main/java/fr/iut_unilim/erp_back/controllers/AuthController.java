@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +22,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final ConnectionRepository connectionRepository;
+    private final ConnectionService connectionService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(ConnectionRepository connectionRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
         this.connectionRepository = connectionRepository;
+        this.connectionService = connectionService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
@@ -62,5 +65,10 @@ public class AuthController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getUsers() {
+        return ResponseEntity.ok(connectionService.getAllConnections());
     }
 }

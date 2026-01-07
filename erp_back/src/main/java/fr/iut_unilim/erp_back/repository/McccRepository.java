@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface McccRepository extends JpaRepository<Mccc, McccId> {
-    Mccc findByMcccId(McccId mcccId);
 }
