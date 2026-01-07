@@ -59,6 +59,7 @@ body.dark-mode .card-action,
 body.dark-mode .skill-card,
 body.dark-mode .login-card,
 body.dark-mode .logout-card,
+body.dark-mode .warning-card,
 body.dark-mode .setting-card,
 body.dark-mode .help-card,
 body.dark-mode .sae-card,
@@ -69,7 +70,10 @@ body.dark-mode .big-square,
 body.dark-mode .semester-column,
 body.dark-mode .form-card,
 body.dark-mode .push-button,
-body.dark-mode .version-item {
+body.dark-mode .version-item,
+body.dark-mode .card,
+body.dark-mode .summary,
+body.dark-mode .info-footer {
   background-color: #333333 !important;
   border-color: #444444 !important;
   color: #ffffff !important;
@@ -119,7 +123,12 @@ body.dark-mode .text-button,
 body.dark-mode .version-code,
 body.dark-mode .text,
 body.dark-mode .highlight,
-body.dark-mode .title-centered {
+body.dark-mode .title-centered,
+body.dark-mode .section-header,
+body.dark-mode .summary-code,
+body.dark-mode .footer-value,
+body.dark-mode .total-number,
+body.dark-mode .ac-tag {
   color: #ef5350 !important;
 }
 
@@ -132,7 +141,9 @@ body.dark-mode .resume-item,
 body.dark-mode .lvl-desc,
 body.dark-mode .sub-text-button,
 body.dark-mode .ac-list li,
-body.dark-mode .no-result {
+body.dark-mode .no-result,
+body.dark-mode .summary-label,
+body.dark-mode .footer-label {
   color: #bbbbbb !important;
 }
 
@@ -201,7 +212,14 @@ body.dark-mode .lvl-data {
 }
 
 body.dark-mode .competence-table th {
-  background-color: #d32f2f !important;
+  background-color: #2a2a2a !important;
+  color: #ef5350 !important;
+  border-bottom-color: #444 !important;
+}
+
+body.dark-mode .competence-table td {
+  border-bottom-color: #444 !important;
+  color: #cccccc !important;
 }
 
 body.dark-mode .btn-sys,
@@ -210,10 +228,23 @@ body.dark-mode .btn-new-user,
 body.dark-mode .btn-retour,
 body.dark-mode .login-button,
 body.dark-mode .btn-primary,
-body.dark-mode .save-btn {
+body.dark-mode .save-btn,
+body.dark-mode .btn-validate {
   background-color: #d32f2f !important;
   color: #fff !important;
   border: none !important;
+}
+
+body.dark-mode .btn-sys.primary {
+  background: linear-gradient(135deg, #c62828 0%, #ef5350 100%) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .btn-sys.secondary,
+body.dark-mode .btn-cancel {
+  background-color: #444444 !important;
+  color: #ffffff !important;
+  border: 1px solid #555555 !important;
 }
 
 body.dark-mode .btn-sys:hover,
@@ -225,6 +256,12 @@ body.dark-mode .btn-primary:hover,
 body.dark-mode .save-btn:hover {
   background-color: #ef5350 !important;
   transform: translateY(-2px);
+}
+
+body.dark-mode .btn-sys.secondary:hover,
+body.dark-mode .btn-cancel:hover {
+  background-color: #555555 !important;
+  color: #ef5350 !important;
 }
 
 body.dark-mode .btn-non,
@@ -309,36 +346,15 @@ body.dark-mode .sidebar.expanded .nav-text{
   color: #ef5350 !important;
 }
 
-body.dark-mode .card,
-body.dark-mode .summary,
-body.dark-mode .info-footer {
-  background-color: #333333 !important;
-  color: #e0e0e0 !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-  border: 1px solid #444 !important;
-}
-
-body.dark-mode .section-header {
-  color: #ef5350 !important;
-  border-bottom-color: #444 !important;
-}
 body.dark-mode .section-main-title {
   color: #ffffff !important;
-}
-body.dark-mode .summary-label,
-body.dark-mode .footer-label {
-  color: #bbbbbb !important;
-}
-body.dark-mode .summary-code,
-body.dark-mode .footer-value,
-body.dark-mode .total-number {
-  color: #ef5350 !important;
 }
 
 body.dark-mode .hour-badge {
   background-color: #444444 !important;
   color: #ffffff !important;
 }
+
 body.dark-mode .sae-chip {
   background-color: rgba(239, 83, 80, 0.15) !important;
   color: #ef5350 !important;
@@ -356,19 +372,6 @@ body.dark-mode .ue-prefix {
   background-color: rgba(0,0,0,0.3) !important;
 }
 
-body.dark-mode .competence-table th {
-  background-color: #2a2a2a !important;
-  color: #ef5350 !important;
-  border-bottom-color: #444 !important;
-}
-body.dark-mode .competence-table td {
-  border-bottom-color: #444 !important;
-  color: #cccccc !important;
-}
-body.dark-mode .lvl-number {
-  background-color: #2e2e2e !important;
-  border-right-color: #444 !important;
-}
 body.dark-mode .circle-number {
   background-color: #ef5350 !important;
   color: #ffffff !important;
@@ -377,24 +380,7 @@ body.dark-mode .empty-table {
   color: #777 !important;
 }
 
-body.dark-mode .ac-tag {
-  color: #ef5350 !important;
-}
 body.dark-mode .total-separator {
   background-color: #444 !important;
-}
-
-body.dark-mode .btn-validate {
-  background: linear-gradient(135deg, #c62828 0%, #ef5350 100%) !important;
-  color: #ffffff !important;
-}
-body.dark-mode .btn-cancel {
-  background-color: #444444 !important;
-  color: #ffffff !important;
-  border-color: #555555 !important;
-}
-body.dark-mode .btn-cancel:hover {
-  background-color: #555555 !important;
-  color: #ef5350 !important;
 }
 </style>
