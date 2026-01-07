@@ -6,12 +6,12 @@
   const router = useRouter();
 
   const handleRetour = () => {
-    router.back();
+    router.push("/home-admin");
   };
 </script>
 
 <template>
-  <Sidebar :dashboard="false" :dashboardAdmin="true"/>
+  <Sidebar/>
   <AppHeader title="Information"/>
   <main class="main-content">
     <p class="text">Une erreur est survenue !</p>
