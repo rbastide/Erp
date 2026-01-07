@@ -30,7 +30,7 @@ const handleSave = () => {
 </script>
 
 <template>
-  <Sidebar :settings="true" />
+  <Sidebar :settingsActive="true" />
   <AppHeader title="Paramètres" />
 
   <div class="main-content">
