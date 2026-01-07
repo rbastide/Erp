@@ -15,7 +15,7 @@ public class ResourceService {
         this.resourceRepository = resourceRepository;
     }
 
-    public List<Resource> getFromName(String name) {
-        return resourceRepository.findByName(name);
+    public List<Resource> getFromNum(String num) {
+        return resourceRepository.findByNum(num);
     }
 }

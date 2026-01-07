@@ -14,13 +14,11 @@ public class McccResponse {
     private int hoursTP;
     private int hoursDS;
     private int hoursDSTP;
-    private int hoursTotal;
 
     private String creationDate;
     private String editDate;
 
     private List<SAE> saeCodes;
-    private String[] ue;
 
     private List<LearningRank> acsGrouped;
 
@@ -50,10 +48,6 @@ public class McccResponse {
         return hoursDSTP;
     }
 
-    public int getHoursTotal() {
-        return hoursTotal;
-    }
-
     public String getCreationDate() {
         return creationDate;
     }
@@ -64,10 +58,6 @@ public class McccResponse {
 
     public List<SAE> getSaeCodes() {
         return saeCodes;
-    }
-
-    public String[] getUe() {
-        return ue;
     }
 
     public List<LearningRank> getAcsGrouped() {

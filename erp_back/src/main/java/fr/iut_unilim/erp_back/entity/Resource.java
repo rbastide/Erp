@@ -18,6 +18,9 @@ public class Resource {
     @Column(name = "name")
     private String name;
 
+    @Column(name="semester")
+    private int semester;
+
     public Resource() {
     }
 
