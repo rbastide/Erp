@@ -10,7 +10,6 @@ import DeconnexionPage from './components/Information/DeconnexionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
-import UserSavePage from "./components/Information/UserSavePage.vue";
 import CancelPageBackToDashboard from "./components/Information/CancelPageBackToDashboard.vue";
 import CancelPageMccc from "./components/Information/CancelPageMccc.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
@@ -91,11 +90,6 @@ const routes = [
         path: '/fillRessourcePage',
         name: 'FilRessourcePage',
         component: FillRessourcePage
-    },
-    {
-        path: '/userSave',
-        name: 'UserSavePage',
-        component: UserSavePage
     },
     {
         path: '/cancel',
