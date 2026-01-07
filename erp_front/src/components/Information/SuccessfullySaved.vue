@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
+import {ref} from "vue";
 
 const router = useRouter();
+const userRole = ref('');
 
 const handleRetour = () => {
-  router.back();
+  if (userRole.value === 'admin') {
+    router.push('/home-admin');
+  } else {
+    router.push('/home');
+  }
 };
 
 </script>
