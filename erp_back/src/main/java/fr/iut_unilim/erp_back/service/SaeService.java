@@ -16,6 +16,8 @@ public class SaeService {
         this.saeRepository = saeRepository;
     }
 
+    public List<Sae> getAllSaes() { return saeRepository.findAll(); }
+
     public List<Sae> getSaeByNum(String num) {
         return saeRepository.findByNum(num);
     }

@@ -34,7 +34,7 @@ const blockNonNumeric = (e) => {
   }
 };
 
-const handleRetour = () => router.back();
+const handleRetour = () => router.push('/cancel');
 const handleValider = () => router.push('/modif-saved');
 
 const handleDelete = (index) => {
