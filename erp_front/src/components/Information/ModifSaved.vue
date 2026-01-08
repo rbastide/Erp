@@ -8,13 +8,15 @@ const router = useRouter();
 const userRole = ref('');
 
 onMounted(() => {
-  userRole.value = localStorage.getItem('user_role') || 'user';
+  // 1. Récupération et normalisation comme dans Sidebar.vue
+  const role = localStorage.getItem('user_role');
+  userRole.value = role ? role.toUpperCase() : 'USER';
 });
-console.log(userRole.value);
 
 const handleRetour = () => {
-  if(userRole.value === 'admin'){
-    router.push('/home-admin')
+  // 2. Test robuste sur les différents types d'admin possibles
+  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
+    router.push('/home-admin');
   }
   else {
     router.push('/home');
@@ -56,7 +58,7 @@ const handleRetour = () => {
 </template>
 
 <style scoped>
-/* --- Layout Global (Identique aux autres pages) --- */
+/* --- Layout Global --- */
 .screen-layout {
   display: flex;
   flex-direction: column;
@@ -75,7 +77,7 @@ const handleRetour = () => {
 
 .main-content {
   flex: 1;
-  margin-left: 80px; /* Espace pour la sidebar */
+  margin-left: 80px;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -115,7 +117,6 @@ const handleRetour = () => {
   margin-bottom: 30px;
 }
 
-/* Spécifique au succès : Vert */
 .icon-circle.success {
   background: rgba(76, 175, 80, 0.1);
   color: #4CAF50;
