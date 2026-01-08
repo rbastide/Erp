@@ -22,7 +22,7 @@ import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
 import McccCompetences from "./components/Mccc/McccCompetences.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
-import CompetencesCreatingPage from "./components/Admin/CompetencesCreatingPage.vue";
+import SkillsGestion from "./components/Admin/SkillsGestion.vue";
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
 import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
@@ -154,7 +154,7 @@ const routes = [
     {
         path: '/competence-creating',
         name: 'CompetencesCreatingPage',
-        component: CompetencesCreatingPage
+        component: SkillsGestion
     },
     {
         path: '/ressource-sheet-history',
