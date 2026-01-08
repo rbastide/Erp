@@ -4,7 +4,6 @@ import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.*;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
-import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +18,8 @@ public class ResourceSheetController {
     private final ResourceSheetRepository resourceSheetRepository;
     private final SaeRepository saeRepository;
     private final ResourceRepository resourceRepository;
-    private final TeacherRepository  teacherRepository;
-    private final HourlyVolumeRepository  hourlyVolumeRepository;
+    private final TeacherRepository teacherRepository;
+    private final HourlyVolumeRepository hourlyVolumeRepository;
     private final PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository;
     private final StudentsFeedbacksRepository studentsFeedbacksRepository;
     private final ImprovementIdeasRepository improvementIdeasRepository;
@@ -48,11 +47,10 @@ public class ResourceSheetController {
         for (ResourceSheetRequest resSheet : resSheetList) {
 
             Optional<ResourceSheet> existingResourceSheet = resourceSheetRepository.findById(resSheet.getSheetsID());
-            if(existingResourceSheet.isPresent()) {
+            if (existingResourceSheet.isPresent()) {
                 ResourceSheet resourceSheetToUpdate = existingResourceSheet.get();
                 Setter(resSheet, resourceSheetToUpdate);
-            }
-            else{
+            } else {
                 ResourceSheet newResourceSheet = new ResourceSheet();
                 Setter(resSheet, newResourceSheet);
             }
@@ -173,5 +171,14 @@ public class ResourceSheetController {
         }
 
         resourceSheetRepository.save(sheet);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
+        if (!resourceSheetRepository.existsById(id)) {
+            return ResponseEntity.ok().build();
+        }
+        resourceSheetRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
