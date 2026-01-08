@@ -1,89 +1,125 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 
-const saes = reactive([
-  { id: 'SAE 1.01', title: 'Implémenter un besoin client' },
-  { id: 'SAE 1.02', title: 'Comparaison d\'algorithmes' }
-]);
-
+const saes = ref([]);
 const editingIndex = ref(null);
 const showAddForm = ref(false);
+const searchQuery = ref('');
 
 const newSae = reactive({
-  id: '',
+  num: '',
   title: ''
 });
 
 const editedSae = reactive({
-  id: '',
+  saeID: null,
+  num: '',
   title: ''
 });
 
-const handleRetour = () => {
-  router.push('/cancel');
+const fetchSaes = async () => {
+  try {
+    const response = await api.get('/sae/getAllSae');
+    if (Array.isArray(response.data)) {
+      saes.value = response.data;
+    } else if (response.data && Array.isArray(response.data.content)) {
+      saes.value = response.data.content;
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-const handleValider = () => {
-  router.push('/modif-saved');
+onMounted(fetchSaes);
+
+const filteredSaes = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return saes.value;
+  return saes.value.filter(sae =>
+      (sae.num && sae.num.toLowerCase().includes(query)) ||
+      (sae.title && sae.title.toLowerCase().includes(query))
+  );
+});
+
+const handleRetour = () => router.push('/home-admin');
+const handleValider = () => router.push('/modif-saved');
+
+const handleAddSae = () => {
+  showAddForm.value = true;
+  editingIndex.value = null;
+  newSae.num = '';
+  newSae.title = '';
 };
 
-const handleDelete = (index) => {
-  if(confirm("Supprimer cette SAE ?")) {
-    saes.splice(index, 1);
+const handleModif = (sae, index) => {
+  if (editingIndex.value === index) {
+    handleCancel();
+  } else {
+    showAddForm.value = false;
+    editingIndex.value = index;
+
+    editedSae.saeID = sae.saeID;
+    editedSae.num = sae.num;
+    editedSae.title = sae.title;
   }
 };
 
 const handleCancel = () => {
   editingIndex.value = null;
   showAddForm.value = false;
-  newSae.id = '';
-  newSae.title = '';
-  editedSae.id = '';
+  editedSae.saeID = null;
+  editedSae.num = '';
   editedSae.title = '';
 };
 
-const handleAddSae = () => {
-  showAddForm.value = true;
-  editingIndex.value = null;
-};
-
-const addSaeToList = () => {
-  if (newSae.id.trim() !== '' && newSae.title.trim() !== '') {
-    saes.push({
-      id: newSae.id.trim(),
-      title: newSae.title.trim()
-    });
-    showAddForm.value = false;
-    newSae.id = '';
-    newSae.title = '';
-  } else {
-    alert("Veuillez remplir le 'Numéro de la SAE' et l''Intitulé'.");
+const handleDelete = async (saeID) => {
+  if(confirm("Voulez-vous vraiment supprimer cette SAE ?")) {
+    try {
+      if (saeID) {
+        await api.delete(`/sae/${saeID}`);
+      }
+      const indexToDelete = saes.value.findIndex(s => s.saeID === saeID);
+      if (indexToDelete !== -1) {
+        saes.value.splice(indexToDelete, 1);
+      }
+      handleCancel();
+    } catch (error) {
+      console.error(error);
+      alert("Erreur lors de la suppression.");
+    }
   }
 };
 
-const handleModif = (index) => {
-  if (editingIndex.value === index) {
-    handleCancel();
-  } else {
-    showAddForm.value = false;
-    editingIndex.value = index;
-    editedSae.id = saes[index].id;
-    editedSae.title = saes[index].title;
-  }
-};
+const saveSae = async (isNew = false) => {
+  const saeObject = isNew
+      ? { saeID: 0, num: newSae.num, title: newSae.title }
+      : { saeID: editedSae.saeID, num: editedSae.num, title: editedSae.title };
 
-const saveModification = (index) => {
-  if (editedSae.id.trim() !== '' && editedSae.title.trim() !== '') {
-    saes[index].id = editedSae.id.trim();
-    saes[index].title = editedSae.title.trim();
-    editingIndex.value = null;
-  } else {
-    alert("Veuillez remplir le 'Numéro de la SAE' et l''Intitulé'.");
+  if (!saeObject.num.trim() || !saeObject.title.trim()) {
+    alert("Veuillez remplir le Numéro (ex: S2.01) et l'Intitulé.");
+    return;
+  }
+
+  try {
+    await api.post('/sae/addSae', [ saeObject ]);
+    await fetchSaes();
+
+    if (isNew) {
+      showAddForm.value = false;
+      newSae.num = '';
+      newSae.title = '';
+    } else {
+      editingIndex.value = null;
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Erreur lors de l'enregistrement.");
   }
 };
 </script>
@@ -94,48 +130,18 @@ const saveModification = (index) => {
     <AppHeader title="Gestion des SAE"/>
 
     <main class="main-content">
+
+      <div v-if="saes.length === 0 && !showAddForm" class="empty-state">
+        Aucune SAE trouvée ou chargement en cours...
+      </div>
+
       <div class="grid-container">
 
-        <div v-for="(sae, index) in saes" :key="index" class="resource-card" :class="{ 'is-editing': editingIndex === index }">
-
-          <div v-if="editingIndex !== index" class="card-content view-mode">
-
-            <div class="icon-circle big-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.4388 7L14.8387 4H7V10H14.8387L12.4388 7ZM19 12H7V22H5V2H19L15 7L19 12Z" fill="currentColor"/></svg>
-            </div>
-
-            <h3 class="resource-id">{{ sae.id }}</h3>
-            <p class="resource-title">{{ sae.title }}</p>
-
-            <div class="card-actions">
-              <button class="action-btn edit" @click="handleModif(index)" title="Modifier">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="action-btn delete" @click="handleDelete(index)" title="Supprimer">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
+        <div v-if="!showAddForm && searchQuery === ''" class="resource-card add-card" @click="handleAddSae">
+          <div class="icon-circle plus">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </div>
-
-          <div v-else class="card-content edit-mode">
-            <div class="edit-header">
-              <h4>Modifier {{ editedSae.id }}</h4>
-              <button class="close-icon" @click="handleCancel">✕</button>
-            </div>
-
-            <div class="input-group">
-              <input type="text" v-model="editedSae.id" placeholder="Numéro (ex: SAE 1.01)" class="card-input">
-            </div>
-
-            <div class="input-group">
-              <input type="text" v-model="editedSae.title" placeholder="Intitulé" class="card-input">
-            </div>
-
-            <button class="save-btn" @click="saveModification(index)">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              Enregistrer
-            </button>
-          </div>
+          <p>Ajouter une SAE</p>
         </div>
 
         <div v-if="showAddForm" class="resource-card is-editing">
@@ -144,37 +150,75 @@ const saveModification = (index) => {
               <h4>Nouvelle SAE</h4>
               <button class="close-icon" @click="handleCancel">✕</button>
             </div>
-
             <div class="input-group">
-              <input type="text" v-model="newSae.id" placeholder="Numéro (ex: SAE 1.01)" class="card-input">
+              <label class="input-label">Numéro SAE</label>
+              <input type="text" v-model="newSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="5">
             </div>
-
             <div class="input-group">
-              <input type="text" v-model="newSae.title" placeholder="Intitulé" class="card-input">
+              <label class="input-label">Intitulé</label>
+              <input type="text" v-model="newSae.title" placeholder="Ex: Découverte..." class="card-input">
             </div>
-
-            <button class="save-btn" @click="addSaeToList">
+            <button class="save-btn" @click="saveSae(true)">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               Ajouter
             </button>
           </div>
         </div>
 
-        <div v-else class="resource-card add-card" @click="handleAddSae">
-          <div class="icon-circle plus">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <div v-for="(sae, index) in filteredSaes" :key="sae.saeID || index" class="resource-card" :class="{ 'is-editing': editingIndex === index }">
+
+          <div v-if="editingIndex !== index" class="card-content view-mode">
+            <div class="icon-circle big-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.4388 7L14.8387 4H7V10H14.8387L12.4388 7ZM19 12H7V22H5V2H19L15 7L19 12Z" fill="currentColor"/></svg>
+            </div>
+            <h3 class="resource-id">{{ sae.num }}</h3>
+            <p class="resource-title">{{ sae.title }}</p>
+            <div class="card-actions">
+              <button class="action-btn edit" @click="handleModif(sae, index)" title="Modifier">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="action-btn delete" @click="handleDelete(sae.saeID)" title="Supprimer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
           </div>
-          <p>Ajouter une SAE</p>
+
+          <div v-else class="card-content edit-mode">
+            <div class="edit-header">
+              <h4>Modification</h4>
+              <button class="close-icon" @click="handleCancel">✕</button>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Numéro SAE</label>
+              <input type="text" v-model="editedSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="5">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Intitulé</label>
+              <input type="text" v-model="editedSae.title" placeholder="Ex: Implémenter..." class="card-input">
+            </div>
+            <button class="save-btn" @click="saveSae(false)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Enregistrer
+            </button>
+          </div>
         </div>
 
       </div>
-
-      <div class="global-actions">
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
-        <button @click="handleRetour" class="btn-sys secondary">Retour</button>
-      </div>
-
     </main>
+
+    <footer class="sticky-bar">
+      <div class="sticky-wrapper">
+        <div class="search-container">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" v-model="searchQuery" placeholder="Rechercher une SAE..." class="search-input" />
+        </div>
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+      </div>
+    </footer>
+
   </div>
 </template>
 
@@ -183,6 +227,7 @@ const saveModification = (index) => {
   min-height: 100vh;
   background-color: #f8f9fa;
   font-family: 'Roboto', sans-serif;
+  padding-bottom: 100px;
 }
 
 .main-content {
@@ -200,6 +245,13 @@ const saveModification = (index) => {
   width: 100%;
   max-width: 1200px;
   margin-bottom: 50px;
+}
+
+.empty-state {
+  margin-bottom: 30px;
+  font-size: 18px;
+  color: #999;
+  font-style: italic;
 }
 
 .resource-card {
@@ -323,11 +375,7 @@ const saveModification = (index) => {
   padding-bottom: 10px;
 }
 
-.edit-header h4 {
-  margin: 0;
-  color: #B51621;
-  font-size: 20px;
-}
+.edit-header h4 { margin: 0; color: #B51621; font-size: 20px; }
 
 .close-icon {
   background: none;
@@ -339,9 +387,8 @@ const saveModification = (index) => {
 }
 .close-icon:hover { color: #333; }
 
-.input-group {
-  width: 100%;
-}
+.input-group { width: 100%; text-align: left; }
+.input-label { display: block; font-size: 12px; color: #888; font-weight: bold; margin-bottom: 5px; margin-left: 5px; }
 
 .card-input {
   width: 100%;
@@ -353,11 +400,7 @@ const saveModification = (index) => {
   font-family: 'Roboto', sans-serif;
   transition: border-color 0.3s;
 }
-
-.card-input:focus {
-  outline: none;
-  border-color: #B51621;
-}
+.card-input:focus { outline: none; border-color: #B51621; }
 
 .save-btn {
   margin-top: 15px;
@@ -376,11 +419,7 @@ const saveModification = (index) => {
   font-size: 16px;
   transition: background 0.3s, transform 0.2s;
 }
-
-.save-btn:hover {
-  background: #94121b;
-  transform: translateY(-2px);
-}
+.save-btn:hover { background: #94121b; transform: translateY(-2px); }
 
 .add-card {
   border: 3px dashed #e0e0e0;
@@ -401,10 +440,7 @@ const saveModification = (index) => {
   font-size: 20px;
   transition: color 0.3s;
 }
-
-.add-card:hover p {
-  color: #B51621;
-}
+.add-card:hover p { color: #B51621; }
 
 .icon-circle.plus {
   width: 80px;
@@ -413,58 +449,62 @@ const saveModification = (index) => {
   background: #e0e0e0;
   margin-bottom: 15px;
 }
-
 .add-card:hover .icon-circle.plus {
   background: #B51621;
   color: white;
   transform: scale(1.1);
 }
 
-.global-actions {
+.sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+  padding: 12px 0;
+  z-index: 100;
+}
+
+.sticky-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
-  gap: 25px;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
 }
 
-.btn-sys {
-  padding: 15px 40px;
-  border-radius: 50px;
-  border: none;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.5px;
-}
-
-.btn-sys:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-}
+.search-container { position: relative; width: 320px; }
+.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+.search-input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 50px; border: 1px solid #ddd; outline: none; font-size: 14px; }
 
 .btn-sys.primary {
   background: linear-gradient(135deg, #B51621 0%, #d92533 100%);
   color: white;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  min-width: 160px;
+  font-size: 15px;
 }
-
 .btn-sys.primary:hover {
   background: linear-gradient(135deg, #94121b 0%, #B51621 100%);
-}
-
-.btn-sys.secondary {
-  background-color: white;
-  color: #555;
-  border: 2px solid #e0e0e0;
-}
-.btn-sys.secondary:hover {
-  border-color: #ccc;
-  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(181, 22, 33, 0.3);
 }
 
 @media (max-width: 600px) {
   .grid-container {
     grid-template-columns: 1fr;
   }
+  .sticky-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-container { width: 100%; }
+  .btn-sys.primary { width: 100%; }
 }
 </style>
