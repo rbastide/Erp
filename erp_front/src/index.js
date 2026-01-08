@@ -5,7 +5,7 @@ import HomePage from './components/User/HomePage.vue';
 import HistoryPage from './components/RessourcePage/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
-import ServicesPage from './components/App/ServiceAidePage.vue';
+import HelpPage from './components/App/HelpPage.vue';
 import DeconnexionPage from './components/Information/DeconnexionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
@@ -24,7 +24,7 @@ import McccCompetences from "./components/Mccc/McccCompetences.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
 import SkillsGestion from "./components/Admin/SkillsGestion.vue";
 import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
-import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
+import ResourcesGestion from "./components/Admin/ResourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
 import SaeGestion from "./components/Admin/SaeGestion.vue";
 import Settings from "./components/App/Settings.vue";
@@ -69,7 +69,7 @@ const routes = [
     {
         path: '/aide',
         name: 'ServicePage',
-        component: ServicesPage
+        component: HelpPage
     },
     {
         path: '/deconnexion',
@@ -164,7 +164,7 @@ const routes = [
     {
         path: '/resources-gestion',
         name: 'RessourcesGestion',
-        component: RessourcesGestion
+        component: ResourcesGestion
     },
     {
         path: '/users-gestion',
