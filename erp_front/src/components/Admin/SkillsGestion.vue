@@ -21,7 +21,10 @@ const competencesFinalisees = ref([
       {
         num: "Niveau 1",
         intitule: "Développer des applications informatiques simples",
-        acs: ["AC11.01: Implémenter une conception", "AC11.02: Tester les applications"]
+        acs: [
+          { num: "11.01", intitule: "Implémenter une conception" },
+          { num: "11.02", intitule: "Tester les applications" }
+        ]
       }
     ]
   }
@@ -79,7 +82,10 @@ const handleSaveNewCompetence = () => {
       .map((n, index) => {
         const acsFiltres = n.acs
             .filter(ac => ac.num.trim() !== '' && ac.intitule.trim() !== '')
-            .map(ac => `AC${ac.num}: ${ac.intitule.trim()}`);
+            .map(ac => ({
+              num: ac.num.trim(),
+              intitule: ac.intitule.trim()
+            }));
 
         return {
           num: `Niveau ${index + 1}`,
@@ -122,11 +128,10 @@ const handleModif = (index) => {
   const niveauxEditable = original.niveaux.map(n => {
     return {
       intitule: n.intitule,
-      acs: n.acs.map(acString => {
-        const parts = acString.split(': ');
-        const acNumClean = parts[0].replace('AC', '');
-        return { num: acNumClean, intitule: parts[1] || '' };
-      })
+      acs: n.acs.map(ac => ({
+        num: ac.num,
+        intitule: ac.intitule
+      }))
     };
   });
 
@@ -157,7 +162,10 @@ const saveModification = (index) => {
       .map((n, i) => {
         const acsFormatted = n.acs
             .filter(ac => ac.num.trim() && ac.intitule.trim())
-            .map(ac => `AC${ac.num}: ${ac.intitule.trim()}`);
+            .map(ac => ({
+              num: ac.num.trim(),
+              intitule: ac.intitule.trim()
+            }));
 
         return {
           num: `Niveau ${i + 1}`,
@@ -222,7 +230,7 @@ const removeAcFromEdit = (lvlIndex, acIndex) => {
                 <p class="level-title">{{ niveau.num }}: {{ niveau.intitule }}</p>
                 <ul class="ac-list">
                   <li v-for="(ac, aIndex) in niveau.acs" :key="'a-' + index + '-' + nIndex + '-' + aIndex">
-                    {{ ac }}
+                    AC{{ ac.num }}: {{ ac.intitule }}
                   </li>
                 </ul>
               </div>
