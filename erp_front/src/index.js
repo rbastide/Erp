@@ -1,30 +1,30 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
-import RessourcePage from './components/RessourcePage/RessourcePage.vue';
+import ResourcePage from '@/components/ResourceSheet/ResourcePage.vue';
 import HomePage from './components/User/HomePage.vue';
-import HistoryPage from './components/RessourcePage/HistoryPage.vue';
+import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
-import ServicesPage from './components/App/ServiceAidePage.vue';
-import DeconnexionPage from './components/Information/DeconnexionPage.vue';
+import HelpPage from './components/App/HelpPage.vue';
+import DeconnectionPage from './components/Information/DeconnectionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
-import FillRessourcePage from "./components/RessourcePage/FillRessourcePage.vue";
+import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
 import CancelPageBackToDashboard from "./components/Information/CancelPageBackToDashboard.vue";
 import CancelPageMccc from "./components/Information/CancelPageMccc.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletePage from "./components/Information/SuccessfullyDelete.vue";
-import McccRessourcePage from "./components/Mccc/McccRessourcePage.vue";
+import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
 import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
 import ModifSaved from "./components/Information/ModifSaved.vue";
 import McccMenuPage from "./components/Mccc/McccMenuPage.vue";
 import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
-import McccCompetences from "./components/Mccc/McccCompetences.vue";
+import McccSkills from "./components/Mccc/McccSkills.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
 import SkillsGestion from "./components/Admin/SkillsGestion.vue";
-import RessourceSheetHistory from "./components/RessourcePage/RessourceSheetHistory.vue";
-import RessourcesGestion from "./components/Admin/RessourcesGestion.vue";
+import ResourceSheetHistory from "@/components/ResourceSheet/ResourceSheetHistory.vue";
+import ResourcesGestion from "./components/Admin/ResourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
 import SaeGestion from "./components/Admin/SaeGestion.vue";
 import Settings from "./components/App/Settings.vue";
@@ -43,8 +43,8 @@ const routes = [
     },
     {
         path: '/ressource',
-        name: 'Ressource',
-        component: RessourcePage
+        name: 'Resource',
+        component: ResourcePage
     },
     {
         path:'/history',
@@ -68,13 +68,13 @@ const routes = [
     },
     {
         path: '/aide',
-        name: 'ServicePage',
-        component: ServicesPage
+        name: 'HelpPage',
+        component: HelpPage
     },
     {
         path: '/deconnexion',
-        name: 'DeconnexionPage',
-        component: DeconnexionPage
+        name: 'DeconnectionPage',
+        component: DeconnectionPage
     },
     {
         path: '/errorSave',
@@ -88,8 +88,8 @@ const routes = [
     },
     {
         path: '/fillRessourcePage',
-        name: 'FilRessourcePage',
-        component: FillRessourcePage
+        name: 'FillResourceSheet',
+        component: FillResourceSheet
     },
     {
         path: '/cancel',
@@ -118,8 +118,8 @@ const routes = [
     },
     {
         path: '/mccc-ressource',
-        name: 'McccRessourcePage',
-        component: McccRessourcePage
+        name: 'McccResourcePage',
+        component: McccResourcePage
     },
     {
         path: '/mccc-hours',
@@ -143,8 +143,8 @@ const routes = [
     },
     {
         path: '/mccc-competences',
-        name: 'McccCompetencesPage',
-        component: McccCompetences
+        name: 'McccSkillsPage',
+        component: McccSkills
     },
     {
         path: '/mccc-summary',
@@ -153,18 +153,18 @@ const routes = [
     },
     {
         path: '/competence-creating',
-        name: 'CompetencesCreatingPage',
+        name: 'SkillsGestionPage',
         component: SkillsGestion
     },
     {
         path: '/ressource-sheet-history',
-        name: 'RessourceSheetHistory',
-        component: RessourceSheetHistory
+        name: 'ResourceSheetHistory',
+        component: ResourceSheetHistory
     },
     {
         path: '/resources-gestion',
-        name: 'RessourcesGestion',
-        component: RessourcesGestion
+        name: 'ResourcesGestion',
+        component: ResourcesGestion
     },
     {
         path: '/users-gestion',
