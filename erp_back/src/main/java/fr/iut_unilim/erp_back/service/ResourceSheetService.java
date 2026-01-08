@@ -17,4 +17,15 @@ public class ResourceSheetService {
     public List<ResourceSheet> getAllResourceSheets() {
         return resourceSheetRepository.findAll();
     }
+
+    public ResourceSheet addResourceSheet(ResourceSheet resourceSheet) {
+        return resourceSheetRepository.save(resourceSheet);
+    }
+
+    public void deleteResourceSheetById(Long id){
+        if(!resourceSheetRepository.existsById(id)){
+            return;
+        }
+        resourceSheetRepository.deleteById(id);
+    }
 }
