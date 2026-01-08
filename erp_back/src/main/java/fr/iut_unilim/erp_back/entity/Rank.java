@@ -2,8 +2,6 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "SkillRanks")
 public class Rank {
@@ -21,7 +19,7 @@ public class Rank {
     @Column(name = "rankTitle")
     private String rankTitle;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "skillID")
     private Skill skillID;
 

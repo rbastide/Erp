@@ -19,4 +19,8 @@ public class CriticalLearningService {
     public List<CriticalLearning> getCriticalLearningsWithNumAndTitleAndRank(int learningNum, String learningTitle, Rank rankID) {
         return criticalLearningRepository.findByLearningNumAndLearningTitleAndRankID(learningNum, learningTitle, rankID);
     }
+
+    public List<CriticalLearning> getAllCriticalLearning() {
+        return criticalLearningRepository.findAll();
+    }
 }
