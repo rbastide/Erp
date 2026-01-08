@@ -19,12 +19,11 @@ const handleLogin = async () => {
   };
 
   try {
-    await AuthService.login(credentials);
+    const userData = await AuthService.login(credentials);
 
-    const role = credentials.identifier === 'admin' ? 'admin' : 'user';
-    localStorage.setItem('user_role', role);
+    const role = userData.role ? userData.role.toUpperCase() : 'USER';
 
-    if (role === 'admin') {
+    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
       await router.push('/home-admin');
     } else {
       await router.push('/home');
@@ -74,7 +73,6 @@ const handleLogin = async () => {
   border: 1px solid #dcdcdc;
   width: 100%;
   max-width: 400px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,12 +111,17 @@ const handleLogin = async () => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
 }
+
 .error-message {
   color: #B51621;
   background: #ffe6e6;
   padding: 10px;
+  border-radius: 4px;
   margin-bottom: 15px;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 </style>
