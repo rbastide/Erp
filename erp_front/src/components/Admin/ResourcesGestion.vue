@@ -1,247 +1,522 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
-
-// Données initiales incluant le semestre
-const resources = reactive([
-  { id: 'R1.01', title: 'Initiation au développement', semestre: 1 },
-  { id: 'R1.02', title: 'Développement interfaces', semestre: 1 }
-]);
-
+const resources = ref([]);
 const editingIndex = ref(null);
-const showAddForm = ref(false);
-
-const newResource = reactive({
-  id: '',
-  title: '',
-  semestre: null
-});
+const isAdding = ref(false);
+const searchQuery = ref('');
 
 const editedResource = reactive({
-  id: '',
-  title: '',
+  resourceID: null,
+  num: '',
+  name: '',
   semestre: null
 });
 
-// Empêche la saisie de caractères non numériques (e, +, -, ., ,)
-const blockNonNumeric = (e) => {
-  if (['e', 'E', '+', '-', '.', ','].includes(e.key)) {
-    e.preventDefault();
+const fetchResources = async () => {
+  try {
+    const response = await api.get('resources/resources');
+    resources.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
+  } catch (error) {
+    console.error(error);
   }
 };
 
-const handleRetour = () => router.push('/cancel');
-const handleValider = () => router.push('/modif-saved');
+onMounted(fetchResources);
 
-const handleDelete = (index) => {
-  if(confirm("Supprimer cette ressource ?")) {
-    resources.splice(index, 1);
+const filteredResources = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return resources.value;
+
+  if (query.startsWith('#')) {
+    const targetSem = query.substring(1);
+    if (!targetSem) return resources.value;
+    return resources.value.filter(res => {
+      const val = res.semestre || res.semester;
+      return val && val.toString() === targetSem;
+    });
   }
+
+  return resources.value.filter(res => {
+    const num = res.num ? res.num.toLowerCase() : '';
+    const name = res.name ? res.name.toLowerCase() : '';
+    return num.includes(query) || name.includes(query);
+  });
+});
+
+const handleDelete = async (resourceID, num) => {
+  if (confirm(`Supprimer la ressource ${num} ?`)) {
+    try {
+      await api.delete(`resources/${resourceID}`);
+      resources.value = resources.value.filter(res => res.resourceID !== resourceID);
+    } catch (error) {
+      alert("Erreur lors de la suppression.");
+    }
+  }
+};
+
+const saveResource = async () => {
+  if (!editedResource.num || !editedResource.name || editedResource.semestre === null) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  if (editedResource.num.length > 5) {
+    alert("Le code ne doit pas dépasser 5 caractères.");
+    return;
+  }
+
+  if (editedResource.semestre < 1) {
+    alert("Le semestre doit être au minimum 1.");
+    return;
+  }
+
+  const resourceData = {
+    num: editedResource.num,
+    name: editedResource.name,
+    semestre: parseInt(editedResource.semestre)
+  };
+
+  if (editedResource.resourceID !== null) {
+    resourceData.resourceID = editedResource.resourceID;
+  }
+
+  try {
+    await api.post('resources/editResource', [resourceData]);
+    await fetchResources();
+    handleCancel();
+  } catch (error) {
+    alert("Erreur lors de l'enregistrement.");
+  }
+};
+
+const handleModif = (resource, index) => {
+  isAdding.value = false;
+  editingIndex.value = index;
+  Object.assign(editedResource, {
+    resourceID: resource.resourceID,
+    num: resource.num,
+    name: resource.name,
+    semestre: resource.semestre || resource.semester
+  });
+};
+
+const handleAddResource = () => {
+  editingIndex.value = null;
+  isAdding.value = true;
+  Object.assign(editedResource, {
+    resourceID: null,
+    num: '',
+    name: '',
+    semestre: null
+  });
 };
 
 const handleCancel = () => {
   editingIndex.value = null;
-  showAddForm.value = false;
-  Object.assign(newResource, { id: '', title: '', semestre: null });
+  isAdding.value = false;
+  Object.assign(editedResource, {
+    resourceID: null,
+    num: '',
+    name: '',
+    semestre: null
+  });
 };
 
-const handleAddResource = () => {
-  showAddForm.value = true;
-  editingIndex.value = null;
-};
-
-const addResourceToList = () => {
-  if (newResource.id && newResource.title && newResource.semestre) {
-    resources.push({ ...newResource });
-    handleCancel();
-  } else {
-    alert("Veuillez remplir tous les champs (Numéro, Intitulé et Semestre).");
-  }
-};
-
-const handleModif = (index) => {
-  showAddForm.value = false;
-  editingIndex.value = index;
-  Object.assign(editedResource, resources[index]);
-};
-
-const saveModification = (index) => {
-  if (editedResource.id && editedResource.title && editedResource.semestre) {
-    resources[index] = { ...editedResource };
-    editingIndex.value = null;
-  } else {
-    alert("Veuillez remplir tous les champs.");
-  }
-};
+const handleValider = () => router.push('/home-admin');
 </script>
 
 <template>
-  <Sidebar/>
+  <Sidebar />
   <div class="page-container">
-    <AppHeader title="Gestion des ressources"/>
-
+    <AppHeader title="Gestion des ressources" />
     <main class="main-content">
       <div class="grid-container">
+        <div
+            v-if="!isAdding"
+            class="user-card add-card compact-add"
+            @click="handleAddResource"
+            v-show="searchQuery === ''"
+        >
+          <div class="icon-circle plus-circle">+</div>
+          <p class="add-label">Ajouter une ressource</p>
+        </div>
 
-        <div v-for="(resource, index) in resources" :key="index" class="resource-card" :class="{ 'is-editing': editingIndex === index }">
-
-          <div v-if="editingIndex !== index" class="card-content view-mode">
-            <div class="icon-circle big-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-            </div>
-
-            <h3 class="resource-id">{{ resource.id }}</h3>
-            <p class="resource-title">{{ resource.title }}</p>
-            <span class="semester-badge">Semestre {{ resource.semestre }}</span>
-
-            <div class="card-actions">
-              <button class="action-btn edit" @click="handleModif(index)" title="Modifier">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="action-btn delete" @click="handleDelete(index)" title="Supprimer">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
-          </div>
-
-          <div v-else class="card-content edit-mode">
+        <div v-if="isAdding || editingIndex !== null" class="user-card is-editing">
+          <div class="card-content edit-mode">
             <div class="edit-header">
-              <h4>Modifier {{ editedResource.id }}</h4>
+              <h4>{{ isAdding ? 'Nouvelle ressource' : 'Édition' }}</h4>
               <button class="close-icon" @click="handleCancel">✕</button>
             </div>
-
-            <div class="input-group">
-              <input type="text" v-model="editedResource.id" placeholder="Numéro (ex: R1.01)" class="card-input">
+            <div class="input-group-compact">
+              <label class="compact-label">Code (max 5)</label>
+              <input
+                  type="text"
+                  v-model="editedResource.num"
+                  class="card-input-compact"
+                  maxlength="5"
+                  placeholder="ex: R1.01"
+              >
             </div>
-
-            <div class="input-group">
-              <input type="text" v-model="editedResource.title" placeholder="Intitulé" class="card-input">
+            <div class="input-group-compact">
+              <label class="compact-label">Nom</label>
+              <input type="text" v-model="editedResource.name" class="card-input-compact">
             </div>
-
-            <div class="input-group">
-              <label class="field-label">Semestre</label>
+            <div class="input-group-compact">
+              <label class="compact-label">Semestre</label>
               <input
                   type="number"
                   v-model.number="editedResource.semestre"
-                  placeholder="Ex: 1"
-                  class="card-input"
-                  @keypress="blockNonNumeric"
+                  class="card-input-compact"
+                  min="1"
+                  placeholder="Saisir 1, 2..."
               >
             </div>
-
-            <button class="save-btn" @click="saveModification(index)">Enregistrer</button>
+            <button class="save-btn-compact" @click="saveResource">
+              {{ isAdding ? 'Créer' : 'Enregistrer' }}
+            </button>
           </div>
         </div>
 
-        <div v-if="showAddForm" class="resource-card is-editing">
-          <div class="card-content edit-mode">
-            <div class="edit-header">
-              <h4>Nouvelle Ressource</h4>
-              <button class="close-icon" @click="handleCancel">✕</button>
+        <template v-for="(resource, index) in filteredResources" :key="resource.resourceID">
+          <div v-if="editingIndex !== index" class="user-card">
+            <div class="card-content view-mode">
+              <div class="icon-circle small-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <h3 class="res-num">{{ resource.num }}</h3>
+              <p class="res-name">{{ resource.name }}</p>
+              <span class="role-badge">Semestre {{ resource.semester || resource.semestre }}</span>
+              <div class="card-actions">
+                <button class="action-btn-mini edit" @click="handleModif(resource, index)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button class="action-btn-mini delete" @click="handleDelete(resource.resourceID, resource.num)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
-
-            <div class="input-group">
-              <input type="text" v-model="newResource.id" placeholder="Numéro (ex: R1.01)" class="card-input">
-            </div>
-
-            <div class="input-group">
-              <input type="text" v-model="newResource.title" placeholder="Intitulé" class="card-input">
-            </div>
-
-            <div class="input-group">
-              <label class="field-label">Semestre</label>
-              <input
-                  type="number"
-                  v-model.number="newResource.semestre"
-                  placeholder="Ex: 1"
-                  class="card-input"
-                  @keypress="blockNonNumeric"
-              >
-            </div>
-
-            <button class="save-btn" @click="addResourceToList">Ajouter</button>
           </div>
-        </div>
-
-        <div v-else class="resource-card add-card" @click="handleAddResource">
-          <div class="icon-circle plus">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          </div>
-          <p>Ajouter une ressource</p>
-        </div>
-
+        </template>
       </div>
-
-      <div class="global-actions">
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
-        <button @click="handleRetour" class="btn-sys secondary">Retour</button>
-      </div>
-
     </main>
+
+    <footer class="sticky-bar">
+      <div class="sticky-wrapper">
+        <div class="search-container">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Recherche par code, nom ou semestre (ex: #2)"
+              class="search-input"
+          />
+        </div>
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+      </div>
+    </footer>
   </div>
 </template>
 
 <style scoped>
-.page-container { min-height: 100vh; background-color: #f8f9fa; font-family: 'Roboto', sans-serif; }
-.main-content { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; margin-top: 180px; }
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; max-width: 1200px; margin-bottom: 50px; }
-
-.resource-card {
-  background: #ffffff; border-radius: 20px; min-height: 380px; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-  transition: all 0.3s ease; position: relative; border: 1px solid transparent;
+.page-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Roboto', sans-serif;
+  padding-bottom: 100px;
 }
 
-.resource-card:hover:not(.is-editing) { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-color: rgba(181, 22, 33, 0.1); }
-.resource-card.is-editing { border: 2px solid #B51621; }
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin-top: 170px;
+}
 
-.card-content { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; height: 100%; justify-content: space-between; }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 50px;
+}
 
-.icon-circle.big-icon { width: 110px; height: 110px; background: rgba(181, 22, 33, 0.05); color: #B51621; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
-.icon-circle.big-icon svg { width: 60px; height: 60px; }
+.user-card {
+  background: #ffffff;
+  border-radius: 12px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  position: relative;
+}
 
-.resource-id { margin: 0; color: #2c3e50; font-size: 32px; font-weight: 900; }
-.resource-title { font-size: 18px; color: #B51621; margin: 5px 0 10px 0; font-weight: 500; }
-.semester-badge { background: #f0f2f5; color: #64748b; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 15px; }
+.user-card.is-editing {
+  border: 2px solid #B51621;
+  min-height: 280px;
+}
 
-.card-actions { display: flex; gap: 15px; margin-top: auto; }
-.action-btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: #f0f2f5; color: #555; }
-.action-btn:hover { transform: scale(1.1); }
-.action-btn.edit:hover { background: #e3f2fd; color: #1976d2; }
-.action-btn.delete:hover { background: #ffebee; color: #c62828; }
+.card-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  justify-content: space-between;
+}
 
-.edit-mode { gap: 10px; }
-.edit-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
-.edit-header h4 { margin: 0; color: #B51621; }
-.close-icon { background: none; border: none; font-size: 20px; cursor: pointer; color: #999; }
+.icon-circle {
+  width: 50px;
+  height: 50px;
+  background: rgba(181, 22, 33, 0.05);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #B51621;
+  transition: all 0.3s ease;
+}
 
-.input-group { width: 100%; text-align: left; }
-.field-label { display: block; font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; margin: 0 0 4px 4px; }
-.card-input { width: 100%; padding: 10px 15px; border: 2px solid #eee; border-radius: 8px; font-size: 15px; box-sizing: border-box; }
-.card-input:focus { outline: none; border-color: #B51621; }
+.small-icon svg {
+  width: 24px;
+  height: 24px;
+}
 
-/* Suppression des flèches sur input type number */
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.res-num {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 700;
+}
 
-.save-btn { width: 100%; padding: 12px; background: #B51621; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+.res-name {
+  font-size: 14px;
+  color: #B51621;
+  margin: 4px 0;
+  font-weight: 500;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.add-card { border: 3px dashed #e0e0e0; cursor: pointer; background: transparent; box-shadow: none; }
-.add-card:hover { border-color: #B51621; background: rgba(181, 22, 33, 0.02); }
-.add-card p { font-weight: 700; color: #888; font-size: 18px; margin-top: 15px; }
-.icon-circle.plus { width: 70px; height: 70px; background: #e0e0e0; color: #888; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
-.add-card:hover .icon-circle.plus { background: #B51621; color: white; }
+.role-badge {
+  background: #f0f0f0;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  color: #666;
+  font-weight: bold;
+}
 
-.global-actions { display: flex; gap: 20px; margin-top: 40px; }
-.btn-sys { padding: 15px 40px; border-radius: 50px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-.btn-sys.primary { background: #B51621; color: white; }
-.btn-sys.secondary { background: white; color: #555; border: 1px solid #ddd; }
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.action-btn-mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  background: #f5f5f5;
+  color: #555;
+}
+
+.action-btn-mini.edit:hover {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-btn-mini.delete:hover {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.add-card {
+  border: 2px dashed #ddd;
+  cursor: pointer;
+  background: transparent;
+}
+
+.add-card:hover {
+  transform: translateY(-5px);
+  background: #ffffff;
+  border-color: #B51621;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.plus-circle {
+  font-size: 20px;
+  background: #eee;
+  color: #666;
+}
+
+.add-card:hover .plus-circle {
+  background: #B51621;
+  color: #ffffff;
+}
+
+.add-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #999;
+  margin-top: 10px;
+  transition: color 0.3s;
+}
+
+.add-card:hover .add-label {
+  color: #B51621;
+}
+
+.edit-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.edit-header h4 {
+  margin: 0;
+  font-size: 13px;
+  color: #B51621;
+}
+
+.compact-label {
+  font-size: 9px;
+  font-weight: bold;
+  color: #999;
+  text-transform: uppercase;
+  display: block;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.input-group-compact {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.card-input-compact {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.save-btn-compact {
+  width: 100%;
+  padding: 8px;
+  background: #B51621;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+  padding: 12px 0;
+  z-index: 100;
+}
+
+.sticky-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.search-container {
+  position: relative;
+  width: 320px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  border-radius: 50px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 14px;
+}
+
+.btn-sys.primary {
+  background: #B51621;
+  color: white;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.close-icon {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #999;
+}
+
+.empty-state {
+  margin-top: 20px;
+  color: #666;
+  font-style: italic;
+}
 </style>

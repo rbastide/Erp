@@ -33,27 +33,27 @@ public class ResourceController {
     };
 
     @PostMapping("/editResource")
-    public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) { 
-
+    public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) {
         for (ResourceResponse res : resList) {
+            // CORRECTION : On vérifie que l'ID n'est pas nul avant findById
+            if (res.getResourceID() != null) {
+                Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
 
-            Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
-
-            if (existingResource.isPresent()) {
-                Resource resourceToUpdate = existingResource.get();
-                resourceToUpdate.setNum(res.getNum());
-                resourceToUpdate.setName(res.getName());
-                resourceToUpdate.setSemester(res.getSemestre());
-                resourceRepository.save(resourceToUpdate);
-            } else {
-                Resource newResource = new Resource();
-                newResource.setNum(res.getNum());
-                newResource.setName(res.getName());
-                newResource.setSemester(res.getSemestre());
-                resourceRepository.save(newResource);
+                if (existingResource.isPresent()) {
+                    Resource resourceToUpdate = existingResource.get();
+                    resourceToUpdate.setNum(res.getNum());
+                    resourceToUpdate.setName(res.getName());
+                    resourceToUpdate.setSemester(res.getSemestre());
+                    resourceRepository.save(resourceToUpdate);
+                    continue;
+                }
             }
+            Resource newResource = new Resource();
+            newResource.setNum(res.getNum());
+            newResource.setName(res.getName());
+            newResource.setSemester(res.getSemestre());
+            resourceRepository.save(newResource);
         }
-
         return ResponseEntity.ok().body("Ressources traitées avec succès");
     }
 
