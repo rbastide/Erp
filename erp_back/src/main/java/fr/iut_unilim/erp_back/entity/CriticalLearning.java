@@ -19,7 +19,7 @@ public class CriticalLearning {
     @Column(name = "learningTitle")
     private String learningTitle;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "rankID")
     private Rank rankID;
 

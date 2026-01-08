@@ -113,7 +113,8 @@ body.dark-mode #card-title,
 body.dark-mode #intitule,
 body.dark-mode .group-label,
 body.dark-mode .field-label,
-body.dark-mode .lvl-label {
+body.dark-mode .lvl-label,
+body.dark-mode .level-title {
   color: #ffffff !important;
 }
 
@@ -145,7 +146,9 @@ body.dark-mode .sub-text-button,
 body.dark-mode .ac-list li,
 body.dark-mode .no-result,
 body.dark-mode .summary-label,
-body.dark-mode .footer-label {
+body.dark-mode .footer-label,
+body.dark-mode .separator-text,
+body.dark-mode .sub-label {
   color: #bbbbbb !important;
 }
 
@@ -206,6 +209,7 @@ body.dark-mode .total-highlight {
   border-color: #ef5350 !important;
 }
 
+/* --- TABLES --- */
 body.dark-mode .competence-table,
 body.dark-mode .competence-table th,
 body.dark-mode .competence-table td,
@@ -300,6 +304,7 @@ body.dark-mode .btn-outline:hover {
   background-color: rgba(239, 83, 80, 0.1) !important;
 }
 
+/* --- ICONS & BADGES --- */
 body.dark-mode .icon-circle {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ef5350 !important;
@@ -333,11 +338,17 @@ body.dark-mode .ue-separator {
   border-color: rgba(239, 83, 80, 0.3) !important;
 }
 
-body.dark-mode .niveau-group {
+body.dark-mode .separator-line {
+  background-color: #444 !important;
+}
+
+body.dark-mode .niveau-group,
+body.dark-mode .niveau-container {
   background-color: #2a2a2a !important;
   border-color: #444 !important;
 }
-body.dark-mode .nested-acs {
+body.dark-mode .nested-acs,
+body.dark-mode .acs-container {
   background-color: rgba(239, 83, 80, 0.05) !important;
   border-left-color: #ef5350 !important;
 }
@@ -389,5 +400,69 @@ body.dark-mode .empty-table {
 
 body.dark-mode .total-separator {
   background-color: #444 !important;
+}
+
+body.dark-mode .action-icon-btn.add {
+  background-color: rgba(46, 125, 50, 0.2) !important;
+  color: #81c784 !important;
+}
+body.dark-mode .action-icon-btn.add:hover {
+  background-color: rgba(46, 125, 50, 0.3) !important;
+}
+
+body.dark-mode .card-header-view {
+  border-bottom-color: #444 !important;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #555 !important;
+}
+
+body.dark-mode .edit-scroll-area {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .edit-level-group {
+  background-color: #333 !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .card-actions-overlay {
+  border-top-color: #444 !important;
+}
+
+body.dark-mode .action-btn.edit {
+  background-color: rgba(25, 118, 210, 0.2) !important;
+  color: #90caf9 !important;
+}
+
+body.dark-mode .action-btn.delete {
+  background-color: rgba(198, 40, 40, 0.2) !important;
+  color: #ef9a9a !important;
+}
+
+body.dark-mode .close-icon {
+  color: #ef5350 !important;
+}
+
+body.dark-mode .btn-dashed {
+  border-color: #666 !important;
+  color: #bbb !important;
+}
+body.dark-mode .btn-dashed:hover {
+  border-color: #ef5350 !important;
+  color: #ef5350 !important;
+}
+
+body.dark-mode .add-mini-btn {
+  color: #ef5350 !important;
+}
+
+body.dark-mode .remove-ac {
+  color: #777 !important;
+}
+body.dark-mode .remove-ac:hover {
+  color: #ef5350 !important;
 }
 </style>
