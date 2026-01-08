@@ -2,10 +2,11 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ResourceSheet")
+@Table(name = "ResourceSheets")
 public class ResourceSheet {
 
     @Id
@@ -23,11 +24,11 @@ public class ResourceSheet {
     @Column(name = "hourlyVolumeID")
     private Long hourlyVolumeID;
 
-    @Column(name = "teachersReturnID")
-    private Long teachersReturnID;
+    @Column(name = "teachersFeedbackID")
+    private Long teachersFeedbackID;
 
-    @Column(name = "studentReturnID")
-    private Long studentReturnID;
+    @Column(name = "studentFeedbackID")
+    private Long studentFeedbackID;
 
     @Column(name = "improvementsIdeaID")
     private Long improvementsIDeaID;
@@ -45,10 +46,13 @@ public class ResourceSheet {
     private String content;
 
     @Column(name = "linkedSAE")
-    private int linkedSAE;
+    private Integer linkedSAE;
 
     @Column(name = "creationDate")
-    private String creationDate;
+    private Date creationDate;
+
+    @Column(name = "lastModificationDate")
+    private Date lastModificationDate;
 
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Teacher> teachers;
@@ -59,31 +63,148 @@ public class ResourceSheet {
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersReturnID, Long studentReturnID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate ) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.referencialTeacherID = referencialTeacherID;
         this.hourlyVolumeID = hourlyVolumeID;
-        this.teachersReturnID = teachersReturnID;
-        this.studentReturnID = studentReturnID;
+        this.teachersFeedbackID = teachersFeedbackID;
+        this.studentFeedbackID = studentFeedbackID;
         this.improvementsIDeaID = improvementsIDeaID;
         this.semester = semester;
         this.year = year;
         this.mainGoal = mainGoal;
         this.content = content;
         this.linkedSAE = linkedSAE;
+        this.creationDate = creationDate;
+        this.lastModificationDate = lastModificationDate;
     }
 
-    public Long sheetsID() { return sheetsID; }
-    public Long resourceID() { return resourceID; }
-    public Long referencialTeacherID() { return referencialTeacherID; }
-    public Long hourlyVolumeID() { return hourlyVolumeID; }
-    public Long teachersReturnID() { return teachersReturnID; }
-    public Long studentReturnID() { return studentReturnID; }
-    public Long improvementsID() { return improvementsIDeaID; }
-    public int semester() { return semester; }
-    public int year() { return year; }
-    public String mainGoal() { return mainGoal; }
-    public String content() { return content; }
-    public int linkedSAE() { return linkedSAE; }
+    public void setSheetsID(Long sheetsID) {
+        this.sheetsID = sheetsID;
+    }
+
+    public void setResourceID(Long resourceID) {
+        this.resourceID = resourceID;
+    }
+
+    public void setReferencialTeacherID(Long referencialTeacherID) {
+        this.referencialTeacherID = referencialTeacherID;
+    }
+
+    public void setHourlyVolumeID(Long hourlyVolumeID) {
+        this.hourlyVolumeID = hourlyVolumeID;
+    }
+
+    public void setTeachersFeedbackID(Long teachersReturnID) {
+        this.teachersFeedbackID = teachersReturnID;
+    }
+
+    public void setStudentFeedbackID(Long studentReturnID) {
+        this.studentFeedbackID = studentReturnID;
+    }
+
+    public void setImprovementsIDeaID(Long improvementsIDeaID) {
+        this.improvementsIDeaID = improvementsIDeaID;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public void setMainGoal(String mainGoal) {
+        this.mainGoal = mainGoal;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setLinkedSAE(Integer linkedSAE) {
+        this.linkedSAE = linkedSAE;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
+
+    public void setTeachers(List<Teacher> teachers) {
+        this.teachers = teachers;
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
+    }
+
+    public Long getSheetsID() {
+        return sheetsID;
+    }
+
+    public Long getResourceID() {
+        return resourceID;
+    }
+
+    public Long getHourlyVolumeID() {
+        return hourlyVolumeID;
+    }
+
+    public Long getReferencialTeacherID() {
+        return referencialTeacherID;
+    }
+
+    public Long getTeachersFeedbackID() {
+        return teachersFeedbackID;
+    }
+
+    public Long getStudentFeedbackID() {
+        return studentFeedbackID;
+    }
+
+    public Long getImprovementsIDeaID() {
+        return improvementsIDeaID;
+    }
+
+    public int getSemester() {
+        return semester;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public String getMainGoal() {
+        return mainGoal;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Integer getLinkedSAE() {
+        return linkedSAE;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+
+    public List<Teacher> getTeachers() {
+        return teachers;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
 }

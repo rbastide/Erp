@@ -50,4 +50,16 @@ public class Teacher {
     public String getFirstname() {
         return firstname;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
 }

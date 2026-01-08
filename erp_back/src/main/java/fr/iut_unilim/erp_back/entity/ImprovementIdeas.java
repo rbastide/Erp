@@ -20,4 +20,12 @@ public class ImprovementIdeas {
 
     public Long improvementsIdeaID(){ return this.improvementsIdeaID; }
     public String idea(){ return this.idea; }
+
+    public void setIdea(String idea) {
+        this.idea = idea;
+    }
+
+    public void setImprovementsIdeaID(Long improvementsIdeaID) {
+        this.improvementsIdeaID = improvementsIdeaID;
+    }
 }

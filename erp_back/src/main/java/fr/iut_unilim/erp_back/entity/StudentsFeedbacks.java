@@ -3,7 +3,7 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "StudentsFeedback")
+@Table(name = "StudentFeedbacks")
 public class StudentsFeedbacks {
 
     @Id
@@ -23,6 +23,14 @@ public class StudentsFeedbacks {
         this.content = content;
     }
 
-    public Long teachersFeedbackID() { return studentFeedbackID; }
+    public Long studentsFeedbackID() { return studentFeedbackID; }
     public String content(){ return content; }
+
+    public void setStudentFeedbackID(Long studentFeedbackID) {
+        this.studentFeedbackID = studentFeedbackID;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
