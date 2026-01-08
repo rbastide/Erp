@@ -20,9 +20,7 @@ const editedUser = reactive({
   newPassword: ''
 });
 
-/**
- * Traduction des rôles pour l'affichage
- */
+
 const formatRole = (role) => {
   const rolesMap = {
     'SUPER_ADMIN': 'Super Administrateur',
@@ -33,9 +31,6 @@ const formatRole = (role) => {
   return rolesMap[role] || role;
 };
 
-/**
- * CHARGEMENT : Récupère la liste via GET /auth/users
- */
 const fetchUsers = async () => {
   try {
     const response = await api.get('/auth/users');
@@ -51,9 +46,6 @@ const fetchUsers = async () => {
 
 onMounted(fetchUsers);
 
-/**
- * FILTRAGE : Calcul de la liste selon la recherche
- */
 const filteredUsers = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   if (!query) return users.value;
@@ -63,9 +55,7 @@ const filteredUsers = computed(() => {
   );
 });
 
-/**
- * SUPPRESSION
- */
+
 const handleDelete = async (id, identifier) => {
   if (confirm(`Voulez-vous vraiment supprimer l'utilisateur "${identifier}" ?`)) {
     try {
@@ -78,9 +68,7 @@ const handleDelete = async (id, identifier) => {
   }
 };
 
-/**
- * MODIFICATION
- */
+
 const saveModification = async (index) => {
   try {
     const payload = {
@@ -321,7 +309,6 @@ const handleAddUser = () => router.push('/new-user');
 .action-btn-mini.edit:hover { background: #e3f2fd; color: #1976d2; }
 .action-btn-mini.delete:hover { background: #ffebee; color: #c62828; }
 
-/* STYLE CARTE AJOUT + EFFETS HOVER */
 .add-card {
   border: 2px dashed #ddd;
   cursor: pointer;
@@ -330,7 +317,7 @@ const handleAddUser = () => router.push('/new-user');
 }
 
 .add-card:hover {
-  transform: translateY(-5px); /* Surélévation */
+  transform: translateY(-5px);
   background: #ffffff;
   border-color: #B51621;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -342,7 +329,6 @@ const handleAddUser = () => router.push('/new-user');
   color: #666;
 }
 
-/* Changement de couleur du cercle au survol */
 .add-card:hover .plus-circle {
   background: #B51621;
   color: #ffffff;
@@ -361,13 +347,11 @@ const handleAddUser = () => router.push('/new-user');
   transition: color 0.3s ease;
 }
 
-/* FORMULAIRE COMPACT */
 .edit-header h4 { margin: 0; font-size: 14px; color: #B51621; }
 .input-group-compact { width: 100%; margin-bottom: 8px; }
 .card-input-compact { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fafafa; }
 .save-btn-compact { width: 100%; padding: 8px; background: #B51621; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; margin-top: 5px; }
 
-/* STICKY BAR */
 .sticky-bar {
   position: fixed;
   bottom: 0;
