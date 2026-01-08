@@ -58,5 +58,14 @@ public class ResourceController {
     }
 
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteResource(@PathVariable Long id) {
+        if (!resourceRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        resourceRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

@@ -12,6 +12,9 @@ export default {
     if (response.data.token) {
       localStorage.setItem('user_token', response.data.token);
     }
+    if(response.data.role){
+        localStorage.setItem('user_role', response.data.role);
+    }
     return response.data;
   },
 

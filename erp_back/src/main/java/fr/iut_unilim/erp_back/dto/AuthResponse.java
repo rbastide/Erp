@@ -21,6 +21,10 @@ public class AuthResponse {
         return token;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public String getType() {
         return type;
     }
