@@ -85,9 +85,10 @@ const handleOui = () => {
 
 .logout-card {
   background: #ffffff;
+  margin-top: 100px;
   width: 100%;
-  max-width: 500px;
-  padding: 50px 40px;
+  max-width: 400px;
+  padding: 30px 40px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   display: flex;
