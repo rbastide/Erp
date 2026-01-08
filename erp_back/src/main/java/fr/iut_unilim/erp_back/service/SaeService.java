@@ -1,7 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.Sae;
-import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.SaeRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,12 @@ public class SaeService {
         return saeRepository.findByNum(num);
     }
 
-    public void save(Sae sae) {saeRepository.save(sae);}
+    public Sae addSae(Sae sae) { return saeRepository.save(sae); }
 
-
+    public void deleteSaeById(Long id) {
+        if (!saeRepository.existsById(id)) {
+            return;
+        }
+        saeRepository.deleteById(id);
+    }
 }
