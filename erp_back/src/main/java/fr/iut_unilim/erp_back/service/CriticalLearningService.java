@@ -23,4 +23,8 @@ public class CriticalLearningService {
     public List<CriticalLearning> getAllCriticalLearning() {
         return criticalLearningRepository.findAll();
     }
+
+    public List<CriticalLearning> getCriticalLearningsByRank(Rank rankID) {
+        return criticalLearningRepository.findByRankID(rankID);
+    }
 }

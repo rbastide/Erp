@@ -10,4 +10,6 @@ public interface CriticalLearningRepository extends JpaRepository<CriticalLearni
     List<CriticalLearning> findByLearningNum(int learningNum);
 
     List<CriticalLearning> findByLearningNumAndLearningTitleAndRankID(int learningNum, String learningTitle, Rank rankID);
+
+    List<CriticalLearning> findByRankID(Rank rankID);
 }

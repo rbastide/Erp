@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface RankRepository extends JpaRepository<Rank,Long> {
     List<Rank> findByRankNum(int rankNum);
+
+    List<Rank> findBySkillID(Skill skill);
 }

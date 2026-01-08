@@ -22,4 +22,8 @@ public class SkillService {
     public boolean doSkillNumExists(int skillNum) {
         return !getSkillsByNum(skillNum).isEmpty();
     }
+
+    public List<Skill> getAllSkills() {
+        return skillRepository.findAll();
+    }
 }

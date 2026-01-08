@@ -20,8 +20,6 @@ public class Skill {
     @Column(name = "skillName")
     private String skillName;
 
-
-
     @ManyToMany
     @JoinTable(
             name = "ResourceSheetSkills",
@@ -39,6 +37,10 @@ public class Skill {
 
     public Long getSkillID() {
         return skillID;
+    }
+
+    public int getSkillNum() {
+        return skillNum;
     }
 
     public String getSkillName() {

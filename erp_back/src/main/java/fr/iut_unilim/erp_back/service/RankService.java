@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.Rank;
+import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.repository.RankRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +23,9 @@ public class RankService {
 
     public boolean doRankNumExists(int skillNum) {
         return !getRanksByNum(skillNum).isEmpty();
+    }
+
+    public List<Rank> getRanksFromSkill(Skill skill) {
+        return rankRepository.findBySkillID(skill);
     }
 }
