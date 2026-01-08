@@ -44,4 +44,20 @@ public class Resource {
     }
 
     public int getSemester() {return semester;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public void setResourceID(Long resourceID) {
+        this.resourceID = resourceID;
+    }
 }
