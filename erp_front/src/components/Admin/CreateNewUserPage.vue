@@ -17,14 +17,6 @@ const handleRetour = () => {
   router.back();
 };
 
-const handleAide = () => {
-  router.push('/aide');
-};
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
-
 const handleRegister = async () => {
   errorMessage.value = '';
 
@@ -46,7 +38,7 @@ const handleRegister = async () => {
 
   try {
     await AuthService.register(userPayload);
-    router.push('/userSave');
+    router.push('/users-gestion');
   } catch (error) {
     console.error("Erreur Inscription:", error);
     if (error.response && error.response.data) {

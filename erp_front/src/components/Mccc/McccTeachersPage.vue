@@ -15,6 +15,12 @@ const handleRetour = () => {
   router.push('/cancel-mccc');
 };
 
+// Fonction pour supprimer un référent
+const handleRemove = (index) => {
+  mcccStore.referents.splice(index, 1);
+  mcccStore.registerMcccStore();
+};
+
 const handleAdd = () => {
   const trimmedLastname = lastname.value.trim();
   const trimmedFirstname = firstname.value.trim();
@@ -69,11 +75,23 @@ onMounted(() => {
   <AppHeader title="Référents de la" :inline="mcccStore.resourceCode"/>
   <main class="main-content">
     <div class="container">
+
       <div class="teachers-list">
-        <div v-for="(teacher, index) in mcccStore.referents" :key="teacher" class="teacher-display-card">
-          Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
+        <div v-for="(teacher, index) in mcccStore.referents" :key="index" class="teacher-display-card">
+          <div class="teacher-info">
+            Référent n°{{ index + 1 }} : {{ teacher.lastname }} {{ teacher.firstname }}
+          </div>
+          <button class="delete-btn" @click="handleRemove(index)" title="Supprimer ce référent">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
         </div>
       </div>
+
       <form class="teacher-card" @submit.prevent>
         <div class="form-group">
           <label for="lastname">Nom</label>
@@ -114,23 +132,13 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Styles existants conservés */
 .main-content {
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;
-  padding-top: 172px;
+  padding-top: 200px;
   box-sizing: border-box;
 }
-
-.description {
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  color: #E92533;
-  margin: 40px;
-}
-
-/* Style de la Carte teacher */
 
 .teachers-list {
   margin-bottom: 30px;
@@ -141,6 +149,7 @@ onMounted(() => {
   max-width: 450px;
 }
 
+/* Modification de la carte d'affichage pour aligner le texte et la poubelle */
 .teacher-display-card {
   width: 100%;
   max-width: 400px;
@@ -152,8 +161,33 @@ onMounted(() => {
   font-weight: 500;
   color: #1E1E1E;
   border-left: 5px solid #E92533;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.teacher-info {
+  flex: 1;
+}
+
+/* Style spécifique pour le bouton de suppression */
+.delete-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.delete-btn:hover {
+  color: #E92533;
+  transform: scale(1.1);
+}
+
+/* Reste du CSS inchangé */
 .add-teacher-button {
   background: none;
   border: none;
@@ -184,7 +218,7 @@ onMounted(() => {
 .teacher-card {
   width: 100%;
   background-color: #FFFFFF;
-  padding: 2.5rem; /* 40px */
+  padding: 2.5rem;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
@@ -192,24 +226,24 @@ onMounted(() => {
 }
 
 .form-group {
-  margin-bottom: 1.5rem; /* 24px */
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem; /* 8px */
+  margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 0.9rem; /* 14px */
+  font-size: 0.9rem;
   color: black;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem; /* 12px */
+  padding: 0.75rem;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
 }
 
 .form-group input:focus {
@@ -233,7 +267,7 @@ onMounted(() => {
   border-radius: 4px;
   background-color: #B51621;
   color: #FFFFFF;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   font-family: 'Roboto', sans-serif;
