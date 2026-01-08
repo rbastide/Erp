@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/skills")
+@RequestMapping("/api")
 public class SkillController {
 
     private final SkillService skillService;
@@ -54,10 +54,19 @@ public class SkillController {
         return criticalLearningDtos;
     }
 
-    @PostMapping("/skillsd")
+    @PostMapping("/skills")
     public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos) {
         convertSkillDtosToEntities(skillsDtos);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/skills/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (skillService.getSkillsFromId(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        skillRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
