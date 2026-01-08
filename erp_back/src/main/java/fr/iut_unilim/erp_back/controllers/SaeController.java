@@ -48,6 +48,9 @@ public class SaeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSae(@PathVariable Long id) {
+        if (!saeRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         saeService.deleteSaeById(id);
         return ResponseEntity.ok().body("La SAE a bien été supprimée");
     }
