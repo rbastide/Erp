@@ -90,4 +90,13 @@ public class AuthController {
     public ResponseEntity<?> getUsers() {
         return ResponseEntity.ok(connectionService.getAllConnections());
     }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!connectionRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        connectionRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }

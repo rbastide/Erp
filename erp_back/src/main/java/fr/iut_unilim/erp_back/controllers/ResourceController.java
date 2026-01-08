@@ -1,10 +1,18 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.dto.ResourceResponse;
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.service.ResourceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -12,13 +20,43 @@ import org.springframework.web.bind.annotation.*;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final ResourceRepository resourceRepository;
 
-    public ResourceController(ResourceService resourceService) {
+    public ResourceController(ResourceService resourceService, ResourceRepository resourceRepository) {
         this.resourceService = resourceService;
+        this.resourceRepository = resourceRepository;
     }
 
-    @GetMapping("/getResource")
+    @GetMapping("/resources")
     public ResponseEntity<?> getResource() {
         return ResponseEntity.ok(resourceService.getAllResources());
     };
+
+    @PostMapping("/editResource")
+    public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) { 
+
+        for (ResourceResponse res : resList) {
+
+            Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
+
+            if (existingResource.isPresent()) {
+                Resource resourceToUpdate = existingResource.get();
+                resourceToUpdate.setNum(res.getNum());
+                resourceToUpdate.setName(res.getName());
+                resourceToUpdate.setSemester(res.getSemestre());
+                resourceRepository.save(resourceToUpdate);
+            } else {
+                Resource newResource = new Resource();
+                newResource.setNum(res.getNum());
+                newResource.setName(res.getName());
+                newResource.setSemester(res.getSemestre());
+                resourceRepository.save(newResource);
+            }
+        }
+
+        return ResponseEntity.ok().body("Ressources traitées avec succès");
+    }
+
+
+
 }
