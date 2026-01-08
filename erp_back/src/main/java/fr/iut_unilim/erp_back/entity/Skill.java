@@ -50,4 +50,20 @@ public class Skill {
     public int getSkillLearning() {
         return skillNum;
     }
+
+    public void setSkillID(Long skillID) {
+        this.skillID = skillID;
+    }
+
+    public void setSkillNum(int skillNum) {
+        this.skillNum = skillNum;
+    }
+
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
+    }
+
+    public void setResourceSheets(List<ResourceSheet> resourceSheets) {
+        this.resourceSheets = resourceSheets;
+    }
 }

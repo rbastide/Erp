@@ -10,4 +10,6 @@ public interface RankRepository extends JpaRepository<Rank,Long> {
     List<Rank> findByRankNum(int rankNum);
 
     List<Rank> findBySkillID(Skill skill);
+
+    List<Rank> findByRankNumAndRankTitle(int rankNum, String rankTitle);
 }

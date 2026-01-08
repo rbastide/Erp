@@ -1,0 +1,9 @@
+package fr.iut_unilim.erp_back.dto;
+
+import fr.iut_unilim.erp_back.entity.CriticalLearning;
+
+public record CriticalLearningDto(Long id, int num, String intitule) {
+    public CriticalLearningDto(CriticalLearning criticalLearning) {
+        this(criticalLearning.getLearningID(), criticalLearning.getLearningNum(), criticalLearning.getLearningTitle());
+    }
+}

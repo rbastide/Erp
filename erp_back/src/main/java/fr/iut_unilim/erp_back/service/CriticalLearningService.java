@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.repository.CriticalLearningRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -26,5 +27,9 @@ public class CriticalLearningService {
 
     public List<CriticalLearning> getCriticalLearningsByRank(Rank rankID) {
         return criticalLearningRepository.findByRankID(rankID);
+    }
+
+    public Optional<CriticalLearning> getCriticalLearningFromId(Long id) {
+        return criticalLearningRepository.findById(id);
     }
 }

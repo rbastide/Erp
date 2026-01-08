@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.repository.RankRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -27,5 +28,13 @@ public class RankService {
 
     public List<Rank> getRanksFromSkill(Skill skill) {
         return rankRepository.findBySkillID(skill);
+    }
+
+    public List<Rank> getRanksFromNumAndTitle(int rankNum, String rankTitle) {
+        return rankRepository.findByRankNumAndRankTitle(rankNum, rankTitle);
+    }
+
+    public Optional<Rank> getRankFromId(Long id) {
+        return rankRepository.findById(id);
     }
 }

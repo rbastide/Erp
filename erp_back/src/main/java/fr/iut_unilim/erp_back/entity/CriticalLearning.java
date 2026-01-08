@@ -11,7 +11,7 @@ public class CriticalLearning {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "learningID")
-    private int learningID;
+    private Long learningID;
 
     @Column(name = "learningNum")
     private int learningNum;
@@ -25,13 +25,17 @@ public class CriticalLearning {
 
     public CriticalLearning() {}
 
-    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rankID) {
-        this.learningNum = criticalLearning.learningNum();
-        this.learningTitle = criticalLearning.learningTitle();
+    public CriticalLearning(int learningNum, String learningTitle, Rank rankID) {
+        this.learningNum = learningNum;
+        this.learningTitle = learningTitle;
         this.rankID = rankID;
     }
 
-    public int getLearningID() {
+    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rankID) {
+        this(criticalLearning.learningNum(), criticalLearning.learningTitle(), rankID);
+    }
+
+    public Long getLearningID() {
         return learningID;
     }
 
@@ -47,7 +51,7 @@ public class CriticalLearning {
         return rankID;
     }
 
-    public void setLearningID(int learningID) {
+    public void setLearningID(Long learningID) {
         this.learningID = learningID;
     }
 

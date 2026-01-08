@@ -6,12 +6,11 @@ import jakarta.persistence.*;
 @Table(name = "SkillRanks")
 public class Rank {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "rankID")
-    private int rankID;
+    private Long rankID;
 
     @Column(name = "rankNum")
     private int rankNum;
@@ -23,10 +22,16 @@ public class Rank {
     @JoinColumn(name = "skillID")
     private Skill skillID;
 
-    public Rank() {};
+    public Rank() {
+    }
 
+    public Rank(int rankNum, String rankTitle, Skill skillID) {
+        this.rankNum = rankNum;
+        this.rankTitle = rankTitle;
+        this.skillID = skillID;
+    }
 
-    public int getRankID() {
+    public Long getRankID() {
         return rankID;
     }
 
@@ -42,7 +47,7 @@ public class Rank {
         return skillID;
     }
 
-    public void setRankID(int rankID) {
+    public void setRankID(Long rankID) {
         this.rankID = rankID;
     }
 
