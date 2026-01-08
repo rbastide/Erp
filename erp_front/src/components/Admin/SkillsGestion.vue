@@ -16,7 +16,8 @@ const handleRetour = () => {
 
 const competencesFinalisees = ref([
   {
-    ue: "1. Réaliser",
+    skillNum: "1",
+    skillName: "Réaliser",
     niveaux: [
       {
         num: "Niveau 1",
@@ -75,8 +76,6 @@ const handleSaveNewCompetence = () => {
     return;
   }
 
-  const ueComplete = `${currentCompetence.value.ueNum.trim()}. ${currentCompetence.value.ueIntitule.trim()}`;
-
   const niveauxResume = currentCompetence.value.niveaux
       .filter(n => n.intitule.trim() !== '')
       .map((n, index) => {
@@ -100,7 +99,11 @@ const handleSaveNewCompetence = () => {
     return;
   }
 
-  competencesFinalisees.value.push({ ue: ueComplete, niveaux: niveauxResume });
+  competencesFinalisees.value.push({
+    skillNum: currentCompetence.value.ueNum.trim(),
+    skillName: currentCompetence.value.ueIntitule.trim(),
+    niveaux: niveauxResume
+  });
 
   currentCompetence.value = { ueNum: '', ueIntitule: '', niveaux: [{ intitule: '', acs: [{ num: '', intitule: '' }] }] };
 };
@@ -121,10 +124,6 @@ const handleModif = (index) => {
   editingIndex.value = index;
   const original = competencesFinalisees.value[index];
 
-  const splitUE = original.ue.split('. ');
-  const uNum = splitUE[0] || '';
-  const uInt = splitUE.slice(1).join('. ') || '';
-
   const niveauxEditable = original.niveaux.map(n => {
     return {
       intitule: n.intitule,
@@ -136,8 +135,8 @@ const handleModif = (index) => {
   });
 
   editedCompetence.value = {
-    ueNum: uNum,
-    ueIntitule: uInt,
+    ueNum: original.skillNum,
+    ueIntitule: original.skillName,
     niveaux: niveauxEditable
   };
 };
@@ -154,8 +153,6 @@ const saveModification = (index) => {
     alert("L'UE doit avoir un numéro et un intitulé.");
     return;
   }
-
-  const ueComplete = `${editData.ueNum.trim()}. ${editData.ueIntitule.trim()}`;
 
   const niveauxResume = editData.niveaux
       .filter(n => n.intitule.trim() !== '')
@@ -180,7 +177,12 @@ const saveModification = (index) => {
     return;
   }
 
-  competencesFinalisees.value[index] = { ue: ueComplete, niveaux: niveauxResume };
+  competencesFinalisees.value[index] = {
+    skillNum: editData.ueNum.trim(),
+    skillName: editData.ueIntitule.trim(),
+    niveaux: niveauxResume
+  };
+
   editingIndex.value = null;
 };
 
@@ -222,7 +224,7 @@ const removeAcFromEdit = (lvlIndex, acIndex) => {
               <div class="icon-circle">
                 <span class="comp-number">{{ index + 1 }}</span>
               </div>
-              <h3>{{ comp.ue }}</h3>
+              <h3>{{ comp.skillNum }}. {{ comp.skillName }}</h3>
             </div>
 
             <div class="card-body-scroll">
