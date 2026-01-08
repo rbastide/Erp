@@ -43,7 +43,7 @@ const routes = [
     },
     {
         path: '/ressource',
-        name: 'Ressource',
+        name: 'Resource',
         component: ResourcePage
     },
     {
@@ -68,12 +68,12 @@ const routes = [
     },
     {
         path: '/aide',
-        name: 'ServicePage',
+        name: 'HelpPage',
         component: HelpPage
     },
     {
         path: '/deconnexion',
-        name: 'DeconnexionPage',
+        name: 'DeconnectionPage',
         component: DeconnectionPage
     },
     {
@@ -88,7 +88,7 @@ const routes = [
     },
     {
         path: '/fillRessourcePage',
-        name: 'FilRessourcePage',
+        name: 'FillResourceSheet',
         component: FillResourceSheet
     },
     {
@@ -118,7 +118,7 @@ const routes = [
     },
     {
         path: '/mccc-ressource',
-        name: 'McccRessourcePage',
+        name: 'McccResourcePage',
         component: McccResourcePage
     },
     {
@@ -143,7 +143,7 @@ const routes = [
     },
     {
         path: '/mccc-competences',
-        name: 'McccCompetencesPage',
+        name: 'McccSkillsPage',
         component: McccSkills
     },
     {
@@ -153,17 +153,17 @@ const routes = [
     },
     {
         path: '/competence-creating',
-        name: 'CompetencesCreatingPage',
+        name: 'SkillsGestionPage',
         component: SkillsGestion
     },
     {
         path: '/ressource-sheet-history',
-        name: 'RessourceSheetHistory',
+        name: 'ResourceSheetHistory',
         component: ResourceSheetHistory
     },
     {
         path: '/resources-gestion',
-        name: 'RessourcesGestion',
+        name: 'ResourcesGestion',
         component: ResourcesGestion
     },
     {
