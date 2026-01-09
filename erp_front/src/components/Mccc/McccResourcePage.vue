@@ -1,10 +1,39 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'; // Ajout de ref et onMounted
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api'; // Import de votre instance axios
 
 const router = useRouter();
+
+// 1. Création d'une variable réactive pour stocker les ressources de la BDD
+// On définit une interface pour typer la ressource selon votre ResourceResponse.java
+interface Resource {
+  resourceID: number;
+  num: string;
+  name: string;
+  semester: string;
+}
+
+const resources = ref<Resource[]>([]);
+
+// 2. Fonction pour charger les données depuis le contrôleur Java
+const fetchResources = async () => {
+  try {
+    // Appel de la route @GetMapping("/resources") définie dans ResourceController
+    const response = await api.get('/resources/resources');
+    resources.value = response.data;
+  } catch (error) {
+    console.error("Erreur lors du chargement des ressources:", error);
+  }
+};
+
+// 3. Appel de la fonction au chargement du composant
+onMounted(() => {
+  fetchResources();
+});
 
 const handleRetour = () => {
   router.back();
@@ -16,8 +45,6 @@ const handleMccc = (code: string) => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
-
-const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
 </script>
 
 <template>
@@ -31,9 +58,9 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
       <div class="grid-container">
         <div
             v-for="res in resources"
-            :key="res"
+            :key="res.resourceID"
             class="card-action"
-            @click="handleMccc(res)"
+            @click="handleMccc(res.num)"
         >
           <div class="icon-circle">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,8 +68,13 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
           </div>
-          <p>{{ res }}</p>
+          <p>{{ res.num }}</p>
+          <span class="res-name">{{ res.name }}</span>
         </div>
+      </div>
+
+      <div v-if="resources.length === 0" class="empty-msg">
+        Aucune ressource disponible en base de données.
       </div>
 
       <div class="footer-actions">
@@ -53,6 +85,7 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
 </template>
 
 <style scoped>
+/* Vos styles existants conservés */
 .page-container {
   min-height: 100vh;
   background-color: #f8f9fa;
@@ -134,6 +167,19 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
   font-weight: 600;
   color: #333333;
   transition: color 0.3s ease;
+}
+
+/* Nouveau style pour le nom de la ressource sous le code */
+.res-name {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.empty-msg {
+  margin-top: 40px;
+  color: #999;
+  font-style: italic;
 }
 
 .card-action:hover p {
