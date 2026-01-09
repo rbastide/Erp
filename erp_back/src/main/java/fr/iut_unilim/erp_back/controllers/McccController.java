@@ -197,4 +197,9 @@ public class McccController {
         hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
         return hourlyVolume;
     }
+
+    @GetMapping("/getTeachers")
+    public ResponseEntity<?> getTeachers() {
+        return ResponseEntity.ok(teacherService.getAllTeachers());
+    };
 }

@@ -1,10 +1,34 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
+
+interface Resource {
+  resourceID: number;
+  num: string;
+  name: string;
+  semester: string;
+}
+
+const resources = ref<Resource[]>([]);
+
+const fetchResources = async () => {
+  try {
+    const response = await api.get('/resources/resources');
+    resources.value = response.data;
+  } catch (error) {
+    console.error("Erreur lors du chargement des ressources:", error);
+  }
+};
+
+onMounted(() => {
+  fetchResources();
+});
 
 const handleRetour = () => {
   router.back();
@@ -16,8 +40,6 @@ const handleMccc = (code: string) => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
-
-const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
 </script>
 
 <template>
@@ -31,9 +53,9 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
       <div class="grid-container">
         <div
             v-for="res in resources"
-            :key="res"
+            :key="res.resourceID"
             class="card-action"
-            @click="handleMccc(res)"
+            @click="handleMccc(res.num)"
         >
           <div class="icon-circle">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,8 +63,13 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
           </div>
-          <p>{{ res }}</p>
+          <p>{{ res.num }}</p>
+          <span class="res-name">{{ res.name }}</span>
         </div>
+      </div>
+
+      <div v-if="resources.length === 0" class="empty-msg">
+        Aucune ressource disponible en base de données.
       </div>
 
       <div class="footer-actions">
@@ -134,6 +161,18 @@ const resources = ['R1.01', 'R1.02', 'R2.01', 'R2.02'];
   font-weight: 600;
   color: #333333;
   transition: color 0.3s ease;
+}
+
+.res-name {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.empty-msg {
+  margin-top: 40px;
+  color: #999;
+  font-style: italic;
 }
 
 .card-action:hover p {

@@ -7,6 +7,11 @@ const router = useRouter()
 
 const handleFermer = () => { router.back() };
 
+// Fonction placeholder pour l'export PDF (identique à l'autre fichier)
+const handleExport = () => {
+  console.log("Export PDF demandé depuis l'historique...");
+};
+
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
   td: { label: 'TD', color: '#7986CB' },
@@ -101,6 +106,7 @@ const hourConfig = {
       </section>
 
       <div class="actions-footer">
+        <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
         <button @click="handleFermer" class="btn btn-primary">Fermer la fiche</button>
       </div>
 
@@ -235,17 +241,37 @@ const hourConfig = {
 .actions-footer {
   display: flex;
   justify-content: center;
+  gap: 20px; /* Espace entre les boutons */
   margin-top: 20px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
 }
+
 .btn {
   padding: 15px 45px;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   border: none;
+  transition: transform 0.2s;
 }
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
 .btn-primary {
   background: #E92533;
   color: white;
+}
+
+.btn-dark {
+  background: #333333;
+  color: white;
+  border: 2px solid #333333;
+}
+.btn-dark:hover {
+  background: #555555;
+  border-color: #555555;
 }
 </style>

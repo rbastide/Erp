@@ -9,6 +9,11 @@ const router = useRouter()
 const handleRetour = () =>{ router.back()};
 const handleValider = () => {router.push('/home')};
 
+// Fonction placeholder pour le futur export PDF
+const handleExport = () => {
+  console.log("Export PDF demandé...");
+};
+
 const hours = ref({
   cm: 0,
   td: 0,
@@ -193,6 +198,7 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
 
       <div class="actions-footer">
         <button @click="handleValider" class="btn btn-primary">Valider la saisie</button>
+        <button @click="handleExport" class="btn btn-dark">Terminer et exporter en PDF</button>
         <button @click="handleRetour" class="btn btn-outline">Annuler</button>
       </div>
 
@@ -254,23 +260,11 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   text-align: center;
 }
 .hour-block label {
-
-
   display: block;
-
-
   font-size: 0.9rem;
-
-
   font-weight: 800;
-
-
   margin-bottom: 8px;
-
-
   text-transform: uppercase;
-
-
 }
 
 .box-input, .wide-input {
@@ -372,6 +366,8 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
+  margin-bottom: 40px; /* Ajout d'un peu de marge en bas */
+  flex-wrap: wrap; /* Pour gérer les écrans plus petits */
 }
 .btn {
   padding: 15px 45px;
@@ -379,6 +375,10 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   font-weight: 700;
   cursor: pointer;
   border: none;
+  transition: transform 0.2s;
+}
+.btn:hover {
+  transform: translateY(-2px);
 }
 .btn-primary {
   background: #E92533;
@@ -388,5 +388,14 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   background: white;
   color: #E92533;
   border: 2px solid #E92533;
+}
+.btn-dark {
+  background: #333333;
+  color: white;
+  border: 2px solid #333333;
+}
+.btn-dark:hover {
+  background: #555555;
+  border-color: #555555;
 }
 </style>
