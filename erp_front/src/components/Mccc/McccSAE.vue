@@ -43,6 +43,8 @@ onMounted(async () => {
       selectedSaeIds.value = [...mcccStore.saeCodes];
     }
   }
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
 });
 
 const getSaeBySemester = (semesterNumber) => {

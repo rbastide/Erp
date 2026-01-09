@@ -29,6 +29,8 @@ onMounted(() => {
   mcccStore.loadMcccStore();
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
   fetchReferentiel();
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
 });
 
 const filteredSkills = computed(() => {
