@@ -7,10 +7,11 @@ import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
-// Ajout des refs pour le nom et le prénom
+// Ajout des refs pour le nom, prénom et email
 const username = ref('');
 const firstname = ref('');
 const lastname = ref('');
+const email = ref(''); // Nouveau champ
 const password = ref('');
 const confirmPassword = ref('');
 const role = ref('');
@@ -28,16 +29,17 @@ const handleRegister = async () => {
     return;
   }
 
-  // Vérification que tous les champs, y compris nom et prénom, sont remplis
-  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value) {
+  // Vérification que tous les champs sont remplis (y compris l'email)
+  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
   }
 
   const userPayload = {
     identifier: username.value,
-    firstname: firstname.value, // Ajout au payload
-    lastname: lastname.value,   // Ajout au payload
+    firstname: firstname.value,
+    lastname: lastname.value,
+    email: email.value, // Ajout au payload
     password: password.value,
     role: role.value
   };
@@ -80,6 +82,17 @@ const handleRegister = async () => {
             id="firstname"
             placeholder="Prénom"
             v-model="firstname"
+            required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Adresse mail</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="exemple@email.com"
+            v-model="email"
             required
         />
       </div>
@@ -167,7 +180,7 @@ const handleRegister = async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
   width: 100%;
-  max-width: 400px; /* Ajouté pour éviter que le formulaire soit trop large */
+  max-width: 400px;
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -200,7 +213,7 @@ const handleRegister = async () => {
   font-size: 16px;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
-  box-sizing: border-box; /* Important pour que le select ne dépasse pas */
+  box-sizing: border-box;
 }
 .login-button {
   width: 100%;
