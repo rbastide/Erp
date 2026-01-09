@@ -37,28 +37,6 @@ public class TeacherService {
         return teacherRepository.findByFirstnameAndLastname(lastname, firstname);
     }
 
-    public void addTeacher(@RequestBody TeacherRequest teacherRequest, Long userID) {
-        if(userID == null) {
-            ResponseEntity.notFound().build();
-            return;
-        }
-        Optional<Teacher> existingTeacher = teacherRepository.findById(teacherRequest.getTeacherID());
-        if(existingTeacher.isEmpty()){
-            Teacher teacher = new Teacher();
-            teacher.setLastname(teacherRequest.getLastName());
-            teacher.setFirstname(teacherRequest.getFirstName());
-            teacher.setuserID(userID);
-            teacherRepository.save(teacher);
-        }
-        Teacher teacherToEdit = existingTeacher.get();
-        teacherToEdit.setLastname(teacherRequest.getLastName());
-        teacherToEdit.setFirstname(teacherRequest.getFirstName());
-        teacherToEdit.setuserID(userID);
-        teacherRepository.save(teacherToEdit);
-
-        ResponseEntity.ok().build();
-
-    }
 
     public void createTeacherFromRegister(RegisterRequest req, Connection connection) {
         Teacher teacher = new Teacher();
