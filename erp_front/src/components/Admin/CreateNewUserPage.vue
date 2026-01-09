@@ -7,6 +7,7 @@ import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
+// Ajout des refs pour le nom et le prénom
 const username = ref('');
 const firstname = ref('');
 const lastname = ref('');
@@ -27,16 +28,16 @@ const handleRegister = async () => {
     return;
   }
 
-  // On oblige l'utilisateur à remplir le Nom et Prénom dans le formulaire
+  // Vérification que tous les champs, y compris nom et prénom, sont remplis
   if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
   }
 
-  // MAIS on ne les inclut pas dans l'objet envoyé au backend
   const userPayload = {
     identifier: username.value,
-    // firstname et lastname sont retirés ici pour ne pas interagir avec la BDD
+    firstname: firstname.value, // Ajout au payload
+    lastname: lastname.value,   // Ajout au payload
     password: password.value,
     role: role.value
   };
@@ -166,7 +167,7 @@ const handleRegister = async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; /* Ajouté pour éviter que le formulaire soit trop large */
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -199,7 +200,7 @@ const handleRegister = async () => {
   font-size: 16px;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* Important pour que le select ne dépasse pas */
 }
 .login-button {
   width: 100%;
