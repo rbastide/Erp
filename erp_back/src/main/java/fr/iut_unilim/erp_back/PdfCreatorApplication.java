@@ -6,10 +6,14 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.List;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import fr.iut_unilim.erp_back.pdf.PdfHeader;
 
 import java.io.IOException;
 
 public class PdfCreatorApplication {
+    public static final String BASE_PATH = "src/main/resources/";
+    private static final String IUT_ICON_PATH = "assets/logo_iut.png";
+
     public static void main(String[] args) {
         generatePdf();
     }
@@ -24,6 +28,12 @@ public class PdfCreatorApplication {
 
             Document document = new Document(pdf);
 
+            Table header = PdfHeader.createInfoCard(IUT_ICON_PATH);
+            if (header == null) {
+                return;
+            }
+            document.add(header);
+
             document.add(new Paragraph("Hello World!"));
 
             List list = new List()
@@ -32,18 +42,10 @@ public class PdfCreatorApplication {
                     .add("Élément 3");
             document.add(list);
 
-            float[] columnWidths = {100, 200};
-            Table table = new Table(columnWidths);
-            table.addCell("ID");
-            table.addCell("Nom");
-            document.add(table);
-
             document.close();
 
-            System.out.println("PDF créé avec succès !");
-
         } catch (IOException e) {
-            ErpBackApplication.LOGGER.info("Issue with creating PDF");
+            ErpBackApplication.LOGGER.info("Issue with creating PDF : " + e.getMessage());
         }
     }
 }
