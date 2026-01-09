@@ -8,6 +8,8 @@ import Sidebar from '../App/Sidebar.vue';
 const router = useRouter();
 
 const username = ref('');
+const firstname = ref('');
+const lastname = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const role = ref('');
@@ -25,13 +27,16 @@ const handleRegister = async () => {
     return;
   }
 
-  if (!username.value || !password.value || !role.value) {
+  // On oblige l'utilisateur à remplir le Nom et Prénom dans le formulaire
+  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
   }
 
+  // MAIS on ne les inclut pas dans l'objet envoyé au backend
   const userPayload = {
     identifier: username.value,
+    // firstname et lastname sont retirés ici pour ne pas interagir avec la BDD
     password: password.value,
     role: role.value
   };
@@ -57,7 +62,29 @@ const handleRegister = async () => {
     <form class="login-card" @submit.prevent="handleRegister">
 
       <div class="form-group">
-        <label for="username">Identifiant</label>
+        <label for="lastname">Nom</label>
+        <input
+            type="text"
+            id="lastname"
+            placeholder="Nom"
+            v-model="lastname"
+            required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="firstname">Prénom</label>
+        <input
+            type="text"
+            id="firstname"
+            placeholder="Prénom"
+            v-model="firstname"
+            required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="username">Identifiant (Login)</label>
         <input
             type="text"
             id="username"
@@ -138,6 +165,8 @@ const handleRegister = async () => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #dcdcdc;
+  width: 100%;
+  max-width: 400px;
 }
 .form-group {
   margin-bottom: 1.5rem;
@@ -165,12 +194,12 @@ const handleRegister = async () => {
 .form-group select {
   appearance: menulist-button;
   width: 100%;
-  max-width: 280px;
   padding: 12px 16px;
   background: rgba(255,255,255,0.4);
   font-size: 16px;
   border: 1px solid #dcdcdc;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 .login-button {
   width: 100%;

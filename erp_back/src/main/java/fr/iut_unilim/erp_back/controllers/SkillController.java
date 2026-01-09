@@ -1,23 +1,13 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.dto.CriticalLearningDto;
-import fr.iut_unilim.erp_back.dto.LearningRankDto;
-import fr.iut_unilim.erp_back.dto.NewSkillDto;
-import fr.iut_unilim.erp_back.entity.CriticalLearning;
-import fr.iut_unilim.erp_back.entity.Rank;
-import fr.iut_unilim.erp_back.entity.Skill;
-import fr.iut_unilim.erp_back.repository.CriticalLearningRepository;
-import fr.iut_unilim.erp_back.repository.SkillRepository;
-import fr.iut_unilim.erp_back.service.CriticalLearningService;
-import fr.iut_unilim.erp_back.service.RankService;
-import fr.iut_unilim.erp_back.service.SkillService;
+import fr.iut_unilim.erp_back.dto.*;
+import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.repository.*;
+import fr.iut_unilim.erp_back.service.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/skill")
@@ -28,41 +18,31 @@ public class SkillController {
     private final CriticalLearningRepository criticalLearningRepository;
     private final CriticalLearningService criticalLearningService;
     private final SkillRepository skillRepository;
+    private final RankRepository rankRepository;
 
-    public SkillController(SkillService skillService, RankService rankService, CriticalLearningRepository criticalLearningRepository, CriticalLearningService criticalLearningService, SkillRepository skillRepository) {
+    public SkillController(SkillService skillService, RankService rankService, CriticalLearningRepository criticalLearningRepository, CriticalLearningService criticalLearningService, SkillRepository skillRepository, RankRepository rankRepository) {
         this.skillService = skillService;
         this.rankService = rankService;
         this.criticalLearningRepository = criticalLearningRepository;
         this.criticalLearningService = criticalLearningService;
         this.skillRepository = skillRepository;
+        this.rankRepository = rankRepository;
     }
 
     @GetMapping("/skills")
     public ResponseEntity<?> getAllSkills() {
         List<Skill> skills = skillService.getAllSkills();
-        List<NewSkillDto> skillsDtos = convertSkillEntitiesToDtos(skills);
-
-        return ResponseEntity.ok(skillsDtos);
-    }
-
-    @NotNull
-    private static List<CriticalLearningDto> convertCriticalLearningEntitiesToDtos(@NotNull List<CriticalLearning> criticalLearnings) {
-        List<CriticalLearningDto> criticalLearningDtos = new ArrayList<>();
-        for (CriticalLearning criticalLearning : criticalLearnings) {
-            criticalLearningDtos.add(new CriticalLearningDto(criticalLearning));
-        }
-        return criticalLearningDtos;
+        return ResponseEntity.ok(convertSkillEntitiesToDtos(skills));
     }
 
     @PostMapping("/skills")
     public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos) {
         convertSkillDtosToEntities(skillsDtos);
-
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/skills/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteSkill(@PathVariable Long id) {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -72,38 +52,43 @@ public class SkillController {
 
     private void convertSkillDtosToEntities(@NotNull List<NewSkillDto> skillsDtos) {
         for (NewSkillDto skillDto : skillsDtos) {
-            Optional<Skill> skillDbRequest = skillService.getSkillsFromId(skillDto.id());
+            Skill skill = (skillDto.id() != null)
+                    ? skillService.getSkillsFromId(skillDto.id()).orElse(new Skill(skillDto.skillName(), skillDto.skillNum()))
+                    : new Skill(skillDto.skillName(), skillDto.skillNum());
 
-            Skill skill = skillDbRequest.orElse(new Skill(skillDto.skillName(), skillDto.skillNum()));
             skill.setSkillName(skillDto.skillName());
             skill.setSkillNum(skillDto.skillNum());
+            skill = skillRepository.save(skill);
 
             convertRankDtosToEntities(skillDto, skill);
-            skillRepository.save(skill);
         }
     }
 
     private void convertRankDtosToEntities(NewSkillDto skillDto, Skill skill) {
         for (LearningRankDto rankDto : skillDto.niveaux()) {
-            Optional<Rank> rankDbRequest = rankService.getRankFromId(rankDto.id());
+            Rank rank = (rankDto.id() != null)
+                    ? rankService.getRankFromId(rankDto.id()).orElse(new Rank(rankDto.num(), rankDto.intitule(), skill))
+                    : new Rank(rankDto.num(), rankDto.intitule(), skill);
 
-            Rank rank = rankDbRequest.orElse(new Rank(rankDto.num(), rankDto.intitule(), skill));
             rank.setRankNum(rankDto.num());
             rank.setRankTitle(rankDto.intitule());
             rank.setSkillID(skill);
+            rank = rankRepository.save(rank);
 
             convertCriticalLearningDtosToEntities(rankDto, rank);
         }
     }
 
     private void convertCriticalLearningDtosToEntities(LearningRankDto rankDto, Rank rank) {
-        for (CriticalLearningDto criticalLearningDto : rankDto.acs()) {
-            Optional<CriticalLearning> criticalLearningDbRequest = criticalLearningService.getCriticalLearningFromId(criticalLearningDto.id());
+        for (CriticalLearningDto acDto : rankDto.acs()) {
+            CriticalLearning cl = (acDto.id() != null)
+                    ? criticalLearningService.getCriticalLearningFromId(acDto.id()).orElse(new CriticalLearning(acDto.num(), acDto.intitule(), rank))
+                    : new CriticalLearning(acDto.num(), acDto.intitule(), rank);
 
-            CriticalLearning criticalLearning = criticalLearningDbRequest.orElse(new CriticalLearning(criticalLearningDto.num(), criticalLearningDto.intitule(), rank));
-            criticalLearning.setLearningNum(criticalLearningDto.num());
-            criticalLearning.setLearningTitle(criticalLearningDto.intitule());
-            criticalLearning.setRankID(rank);
+            cl.setLearningNum(acDto.num());
+            cl.setLearningTitle(acDto.intitule());
+            cl.setRankID(rank);
+            criticalLearningRepository.save(cl);
         }
     }
 
@@ -123,7 +108,10 @@ public class SkillController {
         List<LearningRankDto> learningRankDtos = new ArrayList<>();
         for (Rank rank : ranks) {
             List<CriticalLearning> criticalLearnings = criticalLearningRepository.findByRankID(rank);
-            List<CriticalLearningDto> criticalLearningDtos = convertCriticalLearningEntitiesToDtos(criticalLearnings);
+            List<CriticalLearningDto> criticalLearningDtos = new ArrayList<>();
+            for (CriticalLearning cl : criticalLearnings) {
+                criticalLearningDtos.add(new CriticalLearningDto(cl));
+            }
             learningRankDtos.add(new LearningRankDto(rank, criticalLearningDtos));
         }
         return learningRankDtos;
