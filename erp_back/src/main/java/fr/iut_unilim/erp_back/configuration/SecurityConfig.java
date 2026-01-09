@@ -46,7 +46,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/register").hasAuthority("ADMIN")
+                        .requestMatchers("/api/auth/**").hasAnyAuthority("ADMIN","SUPER_ADMIN")
+                        .requestMatchers("/api/mccc/**").hasAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/resources/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/sae/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/skill/**").hasAnyAuthority("SUPER_ADMIN")
+                        .requestMatchers("/api/resourceSheet/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(customUserDetailsService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
