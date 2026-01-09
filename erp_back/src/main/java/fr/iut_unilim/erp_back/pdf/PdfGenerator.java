@@ -5,8 +5,9 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Table;
 import fr.iut_unilim.erp_back.ErpBackApplication;
-import fr.iut_unilim.erp_back.pdf.model.PdfFormationInfo;
-import fr.iut_unilim.erp_back.pdf.model.PdfHeader;
+import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
+import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
+import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 
 import java.io.IOException;
 
@@ -32,7 +33,11 @@ public class PdfGenerator {
 
             document.add(header);
 
-            document.add(PdfFormationInfo.create());
+            Table formationInfo = PdfFormationInfo.create();
+            formationInfo.setMarginBottom(10);
+            document.add(formationInfo);
+
+            PdfDescription.addToDocument(document);
 
             document.close();
 

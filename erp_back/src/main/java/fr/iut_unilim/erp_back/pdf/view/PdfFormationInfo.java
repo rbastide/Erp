@@ -1,4 +1,4 @@
-package fr.iut_unilim.erp_back.pdf.model;
+package fr.iut_unilim.erp_back.pdf.view;
 
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
