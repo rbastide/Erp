@@ -47,8 +47,7 @@ const filteredSaes = computed(() => {
   );
 });
 
-const handleRetour = () => router.push('/home-admin');
-const handleValider = () => router.push('/modif-saved');
+const handleValider = () => router.back();
 
 const handleAddSae = () => {
   showAddForm.value = true;

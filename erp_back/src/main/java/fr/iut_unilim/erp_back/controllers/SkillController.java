@@ -73,7 +73,7 @@ public class SkillController {
             rank.setRankNum(rankDto.num());
             rank.setRankTitle(rankDto.intitule());
             rank.setSkillID(skill);
-            rank = rankRepository.save(rank); 
+            rank = rankRepository.save(rank);
 
             convertCriticalLearningDtosToEntities(rankDto, rank);
         }
