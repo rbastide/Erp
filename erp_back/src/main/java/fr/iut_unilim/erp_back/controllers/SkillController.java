@@ -52,14 +52,13 @@ public class SkillController {
 
     private void convertSkillDtosToEntities(@NotNull List<NewSkillDto> skillsDtos) {
         for (NewSkillDto skillDto : skillsDtos) {
-            // FIX: Vérifier si l'ID est null pour éviter le plantage du findById
             Skill skill = (skillDto.id() != null)
                     ? skillService.getSkillsFromId(skillDto.id()).orElse(new Skill(skillDto.skillName(), skillDto.skillNum()))
                     : new Skill(skillDto.skillName(), skillDto.skillNum());
 
             skill.setSkillName(skillDto.skillName());
             skill.setSkillNum(skillDto.skillNum());
-            skill = skillRepository.save(skill); // Sauvegarde pour obtenir l'ID parent
+            skill = skillRepository.save(skill);
 
             convertRankDtosToEntities(skillDto, skill);
         }
@@ -74,7 +73,7 @@ public class SkillController {
             rank.setRankNum(rankDto.num());
             rank.setRankTitle(rankDto.intitule());
             rank.setSkillID(skill);
-            rank = rankRepository.save(rank); // Sauvegarde le rang (Niveau)
+            rank = rankRepository.save(rank); 
 
             convertCriticalLearningDtosToEntities(rankDto, rank);
         }
@@ -89,7 +88,7 @@ public class SkillController {
             cl.setLearningNum(acDto.num());
             cl.setLearningTitle(acDto.intitule());
             cl.setRankID(rank);
-            criticalLearningRepository.save(cl); // Sauvegarde l'AC
+            criticalLearningRepository.save(cl);
         }
     }
 
