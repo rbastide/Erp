@@ -142,7 +142,7 @@ const routes = [
         component: McccSAE
     },
     {
-        path: '/mccc-competences',
+        path: '/mccc-skills',
         name: 'McccSkillsPage',
         component: McccSkills
     },
