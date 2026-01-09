@@ -11,13 +11,16 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacherID")
-    private Long id;
+    private Long teacherID;
 
     @Column(name = "lastname")
     private String lastname;
 
     @Column(name = "firstname")
     private String firstname;
+
+    @JoinColumn(name = "userID")
+    private int userID;
 
     @ManyToMany
     @JoinTable(
@@ -39,8 +42,8 @@ public class Teacher {
         this.firstname = firstname;
     }
 
-    public Long getId() {
-        return id;
+    public Long getTeacherID() {
+        return teacherID;
     }
 
     public String getLastname() {
@@ -51,8 +54,12 @@ public class Teacher {
         return firstname;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public int getuserID() {
+        return userID;
+    }
+
+    public void setTeacherID(Long id) {
+        this.teacherID = id;
     }
 
     public void setLastname(String lastname) {
@@ -61,5 +68,9 @@ public class Teacher {
 
     public void setFirstname(String firstname) {
         this.firstname = firstname;
+    }
+
+    public void setuserID(int userID) {
+        this.userID = userID;
     }
 }

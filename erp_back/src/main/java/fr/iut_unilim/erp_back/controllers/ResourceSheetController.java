@@ -84,13 +84,13 @@ public class ResourceSheetController {
         if (resSheet.getReferencialTeacherID() != null) {
             Optional<Teacher> existing = teacherRepository.findById(resSheet.getReferencialTeacherID());
             if (existing.isPresent()) {
-                sheet.setReferencialTeacherID(existing.get().getId());
+                sheet.setReferencialTeacherID(existing.get().getTeacherID());
             } else {
                 Teacher newObj = new Teacher();
                 newObj.setFirstname("Auto");
                 newObj.setLastname("Prof " + resSheet.getReferencialTeacherID());
                 newObj = teacherRepository.save(newObj);
-                sheet.setReferencialTeacherID(newObj.getId());
+                sheet.setReferencialTeacherID(newObj.getTeacherID());
             }
         } else {
             sheet.setReferencialTeacherID(null);
