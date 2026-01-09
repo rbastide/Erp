@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.HourlyVolume;
+import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.HourlyVolumeRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +22,9 @@ public class HourlyVolumeService {
 
     public void save(HourlyVolume hourlyVolume) {
         hourlyVolumeRepository.save(hourlyVolume);
+    }
+
+    public List<HourlyVolume> getAllHourlyVolume() {
+        return hourlyVolumeRepository.findAll();
     }
 }

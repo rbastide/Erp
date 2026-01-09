@@ -207,4 +207,15 @@ public class McccController {
     public ResponseEntity<?> getSaes() {
         return ResponseEntity.ok(saeService.getAllSaes());
     };
+
+    @GetMapping("/getHourlyVolumes")
+    public ResponseEntity<?> getHourlyVolumes() {
+        return ResponseEntity.ok(hourlyVolumeService.getAllHourlyVolume());
+    }
+
+    @PostMapping("/saveHourlyVolume")
+    public ResponseEntity<?> saveHourlyVolume(@RequestBody HourlyVolume hourlyVolume) {
+        hourlyVolumeService.save(hourlyVolume);
+        return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
+    }
 }
