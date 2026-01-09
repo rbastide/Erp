@@ -100,4 +100,6 @@ public class AuthController {
         connectionRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    
 }
