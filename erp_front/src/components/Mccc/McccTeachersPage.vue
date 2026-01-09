@@ -23,13 +23,11 @@ const fetchTeachers = async () => {
       teachersData = response.data.content;
     }
 
-    // Normalisation : on s'assure que chaque prof a une propriété 'teacherID' utilisable
     allTeachers.value = teachersData.map(t => ({
       ...t,
       teacherID: t.teacherID || t.id
     }));
 
-    // Pré-cocher les enseignants déjà présents dans le store
     if (mcccStore.referents && mcccStore.referents.length > 0) {
       selectedTeacherIds.value = mcccStore.referents.map(ref => {
         const found = allTeachers.value.find(t =>

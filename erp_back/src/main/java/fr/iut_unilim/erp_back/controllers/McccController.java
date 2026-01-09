@@ -202,4 +202,9 @@ public class McccController {
     public ResponseEntity<?> getTeachers() {
         return ResponseEntity.ok(teacherService.getAllTeachers());
     };
+
+    @GetMapping("/getSaes")
+    public ResponseEntity<?> getSaes() {
+        return ResponseEntity.ok(saeService.getAllSaes());
+    };
 }

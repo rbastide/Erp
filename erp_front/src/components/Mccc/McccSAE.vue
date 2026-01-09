@@ -1,30 +1,41 @@
 <script setup>
-import {useRouter} from 'vue-router';
-import {onMounted, ref} from 'vue';
-import {mcccStore} from "@/services/mcccStore.js";
+import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 const errorMessage = ref('');
 const selectedSaeIds = ref([]);
+const availableSae = ref([]);
 
-const availableSae = [
-  { id: 'S1.01', title: 'Implémenter un besoin client' },
-  { id: 'S1.02', title: 'Comparaison d\'algorithmes' },
-  { id: 'S1.03', title: 'Installation poste de travail' },
-  { id: 'S2.01', title: 'Développement d\'application' },
-  { id: 'S2.02', title: 'Exploration algorithmique' },
-  { id: 'S3.01', title: 'Développement web' },
-  { id: 'S3.02', title: 'Base de données avancées' },
-  { id: 'S4.01', title: 'Architecture logicielle' },
-  { id: 'S5.01', title: 'Management de projet' },
-  { id: 'S6.01', title: 'Entrepreneuriat' },
-  { id: 'S6.02', title: 'Droit du numérique' },
-];
+const fetchSAEs = async () => {
+  try {
+    const response = await api.get('/mccc/getSaes');
 
-onMounted(() => {
+    let saeData = [];
+    if (Array.isArray(response.data)) {
+      saeData = response.data;
+    } else if (response.data && Array.isArray(response.data.content)) {
+      saeData = response.data.content;
+    }
+
+    availableSae.value = saeData.map(s => ({
+      id: s.num,
+      title: s.title,
+      semester: s.semester
+    }));
+
+  } catch (error) {
+    errorMessage.value = "Impossible de charger les SAÉs.";
+  }
+};
+
+onMounted(async () => {
   mcccStore.loadMcccStore();
+  await fetchSAEs();
   if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0) {
     if (typeof mcccStore.saeCodes[0] === 'object') {
       selectedSaeIds.value = mcccStore.saeCodes.map(item => item.saeCode);
@@ -35,7 +46,10 @@ onMounted(() => {
 });
 
 const getSaeBySemester = (semesterNumber) => {
-  return availableSae.filter(sae => {
+  return availableSae.value.filter(sae => {
+    if (sae.semester) {
+      return sae.semester === semesterNumber;
+    }
     const match = sae.id.match(/S?(\d)\./);
     return match && parseInt(match[1]) === semesterNumber;
   });
@@ -55,15 +69,13 @@ const handleValider = () => {
     errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
     return;
   }
-
   mcccStore.saeCodes = selectedSaeIds.value.map(id => {
-    const fullSae = availableSae.find(s => s.id === id);
+    const fullSae = availableSae.value.find(s => s.id === id);
     return {
       saeCode: id,
       saeName: fullSae ? fullSae.title : ''
     };
   });
-
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -72,14 +84,11 @@ const handleValider = () => {
 <template>
   <Sidebar/>
   <AppHeader title="SAÉs pour" :inline="mcccStore.resourceCode"/>
-
   <main class="main-content">
     <div class="content-wrapper">
-
       <div class="semester-board">
         <div v-for="i in 6" :key="i" class="semester-column">
           <h3 class="column-title">Semestre {{ i }}</h3>
-
           <div class="cards-list">
             <div
                 v-for="sae in getSaeBySemester(i)"
@@ -91,22 +100,18 @@ const handleValider = () => {
               <div class="sae-content">
                 <span class="sae-number">{{ sae.id }}</span>
                 <span class="sae-title">{{ sae.title }}</span>
-
                 <div class="check-indicator" v-if="selectedSaeIds.includes(sae.id)">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
               </div>
             </div>
-
             <div v-if="getSaeBySemester(i).length === 0" class="empty-placeholder">
               Aucune SAE
             </div>
           </div>
         </div>
       </div>
-
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
       <div class="footer-actions">
         <button @click="handleValider" class="btn-main">Valider</button>
         <button @click="router.push('/cancel-mccc')" class="btn-sub">Annuler</button>
@@ -122,14 +127,12 @@ const handleValider = () => {
   background-color: #fcfcfc;
   font-family: 'Roboto', sans-serif;
 }
-
 .content-wrapper {
   width: 95%;
   max-width: 1600px;
   margin: 0 auto;
   padding-bottom: 50px;
 }
-
 .semester-board {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -138,7 +141,6 @@ const handleValider = () => {
   overflow-x: auto;
   padding-bottom: 20px;
 }
-
 .semester-column {
   background-color: #f8f9fa;
   border-radius: 12px;
@@ -148,7 +150,6 @@ const handleValider = () => {
   display: flex;
   flex-direction: column;
 }
-
 .column-title {
   text-align: center;
   color: #B51621;
@@ -159,14 +160,12 @@ const handleValider = () => {
   border-bottom: 2px solid rgba(181, 22, 33, 0.1);
   padding-bottom: 10px;
 }
-
 .cards-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
   flex-grow: 1;
 }
-
 .sae-card {
   background: white;
   border-radius: 8px;
@@ -182,19 +181,16 @@ const handleValider = () => {
   justify-content: center;
   text-align: center;
 }
-
 .sae-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
   border-color: #ccc;
 }
-
 .sae-card.is-selected {
   border-color: #B51621;
   background-color: #fff5f5;
   box-shadow: 0 0 0 1px #B51621;
 }
-
 .sae-content {
   display: flex;
   flex-direction: column;
@@ -202,23 +198,19 @@ const handleValider = () => {
   gap: 5px;
   width: 100%;
 }
-
 .sae-number {
   font-size: 16px;
   font-weight: 800;
   color: #333;
 }
-
 .sae-card.is-selected .sae-number {
   color: #B51621;
 }
-
 .sae-title {
   font-size: 12px;
   color: #666;
   line-height: 1.2;
 }
-
 .check-indicator {
   position: absolute;
   top: 5px;
@@ -233,7 +225,6 @@ const handleValider = () => {
   justify-content: center;
   box-shadow: 0 1px 3px rgba(181, 22, 33, 0.2);
 }
-
 .empty-placeholder {
   text-align: center;
   font-size: 12px;
@@ -241,20 +232,17 @@ const handleValider = () => {
   font-style: italic;
   margin-top: 20px;
 }
-
 .error-message {
   color: #E92533;
   text-align: center;
   font-weight: bold;
   margin-bottom: 30px;
 }
-
 .footer-actions {
   display: flex;
   justify-content: center;
   gap: 20px;
 }
-
 .btn-main {
   background: #B51621;
   color: white;
@@ -266,7 +254,6 @@ const handleValider = () => {
   transition: background 0.2s;
 }
 .btn-main:hover { background: #94121b; }
-
 .btn-sub {
   background: white;
   border: 2px solid #B51621;
@@ -278,19 +265,16 @@ const handleValider = () => {
   transition: background 0.2s;
 }
 .btn-sub:hover { background: #fff0f0; }
-
 @media (max-width: 1200px) {
   .semester-board {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
 @media (max-width: 768px) {
   .semester-board {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 @media (max-width: 500px) {
   .semester-board {
     grid-template-columns: 1fr;
