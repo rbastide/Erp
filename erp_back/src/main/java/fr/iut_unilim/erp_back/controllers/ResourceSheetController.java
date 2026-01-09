@@ -113,7 +113,7 @@ public class ResourceSheetController {
         if (resSheet.getHourlyVolumeID() != null) {
             Optional<HourlyVolume> existing = hourlyVolumeRepository.findById(resSheet.getHourlyVolumeID());
             if (existing.isPresent()) {
-                sheet.setHourlyVolumeID(existing.get().hourlyVolID());
+                sheet.setHourlyVolumeID(existing.get().getHourlyVolID());
             } else {
                 HourlyVolume newObj = new HourlyVolume();
                 newObj.setNbHoursCM(0);
@@ -122,7 +122,7 @@ public class ResourceSheetController {
                 newObj.setNbHoursDSTP(0);
                 newObj.setNbHoursDS(0);
                 newObj = hourlyVolumeRepository.save(newObj);
-                sheet.setHourlyVolumeID(newObj.hourlyVolID());
+                sheet.setHourlyVolumeID(newObj.getHourlyVolID());
             }
         } else {
             sheet.setHourlyVolumeID(null);

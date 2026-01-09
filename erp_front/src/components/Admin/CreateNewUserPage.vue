@@ -45,6 +45,7 @@ const handleRegister = async () => {
   };
 
   try {
+    console.log(userPayload);
     await AuthService.register(userPayload);
     await router.push('/users-gestion');
   } catch (error) {

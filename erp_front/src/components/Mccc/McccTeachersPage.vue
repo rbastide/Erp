@@ -175,7 +175,8 @@ const clearSearch = () => searchQuery.value = '';
         </div>
 
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Terminer</button>
+          <button @click="handleValider" class="btn-sys primary">Valider</button>
+          <button @click="handleCancel" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>

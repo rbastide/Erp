@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
@@ -47,6 +47,15 @@ const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
+
+const handleRetour = () => {
+  router.push('/cancel-mccc');
+};
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
+});
 </script>
 
 <template>
@@ -81,7 +90,8 @@ const handleValider = () => {
       </div>
 
       <div class="actions-container">
-        <button @click="handleValider" class="btn btn-primary">Terminer</button>
+        <button @click="handleValider" class="btn btn-primary">Valider</button>
+        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
       </div>
     </div>
   </main>

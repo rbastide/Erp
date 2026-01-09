@@ -29,6 +29,8 @@ onMounted(() => {
   mcccStore.loadMcccStore();
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
   fetchReferentiel();
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
 });
 
 const filteredSkills = computed(() => {
@@ -85,6 +87,7 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
+const handleCancel = () => router.push('/cancel-mccc');
 const clearSearch = () => searchQuery.value = '';
 </script>
 
@@ -157,7 +160,8 @@ const clearSearch = () => searchQuery.value = '';
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
         </div>
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Terminer</button>
+          <button @click="handleValider" class="btn-sys primary">Valider</button>
+          <button @click="handleCancel" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>
