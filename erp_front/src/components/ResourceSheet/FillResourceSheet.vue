@@ -3,11 +3,11 @@ import { ref, nextTick, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter()
 
 const handleRetour = () =>{ router.back()};
-const handleValider = () => {router.push('/home')};
 
 // Fonction placeholder pour le futur export PDF
 const handleExport = () => {
@@ -77,6 +77,55 @@ const addStudentFeedback = createFieldManager(stFBContents, stFBRefs)
 
 const upgradesContents = ref(['']), upgradesRefs = ref<HTMLTextAreaElement[]>([])
 const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
+
+// --- SAUVEGARDE ---
+const handleValider = async () => {
+  // Construction du contenu pédagogique global (concaténation avec séparateurs)
+  const buildContent = () => {
+    return JSON.stringify({
+      CM: cmContents.value.filter(t => t.trim()),
+      TD: tdContents.value.filter(t => t.trim()),
+      TP: tpContents.value.filter(t => t.trim()),
+      DS: dsContents.value.filter(t => t.trim()),
+      DSTP: dstpContents.value.filter(t => t.trim())
+    });
+  };
+
+  const payload = {
+    // Champs pour ResourceSheet
+    semester: 1, // Exemple, à dynamiser selon contexte
+    year: new Date().getFullYear(),
+    mainGoal: "Objectif par défaut",
+    content: buildContent(),
+
+    // Champs pour HourlyVolume
+    hoursCM: hours.value.cm,
+    hoursTD: hours.value.td,
+    hoursTP: hours.value.tp,
+    hoursDS: hours.value.ds,
+    hoursDSTP: hours.value.ds_tp,
+
+    // Champs pour les Feedbacks (concaténation simple)
+    teacherFeedbackContent: edFBContents.value.join('\n'),
+    studentFeedbackContent: stFBContents.value.join('\n'),
+    improvementIdeaContent: upgradesContents.value.join('\n'),
+
+    // IDs de liaison (si connus, sinon null pour création)
+    resourceID: null,
+    referencialTeacherID: null,
+    linkedSaeID: null
+  };
+
+  try {
+    // Note: On envoie une liste car le controller attend List<ResourceSheetRequest>
+    await api.post('/resourceSheet/resourceSheet', [payload]);
+    alert("Fiche ressource enregistrée avec succès !");
+    router.push('/home');
+  } catch (error) {
+    console.error("Erreur sauvegarde :", error);
+    alert("Erreur lors de l'enregistrement de la fiche.");
+  }
+};
 </script>
 
 <template>
@@ -389,6 +438,7 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
   color: #E92533;
   border: 2px solid #E92533;
 }
+/* Nouveau style pour le bouton PDF */
 .btn-dark {
   background: #333333;
   color: white;
