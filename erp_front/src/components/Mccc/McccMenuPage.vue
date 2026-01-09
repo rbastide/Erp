@@ -6,9 +6,6 @@ import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
 mcccStore.loadMcccStore();
-const handleRetour = () => {
-  router.push('/cancel');
-};
 
 const handleHours = () => {
   router.push('/mccc-hours');
@@ -70,8 +67,7 @@ const handleCompetences = () => {
       </div>
 
       <div class="container-btn">
-        <button @click="handleValider" class="btn-sys primary">Valider</button>
-        <button @click="handleRetour" class="btn-sys secondary">Retour</button>
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </main>
   </div>

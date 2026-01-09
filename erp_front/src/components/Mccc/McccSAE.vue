@@ -113,7 +113,7 @@ const handleValider = () => {
       </div>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <div class="footer-actions">
-        <button @click="handleValider" class="btn-main">Valider</button>
+        <button @click="handleValider" class="btn-main">Terminer</button>
       </div>
     </div>
   </main>
