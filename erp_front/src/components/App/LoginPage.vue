@@ -50,7 +50,7 @@ const handleLogin = async () => {
           <path d="M10 9H8" stroke="#B51621"></path>
         </svg>
       </div>
-      <h1 class="app-title">Fiche<span class="highlight">Express</span></h1>
+      <h1 class="app-title">IUT<span class="highlight">'xpress</span></h1>
     </div>
     <form class="login-card" @submit.prevent="handleLogin">
       <div class="form-group">
@@ -104,7 +104,7 @@ const handleLogin = async () => {
 
 .app-title {
   font-family: 'Roboto', sans-serif;
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 700;
   color: #333;
   margin: 0;
