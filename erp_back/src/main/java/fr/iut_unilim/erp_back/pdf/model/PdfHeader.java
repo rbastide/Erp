@@ -19,7 +19,7 @@ public class PdfHeader {
     private static final int HEADER_MULTIPLE_PARAGRAPH_FIXED_LEADING = 5;
 
     @Nullable
-    public static Table createInfoCard(String iconPath) {
+    public static Table create(String iconPath) {
         String imagePath = BASE_PATH + iconPath;
 
         ImageData dataLogoIut = createImageData(imagePath);

@@ -3,10 +3,9 @@ package fr.iut_unilim.erp_back.pdf;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.List;
-import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import fr.iut_unilim.erp_back.ErpBackApplication;
+import fr.iut_unilim.erp_back.pdf.model.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.model.PdfHeader;
 
 import java.io.IOException;
@@ -25,19 +24,15 @@ public class PdfGenerator {
 
             Document document = new Document(pdf);
 
-            Table header = PdfHeader.createInfoCard(IUT_ICON_PATH);
+            Table header = PdfHeader.create(IUT_ICON_PATH);
             if (header == null) {
                 return;
             }
+            header.setMarginBottom(5);
+
             document.add(header);
 
-            document.add(new Paragraph("Hello World!"));
-
-            List list = new List()
-                    .add("Élément 1")
-                    .add("Élément 2")
-                    .add("Élément 3");
-            document.add(list);
+            document.add(PdfFormationInfo.create());
 
             document.close();
 
