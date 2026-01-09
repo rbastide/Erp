@@ -28,6 +28,8 @@ const fetchResources = async () => {
 
 onMounted(() => {
   fetchResources();
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
 });
 
 const handleRetour = () => {

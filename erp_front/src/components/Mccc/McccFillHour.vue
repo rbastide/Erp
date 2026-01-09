@@ -81,7 +81,8 @@ const handleValider = () => {
       </div>
 
       <div class="actions-container">
-        <button @click="handleValider" class="btn btn-primary">Terminer</button>
+        <button @click="handleValider" class="btn btn-primary">Valider</button>
+        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
       </div>
     </div>
   </main>
