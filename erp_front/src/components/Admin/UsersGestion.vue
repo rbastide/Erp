@@ -12,10 +12,13 @@ const users = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
 
-// Modèle pour l'édition
+// Modèle pour l'édition (Ajout de firstname, lastname, email)
 const editedUser = reactive({
   id: null,
   identifier: '',
+  firstname: '',
+  lastname: '',
+  email: '',
   role: '',
   newPassword: ''
 });
@@ -51,6 +54,8 @@ const filteredUsers = computed(() => {
   if (!query) return users.value;
   return users.value.filter(user =>
       user.identifier.toLowerCase().includes(query) ||
+      (user.firstname && user.firstname.toLowerCase().includes(query)) || // Recherche aussi par prénom
+      (user.lastname && user.lastname.toLowerCase().includes(query)) ||   // Recherche aussi par nom
       formatRole(user.role).toLowerCase().includes(query)
   );
 });
@@ -74,6 +79,9 @@ const saveModification = async (index) => {
     const payload = {
       id: editedUser.id,
       identifier: editedUser.identifier,
+      firstname: editedUser.firstname,
+      lastname: editedUser.lastname,
+      email: editedUser.email,
       role: editedUser.role,
       newPassword: editedUser.newPassword.trim() !== '' ? editedUser.newPassword : null
     };
@@ -81,7 +89,11 @@ const saveModification = async (index) => {
 
     const originalIndex = users.value.findIndex(u => u.id === editedUser.id);
     if (originalIndex !== -1) {
+      // Mise à jour locale pour éviter de recharger
       users.value[originalIndex].identifier = editedUser.identifier;
+      users.value[originalIndex].firstname = editedUser.firstname;
+      users.value[originalIndex].lastname = editedUser.lastname;
+      users.value[originalIndex].email = editedUser.email;
       users.value[originalIndex].role = editedUser.role;
     }
     handleCancel();
@@ -94,13 +106,25 @@ const handleModif = (user, index) => {
   editingIndex.value = index;
   editedUser.id = user.id;
   editedUser.identifier = user.identifier;
+  editedUser.firstname = user.firstname || '';
+  editedUser.lastname = user.lastname || '';
+  editedUser.email = user.email || '';
   editedUser.role = user.role;
   editedUser.newPassword = '';
 };
 
 const handleCancel = () => {
   editingIndex.value = null;
-  Object.assign(editedUser, { id: null, identifier: '', role: '', newPassword: '' });
+  // Reset complet
+  Object.assign(editedUser, {
+    id: null,
+    identifier: '',
+    firstname: '',
+    lastname: '',
+    email: '',
+    role: '',
+    newPassword: ''
+  });
 };
 
 const handleValider = () => router.push('/home-admin');
@@ -132,7 +156,12 @@ const handleAddUser = () => router.push('/new-user');
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
+
             <h3 class="user-id">{{ user.identifier }}</h3>
+            <p class="user-name" v-if="user.firstname || user.lastname">
+              {{ user.firstname }} {{ user.lastname }}
+            </p>
+
             <span class="role-badge">{{ formatRole(user.role) }}</span>
 
             <div class="card-actions">
@@ -156,6 +185,18 @@ const handleAddUser = () => router.push('/new-user');
               <h4>Édition</h4>
               <button class="close-icon" @click="handleCancel">✕</button>
             </div>
+
+            <div class="input-group-compact">
+              <input type="text" v-model="editedUser.lastname" class="card-input-compact" placeholder="Nom">
+            </div>
+            <div class="input-group-compact">
+              <input type="text" v-model="editedUser.firstname" class="card-input-compact" placeholder="Prénom">
+            </div>
+            <div class="input-group-compact">
+              <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Email">
+            </div>
+
+            <hr class="separator"/>
 
             <div class="input-group-compact">
               <input type="text" v-model="editedUser.identifier" class="card-input-compact" placeholder="Identifiant">
@@ -213,32 +254,33 @@ const handleAddUser = () => router.push('/new-user');
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Carte un peu plus large */
   gap: 20px;
   width: 100%;
   max-width: 1200px;
   margin-bottom: 50px;
 }
 
-/* VIGNETTES RÉDUITES */
+/* VIGNETTES AGRANDIES */
 .user-card {
   background: #ffffff;
   border-radius: 12px;
-  min-height: 220px;
+  min-height: 250px; /* Agrandissement hauteur de base */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 15px;
+  padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   border: 1px solid transparent;
   position: relative;
 }
 
+/* Mode édition beaucoup plus grand pour contenir tous les champs */
 .user-card.is-editing {
   border: 2px solid #B51621;
-  min-height: 260px;
+  min-height: 480px;
 }
 
 .card-content {
@@ -274,6 +316,13 @@ const handleAddUser = () => router.push('/new-user');
   color: #333;
   font-size: 18px;
   font-weight: 700;
+}
+
+.user-name {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
 }
 
 .role-badge {
@@ -313,7 +362,7 @@ const handleAddUser = () => router.push('/new-user');
   border: 2px dashed #ddd;
   cursor: pointer;
   background: transparent;
-  min-height: 220px;
+  min-height: 250px; /* Alignement avec les autres cartes */
 }
 
 .add-card:hover {
@@ -347,10 +396,25 @@ const handleAddUser = () => router.push('/new-user');
   transition: color 0.3s ease;
 }
 
+.edit-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
 .edit-header h4 { margin: 0; font-size: 14px; color: #B51621; }
 .input-group-compact { width: 100%; margin-bottom: 8px; }
-.card-input-compact { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fafafa; }
-.save-btn-compact { width: 100%; padding: 8px; background: #B51621; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; margin-top: 5px; }
+.card-input-compact { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fafafa; box-sizing: border-box; }
+.save-btn-compact { width: 100%; padding: 10px; background: #B51621; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px; }
+
+.separator {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 10px 0;
+  width: 100%;
+}
 
 .sticky-bar {
   position: fixed;
