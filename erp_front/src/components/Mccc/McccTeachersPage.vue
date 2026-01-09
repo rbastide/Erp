@@ -12,7 +12,6 @@ const allTeachers = ref([]);
 const selectedTeacherIds = ref([]);
 const errorMessage = ref('');
 
-// --- CHARGEMENT ---
 const fetchTeachers = async () => {
   try {
     const response = await api.get('/mccc/getTeachers');
@@ -69,8 +68,6 @@ const availableTeachersList = computed(() => {
   });
 });
 
-
-// --- SÉLECTION ---
 const toggleTeacher = (id) => {
   errorMessage.value = '';
   if (id === undefined || id === null) return;
@@ -218,13 +215,11 @@ const clearSearch = () => searchQuery.value = '';
   font-weight: 500;
 }
 
-/* Titre spécifique pour la section sélectionnée */
 .selected-title {
   color: #B51621;
   font-weight: 700;
 }
 
-/* --- Grille de Cartes --- */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -255,7 +250,6 @@ const clearSearch = () => searchQuery.value = '';
   border-color: #ccc;
 }
 
-/* Style spécifique pour les cartes sélectionnées */
 .teacher-card.is-selected {
   border-color: #B51621;
   background-color: #fff5f5;
@@ -285,7 +279,6 @@ const clearSearch = () => searchQuery.value = '';
   transition: all 0.3s ease;
 }
 
-/* Avatar rouge quand sélectionné */
 .selected-avatar {
   background: rgba(181, 22, 33, 0.1);
   color: #B51621;
@@ -338,7 +331,6 @@ const clearSearch = () => searchQuery.value = '';
   border-radius: 8px;
 }
 
-/* --- Footer Sticky (Inchangé) --- */
 .sticky-footer {
   position: fixed;
   bottom: 0;
