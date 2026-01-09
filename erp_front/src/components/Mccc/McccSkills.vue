@@ -85,7 +85,6 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleCancel = () => router.push('/cancel-mccc');
 const clearSearch = () => searchQuery.value = '';
 </script>
 
@@ -159,7 +158,6 @@ const clearSearch = () => searchQuery.value = '';
         </div>
         <div class="footer-buttons">
           <button @click="handleValider" class="btn-sys primary">Terminer</button>
-          <button @click="handleCancel" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>
