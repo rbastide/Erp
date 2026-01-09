@@ -8,21 +8,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/mail")
-public class MailTestController {
+public class AutomaticMailController {
 
     private final AutomaticMailService automaticMailService;
 
-    public MailTestController(AutomaticMailService automaticMailService) {
+    public AutomaticMailController(AutomaticMailService automaticMailService) {
         this.automaticMailService = automaticMailService;
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<String> sendTestMail() {
-        automaticMailService.sendAutomaticMail(
-                "nathan.billaud@etu.unilim.fr",
-                "Test de mail",
-                "Si tu reçois ça, c'est que la configuration fonctionne."
-        );
+    @PostMapping("/automatic")
+    public ResponseEntity<String> sendAutomaticMails() {
+        automaticMailService.sendAutomaticMails();
         return ResponseEntity.ok("Mail envoyé (vérifie ta boîte mail)");
     }
 }
