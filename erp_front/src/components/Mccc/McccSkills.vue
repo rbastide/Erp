@@ -1,522 +1,400 @@
 <script setup>
-import {computed, onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import {mcccStore} from "@/services/mcccStore.js";
+import api from '@/services/api';
+import { mcccStore } from "@/services/mcccStore.js";
 
 const router = useRouter();
+const searchQuery = ref('');
+const errorMessage = ref('');
+const isLoading = ref(true);
+
+const allSkills = ref([]);
+
+const fetchReferentiel = async () => {
+  try {
+    isLoading.value = true;
+    const response = await api.get('/skill/skills');
+    allSkills.value = response.data;
+  } catch (error) {
+    errorMessage.value = "Erreur lors du chargement des données.";
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 onMounted(() => {
   mcccStore.loadMcccStore();
-  if (!Array.isArray(mcccStore.ue)) mcccStore.ue = [];
-  if (!Array.isArray(mcccStore.niveaux)) mcccStore.niveaux = [];
-  if (!Array.isArray(mcccStore.acs)) mcccStore.acs = [];
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
+  fetchReferentiel();
 });
+
+const filteredSkills = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+
+  return allSkills.value.filter(s => {
+    const isAlreadySelected = mcccStore.acsGrouped.some(g => g.ue === s.skillName);
+    if (isAlreadySelected) return false;
+
+    if (!query) return true;
+
+    if (query.startsWith('#')) {
+      const numToSearch = query.substring(1);
+      return s.skillNum?.toString().includes(numToSearch);
+    }
+
+    return (
+        s.skillName.toLowerCase().includes(query) ||
+        s.skillNum?.toString().includes(query)
+    );
+  });
+});
+
+const addSkillDirectly = (skill) => {
+  if (!skill.niveaux || skill.niveaux.length === 0) {
+    alert("Cette compétence n'a pas de niveaux définis en base.");
+    return;
+  }
+
+  const defaultRank = skill.niveaux[0];
+
+  const newSelection = {
+    resourceCode: mcccStore.resourceCode,
+    ue: skill.skillName,
+    niveau: defaultRank.intitule,
+    skillNum: skill.skillNum,
+    acs: defaultRank.acs.map(ac => ({
+      learningNum: parseInt(ac.num),
+      learningTitle: ac.intitule
+    }))
+  };
+
+  mcccStore.acsGrouped.unshift(newSelection);
+  mcccStore.registerMcccStore();
+};
+
+const removeGroup = (index) => {
+  mcccStore.acsGrouped.splice(index, 1);
+  mcccStore.registerMcccStore();
+};
 
 const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => router.push('/cancel-mccc');
-
-const groupedCompetences = computed(() => {
-  const groups = {};
-
-  if (!mcccStore.acsGrouped) return {};
-
-  mcccStore.acsGrouped.forEach(item => {
-    if (item.resourceCode === mcccStore.resourceCode) {
-      if (!groups[item.ue]) {
-        groups[item.ue] = [];
-      }
-      groups[item.ue].push({
-        niveau: item.niveau,
-        acs: item.acs
-      });
-    }
-  });
-
-  return groups;
-});
-
-const currentCompetence = ref({
-  ue: '',
-  niveaux: [{niveau: '', acs: ['']}],
-});
-
-const handleAddNiveau = () => {
-  const lastNiveauIndex = currentCompetence.value.niveaux.length - 1;
-  const lastNiveau = currentCompetence.value.niveaux[lastNiveauIndex];
-  const hasValidAc = lastNiveau.acs.some(ac => ac !== '');
-
-  if (lastNiveau.niveau !== '' && hasValidAc) {
-    currentCompetence.value.niveaux.push({niveau: '', acs: ['']});
-  } else {
-    alert("Veuillez choisir le niveau actuel ET au moins un AC associé.");
-  }
-};
-
-const handleAddAc = (niveauIndex) => {
-  const niveau = currentCompetence.value.niveaux[niveauIndex];
-  if (niveau.acs[niveau.acs.length - 1] !== '') {
-    niveau.acs.push('');
-  } else {
-    alert("Veuillez choisir l'AC actuel avant d'en ajouter un autre.");
-  }
-};
-
-const handleSaveCompetence = () => {
-  if (!currentCompetence.value.ue) {
-    alert('Veuillez sélectionner une UE.');
-    return;
-  }
-
-  const parseAcString = (acString) => {
-    const match = acString.match(/\.(\d+)\s*:\s*(.*)/);
-    if (match) {
-      return {
-        learningNum: parseInt(match[1], 10),
-        learningTitle: match[2].trim()
-      };
-    }
-    return {learningNum: 0, learningTitle: acString};
-  };
-
-  const niveauxValides = currentCompetence.value.niveaux
-      .filter(n => n.niveau !== '')
-      .map(n => ({
-        niveau: n.niveau,
-        acs: n.acs.filter(ac => ac !== '').map(parseAcString)
-      }))
-      .filter(n => n.acs.length > 0);
-
-  if (niveauxValides.length === 0) {
-    alert('Veuillez sélectionner au moins un Niveau avec au moins un AC associé.');
-    return;
-  }
-
-  if (!mcccStore.ue.includes(currentCompetence.value.ue)) {
-    mcccStore.ue.push(currentCompetence.value.ue);
-  }
-
-  niveauxValides.forEach(nouveau => {
-    const groupeExistant = mcccStore.acsGrouped.find(g =>
-        g.resourceCode === mcccStore.resourceCode &&
-        g.ue === currentCompetence.value.ue &&
-        g.niveau === nouveau.niveau
-    );
-
-    if (groupeExistant) {
-      nouveau.acs.forEach(newAc => {
-        if (!groupeExistant.acs.some(existingAc => existingAc.learningNum === newAc.learningNum)) {
-          groupeExistant.acs.push(newAc);
-        }
-      });
-    } else {
-      mcccStore.acsGrouped.push({
-        resourceCode: mcccStore.resourceCode,
-        ue: currentCompetence.value.ue,
-        niveau: nouveau.niveau,
-        acs: [...nouveau.acs]
-      });
-    }
-  });
-
-  mcccStore.registerMcccStore();
-
-  currentCompetence.value = {
-    ue: '',
-    niveaux: [{niveau: '', acs: ['']}],
-  };
-};
+const handleCancel = () => router.push('/cancel-mccc');
+const clearSearch = () => searchQuery.value = '';
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader :title="'Compétences ' + (mcccStore.resourceCode || '')"/>
+  <AppHeader title="Compétences" :inline="mcccStore.resourceCode"/>
 
-  <main class="main-div">
-    <div class="description">Veuillez saisir la/les compétences pour cette ressource :</div>
+  <main class="main-content">
+    <div class="content-wrapper">
 
-    <div class="container-global">
+      <div class="selection-section" v-if="mcccStore.acsGrouped.length > 0">
+        <h2 class="section-title selected-title">Compétences sélectionnées :</h2>
+        <div class="grid-container">
+          <div v-for="(group, idx) in mcccStore.acsGrouped" :key="idx" class="admin-card is-selected-summary">
+            <button @click="removeGroup(idx)" class="btn-remove-absolute" title="Supprimer">✕</button>
 
-      <div v-if="Object.keys(groupedCompetences).length > 0" class="skill-card skill-card-resume">
-        <p id="card-title">Récapitulatif des saisies ({{ mcccStore.resourceCode }})</p>
-
-        <div class="resume-item">
-          <strong>UEs ajoutées :</strong>
-          <ul class="resume-list">
-            <li v-for="(ueName, i) in Object.keys(groupedCompetences)" :key="'ue-'+i">{{ ueName }}</li>
-          </ul>
-        </div>
-
-        <div v-for="(groups, ueName) in groupedCompetences" :key="ueName" class="ue-block">
-          <div class="resume-item">
-            <strong style="font-size: 1.1em; color: #B51621; text-decoration: underline;">{{ ueName }}</strong>
-
-            <ul class="resume-list main-level">
-              <li v-for="(group, idx) in groups" :key="idx">
-                <span style="font-weight: bold;">{{ group.niveau }}</span>
-                <ul class="resume-list sub-level">
-                  <li v-for="(ac, acIdx) in group.acs" :key="acIdx">
-                    AC 0{{ ac.learningNum }} : {{ ac.learningTitle }}
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-          <hr class="ue-separator" v-if="Object.keys(groupedCompetences).length > 1">
-        </div>
-      </div>
-
-      <div class="skill-card">
-        <p id="card-title">Ajouter une compétence</p>
-
-        <div class="form-item container-ue">
-          <label for="ue">Veuillez choisir une UE associée à {{ mcccStore.resourceCode }} </label>
-          <select name="ue" id="ue" v-model="currentCompetence.ue">
-            <option value="" selected disabled>Rien de sélectionné</option>
-            <option value="UE 1 : Réaliser">UE 1 : Réaliser</option>
-            <option value="UE 2 : Optimiser">UE 2 : Optimiser</option>
-            <option value="UE 3 : Administrer">UE 3 : Administrer</option>
-            <option value="UE 4 : Gérer">UE 4 : Gérer</option>
-            <option value="UE 5 : Conduire">UE 5 : Conduire</option>
-            <option value="UE 6 : Collaborer">UE 6 : Collaborer</option>
-          </select>
-        </div>
-
-        <hr class="separator"/>
-        <p class="section-title">Définir les Niveaux et leurs ACs associés</p>
-
-        <div v-for="(niveauGroup, nIndex) in currentCompetence.niveaux" :key="'niv-' + nIndex" class="form-item container-niv-group">
-          <div class="niveau-group">
-            <label :for="'niv-' + nIndex">Niveau {{ nIndex + 1 }} attendu </label>
-            <div class="input-with-plus">
-              <select :name="'niv-select-' + nIndex" :id="'niv-select-' + nIndex" v-model="niveauGroup.niveau">
-                <option value="" selected disabled>Rien de sélectionné</option>
-                <option value="Niveau 1 : Développement">Niveau 1 : Développement</option>
-                <option value="Niveau 2 : Optimisation">Niveau 2 : Optimisation</option>
-                <option value="Niveau 3 : Administration">Niveau 3 : Administration</option>
-              </select>
-              <svg v-if="nIndex === currentCompetence.niveaux.length - 1" @click="handleAddNiveau" width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
-                <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
+            <div class="icon-circle selected-icon">
+              {{ group.skillNum || '?' }}
             </div>
 
-            <div class="nested-acs">
-              <div class="ac-title-with-plus">
-                <p class="nested-title">ACs pour {{ niveauGroup.niveau || `Niveau ${nIndex + 1}` }}</p>
-              </div>
-              <div v-for="(_, aIndex) in niveauGroup.acs" :key="'ac-' + nIndex + '-' + aIndex"
-                   class="form-item container-ac ac-input-group">
-                <label :for="'ac-select-' + nIndex + '-' + aIndex" class="nested-label">AC {{ aIndex + 1 }} associé</label>
-                <div class="select-with-plus">
-                  <select :name="'ac-select-' + nIndex + '-' + aIndex" :id="'ac-select-' + nIndex + '-' + aIndex" v-model="niveauGroup.acs[aIndex]">
-                    <option value="" selected disabled>Rien de sélectionné</option>
-                    <option value="AC 11.01 : Implémenter">AC 11.01 : Implémenter</option>
-                    <option value="AC 11.02 : Concevoir">AC 11.02 : Concevoir</option>
-                    <option value="AC 11.03 : Tester">AC 11.03 : Tester</option>
-                    <option value="AC 11.04 : Déployer">AC 11.04 : Déployer</option>
-                  </select>
-                  <svg v-if="aIndex === niveauGroup.acs.length - 1" @click="handleAddAc(nIndex)" width="35" height="35" viewBox="0 0 57 52" xmlns="http://www.w3.org/2000/svg" class="svg-active">
-                    <path d="M28.5 17.3333V34.6667M19 26H38M11.875 6.5H45.125C47.7484 6.5 49.875 8.4401 49.875 10.8333V41.1667C49.875 43.5599 47.7484 45.5 45.125 45.5H11.875C9.25165 45.5 7.125 43.5599 7.125 41.1667V10.8333C7.125 8.4401 9.25165 6.5 11.875 6.5Z" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                  </svg>
-                </div>
+            <h3 class="card-title">{{ group.ue }}</h3>
+            <span class="rank-info">{{ group.niveau }}</span>
+
+            <div class="ac-details-list">
+              <div v-for="ac in group.acs" :key="ac.learningNum" class="ac-detail-item">
+                <strong>AC {{ ac.learningNum }} :</strong> {{ ac.learningTitle }}
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <button @click="handleSaveCompetence" class="card-ok" title="Valider cette compétence">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-            <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
-            <polyline points="9 12 12 15 15 9"/>
-          </svg>
-        </button>
+      <div class="separator-line" v-if="mcccStore.acsGrouped.length > 0"></div>
+
+      <div class="selection-section">
+        <h2 class="section-title">Compétences disponibles :</h2>
+        <div v-if="isLoading" class="loading">Chargement du référentiel...</div>
+
+        <div class="grid-container">
+          <div v-for="skill in filteredSkills"
+               :key="skill.id"
+               class="admin-card"
+               @click="addSkillDirectly(skill)">
+            <div class="icon-circle">
+              {{ skill.skillNum }}
+            </div>
+            <h3 class="card-title">{{ skill.skillName }}</h3>
+            <span class="click-info">+ Ajouter</span>
+          </div>
+        </div>
+
+        <div v-if="!isLoading && filteredSkills.length === 0" class="no-result">
+          <span v-if="searchQuery">Aucune compétence ne correspond à "{{ searchQuery }}"</span>
+          <span v-else>Toutes les compétences sont sélectionnées.</span>
+        </div>
       </div>
-      <div class="container-btn">
-        <div @click="handleValider" class="btn-sys">Valider les compétences</div>
-        <div @click="handleRetour" class="btn-sys">Annuler</div>
-      </div>
+
     </div>
+
+    <footer class="sticky-footer">
+      <div class="footer-content">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Rechercher par nom ou numéro (ex : #3)"
+              class="search-input"
+          />
+          <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
+        </div>
+        <div class="footer-buttons">
+          <button @click="handleValider" class="btn-sys primary">Terminer</button>
+          <button @click="handleCancel" class="btn-sys secondary">Annuler</button>
+        </div>
+      </div>
+    </footer>
   </main>
 </template>
 
 <style scoped>
-.container-card img {
-  position: absolute;
-  width: 127px;
-  height: 127px;
-  left: 64px;
-  top: 22.5px;
-}
-
-.container-card p {
-  position: absolute;
-  width: 723px;
-  height: 124px;
-  left: 209px;
-  top: 24px;
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 900;
-  font-size: 56px;
-  line-height: 110%;
-  display: flex;
-  align-items: center;
-  letter-spacing: -0.03em;
-  color: #FFFFFF;
-}
-
-.main-div {
-  font-family: 'Roboto', sans-serif;
-  min-height: 100vh;
-  padding-top: 172px;
-  box-sizing: border-box;
-  background-color: #f7f7f7;
-}
-
-.container-global {
-  position: relative;
-  width: 450px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding-bottom: 50px;
-}
-
-.description {
-  font-family: 'Roboto', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 32px;
-  color: #B51621;
-  margin: 40px;
-  text-align: center;
-}
-
-#card-title {
-  text-align: center;
-  color: #B51621;
-  font-size: 32px;
-  font-weight: bold;
-  margin: 20px 0;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
-}
-
-.skill-card {
-  width: 100%;
-  background-color: #FFFFFF;
-  padding: 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #dcdcdc;
-  margin-bottom: 30px;
-}
-
-.skill-card-resume {
-  background-color: #ffeaea;
-  border: 1px solid #B51621;
-}
-
-.skill-card-resume #card-title {
-  color: #B51621;
-  border-color: #B51621;
-}
-
-.resume-item {
-  font-size: 18px;
-  margin-bottom: 15px;
-  padding-left: 10px;
-}
-
-.resume-list {
-  list-style-type: disc;
-  padding-left: 20px;
-  margin-top: 5px;
-}
-
-.resume-list li {
-  margin-bottom: 4px;
-  line-height: 1.4;
-}
-
-.resume-list.sub-level {
-  list-style-type: circle;
-  padding-left: 30px;
-  margin-top: 5px;
-}
-
-.resume-list.main-level li {
-  margin-bottom: 10px;
-}
-
-.ue-separator {
-  border: 0;
-  border-top: 1px dashed #B51621;
-  margin: 20px 0;
-  opacity: 0.5;
-}
-
-.form-item {
-  margin-bottom: 1.5rem;
-}
-
-.form-item label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: black;
-  font-size: 20px;
-}
-
-.select-with-plus {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.form-item select {
-  appearance: menulist-button;
-  width: 100%;
-  max-width: 280px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 2px solid rgb(0, 0, 0);
-  font-size: 16px;
-}
-
-.select-with-plus svg,
-.input-with-plus svg {
-  stroke: black;
-  margin: 5px;
-  transition: stroke 0.2s, transform 0.2s;
-  cursor: pointer;
-}
-
-.select-with-plus .svg-active:hover,
-.input-with-plus .svg-active:hover {
-  stroke: green;
-  transform: scale(1.1);
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #444;
-  margin: 25px 0 15px 0;
-  text-align: center;
-}
-
-.separator {
-  border: 0;
-  height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(181, 22, 33, 0.5), rgba(0, 0, 0, 0));
-  margin: 30px 0;
-}
-
-.niveau-group {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.main-content {
   background-color: #fcfcfc;
-  margin-bottom: 25px;
+  min-height: 100vh;
+  padding: 180px 20px 120px;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.nested-acs {
-  padding: 15px;
-  border-left: 3px solid #B51621;
-  margin-top: 15px;
+.content-wrapper {
+  width: 100%;
+  max-width:
+      1200px;
+}
+.selection-section {
+  margin-bottom: 40px;
+}
+.section-title {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.selected-title {
+  color: #B51621;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.admin-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  min-height: 160px;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.admin-card:hover {
+  border-color: #B51621;
+  transform: translateY(-3px);
   background-color: #fff5f5;
 }
 
-.ac-title-with-plus {
+.is-selected-summary {
+  border-color: #B51621;
+  background-color: #fff5f5;
+  cursor: default;
+  min-height: 220px;
+}
+.is-selected-summary:hover {
+  transform: none;
+}
+
+.icon-circle {
+  width: 45px; height: 45px;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; margin-bottom: 15px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.selected-icon {
+  background: #B51621;
+  color: white;
+}
+
+.admin-card:hover .icon-circle {
+  background: #B51621;
+  color: white;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 5px 0;
+  color: #333;
+}
+.rank-info {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.click-info {
+  font-size: 0.75rem;
+  color: #B51621;
+  margin-top: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.ac-details-list {
+  width: 100%;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(181, 22, 33, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ac-detail-item {
+  font-size: 0.75rem;
+  color: #444;
+  text-align: left;
+  line-height: 1.3;
+}
+
+.ac-detail-item strong {
+  color: #B51621;
+  white-space: nowrap;
+}
+
+.btn-remove-absolute {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #B51621;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.separator-line {
+  width: 100%;
+  height: 1px;
+  background: #eee;
+  margin-bottom: 40px;
+}
+
+.no-result {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+  grid-column: 1 / -1;
+}
+
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  padding: 15px 0;
+  z-index: 100;
+}
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
 }
-
-.nested-title {
-  font-weight: 700 !important;
-  color: #B51621;
-  font-size: 18px !important;
-  margin: 0 !important;
-}
-
-.nested-label {
-  font-size: 16px !important;
-  font-weight: 500 !important;
-}
-
-.ac-input-group {
-  border-top: 1px dashed #ccc;
-  padding-top: 15px;
-  margin-bottom: 20px;
-}
-
-.nested-acs .ac-input-group:first-child {
-  border-top: none;
-  padding-top: 0;
-  margin-bottom: 20px;
-}
-
-.card-ok {
+.search-wrapper {
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  background: none;
+  width: 350px;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 40px;
+  border-radius: 50px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.clear-input-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ddd;
   border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 8px;
   cursor: pointer;
-  padding: 0;
-  margin: 20px;
-  transition: transform 0.2s;
-}
-
-.card-ok svg {
-  height: 50px;
-  width: 50px;
-}
-
-.card-ok:hover {
-  color: green;
-}
-
-/* Boutons Système (Bas de page) */
-.container-btn {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
 }
 
 .btn-sys {
-  width: 150px;
-  padding: 13px;
+  padding: 12px 30px;
+  border-radius: 50px;
   border: none;
-  text-align: center;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem;
   font-weight: bold;
-  cursor: pointer;
-  font-family: 'Roboto', sans-serif;
-  transition: background-color 0.2s ease;
-  position: relative;
-  margin: 1%;
+  cursor: pointer; }
+.btn-sys.primary {
+  background: #B51621;
+  color: white;
 }
-
-.btn-sys:hover {
-  background: #999999;
-  transform: translateY(-4px);
-  cursor: pointer;
+.btn-sys.secondary {
+  background: #f0f0f0;
+  color: #666;
+  margin-left: 10px;
 }
 </style>

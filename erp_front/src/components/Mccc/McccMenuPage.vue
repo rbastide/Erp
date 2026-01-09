@@ -27,7 +27,7 @@ const handleSae = () => {
 };
 
 const handleCompetences = () => {
-  router.push('/mccc-competences');
+  router.push('/mccc-skills');
 }
 
 </script>
