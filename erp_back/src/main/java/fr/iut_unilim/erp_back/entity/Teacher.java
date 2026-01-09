@@ -20,7 +20,7 @@ public class Teacher {
     private String firstname;
 
     @JoinColumn(name = "userID")
-    private int userID;
+    private Long userID;
 
     @ManyToMany
     @JoinTable(
@@ -54,7 +54,7 @@ public class Teacher {
         return firstname;
     }
 
-    public int getuserID() {
+    public Long getuserID() {
         return userID;
     }
 
@@ -70,7 +70,7 @@ public class Teacher {
         this.firstname = firstname;
     }
 
-    public void setuserID(int userID) {
+    public void setuserID(Long userID) {
         this.userID = userID;
     }
 }

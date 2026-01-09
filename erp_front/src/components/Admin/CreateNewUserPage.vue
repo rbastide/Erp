@@ -46,7 +46,7 @@ const handleRegister = async () => {
 
   try {
     await AuthService.register(userPayload);
-    router.push('/users-gestion');
+    await router.push('/users-gestion');
   } catch (error) {
     console.error("Erreur Inscription:", error);
     if (error.response && error.response.data) {

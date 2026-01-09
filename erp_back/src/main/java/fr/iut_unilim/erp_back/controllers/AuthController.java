@@ -1,12 +1,11 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
-import fr.iut_unilim.erp_back.dto.AuthResponse;
-import fr.iut_unilim.erp_back.dto.EditUserRequest;
-import fr.iut_unilim.erp_back.dto.LoginRequest;
-import fr.iut_unilim.erp_back.dto.RegisterRequest;
+import fr.iut_unilim.erp_back.dto.*;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +28,15 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
+    private final TeacherRepository teacherRepository;
 
-    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherRepository teacherRepository) {
         this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
+        this.teacherRepository = teacherRepository;
     }
 
     @PostMapping("/register")
@@ -47,6 +48,7 @@ public class AuthController {
         user.setIdentifier(req.getIdentifier());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(req.getRole());
+        user.setEmail(req.getEmail());
         connectionRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -80,6 +82,7 @@ public class AuthController {
         Connection userToEdit = existingUser.get();
         userToEdit.setIdentifier(user.identifier());
         userToEdit.setRole(user.role());
+        userToEdit.setEmail(user.email());
         if (user.newPassword() != null) {
             userToEdit.setPassword(passwordEncoder.encode(user.newPassword()));
         }
@@ -101,5 +104,25 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/addTeacher")
+    public ResponseEntity<?> editTeachers(@RequestBody TeacherRequest teacher,EditUserRequest user) {
+            Optional<Teacher> existingTeachers = teacherRepository.findById(teacher.getTeacherID());
+            if (existingTeachers.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            Teacher teacherToEdit = existingTeachers.get();
+            teacherToEdit.setLastname(teacher.getLastName());
+            teacherToEdit.setFirstname(teacher.getFirstName());
+            Optional<Connection> connection = connectionRepository.findById(user.id());
+            if(connection.isEmpty()){
+                return ResponseEntity.notFound().build();
+            }
+            teacherToEdit.setuserID(connection.get().getId());
+            teacherRepository.save(teacherToEdit);
+            return ResponseEntity.ok().build();
+
+        }
+    }
+
     
-}
+

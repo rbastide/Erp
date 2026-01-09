@@ -20,12 +20,16 @@ public class Connection {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "email")
+    private String email;
+
     public Connection() {}
 
-    public Connection(String identifier, String hashedPassword, String role) {
+    public Connection(String identifier, String hashedPassword, String role, String email) {
         this.identifier = identifier;
         this.hashedPassword = hashedPassword;
         this.role = role;
+        this.email = email;
     }
 
     public Long getId() {
@@ -43,6 +47,7 @@ public class Connection {
     public String getRole() {
         return role;
     }
+    public String getEmail() {return email;}
 
     public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
@@ -50,4 +55,7 @@ public class Connection {
 
     public void setIdentifier(String identifier) { this.identifier = identifier; }
     public void setRole(String role) { this.role = role; }
+
+    public void setEmail(String email) { this.email = email; }
+
 }
