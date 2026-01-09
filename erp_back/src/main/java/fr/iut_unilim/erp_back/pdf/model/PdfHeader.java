@@ -1,4 +1,4 @@
-package fr.iut_unilim.erp_back.pdf;
+package fr.iut_unilim.erp_back.pdf.model;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.layout.element.Cell;
@@ -9,7 +9,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.Nullable;
 
-import static fr.iut_unilim.erp_back.PdfCreatorApplication.BASE_PATH;
+import static fr.iut_unilim.erp_back.pdf.PdfGenerator.BASE_PATH;
 import static fr.iut_unilim.erp_back.pdf.utils.ImageDataUtils.createImageData;
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredParagraph;
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createMultipleLinesParagraph;
