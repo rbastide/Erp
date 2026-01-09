@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'; // Ajout de ref et onMounted
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import api from '@/services/api'; // Import de votre instance axios
+import api from '@/services/api';
 
 const router = useRouter();
 
-// 1. Création d'une variable réactive pour stocker les ressources de la BDD
-// On définit une interface pour typer la ressource selon votre ResourceResponse.java
 interface Resource {
   resourceID: number;
   num: string;
@@ -19,10 +17,8 @@ interface Resource {
 
 const resources = ref<Resource[]>([]);
 
-// 2. Fonction pour charger les données depuis le contrôleur Java
 const fetchResources = async () => {
   try {
-    // Appel de la route @GetMapping("/resources") définie dans ResourceController
     const response = await api.get('/resources/resources');
     resources.value = response.data;
   } catch (error) {
@@ -30,7 +26,6 @@ const fetchResources = async () => {
   }
 };
 
-// 3. Appel de la fonction au chargement du composant
 onMounted(() => {
   fetchResources();
 });
@@ -85,7 +80,6 @@ const handleMccc = (code: string) => {
 </template>
 
 <style scoped>
-/* Vos styles existants conservés */
 .page-container {
   min-height: 100vh;
   background-color: #f8f9fa;
@@ -169,7 +163,6 @@ const handleMccc = (code: string) => {
   transition: color 0.3s ease;
 }
 
-/* Nouveau style pour le nom de la ressource sous le code */
 .res-name {
   font-size: 14px;
   color: #666;
