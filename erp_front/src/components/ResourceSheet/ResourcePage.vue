@@ -1,138 +1,224 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 
-const ressources = ref([
-  { code: 'R1.01', name: 'Initiation au développement' },
-  { code: 'R1.02', name: 'Développement interfaces' },
-  { code: 'R2.01', name: 'Architecture Réseaux' },
-  { code: 'R2.03', name: 'Qualité de dév' },
-  { code: 'R3.01', name: 'Services Web' },
-  { code: 'R3.04', name: 'Management de projet' },
-]);
+interface Resource {
+  resourceID: number;
+  num: string;
+  name: string;
+  semester: string;
+}
 
-const handleRetour = () => router.back();
-const handleFill = () => router.push('/fillressourcepage');
+const resources = ref<Resource[]>([]);
+const isLoading = ref(true);
+
+const fetchResources = async () => {
+  try {
+    isLoading.value = true;
+    const response = await api.get('/resources/resources');
+    resources.value = response.data;
+  } catch (error) {
+    console.error("Erreur lors du chargement des ressources:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchResources();
+});
+
+const handleRetour = () => {
+  router.back();
+};
+
+const handleFill = (code: string) => {
+  router.push({ path: '/fillressourcepage', query: { code: code } });
+}
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader title="Choix de la ressource" />
+  <div class="page-container">
+    <AppHeader title="Choix de la ressource" />
 
-  <main class="main-content">
-    <div class="container">
-      <h2 class="description">Veuillez choisir votre ressource :</h2>
+    <main class="main-content">
+      <div class="section-title">Veuillez choisir la ressource :</div>
 
-      <div class="container-button">
+      <div v-if="isLoading" class="empty-msg">
+        Chargement des ressources en cours...
+      </div>
+
+      <div v-else class="grid-container">
         <div
-            v-for="res in ressources"
-            :key="res.code"
-            @click="handleFill"
-            class="push-button"
+            v-for="res in resources"
+            :key="res.resourceID"
+            class="card-action"
+            @click="handleFill(res.num)"
         >
-          <p class="text-button">{{ res.code }}</p>
-          <p class="sub-text-button">{{ res.name }}</p>
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
+          <p class="res-num">{{ res.num }}</p>
+          <span class="res-name">{{ res.name }}</span>
         </div>
       </div>
 
-      <div class="actions-container">
-        <button @click="handleRetour" class="btn-quitter">Quitter</button>
+      <div v-if="!isLoading && resources.length === 0" class="empty-msg">
+        Aucune ressource disponible.
       </div>
-    </div>
-  </main>
+
+      <div class="footer-actions">
+        <button @click="handleRetour" class="btn-quitter">Retour</button>
+      </div>
+    </main>
+  </div>
 </template>
 
 <style scoped>
-.main-content {
-  background-color: #f4f7f9;
+.page-container {
   min-height: 100vh;
-  padding: 220px 20px 60px;
+  background-color: #f8f9fa;
   font-family: 'Roboto', sans-serif;
+}
+
+.main-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 40px 20px;
+  margin-top: 175px;
 }
 
-.container {
+.section-title {
   width: 100%;
-  max-width: 1000px;
-}
-
-.description {
-  color: #E92533;
-  font-size: 1.8rem;
-  font-weight: 500;
+  max-width: 1200px;
   margin-bottom: 40px;
+  font-size: 32px;
+  font-weight: 400;
+  color: #E92533;
   text-align: left;
 }
 
-/* GRILLE */
-.container-button {
+.grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
+  gap: 30px;
   width: 100%;
-  margin-bottom: 50px;
+  max-width: 1200px;
+  justify-items: center;
 }
 
-.push-button {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 40px 20px;
+.card-action {
+  cursor: pointer;
+  background: #ffffff;
+  width: 100%;
+  max-width: 340px;
+  height: 220px;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.push-button:hover {
-  transform: translateY(-8px);
-  border-color: #B51621;
-  box-shadow: 0 12px 25px rgba(181, 22, 33, 0.1);
-}
-
-.text-button {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: #B51621;
-  margin: 0;
-}
-
-.sub-text-button {
-  font-size: 1rem;
-  color: #64748b;
-  margin-top: 10px;
   text-align: center;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(181, 22, 33, 0.1);
+}
+
+.card-action:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(181, 22, 33, 0.15);
+  border-color: #B51621;
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  background: rgba(181, 22, 33, 0.05);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  color: #B51621;
+  transition: all 0.3s ease;
+}
+
+.card-action:hover .icon-circle {
+  background: #B51621;
+  color: #ffffff;
+}
+
+.res-num {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  color: #333333;
+  transition: color 0.3s ease;
+}
+
+.res-name {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 5px;
   font-weight: 500;
 }
 
-.actions-container {
+.card-action:hover .res-num {
+  color: #B51621;
+}
+
+.empty-msg {
+  margin-top: 40px;
+  color: #999;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.footer-actions {
+  margin-top: 60px;
+  width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
 }
 
 .btn-quitter {
-  background: #B51621;
-  color: white;
-  padding: 15px 60px;
-  border: none;
-  border-radius: 10px;
-  font-weight: 700;
+  width: 180px;
+  padding: 12px;
+  border: 2px solid #B51621;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #B51621;
+  color: #FFFFFF;
   font-size: 1.1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: all 0.3s ease;
 }
 
 .btn-quitter:hover {
-  background: #8e111a;
-  transform: translateY(-2px);
+  background-color: transparent;
+  color: #B51621;
+  transform: scale(1.05);
+}
+
+@media (max-width: 750px) {
+  .section-title {
+    text-align: center;
+    font-size: 24px;
+  }
+  .main-content {
+    margin-top: 150px;
+  }
 }
 </style>
