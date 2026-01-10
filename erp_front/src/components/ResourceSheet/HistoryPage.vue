@@ -31,7 +31,6 @@ const filteredVersions = computed(() => {
 
 const handleRetour = () => router.back();
 
-// CORRECTION ICI : On accepte l'objet item pour transmettre ses infos
 const handleShow = (item: any) => {
   router.push({
     path: '/ressource-sheet-history',
