@@ -30,7 +30,17 @@ const filteredVersions = computed(() => {
 });
 
 const handleRetour = () => router.back();
-const handleShow = () => router.push('/ressource-sheet-history');
+
+// CORRECTION ICI : On accepte l'objet item pour transmettre ses infos
+const handleShow = (item: any) => {
+  router.push({
+    path: '/ressource-sheet-history',
+    query: {
+      code: item.code,
+      date: item.date
+    }
+  });
+};
 
 const handleExportPdf = (code: string) => {
   console.log(`Export PDF demandé pour ${code}`);
@@ -56,7 +66,7 @@ const clearSearch = () => searchQuery.value = '';
               v-for="(item, index) in filteredVersions"
               :key="index"
               class="version-item"
-              @click="handleShow"
+              @click="handleShow(item)"
           >
             <div class="info-group">
               <span class="version-code">{{ item.code }}</span>
@@ -137,7 +147,7 @@ const clearSearch = () => searchQuery.value = '';
 .info-group {
   display: flex;
   align-items: center;
-  gap: 20px; /* Réduit pour laisser de la place au titre */
+  gap: 20px;
   flex: 1;
 }
 
@@ -148,15 +158,14 @@ const clearSearch = () => searchQuery.value = '';
   min-width: 100px;
 }
 
-/* 4. STYLE DU NOUVEAU TITRE */
 .version-title {
   font-size: 1.1rem;
   color: #333;
   font-weight: 600;
-  flex: 1; /* Prend l'espace disponible */
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Coupe proprement si trop long */
+  text-overflow: ellipsis;
   margin-right: 15px;
 }
 
@@ -164,10 +173,9 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 1rem;
   color: #64748b;
   font-weight: 500;
-  white-space: nowrap; /* Empêche la date de passer à la ligne */
+  white-space: nowrap;
 }
 
-/* Bouton PDF */
 .btn-icon-container {
   background: none;
   border: none;
@@ -196,7 +204,6 @@ const clearSearch = () => searchQuery.value = '';
   fill: #1976D2;
 }
 
-/* Recherche vide */
 .no-result {
   text-align: center;
   margin-top: 60px;
@@ -212,7 +219,6 @@ const clearSearch = () => searchQuery.value = '';
   font-weight: bold;
 }
 
-/* Footer Sticky */
 .sticky-footer {
   position: fixed;
   bottom: 0;

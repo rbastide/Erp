@@ -9,6 +9,7 @@ const router = useRouter()
 const route = useRoute()
 
 const resourceCode = ref('')
+const ressourceDate = ref('')
 const currentResourceId = ref<number | null>(null)
 
 const hours = ref({
@@ -32,17 +33,28 @@ const contents = ref({
 })
 
 const fetchResourceData = async () => {
+  // 1. On initialise immédiatement avec les paramètres de l'URL
+  // Comme ça, même si la BDD ne connait pas la ressource, le titre s'affiche quand même.
+  const targetCode = route.query.code as string
+  const targetDate = route.query.date as string
+
+  if (targetCode) resourceCode.value = targetCode
+  if (targetDate) ressourceDate.value = targetDate
+
   try {
     const response = await api.get('/resources/resources')
     if (response.data && Array.isArray(response.data)) {
-      const targetCode = route.query.code as string
+
       if (targetCode) {
+        // On essaie de trouver plus d'infos en BDD (pour l'ID par exemple)
         const found = response.data.find((r: any) => r.num === targetCode)
         if (found) {
+          // Si trouvé, on confirme le code (au cas où la casse changerait) et on prend l'ID
           resourceCode.value = found.num
           currentResourceId.value = found.resourceID || found.id
         }
       } else if (response.data.length > 0) {
+        // Fallback seulement si aucun code n'est passé dans l'URL
         const first = response.data[0]
         resourceCode.value = first.num
         currentResourceId.value = first.resourceID || first.id
@@ -82,7 +94,7 @@ const hourConfig = {
 
 <template>
   <Sidebar/>
-  <AppHeader :title="`Fiche de la Ressource ${resourceCode}`" />
+  <AppHeader title="Fiche Ressource" :inline="`${resourceCode} du ${ressourceDate}`" />
 
   <main class="main-content">
     <div class="container">
@@ -174,6 +186,7 @@ const hourConfig = {
 </template>
 
 <style scoped>
+/* (Le style reste identique) */
 .main-content {
   background-color: #f4f7f9;
   min-height: 100vh;
