@@ -8,22 +8,23 @@ const router = useRouter();
 const searchQuery = ref('');
 
 const versions = ref([
-  { code: 'R1.01', date: '30/10/2022' },
-  { code: 'R1.02', date: '15/11/2019' },
-  { code: 'R1.03', date: '01/01/2018' },
-  { code: 'R2.01', date: '05/08/2017' },
-  { code: 'R2.02', date: '06/06/2017' },
-  { code: 'R2.04', date: '08/05/2017' },
-  { code: 'R2.05', date: '01/12/2016' },
-  { code: 'R3.02', date: '15/05/2016' },
-  { code: 'R3.03', date: '18/04/2016' },
-  { code: 'R4.01', date: '14/02/2016' },
+  { code: 'R1.01', title: 'Initiation au développement', date: '30/10/2022' },
+  { code: 'R1.02', title: 'Dév. interfaces web', date: '15/11/2019' },
+  { code: 'R1.03', title: 'Architecture des ordinateurs', date: '01/01/2018' },
+  { code: 'R2.01', title: 'Dév. orienté objets', date: '05/08/2017' },
+  { code: 'R2.02', title: 'Dév. d\'applications', date: '06/06/2017' },
+  { code: 'R2.04', title: 'Communication et fonctionnement', date: '08/05/2017' },
+  { code: 'R2.05', title: 'Gestion de projet', date: '01/12/2016' },
+  { code: 'R3.02', title: 'Dév. efficace', date: '15/05/2016' },
+  { code: 'R3.03', title: 'Analyse de données', date: '18/04/2016' },
+  { code: 'R4.01', title: 'Architecture logicielle', date: '14/02/2016' },
 ]);
 
 const filteredVersions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   return versions.value.filter(item =>
       item.code.toLowerCase().includes(query) ||
+      item.title.toLowerCase().includes(query) || // Recherche dans le titre
       item.date.toLowerCase().includes(query)
   );
 });
@@ -39,8 +40,6 @@ const clearSearch = () => searchQuery.value = '';
 
   <main class="main-content">
     <div class="container">
-      <h2 class="description">Gestion de l'historique :</h2>
-
       <div class="version-list-container">
         <div v-if="filteredVersions.length === 0" class="no-result">
           <p>Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
@@ -55,6 +54,7 @@ const clearSearch = () => searchQuery.value = '';
           >
             <div class="info-group">
               <span class="version-code">{{ item.code }}</span>
+              <span class="version-title">{{ item.title }}</span>
               <span class="version-date">{{ item.date }}</span>
             </div>
 
@@ -76,7 +76,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Chercher par nom (ex : R1.02) ou par date (ex : 30/01/2022)"
+              placeholder="Chercher par nom, code ou date..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
@@ -101,14 +101,6 @@ const clearSearch = () => searchQuery.value = '';
 .container {
   width: 100%;
   max-width: 900px;
-}
-
-.description {
-  color: #E92533;
-  font-size: 1.8rem;
-  font-weight: 500;
-  margin-bottom: 30px;
-  text-align: left;
 }
 
 .version-list {
@@ -138,7 +130,7 @@ const clearSearch = () => searchQuery.value = '';
 .info-group {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 20px;
   flex: 1;
 }
 
@@ -146,13 +138,25 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 1.8rem;
   font-weight: 700;
   color: #B51621;
-  min-width: 120px;
+  min-width: 100px;
+}
+
+.version-title {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 15px;
 }
 
 .version-date {
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: #64748b;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .btn-supp-container {
@@ -162,6 +166,7 @@ const clearSearch = () => searchQuery.value = '';
   padding: 10px;
   border-radius: 50%;
   transition: background-color 0.2s;
+  margin-left: 10px;
 }
 
 .btn-supp-container:hover {

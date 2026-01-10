@@ -93,7 +93,7 @@ const clearSearch = () => searchQuery.value = '';
 
 <template>
   <Sidebar/>
-  <AppHeader title="Compétences" :inline="mcccStore.resourceCode"/>
+  <AppHeader title="Compétences" :inline="`pour la ${mcccStore.resourceCode}`"/>
 
   <main class="main-content">
     <div class="content-wrapper">

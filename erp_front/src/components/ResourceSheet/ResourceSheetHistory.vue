@@ -1,16 +1,75 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
+import api from '@/services/api'
 
 const router = useRouter()
+const route = useRoute()
 
-const handleFermer = () => { router.back() };
+const resourceCode = ref('')
+const currentResourceId = ref<number | null>(null)
 
-// Fonction placeholder pour l'export PDF (identique à l'autre fichier)
+const hours = ref({
+  cm: 0,
+  td: 0,
+  tp: 0,
+  ds: 0,
+  ds_tp: 0,
+  student: 0
+})
+
+const contents = ref({
+  cm: 'Contenu des CM...',
+  td: 'Contenu des TD...',
+  tp: 'Contenu des TP...',
+  ds: "Modalités d'évaluation...",
+  ds_tp: 'Contenu DS/TP...',
+  teacherFeedback: 'Points forts, points faibles du semestre...',
+  studentFeedback: 'Synthèse des retours...',
+  upgrades: 'Modifications prévues...'
+})
+
+const fetchResourceData = async () => {
+  try {
+    const response = await api.get('/resources/resources')
+    if (response.data && Array.isArray(response.data)) {
+      const targetCode = route.query.code as string
+      if (targetCode) {
+        const found = response.data.find((r: any) => r.num === targetCode)
+        if (found) {
+          resourceCode.value = found.num
+          currentResourceId.value = found.resourceID || found.id
+        }
+      } else if (response.data.length > 0) {
+        const first = response.data[0]
+        resourceCode.value = first.num
+        currentResourceId.value = first.resourceID || first.id
+      }
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la ressource :", error)
+  }
+}
+
+onMounted(() => {
+  fetchResourceData()
+})
+
+const handleFermer = () => { router.back() }
+
 const handleExport = () => {
-  console.log("Export PDF demandé depuis l'historique...");
-};
+  console.log("Export PDF demandé depuis l'historique...")
+}
+
+const totalGlobal = computed(() => {
+  return (hours.value.cm || 0) +
+      (hours.value.td || 0) +
+      (hours.value.ds || 0) +
+      (hours.value.tp || 0) +
+      (hours.value.ds_tp || 0)
+})
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -23,7 +82,7 @@ const hourConfig = {
 
 <template>
   <Sidebar/>
-  <AppHeader title="Fiche Ressource" inline="RX.XX du 00/00/0000" />
+  <AppHeader :title="`Fiche de la Ressource ${resourceCode}`" />
 
   <main class="main-content">
     <div class="container">
@@ -35,25 +94,25 @@ const hourConfig = {
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ 0 }}</div>
+              <div class="box-static">{{ hours[key] }}</div>
             </div>
           </div>
 
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ 0 }}</div>
+              <div class="box-static">{{ hours[key] }}</div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
-              <div class="box-static total-highlight">{{ 0 }} h</div>
+              <div class="box-static total-highlight">{{ totalGlobal }} h</div>
             </div>
           </div>
         </div>
 
         <div class="student-hour-row">
           <label>Nombre d'heures par étudiant :</label>
-          <div class="box-static student-box">0 h</div>
+          <div class="box-static student-box">{{ hours.student }} h</div>
         </div>
       </section>
 
@@ -62,27 +121,27 @@ const hourConfig = {
 
         <div class="pedagogic-group">
           <h3 class="group-label">CM</h3>
-          <div class="read-only-box">Contenu des CM...</div>
+          <div class="read-only-box">{{ contents.cm }}</div>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">TD</h3>
-          <div class="read-only-box">Contenu des TD...</div>
+          <div class="read-only-box">{{ contents.td }}</div>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">TP</h3>
-          <div class="read-only-box">Contenu des TP...</div>
+          <div class="read-only-box">{{ contents.tp }}</div>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">DS</h3>
-          <div class="read-only-box">Modalités d'évaluation...</div>
+          <div class="read-only-box">{{ contents.ds }}</div>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">DS/TP</h3>
-          <div class="read-only-box">Contenu DS/TP...</div>
+          <div class="read-only-box">{{ contents.ds_tp }}</div>
         </div>
       </section>
 
@@ -91,17 +150,17 @@ const hourConfig = {
 
         <div class="pedagogic-group">
           <label class="field-label">Retour pédagogique des professeurs :</label>
-          <div class="read-only-box large">Points forts, points faibles du semestre...</div>
+          <div class="read-only-box large">{{ contents.teacherFeedback }}</div>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Retour des étudiants :</label>
-          <div class="read-only-box large">Synthèse des retours...</div>
+          <div class="read-only-box large">{{ contents.studentFeedback }}</div>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Améliorations à apporter :</label>
-          <div class="read-only-box large">Modifications prévues...</div>
+          <div class="read-only-box large">{{ contents.upgrades }}</div>
         </div>
       </section>
 
@@ -241,7 +300,7 @@ const hourConfig = {
 .actions-footer {
   display: flex;
   justify-content: center;
-  gap: 20px; /* Espace entre les boutons */
+  gap: 20px;
   margin-top: 20px;
   margin-bottom: 40px;
   flex-wrap: wrap;

@@ -8,22 +8,23 @@ const router = useRouter();
 const searchQuery = ref('');
 
 const versions = ref([
-  { code: 'R1.01', date: '30/10/2022' },
-  { code: 'R1.02', date: '15/11/2019' },
-  { code: 'R1.03', date: '01/01/2018' },
-  { code: 'R2.01', date: '05/08/2017' },
-  { code: 'R2.02', date: '06/06/2017' },
-  { code: 'R2.04', date: '08/05/2017' },
-  { code: 'R2.05', date: '01/12/2016' },
-  { code: 'R3.02', date: '15/05/2016' },
-  { code: 'R3.03', date: '18/04/2016' },
-  { code: 'R4.01', date: '14/02/2016' },
+  { code: 'R1.01', title: 'Initiation au développement', date: '30/10/2022' },
+  { code: 'R1.02', title: 'Dév. interfaces web', date: '15/11/2019' },
+  { code: 'R1.03', title: 'Architecture des ordinateurs', date: '01/01/2018' },
+  { code: 'R2.01', title: 'Dév. orienté objets', date: '05/08/2017' },
+  { code: 'R2.02', title: 'Dév. d\'applications', date: '06/06/2017' },
+  { code: 'R2.04', title: 'Communication et fonctionnement', date: '08/05/2017' },
+  { code: 'R2.05', title: 'Gestion de projet', date: '01/12/2016' },
+  { code: 'R3.02', title: 'Dév. efficace', date: '15/05/2016' },
+  { code: 'R3.03', title: 'Analyse de données', date: '18/04/2016' },
+  { code: 'R4.01', title: 'Architecture logicielle', date: '14/02/2016' },
 ]);
 
 const filteredVersions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   return versions.value.filter(item =>
       item.code.toLowerCase().includes(query) ||
+      item.title.toLowerCase().includes(query) ||
       item.date.toLowerCase().includes(query)
   );
 });
@@ -31,10 +32,8 @@ const filteredVersions = computed(() => {
 const handleRetour = () => router.back();
 const handleShow = () => router.push('/ressource-sheet-history');
 
-// Fonction placeholder pour l'export PDF
 const handleExportPdf = (code: string) => {
   console.log(`Export PDF demandé pour ${code}`);
-  // Logique d'export à implémenter ici
 };
 
 const clearSearch = () => searchQuery.value = '';
@@ -46,8 +45,6 @@ const clearSearch = () => searchQuery.value = '';
 
   <main class="main-content">
     <div class="container">
-      <h2 class="description">Consulter l'historique :</h2>
-
       <div class="version-list-container">
         <div v-if="filteredVersions.length === 0" class="no-result">
           <p>Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
@@ -63,6 +60,7 @@ const clearSearch = () => searchQuery.value = '';
           >
             <div class="info-group">
               <span class="version-code">{{ item.code }}</span>
+              <span class="version-title">{{ item.title }}</span>
               <span class="version-date">{{ item.date }}</span>
             </div>
 
@@ -84,7 +82,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Chercher par nom (ex : R1.02) ou par date (ex : 30/01/2022)"
+              placeholder="Chercher par nom, code ou date..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
@@ -111,14 +109,6 @@ const clearSearch = () => searchQuery.value = '';
   max-width: 900px;
 }
 
-.description {
-  color: #E92533;
-  font-size: 1.8rem;
-  font-weight: 500;
-  margin-bottom: 30px;
-  text-align: left;
-}
-
 .version-list {
   list-style: none;
   padding: 0;
@@ -136,7 +126,7 @@ const clearSearch = () => searchQuery.value = '';
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
-  cursor: pointer; /* Indique que toute la ligne est cliquable */
+  cursor: pointer;
 }
 
 .version-item:hover {
@@ -147,7 +137,7 @@ const clearSearch = () => searchQuery.value = '';
 .info-group {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 20px; /* Réduit pour laisser de la place au titre */
   flex: 1;
 }
 
@@ -155,13 +145,26 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 1.8rem;
   font-weight: 700;
   color: #B51621;
-  min-width: 120px;
+  min-width: 100px;
+}
+
+/* 4. STYLE DU NOUVEAU TITRE */
+.version-title {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+  flex: 1; /* Prend l'espace disponible */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Coupe proprement si trop long */
+  margin-right: 15px;
 }
 
 .version-date {
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: #64748b;
   font-weight: 500;
+  white-space: nowrap; /* Empêche la date de passer à la ligne */
 }
 
 /* Bouton PDF */
@@ -175,10 +178,11 @@ const clearSearch = () => searchQuery.value = '';
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 10px;
 }
 
 .btn-icon-container:hover {
-  background-color: #e3f2fd; /* Bleu très clair pour le PDF */
+  background-color: #e3f2fd;
 }
 
 .btn-icon {
@@ -189,7 +193,7 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .btn-icon-container:hover .btn-icon {
-  fill: #1976D2; /* Bleu plus soutenu au survol */
+  fill: #1976D2;
 }
 
 /* Recherche vide */

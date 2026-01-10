@@ -85,7 +85,7 @@ const handleValider = () => {
 
 <template>
   <Sidebar/>
-  <AppHeader title="SAÉs pour" :inline="mcccStore.resourceCode"/>
+  <AppHeader title="SAÉs pour" :inline="`la ${mcccStore.resourceCode}`"/>
   <main class="main-content">
     <div class="content-wrapper">
       <div class="semester-board">

@@ -1,15 +1,51 @@
 <script setup lang="ts">
-import { ref, nextTick, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, nextTick, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 
 const router = useRouter()
+const route = useRoute()
+
+const resourceCode = ref('');
+const currentResourceId = ref<number | null>(null);
+
+const fetchResourceData = async () => {
+  try {
+    const response = await api.get('/resources/resources');
+
+    if (response.data && Array.isArray(response.data)) {
+      const targetCode = route.query.code as string;
+
+      if (targetCode) {
+        const found = response.data.find((r: any) => r.num === targetCode);
+
+        if (found) {
+          resourceCode.value = found.num;
+          currentResourceId.value = found.resourceID || found.id;
+        } else {
+          console.warn(`Ressource avec le code ${targetCode} non trouvée.`);
+        }
+      } else {
+        if (response.data.length > 0) {
+          const first = response.data[0];
+          resourceCode.value = first.num;
+          currentResourceId.value = first.resourceID || first.id;
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la ressource :", error);
+  }
+};
+
+onMounted(() => {
+  fetchResourceData();
+});
 
 const handleRetour = () =>{ router.back()};
 
-// Fonction placeholder pour le futur export PDF
 const handleExport = () => {
   console.log("Export PDF demandé...");
 };
@@ -44,7 +80,6 @@ const validatePositive = (key: keyof typeof hours.value) => {
   if (hours.value[key] < 0 || hours.value[key] === null) hours.value[key] = 0
 }
 
-// --- LOGIQUE DYNAMIQUE DES TEXTAREAS ---
 const createFieldManager = (contentRef: any, elementRefs: any) => {
   return async () => {
     contentRef.value.push('')
@@ -78,9 +113,7 @@ const addStudentFeedback = createFieldManager(stFBContents, stFBRefs)
 const upgradesContents = ref(['']), upgradesRefs = ref<HTMLTextAreaElement[]>([])
 const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
 
-// --- SAUVEGARDE ---
 const handleValider = async () => {
-  // Construction du contenu pédagogique global (concaténation avec séparateurs)
   const buildContent = () => {
     return JSON.stringify({
       CM: cmContents.value.filter(t => t.trim()),
@@ -92,32 +125,25 @@ const handleValider = async () => {
   };
 
   const payload = {
-    // Champs pour ResourceSheet
-    semester: 1, // Exemple, à dynamiser selon contexte
+    semester: 1,
     year: new Date().getFullYear(),
     mainGoal: "Objectif par défaut",
     content: buildContent(),
-
-    // Champs pour HourlyVolume
     hoursCM: hours.value.cm,
     hoursTD: hours.value.td,
     hoursTP: hours.value.tp,
     hoursDS: hours.value.ds,
     hoursDSTP: hours.value.ds_tp,
-
-    // Champs pour les Feedbacks (concaténation simple)
     teacherFeedbackContent: edFBContents.value.join('\n'),
     studentFeedbackContent: stFBContents.value.join('\n'),
     improvementIdeaContent: upgradesContents.value.join('\n'),
 
-    // IDs de liaison (si connus, sinon null pour création)
-    resourceID: null,
+    resourceID: currentResourceId.value,
     referencialTeacherID: null,
     linkedSaeID: null
   };
 
   try {
-    // Note: On envoie une liste car le controller attend List<ResourceSheetRequest>
     await api.post('/resourceSheet/resourceSheet', [payload]);
     alert("Fiche ressource enregistrée avec succès !");
     router.push('/home');
@@ -130,7 +156,8 @@ const handleValider = async () => {
 
 <template>
   <Sidebar/>
-  <AppHeader title="Fiche Ressource RX.XX" />
+
+  <AppHeader :title="`Fiche de la Ressource ${resourceCode}`" />
 
   <main class="main-content">
     <div class="container">
@@ -415,8 +442,8 @@ const handleValider = async () => {
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
-  margin-bottom: 40px; /* Ajout d'un peu de marge en bas */
-  flex-wrap: wrap; /* Pour gérer les écrans plus petits */
+  margin-bottom: 40px;
+  flex-wrap: wrap;
 }
 .btn {
   padding: 15px 45px;
@@ -438,7 +465,6 @@ const handleValider = async () => {
   color: #E92533;
   border: 2px solid #E92533;
 }
-/* Nouveau style pour le bouton PDF */
 .btn-dark {
   background: #333333;
   color: white;

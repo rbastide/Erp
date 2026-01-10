@@ -60,7 +60,7 @@ onMounted(() => {
 
 <template>
   <Sidebar/>
-  <AppHeader title="Veuillez saisir les " inline = "heures par élève : "/>
+  <AppHeader title="Saisissez les heures " :inline = "`par élève pour la ${mcccStore.resourceCode}`"/>
 
   <main class="main-content">
     <div class="content-wrapper">
