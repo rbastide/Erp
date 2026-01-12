@@ -32,12 +32,12 @@ public class PdfSkills {
     }};
 
     public static Table create() {
-        Table table = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25}));
+        Table table = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
         table.useAllAvailableWidth();
         table.setBorder(Border.NO_BORDER);
 
-        table.addCell(CellUtils.createCenteredCell("Compétences", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
-        table.addCell(CellUtils.createCenteredCell("Apprentissages critiques", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
+        table.addCell(CellUtils.createCenteredCell("Compétences").setBorder(new SolidBorder(BORDER_WIDTH)));
+        table.addCell(CellUtils.createCenteredCell("Apprentissages critiques").setBorder(new SolidBorder(BORDER_WIDTH)));
 
         addSkillsToTable(table);
 
@@ -49,7 +49,7 @@ public class PdfSkills {
             List<String> learnings = skill.getValue();
             int nbLearnings = learnings.size();
 
-            Cell cellTitle = new Cell(nbLearnings, 2)
+            Cell cellTitle = new Cell()
                     .setBorder(Border.NO_BORDER)
                     .setBorderLeft(new SolidBorder(BORDER_WIDTH))
                     .setBorderRight(new SolidBorder(BORDER_WIDTH))
@@ -61,8 +61,9 @@ public class PdfSkills {
             table.addCell(cellTitle);
 
             for (int i = 0; i < nbLearnings; i++) {
-                Cell cellLearning = new Cell(1, 2)
+                Cell cellLearning = new Cell()
                         .setBorder(Border.NO_BORDER)
+                        .setBorderLeft(new SolidBorder(BORDER_WIDTH))
                         .setBorderRight(new SolidBorder(BORDER_WIDTH))
                         .setBorderBottom(new SolidBorder(BORDER_WIDTH));
 
