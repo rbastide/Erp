@@ -4,10 +4,12 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Table;
 import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
+import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 
@@ -31,24 +33,47 @@ public class PdfGenerator {
             FooterHandler handler = new FooterHandler();
             pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-            Table header = PdfHeader.create(IUT_ICON_PATH);
-            if (header == null) {
-                return;
-            }
-            header.setMarginBottom(5);
+            if (!generateFirstPage(document)) return;
 
-            document.add(header);
+            document.add(new AreaBreak());
 
-            Table formationInfo = PdfFormationInfo.create();
-            formationInfo.setMarginBottom(10);
-            document.add(formationInfo);
-
-            PdfDescription.addToDocument(document);
+            if (!generateSecondPage(document)) return;
 
             document.close();
 
         } catch (IOException e) {
             ErpBackApplication.LOGGER.info("Issue with creating PDF : " + e.getMessage());
         }
+    }
+
+    private static boolean generateFirstPage(Document document) {
+        Table header = PdfHeader.create(IUT_ICON_PATH);
+        if (header == null) {
+            return false;
+        }
+        header.setMarginBottom(13);
+
+        document.add(header);
+
+        Table formationInfo = PdfFormationInfo.create();
+        formationInfo.setMarginBottom(10);
+        document.add(formationInfo);
+
+        PdfDescription.addToDocument(document);
+        return true;
+    }
+
+    private static boolean generateSecondPage(Document document) {
+        Table header = PdfHeader.create(IUT_ICON_PATH);
+        if (header == null) {
+            return false;
+        }
+        header.setMarginBottom(13);
+
+        document.add(header);
+
+        document.add(PdfHours.create());
+
+        return true;
     }
 }
