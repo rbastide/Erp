@@ -37,8 +37,16 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'com.itextpdf:itext-core:9.4.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.register('runPdfGenerator', JavaExec) {
+    group = 'verification'
+    mainClass = 'fr.iut_unilim.erp_back.PdfCreatorApplication'
+    classpath = sourceSets.main.runtimeClasspath
 }
