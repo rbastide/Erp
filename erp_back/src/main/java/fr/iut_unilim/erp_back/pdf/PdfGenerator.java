@@ -12,8 +12,11 @@ import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
+import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
 
 import java.io.IOException;
+
+import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 
 public class PdfGenerator {
     public static final String BASE_PATH = "src/main/resources/";
@@ -68,11 +71,16 @@ public class PdfGenerator {
         if (header == null) {
             return false;
         }
-        header.setMarginBottom(13);
+        header.setMarginBottom(5);
 
         document.add(header);
 
+        document.add(createTitle("Heures :"));
         document.add(PdfHours.create());
+
+        document.add(createTitle("Contenu pédagogique :"));
+        document.add(PdfPedalogicalContent.create());
+
 
         return true;
     }
