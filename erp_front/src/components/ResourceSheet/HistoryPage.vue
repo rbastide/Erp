@@ -1,42 +1,56 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 const searchQuery = ref('');
+const historyItems = ref([]); // On stocke les données venant de la BDD ici
+const isLoading = ref(true);
 
-const versions = ref([
-  { code: 'R1.01', title: 'Initiation au développement', date: '30/10/2022' },
-  { code: 'R1.02', title: 'Dév. interfaces web', date: '15/11/2019' },
-  { code: 'R1.03', title: 'Architecture des ordinateurs', date: '01/01/2018' },
-  { code: 'R2.01', title: 'Dév. orienté objets', date: '05/08/2017' },
-  { code: 'R2.02', title: 'Dév. d\'applications', date: '06/06/2017' },
-  { code: 'R2.04', title: 'Communication et fonctionnement', date: '08/05/2017' },
-  { code: 'R2.05', title: 'Gestion de projet', date: '01/12/2016' },
-  { code: 'R3.02', title: 'Dév. efficace', date: '15/05/2016' },
-  { code: 'R3.03', title: 'Analyse de données', date: '18/04/2016' },
-  { code: 'R4.01', title: 'Architecture logicielle', date: '14/02/2016' },
-]);
+// Fonction pour formater la date (ex: 2024-01-12T10:00 -> 12/01/2024)
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR');
+};
+
+const fetchHistory = async () => {
+  try {
+    isLoading.value = true;
+    const response = await api.get('/resourceSheet/getHistory');
+    historyItems.value = response.data;
+  } catch (error) {
+    console.error("Erreur chargement historique :", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchHistory();
+});
 
 const filteredVersions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
-  return versions.value.filter(item =>
-      item.code.toLowerCase().includes(query) ||
-      item.title.toLowerCase().includes(query) ||
-      item.date.toLowerCase().includes(query)
+  return historyItems.value.filter((item: any) =>
+      (item.resourceCode && item.resourceCode.toLowerCase().includes(query)) ||
+      (item.resourceName && item.resourceName.toLowerCase().includes(query)) ||
+      (item.date && formatDate(item.date).includes(query))
   );
 });
 
 const handleRetour = () => router.back();
 
 const handleShow = (item: any) => {
+  // On envoie le code et la date formatée vers la page de détails
   router.push({
     path: '/ressource-sheet-history',
     query: {
-      code: item.code,
-      date: item.date
+      code: item.resourceCode,
+      date: formatDate(item.date)
     }
   });
 };
@@ -55,12 +69,18 @@ const clearSearch = () => searchQuery.value = '';
   <main class="main-content">
     <div class="container">
       <div class="version-list-container">
-        <div v-if="filteredVersions.length === 0" class="no-result">
-          <p>Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
-          <button @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
+
+        <div v-if="isLoading" class="no-result">
+          <p>Chargement de l'historique...</p>
         </div>
 
-        <ul class="version-list">
+        <div v-else-if="filteredVersions.length === 0" class="no-result">
+          <p v-if="searchQuery">Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
+          <p v-else>Aucun historique disponible.</p>
+          <button v-if="searchQuery" @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
+        </div>
+
+        <ul v-else class="version-list">
           <li
               v-for="(item, index) in filteredVersions"
               :key="index"
@@ -68,12 +88,12 @@ const clearSearch = () => searchQuery.value = '';
               @click="handleShow(item)"
           >
             <div class="info-group">
-              <span class="version-code">{{ item.code }}</span>
-              <span class="version-title">{{ item.title }}</span>
-              <span class="version-date">{{ item.date }}</span>
+              <span class="version-code">{{ item.resourceCode }}</span>
+              <span class="version-title">{{ item.resourceName }}</span>
+              <span class="version-date">{{ formatDate(item.date) }}</span>
             </div>
 
-            <button class="btn-icon-container" @click.stop="handleExportPdf(item.code)" title="Exporter en PDF">
+            <button class="btn-icon-container" @click.stop="handleExportPdf(item.resourceCode)" title="Exporter en PDF">
               <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
                 <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
@@ -91,7 +111,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Chercher par nom, code ou date..."
+              placeholder="Chercher par code, nom ou date..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
