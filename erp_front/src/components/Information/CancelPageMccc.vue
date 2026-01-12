@@ -73,7 +73,6 @@ const handleOui = () => {
 
 .main-content {
   flex: 1;
-  /* Marge pour la sidebar si elle est fixed/absolue, sinon flex gère */
   margin-left: 80px;
   height: 100%;
   display: flex;
@@ -82,11 +81,11 @@ const handleOui = () => {
   padding: 20px;
 }
 
-/* --- Carte d'avertissement --- */
 .warning-card {
   background: #ffffff;
   width: 100%;
   max-width: 500px;
+  margin-top: 120px;
   padding: 50px 40px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
