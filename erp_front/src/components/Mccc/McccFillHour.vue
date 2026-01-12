@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'; // Ajout de ref
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
 import api from '@/services/api';
@@ -8,7 +8,6 @@ import Sidebar from '../App/Sidebar.vue';
 
 mcccStore.loadMcccStore();
 const router = useRouter();
-// On crée une ref pour stocker l'ID de la ligne qu'on modifie
 const currentHourlyVolID = ref(null);
 
 const hourTypes = [
@@ -26,7 +25,6 @@ const fetchHourlyVolumes = async () => {
     if (response.data && response.data.length > 0) {
       const bddData = response.data[0];
 
-      // IMPORTANT : On sauvegarde l'ID de la ligne chargée
       currentHourlyVolID.value = bddData.hourlyVolID;
 
       mcccStore.hoursCM = bddData.nbHoursCM;
@@ -35,16 +33,17 @@ const fetchHourlyVolumes = async () => {
       mcccStore.hoursDS = bddData.nbHoursDS;
       mcccStore.hoursDSTP = bddData.nbHoursDSTP;
     }
+    mcccStore.saveBackup();
   } catch (error) {
     console.error("Erreur chargement volumes horaires :", error);
   }
 };
 
 onMounted(() => {
+  mcccStore.loadMcccStore();
   fetchHourlyVolumes();
 });
 
-// ... (totalHeures, updateHours, validateInput, blockNegative restent identiques) ...
 const totalHeures = computed(() => {
   return (mcccStore.hoursCM || 0) + (mcccStore.hoursTD || 0) + (mcccStore.hoursDS || 0) + (mcccStore.hoursTP || 0) + (mcccStore.hoursDSTP || 0);
 });
@@ -59,12 +58,10 @@ const blockNegative = (evt: KeyboardEvent) => {
   if (evt.key === '-') evt.preventDefault();
 };
 
-// --- MODIFICATION ICI ---
 const handleValider = async () => {
   try {
-    // 1. On prépare l'objet à envoyer au Backend (doit correspondre à l'Entity Java)
     const payload = {
-      hourlyVolID: currentHourlyVolID.value, // L'ID est crucial pour que ce soit un UPDATE
+      hourlyVolID: currentHourlyVolID.value,
       nbHoursCM: mcccStore.hoursCM,
       nbHoursTD: mcccStore.hoursTD,
       nbHoursTP: mcccStore.hoursTP,
@@ -72,10 +69,8 @@ const handleValider = async () => {
       nbHoursDSTP: mcccStore.hoursDSTP
     };
 
-    // 2. On envoie les données
     await api.post('/mccc/saveHourlyVolume', payload);
 
-    // 3. Si tout va bien, on met à jour le store et on change de page
     mcccStore.registerMcccStore();
     router.push('/mccc-menu');
 
@@ -83,6 +78,10 @@ const handleValider = async () => {
     console.error("Erreur lors de la sauvegarde :", error);
     alert("Une erreur est survenue lors de la sauvegarde des heures.");
   }
+};
+
+const handleRetour = () => {
+  router.push('/cancel-mccc');
 };
 </script>
 
