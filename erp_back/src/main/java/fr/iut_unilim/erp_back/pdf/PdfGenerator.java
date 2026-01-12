@@ -4,12 +4,18 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.AreaBreak;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
+import fr.iut_unilim.erp_back.pdf.view.PdfFeedbacks;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
@@ -41,6 +47,10 @@ public class PdfGenerator {
             document.add(new AreaBreak());
 
             if (!generateSecondPage(document)) return;
+
+            document.add(new AreaBreak());
+
+            if (!generateThirdPage(document)) return;
 
             document.close();
 
@@ -81,6 +91,38 @@ public class PdfGenerator {
         document.add(createTitle("Contenu pédagogique :"));
         document.add(PdfPedalogicalContent.create());
 
+        return true;
+    }
+
+    private static boolean generateThirdPage(Document document) {
+        Table header = PdfHeader.create(IUT_ICON_PATH);
+        if (header == null) {
+            return false;
+        }
+        header.setMarginBottom(5);
+
+        document.add(header);
+
+        document.add(createTitle("Suivi de la ressource / module :"));
+        document.add(PdfFeedbacks.create());
+
+        Table infoTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
+        infoTable.useAllAvailableWidth();
+        infoTable.setMarginTop(50);
+
+        infoTable.setBorder(Border.NO_BORDER);
+
+        Cell dateCell = new Cell().add(new Paragraph("Date : 17 juillet 2025"))
+                .setTextAlignment(TextAlignment.LEFT)
+                .setBorder(Border.NO_BORDER);
+        infoTable.addCell(dateCell);
+
+        Cell refCell = new Cell().add(new Paragraph("Référent module : Thomas Hügel"))
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setBorder(Border.NO_BORDER);
+        infoTable.addCell(refCell);
+
+        document.add(infoTable);
 
         return true;
     }
