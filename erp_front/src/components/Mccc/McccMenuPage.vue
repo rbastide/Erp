@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import { mcccStore } from '@/services/mcccStore';
 
 const router = useRouter();
-mcccStore.loadMcccStore();
+
 const handleRetour = () => {
   router.push('/cancel');
 };
@@ -19,6 +20,8 @@ const handleTeachers = () => {
 }
 
 const handleValider = () => {
+  mcccStore.backup = null;
+  mcccStore.registerMcccStore();
   router.push('/mccc-summary');
 };
 
@@ -29,6 +32,11 @@ const handleSae = () => {
 const handleCompetences = () => {
   router.push('/mccc-skills');
 }
+
+onMounted(() => {
+  mcccStore.loadMcccStore();
+  mcccStore.saveBackup();
+});
 
 </script>
 
