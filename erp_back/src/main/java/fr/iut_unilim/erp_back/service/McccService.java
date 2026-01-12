@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.repository.McccRepository;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,5 +22,9 @@ public class McccService {
 
     public void save(Mccc mccc) {
         mcccRepository.save(mccc);
+    }
+
+    public List<Mccc> getAllMccc() {
+        return mcccRepository.findAll();
     }
 }
