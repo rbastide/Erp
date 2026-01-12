@@ -76,8 +76,13 @@ const totalGlobal = computed(() => {
 })
 
 const blockNegative = (e: KeyboardEvent) => { if (e.key === '-') e.preventDefault() }
+
 const validatePositive = (key: keyof typeof hours.value) => {
-  if (hours.value[key] < 0 || hours.value[key] === null) hours.value[key] = 0
+  const value = hours.value[key] as any;
+
+  if (value === "" || value === null || value === undefined || value < 0) {
+    hours.value[key] = 0;
+  }
 }
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {
