@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/improvementIdeas")
 public class ImprovementIdeasController {
 
-    private ImprovementIdeasService improvementIdeasService;
+    private final ImprovementIdeasService improvementIdeasService;
 
     public ImprovementIdeasController(ImprovementIdeasService improvementIdeasService) {
         this.improvementIdeasService = improvementIdeasService;

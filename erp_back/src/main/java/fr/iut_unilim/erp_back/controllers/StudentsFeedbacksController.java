@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/studentsFeedbacks")
 public class StudentsFeedbacksController {
 
-    private StudentsFeedbacksService studentsFeedbackService;
+    private final StudentsFeedbacksService studentsFeedbackService;
 
     public StudentsFeedbacksController(StudentsFeedbacksService studentsFeedbackService) {
         this.studentsFeedbackService = studentsFeedbackService;

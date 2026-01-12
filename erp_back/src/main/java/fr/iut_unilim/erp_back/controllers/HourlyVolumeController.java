@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/hourlyVolume")
 public class HourlyVolumeController {
 
-    private HourlyVolumeService hourlyVolumeService;
+    private final HourlyVolumeService hourlyVolumeService;
 
     public HourlyVolumeController(HourlyVolumeService hourlyVolumeService) {
         this.hourlyVolumeService = hourlyVolumeService;
