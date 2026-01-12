@@ -64,7 +64,13 @@ const updateHours = (key: string, delta: number) => {
   mcccStore.registerMcccStore();
 };
 const validateInput = (key: string) => {
-  if ((mcccStore as any)[key] < 0) (mcccStore as any)[key] = 0;
+  const value = (mcccStore as any)[key];
+  if (value === "" || value === null || value === undefined) {
+    (mcccStore as any)[key] = 0;
+  }
+  else if (value < 0) {
+    (mcccStore as any)[key] = 0;
+  }
 };
 const blockNegative = (evt: KeyboardEvent) => {
   if (evt.key === '-') evt.preventDefault();
