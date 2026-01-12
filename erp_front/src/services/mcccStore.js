@@ -33,16 +33,33 @@ export const mcccStore = reactive({
 
 
     saveBackup() {
-        const { backup, ...dataToSave } = this;
+        if (this.backup) return;
+
+        const dataToSave = {
+            resourceCode: this.resourceCode,
+            hoursCM: this.hoursCM,
+            hoursTD: this.hoursTD,
+            hoursTP: this.hoursTP,
+            hoursDS: this.hoursDS,
+            hoursDSTP: this.hoursDSTP,
+            acsGrouped: this.acsGrouped,
+            saeCodes: this.saeCodes,
+            referents: this.referents,
+        };
         this.backup = JSON.stringify(dataToSave);
     },
 
     restoreBackup() {
         if (this.backup) {
-            const oldData = JSON.parse(this.backup);
-            Object.assign(this, oldData);
-            this.backup = null;
-            this.registerMcccStore();
+            try {
+                const oldData = JSON.parse(this.backup);
+                Object.assign(this, oldData);
+                this.backup = null;
+                this.registerMcccStore();
+                console.log("Restauration réussie !");
+            } catch (e) {
+                console.error("Erreur lors de la restauration du backup", e);
+            }
         }
     },
 

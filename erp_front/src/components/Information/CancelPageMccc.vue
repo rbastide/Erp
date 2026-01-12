@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from "../App/Sidebar.vue";
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 
@@ -10,6 +11,7 @@ const handleNon = () => {
 }
 
 const handleOui = () => {
+  mcccStore.restoreBackup();
   router.push('/mccc-menu')
 }
 </script>

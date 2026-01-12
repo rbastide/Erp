@@ -60,10 +60,18 @@ const getSaeBySemester = (semesterNumber) => {
 const toggleSae = (saeId) => {
   errorMessage.value = '';
   if (selectedSaeIds.value.includes(saeId)) {
-    selectedSaeIds.value = selectedSaeIds.value.filter(id => id !== saeId);
+    selectedSaeIds.value = selectedSaeIds.value.filter(id => id !== id);
   } else {
     selectedSaeIds.value.push(saeId);
   }
+  mcccStore.saeCodes = selectedSaeIds.value.map(id => {
+    const fullSae = availableSae.value.find(s => s.id === id);
+    return {
+      saeCode: id,
+      saeName: fullSae ? fullSae.title : ''
+    };
+  });
+  mcccStore.registerMcccStore();
 };
 
 const handleValider = () => {
@@ -78,6 +86,7 @@ const handleValider = () => {
       saeName: fullSae ? fullSae.title : ''
     };
   });
+  mcccStore.backup = null;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };

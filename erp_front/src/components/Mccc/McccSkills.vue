@@ -83,6 +83,7 @@ const removeGroup = (index) => {
 };
 
 const handleValider = () => {
+  mcccStore.backup = null;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
