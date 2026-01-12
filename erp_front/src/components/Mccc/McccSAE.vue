@@ -81,6 +81,10 @@ const handleValider = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
+
+const handleRetour = () => {
+  router.push('/cancel-mccc');
+};
 </script>
 
 <template>
@@ -116,7 +120,7 @@ const handleValider = () => {
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <div class="footer-actions">
         <button @click="handleValider" class="btn-main">Valider</button>
-        <button @click="router.push('/cancel-mccc')" class="btn-sub">Annuler</button>
+        <button @click="handleRetour" class="btn-sub">Annuler</button>
       </div>
     </div>
   </main>
