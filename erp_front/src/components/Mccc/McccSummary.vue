@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import {useRouter} from 'vue-router';
-import {mcccStore} from "@/services/mcccStore.js";
+import { useRouter } from 'vue-router';
+import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
-import {onMounted} from 'vue';
+import { onMounted, ref } from 'vue';
 import api from '@/services/api';
 import Sidebar from "../App/Sidebar.vue";
 
 const router = useRouter();
+const allSaes = ref([]);
 
 const handleRetour = () => router.back();
 
@@ -16,17 +17,13 @@ const handleValider = async () => {
       resourceCode: mcccStore.resourceCode,
       creationDate: mcccStore.creationDate,
       editDate: mcccStore.editDate,
-
       hoursCM: mcccStore.hoursCM,
       hoursTD: mcccStore.hoursTD,
       hoursTP: mcccStore.hoursTP,
       hoursDS: mcccStore.hoursDS,
       hoursDSTP: mcccStore.hoursDSTP,
-
       saeCodes: mcccStore.saeCodes,
-
       acsGrouped: mcccStore.acsGrouped,
-
       referents: mcccStore.referents
     };
 
@@ -46,7 +43,36 @@ const handleValider = async () => {
   }
 };
 
-onMounted(() => {
+const fetchSaes = async () => {
+  try {
+    const response = await api.get('/sae/saes');
+    if (response.data) {
+      allSaes.value = response.data;
+    }
+  } catch (error) {
+    console.error("Erreur lors du chargement des SAE :", error);
+  }
+};
+
+const getSaeDisplay = (saeItem) => {
+  if (typeof saeItem === 'object' && saeItem !== null) {
+    const code = saeItem.saeCode || saeItem.code || saeItem.num;
+    const name = saeItem.saeName || saeItem.title || saeItem.name || '';
+
+    if (code) {
+      return `${code} - ${name}`;
+    }
+  }
+  const found = allSaes.value.find((s) => s.num === saeItem || s.code === saeItem);
+
+  if (found) {
+    const title = found.title || found.name || '';
+    return `${found.num || found.code} - ${title}`;
+  }
+  return String(saeItem);
+};
+
+onMounted(async () => {
   mcccStore.loadMcccStore();
 
   const today = new Date().toLocaleDateString('fr-FR');
@@ -58,6 +84,8 @@ onMounted(() => {
   mcccStore.editDate = today;
 
   mcccStore.registerMcccStore();
+
+  await fetchSaes();
 });
 
 const getGroupsForUE = (ueName) => {
@@ -112,7 +140,7 @@ const getGroupsForUE = (ueName) => {
         <p class="section-header">SAE(s) concernées</p>
         <div class="sae-list">
           <div class="sae-chip" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
-            {{ saeCode }}
+            {{ getSaeDisplay(saeCode) }}
           </div>
           <div v-if="!mcccStore.saeCodes || mcccStore.saeCodes.length === 0" class="empty-msg">
             Aucune SAE liée
@@ -317,15 +345,20 @@ const getGroupsForUE = (ueName) => {
   justify-content: flex-start;
 }
 
+/* Modification CSS pour gérer les titres longs */
 .sae-chip {
   background-color: #ffebee;
   color: #c62828;
   padding: 10px 20px;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem; /* Police légèrement réduite pour le texte long */
   border: 1px solid #ffcdd2;
   transition: transform 0.2s;
+  /* Ajouts pour le texte long */
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
 }
 
 .sae-chip:hover {
