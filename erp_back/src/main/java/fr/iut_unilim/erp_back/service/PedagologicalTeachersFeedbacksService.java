@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class PedagologicalTeachersFeedbacksService {
 
-    private final PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbackRepository;
-
     public PedagologicalTeachersFeedbacksService(PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbackRepository) {
-        this.pedagologicalTeachersFeedbackRepository = pedagologicalTeachersFeedbackRepository;
     }
 }
