@@ -11,6 +11,7 @@ import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,6 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
@@ -84,6 +86,7 @@ public class AuthController {
     }
 
     @PostMapping("/user")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> editUser(@RequestBody EditUserRequest user) {
         Optional<Connection> existingUser = connectionRepository.findById(user.id());
         if (existingUser.isEmpty()) {
@@ -101,11 +104,13 @@ public class AuthController {
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getUsers() {
         return ResponseEntity.ok(connectionService.getAllConnections());
     }
 
     @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         if (!connectionRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

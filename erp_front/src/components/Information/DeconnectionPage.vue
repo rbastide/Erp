@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import {useRouter} from 'vue-router';
 import AuthService from "../../services/AuthService.js";
 import AppHeader from "../App/Header.vue";
 import Sidebar from "../App/Sidebar.vue";
@@ -11,6 +11,8 @@ const handleNon = () => {
 }
 
 const handleOui = () => {
+  localStorage.removeItem('user_token');
+  localStorage.removeItem('user_role');
   AuthService.logout();
   router.push('/login');
 }

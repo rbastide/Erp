@@ -86,7 +86,6 @@ const handleValider = async () => {
       nbHoursDS: mcccStore.hoursDS,
       nbHoursDSTP: mcccStore.hoursDSTP
     };
-
     await api.post('/mccc/saveHourlyVolume', payload);
 
     mcccStore.registerMcccStore();

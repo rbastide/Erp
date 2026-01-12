@@ -46,6 +46,8 @@ const fetchTeachers = async () => {
 onMounted(() => {
   mcccStore.loadMcccStore();
   fetchTeachers();
+  mcccStore.saveBackup();
+
 });
 
 const selectedTeachersList = computed(() => {
@@ -76,6 +78,11 @@ const toggleTeacher = (id) => {
     selectedTeacherIds.value.push(id);
   }
 
+  mcccStore.referents = selectedTeacherIds.value.map(teacherId => {
+    const user = allTeachers.value.find(u => u.teacherID === teacherId);
+    return user ? { lastname: user.lastname, firstname: user.firstname } : null;
+  }).filter(Boolean);
+  mcccStore.registerMcccStore();
 };
 
 const handleValider = () => {

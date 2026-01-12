@@ -17,11 +17,10 @@ onMounted(() => {
 });
 
 const handleOui = () => {
+  mcccStore.restoreBackup();
   if (userRole.value === "ADMIN" || userRole.value === 'SUPER_ADMIN'){
     router.push('/home-admin');
-    mcccStore.clearMcccStore();
-  }
-  else {
+  } else {
     router.push('/home');
   }
 }
