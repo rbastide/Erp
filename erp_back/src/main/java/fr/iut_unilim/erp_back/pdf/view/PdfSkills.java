@@ -39,6 +39,12 @@ public class PdfSkills {
         table.addCell(CellUtils.createCenteredCell("Compétences", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
         table.addCell(CellUtils.createCenteredCell("Apprentissages critiques", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
 
+        addSkillsToTable(table);
+
+        return table;
+    }
+
+    private static void addSkillsToTable(Table table) {
         for (Map.Entry<String, List<String>> skill : SKILLS_LABELS.entrySet()) {
             List<String> learnings = skill.getValue();
             int nbLearnings = learnings.size();
@@ -65,7 +71,5 @@ public class PdfSkills {
                 table.addCell(cellLearning);
             }
         }
-
-        return table;
     }
 }
