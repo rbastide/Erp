@@ -86,7 +86,6 @@ const handleValider = () => {
       saeName: fullSae ? fullSae.title : ''
     };
   });
-  mcccStore.backup = null;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };

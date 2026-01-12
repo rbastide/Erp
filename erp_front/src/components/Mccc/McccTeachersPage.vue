@@ -101,7 +101,6 @@ const handleValider = () => {
   }).filter(Boolean);
 
   mcccStore.referents = selectedObjects;
-  mcccStore.backup = null;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
