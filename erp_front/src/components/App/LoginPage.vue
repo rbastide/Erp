@@ -70,7 +70,7 @@ const handleLogin = async () => {
 <style scoped>
 .main-content {
   display: flex;
-  margin-top: 35px;
+  margin-top: 60px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
