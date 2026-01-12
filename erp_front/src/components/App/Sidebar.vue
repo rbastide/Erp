@@ -14,7 +14,6 @@ const router = useRouter();
 const isExpanded = ref(false);
 const userRole = ref('');
 
-// Fonction pour synchroniser le rôle depuis le stockage local
 const updateRole = () => {
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
@@ -37,7 +36,7 @@ const handleDashboardClick = () => {
 };
 
 const handleSettings = () => router.push('/settings');
-const handleAide = () => router.push('/aide');
+const handleHelp = () => router.push('/help');
 
 const handleDeconnexion = () => {
   router.push('/deconnexion');
@@ -91,7 +90,7 @@ const handleDeconnexion = () => {
     </nav>
 
     <div class="sidebar-footer">
-      <div class="nav-item small" :class="{ active: props.helpActive }" @click="handleAide">
+      <div class="nav-item small" :class="{ active: props.helpActive }" @click="handleHelp">
         <div class="icon-wrapper">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>

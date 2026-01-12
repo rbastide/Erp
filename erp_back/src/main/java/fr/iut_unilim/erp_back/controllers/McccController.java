@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
 
@@ -225,5 +222,14 @@ public class McccController {
     public ResponseEntity<?> saveHourlyVolume(@RequestBody HourlyVolume hourlyVolume) {
         hourlyVolumeService.save(hourlyVolume);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
+    }
+
+    @GetMapping("/getHourlyVolumesID/{id}")
+    public ResponseEntity<?> getHourlyVolumesID(@PathVariable Long id) {
+        Optional<HourlyVolume> hourlyVolume = hourlyVolumeService.findById(id);
+        if (hourlyVolume.isPresent()) {
+            return ResponseEntity.ok(hourlyVolume.get());
+        }
+        return ResponseEntity.notFound().build();
     }
 }
