@@ -17,7 +17,7 @@ onMounted(() => {
 });
 
 const handleOui = () => {
-  if (userRole.value === "ADMIN"){
+  if (userRole.value === "ADMIN" || userRole.value === 'SUPER_ADMIN'){
     router.push('/home-admin');
     mcccStore.clearMcccStore();
   }

@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
+import api from '@/services/api';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 
 mcccStore.loadMcccStore();
 const router = useRouter();
+const currentHourlyVolID = ref(null);
 
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
@@ -16,51 +18,88 @@ const hourTypes = [
   { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
-const totalHeures = computed(() => {
-  return (mcccStore.hoursCM || 0) +
+const fetchHourlyVolumes = async () => {
+  try {
+    const response = await api.get('/mccc/getHourlyVolumes');
+
+    if (response.data && response.data.length > 0) {
+      const bddData = response.data[0];
+
+      currentHourlyVolID.value = bddData.hourlyVolID;
+
+      mcccStore.hoursCM = bddData.nbHoursCM;
+      mcccStore.hoursTD = bddData.nbHoursTD;
+      mcccStore.hoursTP = bddData.nbHoursTP;
+      mcccStore.hoursDS = bddData.nbHoursDS;
+      mcccStore.hoursDSTP = bddData.nbHoursDSTP;
+    }
+    mcccStore.saveBackup();
+  } catch (error) {
+    console.error("Erreur chargement volumes horaires :", error);
+  }
+};
+
+onMounted(async () => {
+  mcccStore.loadMcccStore();
+  const isStoreEmpty = (
+      (mcccStore.hoursCM || 0) +
       (mcccStore.hoursTD || 0) +
-      (mcccStore.hoursDS || 0) +
       (mcccStore.hoursTP || 0) +
-      (mcccStore.hoursDSTP || 0);
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursDSTP || 0)
+  ) === 0;
+  if (isStoreEmpty) {
+    await fetchHourlyVolumes();
+  } else {
+    mcccStore.saveBackup();
+  }
 });
 
+const totalHeures = computed(() => {
+  return (mcccStore.hoursCM || 0) + (mcccStore.hoursTD || 0) + (mcccStore.hoursDS || 0) + (mcccStore.hoursTP || 0) + (mcccStore.hoursDSTP || 0);
+});
 const updateHours = (key: string, delta: number) => {
   const current = (mcccStore as any)[key] || 0;
-  const newValue = Math.max(0, current + delta);
-  (mcccStore as any)[key] = newValue;
-};
-
-const validateInput = (key: string) => {
-  if ((mcccStore as any)[key] < 0 || (mcccStore as any)[key] === null) {
-    (mcccStore as any)[key] = 0;
-  }
-};
-
-const blockNegative = (evt: KeyboardEvent) => {
-  if (evt.key === '-') {
-    evt.preventDefault();
-  }
-};
-
-
-const handleValider = () => {
+  (mcccStore as any)[key] = Math.max(0, current + delta);
   mcccStore.registerMcccStore();
-  router.push('/mccc-menu');
+};
+const validateInput = (key: string) => {
+  if ((mcccStore as any)[key] < 0) (mcccStore as any)[key] = 0;
+};
+const blockNegative = (evt: KeyboardEvent) => {
+  if (evt.key === '-') evt.preventDefault();
+};
+
+const handleValider = async () => {
+  try {
+    const payload = {
+      hourlyVolID: currentHourlyVolID.value,
+      nbHoursCM: mcccStore.hoursCM,
+      nbHoursTD: mcccStore.hoursTD,
+      nbHoursTP: mcccStore.hoursTP,
+      nbHoursDS: mcccStore.hoursDS,
+      nbHoursDSTP: mcccStore.hoursDSTP
+    };
+
+    await api.post('/mccc/saveHourlyVolume', payload);
+
+    mcccStore.registerMcccStore();
+    router.push('/mccc-menu');
+
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde :", error);
+    alert("Une erreur est survenue lors de la sauvegarde des heures.");
+  }
 };
 
 const handleRetour = () => {
   router.push('/cancel-mccc');
 };
-
-onMounted(() => {
-  mcccStore.loadMcccStore();
-  mcccStore.saveBackup();
-});
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader title="Saisissez les heures " :inline = "`par élève pour la ${mcccStore.resourceCode}`"/>
+  <AppHeader title="Heures par élève pour la" :inline = "mcccStore.resourceCode"/>
 
   <main class="main-content">
     <div class="content-wrapper">
@@ -76,7 +115,7 @@ onMounted(() => {
                 type="number"
                 v-model.number="(mcccStore as any)[type.key]"
                 min="0"
-                @input="validateInput(type.key)"
+                @input="() => { validateInput(type.key); mcccStore.registerMcccStore(); }"
                 @keypress="blockNegative"
             >
 
