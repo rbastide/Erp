@@ -1,8 +1,8 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.service.PdfService;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,10 +18,9 @@ public class PdfController {
     }
 
     @GetMapping("/resource-sheet/{id}")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getResourceSheet(@PathVariable Integer id) {
-        ErpBackApplication.LOGGER.info("getResourceSheet");
         byte[] pdfContent = pdfService.generateResourceSheetPdf();
-        ErpBackApplication.LOGGER.info("Generation success");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

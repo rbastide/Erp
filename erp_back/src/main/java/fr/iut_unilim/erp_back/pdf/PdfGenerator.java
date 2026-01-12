@@ -11,7 +11,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
@@ -41,20 +40,16 @@ public class PdfGenerator {
         FooterHandler handler = new FooterHandler();
         pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-        ErpBackApplication.LOGGER.info("Created pdf");
         if (!generateFirstPage(document)) return null;
 
         document.add(new AreaBreak());
 
-        ErpBackApplication.LOGGER.info("Created pdf");
         if (!generateSecondPage(document)) return null;
 
         document.add(new AreaBreak());
 
-        ErpBackApplication.LOGGER.info("Created pdf");
         if (!generateThirdPage(document)) return null;
 
-        ErpBackApplication.LOGGER.info("Created pdf");
         document.close();
 
         return baos.toByteArray();
