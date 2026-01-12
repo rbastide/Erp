@@ -1,10 +1,12 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
-import fr.iut_unilim.erp_back.dto.*;
+import fr.iut_unilim.erp_back.dto.AuthResponse;
+import fr.iut_unilim.erp_back.dto.EditUserRequest;
+import fr.iut_unilim.erp_back.dto.LoginRequest;
+import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
-import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpStatus;

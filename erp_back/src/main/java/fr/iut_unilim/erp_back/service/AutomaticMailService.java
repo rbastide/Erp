@@ -1,12 +1,11 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
