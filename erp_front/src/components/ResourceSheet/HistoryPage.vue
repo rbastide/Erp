@@ -7,10 +7,9 @@ import api from '@/services/api';
 
 const router = useRouter();
 const searchQuery = ref('');
-const historyItems = ref([]); // On stocke les données venant de la BDD ici
+const historyItems = ref([]);
 const isLoading = ref(true);
 
-// Fonction pour formater la date (ex: 2024-01-12T10:00 -> 12/01/2024)
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -45,7 +44,6 @@ const filteredVersions = computed(() => {
 const handleRetour = () => router.back();
 
 const handleShow = (item: any) => {
-  // On envoie le code et la date formatée vers la page de détails
   router.push({
     path: '/ressource-sheet-history',
     query: {

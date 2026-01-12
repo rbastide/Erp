@@ -4,27 +4,23 @@ import java.util.Date;
 
 public class ResourceSheetRequest {
 
-    // --- Identifiants ---
     private Long sheetsID;
     private Long resourceID;
     private Long referencialTeacherID;
 
-    // IDs techniques (pour modification d'existants)
     private Long hourlyVolumeID;
     private Long teachersFeedbackID;
     private Long studentFeedbackID;
     private Long improvementsIdeaID;
     private Long linkedSaeID;
 
-    // --- Champs de base ---
     private int semester;
     private int year;
     private String mainGoal;
-    private String content; // JSON stringifié contenant le détail pédagogique
+    private String content;
     private Date creationDate;
     private Date lastModificationDate;
 
-    // --- NOUVEAUX CHAMPS (Pour réceptionner les données du formulaire VueJS) ---
     private int hoursCM;
     private int hoursTD;
     private int hoursTP;
@@ -34,9 +30,7 @@ public class ResourceSheetRequest {
     private String teacherFeedbackContent;
     private String studentFeedbackContent;
     private String improvementIdeaContent;
-    // --------------------------------------------------------------------------
 
-    // --- GETTERS ---
     public Long getSheetsID() { return sheetsID; }
     public Long getResourceID() { return resourceID; }
     public Long getReferencialTeacherID() { return referencialTeacherID; }
@@ -53,7 +47,6 @@ public class ResourceSheetRequest {
     public Date getCreationDate() { return creationDate; }
     public Date getLastModificationDate() { return lastModificationDate; }
 
-    // Getters pour les nouveaux champs
     public int getHoursCM() { return hoursCM; }
     public int getHoursTD() { return hoursTD; }
     public int getHoursTP() { return hoursTP; }
@@ -65,7 +58,6 @@ public class ResourceSheetRequest {
     public String getImprovementIdeaContent() { return improvementIdeaContent; }
 
 
-    // --- SETTERS ---
     public void setSheetsID(Long sheetsID) { this.sheetsID = sheetsID; }
     public void setResourceID(Long resourceID) { this.resourceID = resourceID; }
     public void setReferencialTeacherID(Long referencialTeacherID) { this.referencialTeacherID = referencialTeacherID; }
@@ -82,7 +74,6 @@ public class ResourceSheetRequest {
     public void setCreationDate(Date creationDate) { this.creationDate = creationDate; }
     public void setLastModificationDate(Date lastModificationDate) { this.lastModificationDate = lastModificationDate; }
 
-    // Setters pour les nouveaux champs
     public void setHoursCM(int hoursCM) { this.hoursCM = hoursCM; }
     public void setHoursTD(int hoursTD) { this.hoursTD = hoursTD; }
     public void setHoursTP(int hoursTP) { this.hoursTP = hoursTP; }

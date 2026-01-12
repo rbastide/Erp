@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class HistoryResponse {
     private Long sheetID;
-    private String resourceCode; // ex: R1.01
-    private String resourceName; // ex: Dév Web
+    private String resourceCode;
+    private String resourceName;
     private Date date;
 
     public HistoryResponse(Long sheetID, String resourceCode, String resourceName, Date date) {
@@ -15,7 +15,6 @@ public class HistoryResponse {
         this.date = date;
     }
 
-    // Getters et Setters nécessaires pour le JSON
     public Long getSheetID() { return sheetID; }
     public void setSheetID(Long sheetID) { this.sheetID = sheetID; }
 
