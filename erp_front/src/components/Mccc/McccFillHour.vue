@@ -39,9 +39,20 @@ const fetchHourlyVolumes = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   mcccStore.loadMcccStore();
-  fetchHourlyVolumes();
+  const isStoreEmpty = (
+      (mcccStore.hoursCM || 0) +
+      (mcccStore.hoursTD || 0) +
+      (mcccStore.hoursTP || 0) +
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursDSTP || 0)
+  ) === 0;
+  if (isStoreEmpty) {
+    await fetchHourlyVolumes();
+  } else {
+    mcccStore.saveBackup();
+  }
 });
 
 const totalHeures = computed(() => {
@@ -50,6 +61,7 @@ const totalHeures = computed(() => {
 const updateHours = (key: string, delta: number) => {
   const current = (mcccStore as any)[key] || 0;
   (mcccStore as any)[key] = Math.max(0, current + delta);
+  mcccStore.registerMcccStore();
 };
 const validateInput = (key: string) => {
   if ((mcccStore as any)[key] < 0) (mcccStore as any)[key] = 0;
@@ -103,7 +115,7 @@ const handleRetour = () => {
                 type="number"
                 v-model.number="(mcccStore as any)[type.key]"
                 min="0"
-                @input="validateInput(type.key)"
+                @input="() => { validateInput(type.key); mcccStore.registerMcccStore(); }"
                 @keypress="blockNegative"
             >
 
