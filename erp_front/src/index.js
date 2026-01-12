@@ -34,7 +34,7 @@ const routes = [
     {
         path: '/',
         name: 'Default',
-        component: LoginPage // La page par défaut
+        component: LoginPage
     },
     {
         path: '/home',
@@ -42,7 +42,7 @@ const routes = [
         component: HomePage
     },
     {
-        path: '/ressource',
+        path: '/resource',
         name: 'Resource',
         component: ResourcePage
     },
@@ -67,7 +67,7 @@ const routes = [
         component: CreateNewUserPage
     },
     {
-        path: '/aide',
+        path: '/help',
         name: 'HelpPage',
         component: HelpPage
     },
@@ -112,7 +112,7 @@ const routes = [
         component: HistoryAdminPage
     },
     {
-        path: '/supp-fiche',
+        path: '/supp-sheet',
         name: 'SuccessfullyDeletePage',
         component: SuccessfullyDeletedPage
     },
