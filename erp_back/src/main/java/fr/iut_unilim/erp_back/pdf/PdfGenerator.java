@@ -2,9 +2,11 @@ package fr.iut_unilim.erp_back.pdf;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Table;
 import fr.iut_unilim.erp_back.ErpBackApplication;
+import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
@@ -26,6 +28,8 @@ public class PdfGenerator {
 
             Document document = new Document(pdf);
             document.setFontSize(DOCUMENT_FONT_SIZE);
+            FooterHandler handler = new FooterHandler();
+            pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
             Table header = PdfHeader.create(IUT_ICON_PATH);
             if (header == null) {

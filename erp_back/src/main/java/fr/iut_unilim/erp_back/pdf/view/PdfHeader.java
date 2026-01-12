@@ -29,7 +29,7 @@ public class PdfHeader {
         Cell cellIconIut = new Cell();
         cellIconIut.add(logoIut);
 
-        String[] informationParagraphsLines = new String[]{"Référence : \t UI en FOR 001",
+        String[] informationParagraphsLines = new String[]{"Référence : \t IU en FOR 001",
                 "Date de création : \t 13/04/2021",
                 "Date de modification : \t 17/07/2025"};
 
