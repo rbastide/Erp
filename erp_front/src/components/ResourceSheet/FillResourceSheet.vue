@@ -8,7 +8,18 @@ import api from '@/services/api';
 const router = useRouter()
 const route = useRoute()
 
+const resourceId = ref();
 const resourceCode = ref('');
+const currentHourlyVolId = ref<number | null>(null);
+
+let hours = ref({
+  cm: 0,
+  td: 0,
+  ds: 0,
+  tp: 0,
+  ds_tp: 0,
+  student: 0
+})
 const currentResourceId = ref<number | null>(null);
 
 const fetchResourceData = async () => {
@@ -40,8 +51,43 @@ const fetchResourceData = async () => {
   }
 };
 
+const fetchHoursData = async () => {
+  try {
+    const response = await api.get('/mccc/getMccc');
+
+    if (response.data && Array.isArray(response.data)) {
+
+      const mcccFound = response.data.find((m: any) =>
+          m.resourceId && m.resourceId.num === resourceCode.value
+      );
+
+      if (mcccFound && mcccFound.hourlyVolId) {
+        const vol = mcccFound.hourlyVolId;
+
+        hours.value = {
+          cm: vol.nbHoursCM,
+          td: vol.nbHoursTD,
+          tp: vol.nbHoursTP,
+          ds: vol.nbHoursDS,
+          ds_tp: vol.nbHoursDSTP,
+          student: 0
+        };
+
+        currentHourlyVolId.value = vol.hourlyVolID;
+      }
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      console.error("Accès refusé (Token expiré ?).");
+    } else {
+      console.error("Erreur chargement des données MCCC :", error);
+    }
+  }
+};
+
 onMounted(() => {
   fetchResourceData();
+  fetchHoursData();
 });
 
 const handleRetour = () =>{ router.back()};
@@ -49,15 +95,6 @@ const handleRetour = () =>{ router.back()};
 const handleExport = () => {
   console.log("Export PDF demandé...");
 };
-
-const hours = ref({
-  cm: 0,
-  td: 0,
-  ds: 0,
-  tp: 0,
-  ds_tp: 0,
-  student: 0
-})
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
