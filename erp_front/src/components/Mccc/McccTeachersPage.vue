@@ -179,7 +179,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher un enseignant..."
+              placeholder="Rechercher un enseignant via son nom ou prénom"
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
