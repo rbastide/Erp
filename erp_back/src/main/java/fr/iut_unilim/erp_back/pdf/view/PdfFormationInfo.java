@@ -8,6 +8,8 @@ import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
 
 import java.util.Arrays;
 
+import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredParagraph;
+
 public class PdfFormationInfo {
     private static final int[] HOURS = new int[]{4, 6, 30};
     private static final String[] HOURS_CLASS_CORRESPONDANCE = new String[]{"CM", "TD", "TP"};
@@ -15,6 +17,8 @@ public class PdfFormationInfo {
     public static Table create() {
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{33, 33, 11, 11, 11}));
         infoTable.useAllAvailableWidth();
+
+        infoTable.addCell(new Cell(1, 5).add(createCenteredParagraph("Semestre 2")));
 
         infoTable.addCell(CellUtils.createCenteredCell("UE 2.4"));
 
