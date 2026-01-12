@@ -14,6 +14,7 @@ import java.io.IOException;
 public class PdfGenerator {
     public static final String BASE_PATH = "src/main/resources/";
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";
+    public static final int DOCUMENT_FONT_SIZE = 10;
 
     public static void createPdf() {
         String path = "mon_document.pdf";
@@ -24,6 +25,7 @@ public class PdfGenerator {
             PdfDocument pdf = new PdfDocument(writer);
 
             Document document = new Document(pdf);
+            document.setFontSize(DOCUMENT_FONT_SIZE);
 
             Table header = PdfHeader.create(IUT_ICON_PATH);
             if (header == null) {
