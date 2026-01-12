@@ -30,7 +30,7 @@ public class ResourceController {
     @GetMapping("/resources")
     public ResponseEntity<?> getResource() {
         return ResponseEntity.ok(resourceService.getAllResources());
-    };
+    }
 
     @PostMapping("/editResource")
     public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) {

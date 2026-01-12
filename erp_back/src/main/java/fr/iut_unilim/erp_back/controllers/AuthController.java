@@ -29,7 +29,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final TeacherService teacherService;
-    ;
+
 
     public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService) {
         this.connectionRepository = connectionRepository;

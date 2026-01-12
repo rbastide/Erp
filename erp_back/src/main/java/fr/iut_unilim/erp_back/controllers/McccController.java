@@ -201,12 +201,12 @@ public class McccController {
     @GetMapping("/getTeachers")
     public ResponseEntity<?> getTeachers() {
         return ResponseEntity.ok(teacherService.getAllTeachers());
-    };
+    }
 
     @GetMapping("/getSaes")
     public ResponseEntity<?> getSaes() {
         return ResponseEntity.ok(saeService.getAllSaes());
-    };
+    }
 
     @GetMapping("/getHourlyVolumes")
     public ResponseEntity<?> getHourlyVolumes() {
