@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.service.ResourceService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,15 +24,12 @@ public class ResourceController {
         this.resourceRepository = resourceRepository;
     }
 
-    @GetMapping("/resources")
-    public ResponseEntity<?> getResource() {
-        return ResponseEntity.ok(resourceService.getAllResources());
-    }
+    
 
     @PostMapping("/editResource")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) {
         for (ResourceResponse res : resList) {
-            // CORRECTION : On vérifie que l'ID n'est pas nul avant findById
             if (res.getResourceID() != null) {
                 Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
 
@@ -55,6 +53,7 @@ public class ResourceController {
 
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteResource(@PathVariable Long id) {
         if (!resourceRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

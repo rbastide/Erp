@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.*;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,11 +42,13 @@ public class ResourceSheetController {
     }
 
     @GetMapping("/getResourceSheet")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getResourceSheet() {
         return ResponseEntity.ok(resourceSheetService.getAllResourceSheets());
     }
 
     @PostMapping("/resourceSheet")
+    @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> editResourceSheet(@RequestBody List<ResourceSheetRequest> resSheetList) {
         for (ResourceSheetRequest resSheet : resSheetList) {
             ResourceSheet sheetToSave;
@@ -147,6 +150,7 @@ public class ResourceSheetController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
         if (!resourceSheetRepository.existsById(id)) {
             return ResponseEntity.ok().build();
@@ -156,6 +160,7 @@ public class ResourceSheetController {
     }
 
     @GetMapping("/getHistory")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<List<HistoryResponse>> getHistory() {
         List<ResourceSheet> sheets = resourceSheetRepository.findAll();
         List<HistoryResponse> historyList = new ArrayList<>();

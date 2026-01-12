@@ -8,6 +8,7 @@ import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -57,6 +58,12 @@ public class McccController {
             return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
         }
         return null;
+    }
+
+    @GetMapping("/getMccc")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    public ResponseEntity<?> getMccc() {
+        return ResponseEntity.ok(mcccService.getAllMccc());
     }
 
     @PostMapping("/save")
@@ -214,6 +221,7 @@ public class McccController {
     }
 
     @PostMapping("/saveHourlyVolume")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> saveHourlyVolume(@RequestBody HourlyVolume hourlyVolume) {
         hourlyVolumeService.save(hourlyVolume);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");

@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Sae;
 import fr.iut_unilim.erp_back.repository.SaeRepository;
 import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +23,11 @@ public class SaeController {
     }
 
     @GetMapping("/getAllSae")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getAllSae() { return ResponseEntity.ok(saeService.getAllSaes()); }
 
     @PostMapping("/addSae")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> addSae(@RequestBody List<SaeRequest> saeRequest) {
 
         for (SaeRequest sae : saeRequest) {
@@ -47,6 +50,7 @@ public class SaeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteSae(@PathVariable Long id) {
         if (!saeRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

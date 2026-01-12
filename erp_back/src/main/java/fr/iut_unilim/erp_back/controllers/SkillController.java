@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.repository.*;
 import fr.iut_unilim.erp_back.service.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
@@ -30,18 +31,21 @@ public class SkillController {
     }
 
     @GetMapping("/skills")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getAllSkills() {
         List<Skill> skills = skillService.getAllSkills();
         return ResponseEntity.ok(convertSkillEntitiesToDtos(skills));
     }
 
     @PostMapping("/skills")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos) {
         convertSkillDtosToEntities(skillsDtos);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/skills/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteSkill(@PathVariable Long id) {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
