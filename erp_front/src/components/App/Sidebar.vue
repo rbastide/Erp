@@ -1,6 +1,6 @@
 <script setup>
-import { useRouter } from 'vue-router';
-import { ref, onMounted, watchEffect } from "vue";
+import {useRouter} from 'vue-router';
+import {onMounted, ref, watchEffect} from "vue";
 
 const props = defineProps({
   dashboardAdminActive: { type: Boolean, default: false },
@@ -17,7 +17,6 @@ const userRole = ref('');
 // Fonction pour synchroniser le rôle depuis le stockage local
 const updateRole = () => {
   const role = localStorage.getItem('user_role');
-  // On harmonise en majuscules pour correspondre aux tests (ADMIN / TEACHER)
   userRole.value = role ? role.toUpperCase() : 'USER';
 };
 
@@ -25,13 +24,11 @@ onMounted(() => {
   updateRole();
 });
 
-// Sécurité : on surveille les changements pour mettre à jour la vue si nécessaire
 watchEffect(() => {
   updateRole();
 });
 
 const handleDashboardClick = () => {
-  // Redirection basée sur le rôle réel stocké lors du login
   if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
     router.push('/home-admin');
   } else {
@@ -43,9 +40,6 @@ const handleSettings = () => router.push('/settings');
 const handleAide = () => router.push('/aide');
 
 const handleDeconnexion = () => {
-  // Nettoyage complet des informations de session
-  localStorage.removeItem('user_token');
-  localStorage.removeItem('user_role');
   router.push('/deconnexion');
 };
 </script>
