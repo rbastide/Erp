@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue'; // Ajout de ref
 import { useRouter } from 'vue-router';
 import { mcccStore } from '@/services/mcccStore';
+import api from '@/services/api';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 
 mcccStore.loadMcccStore();
 const router = useRouter();
+// On crée une ref pour stocker l'ID de la ligne qu'on modifie
+const currentHourlyVolID = ref(null);
 
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
@@ -16,51 +19,76 @@ const hourTypes = [
   { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
-const totalHeures = computed(() => {
-  return (mcccStore.hoursCM || 0) +
-      (mcccStore.hoursTD || 0) +
-      (mcccStore.hoursDS || 0) +
-      (mcccStore.hoursTP || 0) +
-      (mcccStore.hoursDSTP || 0);
-});
+const fetchHourlyVolumes = async () => {
+  try {
+    const response = await api.get('/mccc/getHourlyVolumes');
 
-const updateHours = (key: string, delta: number) => {
-  const current = (mcccStore as any)[key] || 0;
-  const newValue = Math.max(0, current + delta);
-  (mcccStore as any)[key] = newValue;
-};
+    if (response.data && response.data.length > 0) {
+      const bddData = response.data[0];
 
-const validateInput = (key: string) => {
-  if ((mcccStore as any)[key] < 0 || (mcccStore as any)[key] === null) {
-    (mcccStore as any)[key] = 0;
+      // IMPORTANT : On sauvegarde l'ID de la ligne chargée
+      currentHourlyVolID.value = bddData.hourlyVolID;
+
+      mcccStore.hoursCM = bddData.nbHoursCM;
+      mcccStore.hoursTD = bddData.nbHoursTD;
+      mcccStore.hoursTP = bddData.nbHoursTP;
+      mcccStore.hoursDS = bddData.nbHoursDS;
+      mcccStore.hoursDSTP = bddData.nbHoursDSTP;
+    }
+  } catch (error) {
+    console.error("Erreur chargement volumes horaires :", error);
   }
-};
-
-const blockNegative = (evt: KeyboardEvent) => {
-  if (evt.key === '-') {
-    evt.preventDefault();
-  }
-};
-
-
-const handleValider = () => {
-  mcccStore.registerMcccStore();
-  router.push('/mccc-menu');
-};
-
-const handleRetour = () => {
-  router.push('/cancel-mccc');
 };
 
 onMounted(() => {
-  mcccStore.loadMcccStore();
-  mcccStore.saveBackup();
+  fetchHourlyVolumes();
 });
+
+// ... (totalHeures, updateHours, validateInput, blockNegative restent identiques) ...
+const totalHeures = computed(() => {
+  return (mcccStore.hoursCM || 0) + (mcccStore.hoursTD || 0) + (mcccStore.hoursDS || 0) + (mcccStore.hoursTP || 0) + (mcccStore.hoursDSTP || 0);
+});
+const updateHours = (key: string, delta: number) => {
+  const current = (mcccStore as any)[key] || 0;
+  (mcccStore as any)[key] = Math.max(0, current + delta);
+};
+const validateInput = (key: string) => {
+  if ((mcccStore as any)[key] < 0) (mcccStore as any)[key] = 0;
+};
+const blockNegative = (evt: KeyboardEvent) => {
+  if (evt.key === '-') evt.preventDefault();
+};
+
+// --- MODIFICATION ICI ---
+const handleValider = async () => {
+  try {
+    // 1. On prépare l'objet à envoyer au Backend (doit correspondre à l'Entity Java)
+    const payload = {
+      hourlyVolID: currentHourlyVolID.value, // L'ID est crucial pour que ce soit un UPDATE
+      nbHoursCM: mcccStore.hoursCM,
+      nbHoursTD: mcccStore.hoursTD,
+      nbHoursTP: mcccStore.hoursTP,
+      nbHoursDS: mcccStore.hoursDS,
+      nbHoursDSTP: mcccStore.hoursDSTP
+    };
+
+    // 2. On envoie les données
+    await api.post('/mccc/saveHourlyVolume', payload);
+
+    // 3. Si tout va bien, on met à jour le store et on change de page
+    mcccStore.registerMcccStore();
+    router.push('/mccc-menu');
+
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde :", error);
+    alert("Une erreur est survenue lors de la sauvegarde des heures.");
+  }
+};
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader title="Saisissez les heures " :inline = "`par élève pour la ${mcccStore.resourceCode}`"/>
+  <AppHeader title="Heures par élève pour la" :inline = "mcccStore.resourceCode"/>
 
   <main class="main-content">
     <div class="content-wrapper">
