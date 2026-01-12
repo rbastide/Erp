@@ -24,7 +24,11 @@ public class ResourceController {
         this.resourceRepository = resourceRepository;
     }
 
-    
+    @GetMapping("/resources")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    public ResponseEntity<?> getResource() {
+        return ResponseEntity.ok(resourceService.getAllResources());
+    }
 
     @PostMapping("/editResource")
     @PreAuthorize("hasAuthority('ADMIN')")
