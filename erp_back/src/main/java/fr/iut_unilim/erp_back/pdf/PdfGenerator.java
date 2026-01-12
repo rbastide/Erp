@@ -20,43 +20,44 @@ import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
 
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 
 public class PdfGenerator {
-    public static final String BASE_PATH = "src/main/resources/";
+    public static final String BASE_PATH = "erp_back/src/main/resources/";
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";
     public static final int DOCUMENT_FONT_SIZE = 10;
 
-    public static void createPdf() {
-        String path = "mon_document.pdf";
+    public static byte[] createPdf() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        try {
-            PdfWriter writer = new PdfWriter(path);
+        PdfWriter writer = new PdfWriter(baos);
 
-            PdfDocument pdf = new PdfDocument(writer);
+        PdfDocument pdf = new PdfDocument(writer);
 
-            Document document = new Document(pdf);
-            document.setFontSize(DOCUMENT_FONT_SIZE);
-            FooterHandler handler = new FooterHandler();
-            pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
+        Document document = new Document(pdf);
+        document.setFontSize(DOCUMENT_FONT_SIZE);
+        FooterHandler handler = new FooterHandler();
+        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-            if (!generateFirstPage(document)) return;
+        ErpBackApplication.LOGGER.info("Created pdf");
+        if (!generateFirstPage(document)) return null;
 
-            document.add(new AreaBreak());
+        document.add(new AreaBreak());
 
-            if (!generateSecondPage(document)) return;
+        ErpBackApplication.LOGGER.info("Created pdf");
+        if (!generateSecondPage(document)) return null;
 
-            document.add(new AreaBreak());
+        document.add(new AreaBreak());
 
-            if (!generateThirdPage(document)) return;
+        ErpBackApplication.LOGGER.info("Created pdf");
+        if (!generateThirdPage(document)) return null;
 
-            document.close();
+        ErpBackApplication.LOGGER.info("Created pdf");
+        document.close();
 
-        } catch (IOException e) {
-            ErpBackApplication.LOGGER.info("Issue with creating PDF : " + e.getMessage());
-        }
+        return baos.toByteArray();
     }
 
     private static boolean generateFirstPage(Document document) {
