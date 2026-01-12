@@ -13,7 +13,7 @@ import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue"
 import CancelPageBackToDashboard from "./components/Information/CancelPageBackToDashboard.vue";
 import CancelPageMccc from "./components/Information/CancelPageMccc.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
-import SuccessfullyDeletePage from "./components/Information/SuccessfullyDelete.vue";
+import SuccessfullyDeletedPage from "./components/Information/SuccessfullyDeleted.vue";
 import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
 import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
 import ModifSaved from "./components/Information/ModifSaved.vue";
@@ -114,7 +114,7 @@ const routes = [
     {
         path: '/supp-fiche',
         name: 'SuccessfullyDeletePage',
-        component: SuccessfullyDeletePage
+        component: SuccessfullyDeletedPage
     },
     {
         path: '/mccc-ressource',
