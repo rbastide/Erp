@@ -2,8 +2,11 @@ package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ResourceSheetService {
@@ -27,5 +30,9 @@ public class ResourceSheetService {
             return;
         }
         resourceSheetRepository.deleteById(id);
+    }
+
+    public Optional<ResourceSheet> getResourceSheetFromId(@NotNull Long id) {
+        return resourceSheetRepository.findById(id);
     }
 }
