@@ -20,25 +20,13 @@ public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
     private final ResourceSheetRepository resourceSheetRepository;
-    private final SaeRepository saeRepository;
     private final ResourceRepository resourceRepository;
-    private final TeacherRepository teacherRepository;
-    private final HourlyVolumeRepository hourlyVolumeRepository;
-    private final PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository;
-    private final StudentsFeedbacksRepository studentsFeedbacksRepository;
-    private final ImprovementIdeasRepository improvementIdeasRepository;
     private final ClassTypeRepository classTypeRepository;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, SaeRepository saeRepository, ResourceRepository resourceRepository, TeacherRepository teacherRepository, HourlyVolumeRepository hourlyVolumeRepository, PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository, StudentsFeedbacksRepository studentsFeedbacksRepository, ImprovementIdeasRepository improvementIdeasRepository, ClassTypeRepository classTypeRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ClassTypeRepository classTypeRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
-        this.saeRepository = saeRepository;
         this.resourceRepository = resourceRepository;
-        this.teacherRepository = teacherRepository;
-        this.hourlyVolumeRepository = hourlyVolumeRepository;
-        this.pedagologicalTeachersFeedbacksRepository = pedagologicalTeachersFeedbacksRepository;
-        this.studentsFeedbacksRepository = studentsFeedbacksRepository;
-        this.improvementIdeasRepository = improvementIdeasRepository;
         this.classTypeRepository = classTypeRepository;
     }
 
@@ -107,7 +95,6 @@ public class ResourceSheetController {
 
         List<PedagologicalContent> pedagologicalContent = new ArrayList<>();
 
-        // On prépare le regex
         String regex = "^(TP|CM|TD)\\s*(\\d+)\\s*:\\s*(.*)$";
         Pattern pattern = Pattern.compile(regex);
 
@@ -118,22 +105,20 @@ public class ResourceSheetController {
                 return ResponseEntity.badRequest().body("Invalid content !");
             }
 
-            String typeName = matcher.group(1); // "TP", "TD" ou "CM"
+            String typeName = matcher.group(1);
             String numero = matcher.group(2);
             String description = matcher.group(3);
 
             PedagologicalContent pedagologicalContentEntity = new PedagologicalContent();
 
-            // --- CORRECTION MAJEURE ICI ---
-            // On cherche l'objet en base de données au lieu d'en créer un nouveau
             ClassType existingType = classTypeRepository.findByClassType(typeName)
-                    .orElseThrow(() -> new RuntimeException("Erreur : Le type de cours '" + typeName + "' n'existe pas en base de données."));
-
-            pedagologicalContentEntity.setClassTypeId(existingType); // existingType possède un ID valide
-            // ------------------------------
+                    .orElseThrow(() -> new RuntimeException("Erreur : Le type '" + typeName + "' n'existe pas."));
+            pedagologicalContentEntity.setClassTypeId(existingType);
 
             pedagologicalContentEntity.setContent(description);
             pedagologicalContentEntity.setCourseNumber(Long.valueOf(numero));
+
+            pedagologicalContentEntity.setRessourceSheetId(resourceSheet);
 
             pedagologicalContent.add(pedagologicalContentEntity);
         }
