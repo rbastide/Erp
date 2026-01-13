@@ -1,14 +1,24 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.dto.*;
-import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.*;
-import fr.iut_unilim.erp_back.service.*;
+import fr.iut_unilim.erp_back.dto.CriticalLearningDto;
+import fr.iut_unilim.erp_back.dto.LearningRankDto;
+import fr.iut_unilim.erp_back.dto.NewSkillDto;
+import fr.iut_unilim.erp_back.entity.CriticalLearning;
+import fr.iut_unilim.erp_back.entity.Rank;
+import fr.iut_unilim.erp_back.entity.Skill;
+import fr.iut_unilim.erp_back.repository.CriticalLearningRepository;
+import fr.iut_unilim.erp_back.repository.RankRepository;
+import fr.iut_unilim.erp_back.repository.SkillRepository;
+import fr.iut_unilim.erp_back.service.CriticalLearningService;
+import fr.iut_unilim.erp_back.service.RankService;
+import fr.iut_unilim.erp_back.service.SkillService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/skill")
@@ -69,7 +79,7 @@ public class SkillController {
     }
 
     private void convertRankDtosToEntities(NewSkillDto skillDto, Skill skill) {
-        for (LearningRankDto rankDto : skillDto.niveaux()) {
+        for (LearningRankDto rankDto : skillDto.levels()) {
             Rank rank = (rankDto.id() != null)
                     ? rankService.getRankFromId(rankDto.id()).orElse(new Rank(rankDto.num(), rankDto.intitule(), skill))
                     : new Rank(rankDto.num(), rankDto.intitule(), skill);
