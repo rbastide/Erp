@@ -7,17 +7,15 @@ import api from '@/services/api';
 
 const router = useRouter();
 
-// Liste des utilisateurs chargés depuis le back
 const users = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
 
-// Modèle pour l'édition (Ajout de firstname, lastname, email)
 const editedUser = reactive({
   id: null,
   identifier: '',
-  firstname: '',
-  lastname: '',
+  firstName: '',
+  lastName: '',
   email: '',
   role: '',
   newPassword: ''
@@ -54,8 +52,8 @@ const filteredUsers = computed(() => {
   if (!query) return users.value;
   return users.value.filter(user =>
       user.identifier.toLowerCase().includes(query) ||
-      (user.firstname && user.firstname.toLowerCase().includes(query)) || // Recherche aussi par prénom
-      (user.lastname && user.lastname.toLowerCase().includes(query)) ||   // Recherche aussi par nom
+      (user.firstName && user.firstName.toLowerCase().includes(query)) ||
+      (user.lastName && user.lastName.toLowerCase().includes(query)) ||
       formatRole(user.role).toLowerCase().includes(query)
   );
 });
@@ -66,6 +64,9 @@ const handleDelete = async (id, identifier) => {
     try {
       await api.delete(`/auth/users/${id}`);
       users.value = users.value.filter(u => u.id !== id);
+      if (editedUser.id === id) {
+        handleCancel();
+      }
     } catch (error) {
       console.error("Erreur suppression :", error);
       alert("Erreur lors de la suppression.");
@@ -74,28 +75,29 @@ const handleDelete = async (id, identifier) => {
 };
 
 
-const saveModification = async (index) => {
+const saveModification = async (  ) => {
   try {
     const payload = {
       id: editedUser.id,
       identifier: editedUser.identifier,
-      firstname: editedUser.firstname,
-      lastname: editedUser.lastname,
+      firstName: editedUser.firstName,
+      lastName: editedUser.lastName,
       email: editedUser.email,
       role: editedUser.role,
       newPassword: editedUser.newPassword.trim() !== '' ? editedUser.newPassword : null
     };
     await api.post('/auth/user', payload);
 
-    const originalIndex = users.value.findIndex(u => u.id === editedUser.id);
-    if (originalIndex !== -1) {
-      // Mise à jour locale pour éviter de recharger
-      users.value[originalIndex].identifier = editedUser.identifier;
-      users.value[originalIndex].firstname = editedUser.firstname;
-      users.value[originalIndex].lastname = editedUser.lastname;
-      users.value[originalIndex].email = editedUser.email;
-      users.value[originalIndex].role = editedUser.role;
+    const userToUpdate = users.value.find(u => u.id === editedUser.id);
+
+    if (userToUpdate) {
+      userToUpdate.identifier = editedUser.identifier;
+      userToUpdate.firstName = editedUser.firstName;
+      userToUpdate.lastName = editedUser.lastName;
+      userToUpdate.email = editedUser.email;
+      userToUpdate.role = editedUser.role;
     }
+
     handleCancel();
   } catch (error) {
     alert("Erreur lors de la mise à jour.");
@@ -106,8 +108,8 @@ const handleModif = (user, index) => {
   editingIndex.value = index;
   editedUser.id = user.id;
   editedUser.identifier = user.identifier;
-  editedUser.firstname = user.firstname || '';
-  editedUser.lastname = user.lastname || '';
+  editedUser.firstName = user.firstName || '';
+  editedUser.lastName = user.lastName || '';
   editedUser.email = user.email || '';
   editedUser.role = user.role;
   editedUser.newPassword = '';
@@ -115,12 +117,11 @@ const handleModif = (user, index) => {
 
 const handleCancel = () => {
   editingIndex.value = null;
-  // Reset complet
   Object.assign(editedUser, {
     id: null,
     identifier: '',
-    firstname: '',
-    lastname: '',
+    firstName: '',
+    lastName: '',
     email: '',
     role: '',
     newPassword: ''
@@ -158,8 +159,8 @@ const handleAddUser = () => router.push('/new-user');
             </div>
 
             <h3 class="user-id">{{ user.identifier }}</h3>
-            <p class="user-name" v-if="user.firstname || user.lastname">
-              {{ user.firstname }} {{ user.lastname }}
+            <p class="user-name" v-if="user.firstName || user.lastName">
+              {{ user.firstName }} {{ user.lastName }}
             </p>
 
             <span class="role-badge">{{ formatRole(user.role) }}</span>
@@ -187,10 +188,10 @@ const handleAddUser = () => router.push('/new-user');
             </div>
 
             <div class="input-group-compact">
-              <input type="text" v-model="editedUser.lastname" class="card-input-compact" placeholder="Nom">
+              <input type="text" v-model="editedUser.lastName" class="card-input-compact" placeholder="Nom">
             </div>
             <div class="input-group-compact">
-              <input type="text" v-model="editedUser.firstname" class="card-input-compact" placeholder="Prénom">
+              <input type="text" v-model="editedUser.firstName" class="card-input-compact" placeholder="Prénom">
             </div>
             <div class="input-group-compact">
               <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Email">
