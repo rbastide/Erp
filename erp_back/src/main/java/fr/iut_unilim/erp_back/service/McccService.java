@@ -36,7 +36,7 @@ public class McccService {
     }
 
     @Nullable
-    public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
+    public Mccc getCurrentMcccFromResource(Resource resource) {
         List<Mccc> mcccs = mcccRepository.findByResourceId(resource);
 
         if (mcccs.isEmpty()) {
@@ -48,6 +48,16 @@ public class McccService {
             if (mccc.getCreationDate().after(currentMccc.getCreationDate())) {
                 currentMccc = mccc;
             }
+        }
+        return currentMccc;
+    }
+
+    @Nullable
+    public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
+        Mccc currentMccc = getCurrentMcccFromResource(resource);
+
+        if (currentMccc == null) {
+            return null;
         }
 
         return currentMccc.getCriticalLearningsId();
