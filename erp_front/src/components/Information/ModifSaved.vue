@@ -151,7 +151,7 @@ h2 {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125em;
   font-family: 'Roboto', sans-serif;
 }
 

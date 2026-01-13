@@ -157,15 +157,6 @@ const handleRetour = () => {
   align-items: flex-start;
 }
 
-.instruction-text {
-  font-size: 28px;
-  color: #E92533;
-  margin-bottom: 50px;
-  font-weight: 500;
-  text-align: left;
-  width: 100%;
-}
-
 .hours-flex-container {
   display: flex;
   flex-wrap: wrap;

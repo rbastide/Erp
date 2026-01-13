@@ -50,7 +50,6 @@ body.dark-mode .app-footer {
   border-color: #444444 !important;
   color: #ffffff !important;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
-  background: #333333 !important;
 }
 
 body.dark-mode .resource-card,

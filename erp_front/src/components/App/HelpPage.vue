@@ -191,7 +191,7 @@ h3 {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.03125em;
   font-family: 'Roboto', sans-serif;
 }
 
@@ -229,8 +229,7 @@ h3 {
 
 @media (max-width: 600px) {
   .main-content {
-    padding: 20px;
-    padding-left: 90px;
+    padding: 20px 20px 20px 90px;
   }
 }
 </style>
