@@ -6,7 +6,7 @@ import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
-import DeconnectionPage from './components/Information/DeconnectionPage.vue';
+import DisconnectionPage from './components/Information/DisconnectionPage.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
@@ -72,9 +72,9 @@ const routes = [
         component: HelpPage
     },
     {
-        path: '/deconnection',
-        name: 'DeconnectionPage',
-        component: DeconnectionPage
+        path: '/disconnection',
+        name: 'DisconnectionPage',
+        component: DisconnectionPage
     },
     {
         path: '/error-save',

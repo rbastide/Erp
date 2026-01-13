@@ -345,17 +345,15 @@ const getGroupsForUE = (ueName) => {
   justify-content: flex-start;
 }
 
-/* Modification CSS pour gérer les titres longs */
 .sae-chip {
   background-color: #ffebee;
   color: #c62828;
   padding: 10px 20px;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 1rem; /* Police légèrement réduite pour le texte long */
+  font-size: 1rem;
   border: 1px solid #ffcdd2;
   transition: transform 0.2s;
-  /* Ajouts pour le texte long */
   white-space: normal;
   text-align: center;
   max-width: 100%;

@@ -109,7 +109,7 @@ body.dark-mode .sae-number,
 body.dark-mode .label,
 body.dark-mode .container-connexion p,
 body.dark-mode #card-title,
-body.dark-mode #intitule,
+body.dark-mode #title,
 body.dark-mode .group-label,
 body.dark-mode .field-label,
 body.dark-mode .lvl-label,
@@ -228,9 +228,9 @@ body.dark-mode .competence-table td {
 }
 
 body.dark-mode .btn-sys,
-body.dark-mode .btn-quitter,
+body.dark-mode .quit-btn,
 body.dark-mode .btn-new-user,
-body.dark-mode .btn-retour,
+body.dark-mode .back-btn,
 body.dark-mode .login-button,
 body.dark-mode .btn-primary,
 body.dark-mode .save-btn,
@@ -253,9 +253,9 @@ body.dark-mode .btn-cancel {
 }
 
 body.dark-mode .btn-sys:hover,
-body.dark-mode .btn-quitter:hover,
+body.dark-mode .quit-btn:hover,
 body.dark-mode .btn-new-user:hover,
-body.dark-mode .btn-retour:hover,
+body.dark-mode .back-btn:hover,
 body.dark-mode .login-button:hover,
 body.dark-mode .btn-primary:hover,
 body.dark-mode .save-btn:hover {

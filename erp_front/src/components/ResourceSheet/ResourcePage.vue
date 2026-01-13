@@ -192,7 +192,7 @@ const handleFill = (code: string) => {
   justify-content: center;
 }
 
-.btn-quitter {
+.quit-btn {
   width: 180px;
   padding: 12px;
   border: 2px solid #B51621;
@@ -206,7 +206,7 @@ const handleFill = (code: string) => {
   transition: all 0.3s ease;
 }
 
-.btn-quitter:hover {
+.quit-btn:hover {
   background-color: transparent;
   color: #B51621;
   transform: scale(1.05);

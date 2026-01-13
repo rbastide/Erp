@@ -13,7 +13,7 @@ const isLoading = ref(true);
 
 const allSkills = ref([]);
 
-const fetchReferentiel = async () => {
+const fetchReferential = async () => {
   try {
     isLoading.value = true;
     const response = await api.get('/skill/skills');
@@ -28,7 +28,7 @@ const fetchReferentiel = async () => {
 onMounted(() => {
   mcccStore.loadMcccStore();
   if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
-  fetchReferentiel();
+  fetchReferential();
   mcccStore.loadMcccStore();
   mcccStore.saveBackup();
 });
@@ -55,12 +55,12 @@ const filteredSkills = computed(() => {
 });
 
 const addSkillDirectly = (skill) => {
-  if (!skill.niveaux || skill.niveaux.length === 0) {
+  if (!skill.levels || skill.levels.length === 0) {
     alert("Cette compétence n'a pas de niveaux définis en base.");
     return;
   }
 
-  const defaultRank = skill.niveaux[0];
+  const defaultRank = skill.levels[0];
 
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
@@ -321,7 +321,7 @@ const clearSearch = () => searchQuery.value = '';
   left: 0;
   width: 100%;
   background: white;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15); /* Ombre vers le haut */
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   padding: 15px 0;
   z-index: 100;
 }

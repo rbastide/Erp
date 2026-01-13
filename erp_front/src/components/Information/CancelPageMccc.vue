@@ -54,7 +54,6 @@ const handleOui = () => {
 </template>
 
 <style scoped>
-/* --- Layout global (identique à Deconnexion) --- */
 .screen-layout {
   display: flex;
   flex-direction: column;
@@ -102,20 +101,18 @@ const handleOui = () => {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* --- Icône --- */
 .icon-circle {
   width: 100px;
   height: 100px;
-  background: rgba(181, 22, 33, 0.08); /* Fond rouge très pâle */
+  background: rgba(181, 22, 33, 0.08);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #B51621; /* Rouge charte */
+  color: #B51621;
   margin-bottom: 30px;
 }
 
-/* --- Typographie --- */
 h2 {
   font-size: 24px;
   color: #333;
@@ -130,7 +127,6 @@ h2 {
   line-height: 1.5;
 }
 
-/* --- Boutons --- */
 .actions {
   display: flex;
   flex-direction: column;

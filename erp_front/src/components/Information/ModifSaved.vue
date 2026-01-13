@@ -8,13 +8,11 @@ const router = useRouter();
 const userRole = ref('');
 
 onMounted(() => {
-  // 1. Récupération et normalisation comme dans Sidebar.vue
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
 });
 
 const handleRetour = () => {
-  // 2. Test robuste sur les différents types d'admin possibles
   if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
     router.push('/home-admin');
   }
@@ -58,7 +56,6 @@ const handleRetour = () => {
 </template>
 
 <style scoped>
-/* --- Layout Global --- */
 .screen-layout {
   display: flex;
   flex-direction: column;
@@ -85,7 +82,6 @@ const handleRetour = () => {
   padding: 20px;
 }
 
-/* --- Carte de Succès --- */
 .success-card {
   background: #ffffff;
   width: 100%;
@@ -106,7 +102,6 @@ const handleRetour = () => {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* --- Icône --- */
 .icon-circle {
   width: 100px;
   height: 100px;
@@ -122,7 +117,6 @@ const handleRetour = () => {
   color: #4CAF50;
 }
 
-/* --- Typographie --- */
 h2 {
   font-size: 28px;
   color: #333;

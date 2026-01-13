@@ -4,11 +4,11 @@ import AppHeader from '../App/Header.vue';
 
 const router = useRouter();
 
-const handleRetour = () => {
+const handleBack = () => {
   router.back();
 };
 
-const handleAutreFiche = () => {
+const handleOtherSheet = () => {
   router.push('/history-admin');
 };
 
@@ -21,8 +21,8 @@ const handleAutreFiche = () => {
   </main>
   <footer>
     <div class="btn-container">
-      <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
-      <div @click="handleAutreFiche" class="btn-quitter">Supprimer une nouvelle fiche</div>
+      <div @click="handleBack" class="btn-quitter">Retour au menu</div>
+      <div @click="handleOtherSheet" class="btn-quitter">Supprimer une nouvelle fiche</div>
     </div>
   </footer>
 </template>
@@ -53,7 +53,7 @@ const handleAutreFiche = () => {
   align-items: center;
 }
 
-.btn-quitter{
+.quit-btn{
   width: fit-content;
   padding: 0.8rem; /* 13px */
   border: none;
@@ -70,7 +70,7 @@ const handleAutreFiche = () => {
   margin: 5% auto;
 }
 
-.btn-quitter:hover, .btn-retour:hover{
+.quit-btn:hover, .back-btn:hover{
   background: #999999;
   transform: translateY(-4px);
   cursor: pointer;

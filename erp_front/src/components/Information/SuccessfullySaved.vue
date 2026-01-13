@@ -6,7 +6,7 @@ import {ref} from "vue";
 const router = useRouter();
 const userRole = ref('');
 
-const handleRetour = () => {
+const handleBack = () => {
   if (userRole.value === 'admin') {
     router.push('/home-admin');
   } else {
@@ -22,7 +22,7 @@ const handleRetour = () => {
     <p class="text">Votre fiche ressource a bien été sauvegardée !</p>
   </main>
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Retour au menu</div>
+    <div @click="handleBack" class="btn-quitter">Retour au menu</div>
   </footer>
 </template>
 
@@ -41,30 +41,5 @@ const handleRetour = () => {
   margin-top: 5%;
   color: green;
   font-size: 40px;
-}
-
-/*Footer*/
-.btn-quitter{
-  width: 150px;
-  padding: 0.8rem; /* 13px */
-  border: none;
-  text-align: center;
-  border-radius: 4px;
-  background-color: #B51621;
-  color: #FFFFFF;
-  font-size: 1rem; /* 16px */
-  font-weight: bold;
-  font-family: 'Roboto', sans-serif;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  position: relative;
-  margin: 5% auto;
-
-}
-
-.btn-quitter:hover{
-  background: #999999;
-  transform: translateY(-4px);
-  cursor: pointer;
 }
 </style>

@@ -47,7 +47,6 @@ onMounted(() => {
   mcccStore.loadMcccStore();
   fetchTeachers();
   mcccStore.saveBackup();
-
 });
 
 const selectedTeachersList = computed(() => {
@@ -210,7 +209,6 @@ const clearSearch = () => searchQuery.value = '';
   max-width: 1200px;
 }
 
-/* Espacement entre les sections */
 .selection-section {
   margin-bottom: 40px;
 }
@@ -242,7 +240,7 @@ const clearSearch = () => searchQuery.value = '';
   border: 1px solid #e0e0e0;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transition plus fluide */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -273,7 +271,7 @@ const clearSearch = () => searchQuery.value = '';
 .avatar-circle {
   width: 50px;
   height: 50px;
-  background: #f0f0f0; /* Gris par défaut pour les non-sélectionnés */
+  background: #f0f0f0;
   color: #666;
   border-radius: 50%;
   display: flex;

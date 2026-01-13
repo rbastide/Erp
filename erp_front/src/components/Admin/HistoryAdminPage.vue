@@ -265,7 +265,7 @@ const clearSearch = () => searchQuery.value = '';
   cursor: pointer;
 }
 
-.btn-quitter {
+.quit-btn {
   background-color: #B51621;
   color: white;
   padding: 12px 40px;
@@ -276,7 +276,7 @@ const clearSearch = () => searchQuery.value = '';
   white-space: nowrap;
 }
 
-.btn-quitter:hover {
+.quit-btn:hover {
   background-color: #8e111a;
 }
 </style>

@@ -125,7 +125,7 @@ const handleRetour = () => {
   border-color: rgba(181, 22, 33, 0.1);
 }
 
-/* Icônes */
+
 .icon-circle {
   width: 80px;
   height: 80px;
@@ -178,7 +178,6 @@ h3 {
   margin: 0;
 }
 
-/* Bouton Retour */
 .footer-actions {
   margin-top: 20px;
 }
@@ -208,7 +207,6 @@ h3 {
   box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .cards-container {
     flex-direction: column;

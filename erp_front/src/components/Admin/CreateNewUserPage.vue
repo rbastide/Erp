@@ -229,7 +229,7 @@ const handleRegister = async () => {
 .login-button:hover {
   background-color: #9c121b;
 }
-.btn-quitter {
+.quit-btn {
   width: 150px;
   padding: 0.8rem;
   border: none;
@@ -245,7 +245,7 @@ const handleRegister = async () => {
   margin: 5% auto;
   font-family: 'Roboto', sans-serif;
 }
-.btn-quitter:hover {
+.quit-btn:hover {
   background: #999999;
   transform: translateY(-4px);
 }

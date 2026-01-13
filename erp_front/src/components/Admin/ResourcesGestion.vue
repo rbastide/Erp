@@ -15,7 +15,7 @@ const editedResource = reactive({
   resourceID: null,
   num: '',
   name: '',
-  semestre: null
+  semester: null
 });
 
 const fetchResources = async () => {
@@ -61,7 +61,7 @@ const handleDelete = async (resourceID, num) => {
 };
 
 const saveResource = async () => {
-  if (!editedResource.num || !editedResource.name || editedResource.semestre === null) {
+  if (!editedResource.num || !editedResource.name || editedResource.semester === null) {
     alert("Veuillez remplir tous les champs.");
     return;
   }
@@ -71,7 +71,7 @@ const saveResource = async () => {
     return;
   }
 
-  if (editedResource.semestre < 1) {
+  if (editedResource.semester < 1) {
     alert("Le semestre doit être au minimum 1.");
     return;
   }
@@ -79,7 +79,7 @@ const saveResource = async () => {
   const resourceData = {
     num: editedResource.num,
     name: editedResource.name,
-    semestre: parseInt(editedResource.semestre)
+    semester: parseInt(editedResource.semester)
   };
 
   if (editedResource.resourceID !== null) {
@@ -102,7 +102,7 @@ const handleModif = (resource, index) => {
     resourceID: resource.resourceID,
     num: resource.num,
     name: resource.name,
-    semestre: resource.semestre || resource.semester
+    semester: resource.semester || resource.semester
   });
 };
 
@@ -113,7 +113,7 @@ const handleAddResource = () => {
     resourceID: null,
     num: '',
     name: '',
-    semestre: null
+    semester: null
   });
 };
 
@@ -124,7 +124,7 @@ const handleCancel = () => {
     resourceID: null,
     num: '',
     name: '',
-    semestre: null
+    semester: null
   });
 };
 
@@ -171,7 +171,7 @@ const handleValider = () => router.push('/home-admin');
               <label class="compact-label">Semestre</label>
               <input
                   type="number"
-                  v-model.number="editedResource.semestre"
+                  v-model.number="editedResource.semester"
                   class="card-input-compact"
                   min="1"
                   placeholder="Saisir 1, 2..."
@@ -194,7 +194,7 @@ const handleValider = () => router.push('/home-admin');
               </div>
               <h3 class="res-num">{{ resource.num }}</h3>
               <p class="res-name">{{ resource.name }}</p>
-              <span class="role-badge">Semestre {{ resource.semester || resource.semestre }}</span>
+              <span class="role-badge">Semestre {{ resource.semester || resource.semester }}</span>
               <div class="card-actions">
                 <button class="action-btn-mini edit" @click="handleModif(resource, index)">
                   <svg width="16" height="16" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2.5">
@@ -512,11 +512,5 @@ const handleValider = () => router.push('/home-admin');
   font-size: 16px;
   cursor: pointer;
   color: #999;
-}
-
-.empty-state {
-  margin-top: 20px;
-  color: #666;
-  font-style: italic;
 }
 </style>
