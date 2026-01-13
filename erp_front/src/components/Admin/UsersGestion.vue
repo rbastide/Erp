@@ -255,18 +255,16 @@ const handleAddUser = () => router.push('/new-user');
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Carte un peu plus large */
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); : 20px;
   width: 100%;
   max-width: 1200px;
   margin-bottom: 50px;
 }
 
-/* VIGNETTES AGRANDIES */
 .user-card {
   background: #ffffff;
   border-radius: 12px;
-  min-height: 250px; /* Agrandissement hauteur de base */
+  min-height: 250px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -278,7 +276,6 @@ const handleAddUser = () => router.push('/new-user');
   position: relative;
 }
 
-/* Mode édition beaucoup plus grand pour contenir tous les champs */
 .user-card.is-editing {
   border: 2px solid #B51621;
   min-height: 480px;
@@ -363,7 +360,7 @@ const handleAddUser = () => router.push('/new-user');
   border: 2px dashed #ddd;
   cursor: pointer;
   background: transparent;
-  min-height: 250px; /* Alignement avec les autres cartes */
+  min-height: 250px;
 }
 
 .add-card:hover {

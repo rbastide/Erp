@@ -11,7 +11,7 @@ export const mcccStore = reactive({
     creationDate: '',
     editDate: '',
     saeCodes: [],
-    niveaux: [],
+    levels: [],
     ue: [],
     acs: [],
     acsGrouped: [],

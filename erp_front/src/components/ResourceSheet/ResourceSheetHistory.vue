@@ -9,7 +9,7 @@ const router = useRouter()
 const route = useRoute()
 
 const resourceCode = ref('')
-const ressourceDate = ref('')
+const resourceDate = ref('')
 const currentResourceId = ref<number | null>(null)
 
 const hours = ref({
@@ -38,7 +38,7 @@ const fetchResourceData = async () => {
   const targetDate = route.query.date as string
 
   if (targetCode) resourceCode.value = targetCode
-  if (targetDate) ressourceDate.value = targetDate
+  if (targetDate) resourceDate.value = targetDate
 
   try {
     const response = await api.get('/resources/resources')
@@ -90,7 +90,7 @@ const hourConfig = {
 
 <template>
   <Sidebar/>
-  <AppHeader title="Fiche Ressource" :inline="`${resourceCode} du ${ressourceDate}`" />
+  <AppHeader title="Fiche Ressource" :inline="`${resourceCode} du ${resourceDate}`" />
 
   <main class="main-content">
     <div class="container">

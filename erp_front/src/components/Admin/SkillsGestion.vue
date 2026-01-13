@@ -6,22 +6,22 @@ import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 
 const router = useRouter();
-const competencesFinalisees = ref([]);
+const finalSkills = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
 
-const currentCompetence = ref({
+const currentSkill = ref({
   skillNum: null,
   skillName: '',
-  niveaux: [{ title: '', acs: [{ num: null, title: '' }] }],
+  levels: [{ title: '', acs: [{ num: null, title: '' }] }],
 });
 
-const editedCompetence = ref({ id: null, skillNum: null, skillName: '', niveaux: [] });
+const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
 const fetchSkills = async () => {
   try {
     const response = await api.get('/skill/skills');
-    competencesFinalisees.value = response.data;
+    finalSkills.value = response.data;
   } catch (error) {
     console.error(error);
   }
@@ -29,28 +29,28 @@ const fetchSkills = async () => {
 
 onMounted(fetchSkills);
 
-const filteredCompetences = computed(() => {
+const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
-  if (!query) return competencesFinalisees.value;
+  if (!query) return finalSkills.value;
 
   if (query.startsWith('#')) {
     const numSearch = query.substring(1);
-    return competencesFinalisees.value.filter(c =>
+    return finalSkills.value.filter(c =>
         c.skillNum?.toString().includes(numSearch)
     );
   }
 
-  return competencesFinalisees.value.filter(c =>
+  return finalSkills.value.filter(c =>
       c.skillName.toLowerCase().includes(query)
   );
 });
 
 const syncWithBackend = async () => {
-  const payload = competencesFinalisees.value.map(comp => ({
+  const payload = finalSkills.value.map(comp => ({
     id: comp.id || null,
     skillNum: comp.skillNum ? comp.skillNum.toString() : "",
     skillName: comp.skillName || "",
-    niveaux: comp.niveaux.map((niv, nIdx) => ({
+    levels: comp.levels.map((niv, nIdx) => ({
       id: niv.id || null,
       num: niv.num ? parseInt(niv.num) : (nIdx + 1),
       title: niv.title || "",
@@ -71,28 +71,28 @@ const syncWithBackend = async () => {
 };
 
 const handleSaveNewCompetence = async () => {
-  if (!currentCompetence.value.skillNum || !currentCompetence.value.skillName.trim()) return alert('Numéro et intitulé requis.');
-  competencesFinalisees.value.unshift(JSON.parse(JSON.stringify(currentCompetence.value)));
-  currentCompetence.value = {
+  if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
+  finalSkills.value.unshift(JSON.parse(JSON.stringify(currentSkill.value)));
+  currentSkill.value = {
     skillNum: null,
     skillName: '',
-    niveaux: [{ title: '', acs: [{ num: null, title: '' }] }]
+    levels: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
   await syncWithBackend();
 };
 
 const saveModification = async (index) => {
-  competencesFinalisees.value[index] = JSON.parse(JSON.stringify(editedCompetence.value));
+  finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
   editingIndex.value = null;
   await syncWithBackend();
 };
 
 const handleDelete = async (index) => {
-  const target = competencesFinalisees.value[index];
+  const target = finalSkills.value[index];
   if (!confirm(`Supprimer "${target.skillName}" ?`)) return;
   try {
     if (target.id) await api.delete(`/skill/skills/${target.id}`);
-    competencesFinalisees.value.splice(index, 1);
+    finalSkills.value.splice(index, 1);
     await syncWithBackend();
   } catch (error) {
     console.error(error);
@@ -100,32 +100,32 @@ const handleDelete = async (index) => {
 };
 
 const handleAddNiveau = () => {
-  if (currentCompetence.value.niveaux.length < 3) {
-    currentCompetence.value.niveaux.push({ title: '', acs: [{ num: null, title: '' }] });
+  if (currentSkill.value.levels.length < 3) {
+    currentSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
 
 const removeNiveau = (i) => {
-  if (currentCompetence.value.niveaux.length > 1) {
-    currentCompetence.value.niveaux.splice(i, 1);
+  if (currentSkill.value.levels.length > 1) {
+    currentSkill.value.levels.splice(i, 1);
   }
 };
 
 const handleAddAc = (nivIdx) => {
-  if (currentCompetence.value.niveaux[nivIdx].acs.length < 4) {
-    currentCompetence.value.niveaux[nivIdx].acs.push({ num: null, title: '' });
+  if (currentSkill.value.levels[nivIdx].acs.length < 4) {
+    currentSkill.value.levels[nivIdx].acs.push({ num: null, title: '' });
   }
 };
 
 const removeAc = (nivIdx, acIdx) => {
-  if (currentCompetence.value.niveaux[nivIdx].acs.length > 1) {
-    currentCompetence.value.niveaux[nivIdx].acs.splice(acIdx, 1);
+  if (currentSkill.value.levels[nivIdx].acs.length > 1) {
+    currentSkill.value.levels[nivIdx].acs.splice(acIdx, 1);
   }
 };
 
 const handleModif = (comp, index) => {
   editingIndex.value = index;
-  editedCompetence.value = JSON.parse(JSON.stringify(comp));
+  editedSkill.value = JSON.parse(JSON.stringify(comp));
 };
 
 const handleCancelEdit = () => {
@@ -133,25 +133,25 @@ const handleCancelEdit = () => {
 };
 
 const addLevelToEdit = () => {
-  if (editedCompetence.value.niveaux.length < 3) {
-    editedCompetence.value.niveaux.push({ title: '', acs: [{ num: null, title: '' }] });
+  if (editedSkill.value.levels.length < 3) {
+    editedSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
 
 const removeLevelToEdit = (i) => {
-  if (editedCompetence.value.niveaux.length > 1) {
-    editedCompetence.value.niveaux.splice(i, 1);
+  if (editedSkill.value.levels.length > 1) {
+    editedSkill.value.levels.splice(i, 1);
   }
 };
 
 const addAcToEdit = (lvlI) => {
-  if (editedCompetence.value.niveaux[lvlI].acs.length < 4) {
-    editedCompetence.value.niveaux[lvlI].acs.push({ num: null, title: '' });
+  if (editedSkill.value.levels[lvlI].acs.length < 4) {
+    editedSkill.value.levels[lvlI].acs.push({ num: null, title: '' });
   }
 };
 
 const removeAcFromEdit = (lvlI, acI) => {
-  editedCompetence.value.niveaux[lvlI].acs.splice(acI, 1);
+  editedSkill.value.levels[lvlI].acs.splice(acI, 1);
 };
 
 const handleValider = () => router.back();
@@ -170,18 +170,18 @@ const handleValider = () => router.back();
         <div class="row-inputs">
           <div class="input-group small">
             <label class="field-label">N°</label>
-            <input type="number" v-model.number="currentCompetence.skillNum" min="1" placeholder="1" class="card-input">
+            <input type="number" v-model.number="currentSkill.skillNum" min="1" placeholder="1" class="card-input">
           </div>
           <div class="input-group large">
             <label class="field-label">Intitulé de la Compétence</label>
-            <input type="text" v-model="currentCompetence.skillName" placeholder="Réaliser" class="card-input">
+            <input type="text" v-model="currentSkill.skillName" placeholder="Réaliser" class="card-input">
           </div>
         </div>
-        <div v-for="(niveau, nIndex) in currentCompetence.niveaux" :key="nIndex" class="niveau-container">
+        <div v-for="(niveau, nIndex) in currentSkill.levels" :key="nIndex" class="niveau-container">
           <div class="niveau-header">
             <div class="header-with-remove">
               <label class="group-label">Niveau {{ nIndex + 1 }}</label>
-              <button v-if="currentCompetence.niveaux.length > 1" @click="removeNiveau(nIndex)" class="btn-remove-item">✕</button>
+              <button v-if="currentSkill.levels.length > 1" @click="removeNiveau(nIndex)" class="btn-remove-item">✕</button>
             </div>
             <input type="text" v-model="niveau.title" placeholder="Intitulé du niveau..." class="card-input">
           </div>
@@ -196,7 +196,7 @@ const handleValider = () => router.back();
             </div>
           </div>
         </div>
-        <div class="add-level-center-wrapper" v-if="currentCompetence.niveaux.length < 3">
+        <div class="add-level-center-wrapper" v-if="currentSkill.levels.length < 3">
           <button @click="handleAddNiveau" class="btn-framed-add">+ Ajouter un Niveau</button>
         </div>
         <button class="save-btn big-save" @click="handleSaveNewCompetence">Valider et synchroniser</button>
@@ -204,8 +204,8 @@ const handleValider = () => router.back();
 
       <div class="separator-line"></div>
 
-      <div v-if="competencesFinalisees.length > 0" class="grid-container">
-        <div v-for="(comp, index) in filteredCompetences" :key="comp.id || index" class="skill-card" :class="{ 'is-editing': editingIndex === index }">
+      <div v-if="finalSkills.length > 0" class="grid-container">
+        <div v-for="(comp, index) in filteredSkills" :key="comp.id || index" class="skill-card" :class="{ 'is-editing': editingIndex === index }">
 
           <div v-if="editingIndex !== index" class="view-mode-container">
             <div class="card-header-view">
@@ -213,7 +213,7 @@ const handleValider = () => router.back();
               <h3>{{ comp.skillName }}</h3>
             </div>
             <div class="card-body-scroll">
-              <div v-for="(niv, nIdx) in comp.niveaux" :key="nIdx" class="level-block">
+              <div v-for="(niv, nIdx) in comp.levels" :key="nIdx" class="level-block">
                 <p class="level-title">Niveau {{ niv.num }}: {{ niv.title }}</p>
                 <ul class="ac-list">
                   <li v-for="(ac, aIdx) in niv.acs" :key="aIdx">AC {{ ac.num }}: {{ ac.title }}</li>
@@ -244,13 +244,13 @@ const handleValider = () => router.back();
             <div class="edit-scroll-area">
               <label class="field-label">N° & Nom</label>
               <div class="ac-edit-row">
-                <input type="number" v-model.number="editedCompetence.skillNum" min="1" class="card-input tiny">
-                <input type="text" v-model="editedCompetence.skillName" class="card-input compact flex-1">
+                <input type="number" v-model.number="editedSkill.skillNum" min="1" class="card-input tiny">
+                <input type="text" v-model="editedSkill.skillName" class="card-input compact flex-1">
               </div>
-              <div v-for="(lvl, lIdx) in editedCompetence.niveaux" :key="lIdx" class="edit-level-group">
+              <div v-for="(lvl, lIdx) in editedSkill.levels" :key="lIdx" class="edit-level-group">
                 <div class="header-with-remove">
                   <span class="field-label">Niveau {{ lIdx + 1 }}</span>
-                  <button v-if="editedCompetence.niveaux.length > 1" @click="removeLevelToEdit(lIdx)" class="remove-ac">✕</button>
+                  <button v-if="editedSkill.levels.length > 1" @click="removeLevelToEdit(lIdx)" class="remove-ac">✕</button>
                 </div>
                 <input type="text" v-model="lvl.title" class="card-input compact" placeholder="Intitulé">
                 <div v-for="(ac, acIdx) in lvl.acs" :key="acIdx" class="ac-edit-row">
@@ -262,7 +262,7 @@ const handleValider = () => router.back();
                   <div @click="addAcToEdit(lIdx)" class="add-mini-btn-framed">+ AC</div>
                 </div>
               </div>
-              <div class="add-ac-center-wrapper" v-if="editedCompetence.niveaux.length < 3" style="margin-top: 10px;">
+              <div class="add-ac-center-wrapper" v-if="editedSkill.levels.length < 3" style="margin-top: 10px;">
                 <div @click="addLevelToEdit" class="add-mini-btn-framed" style="width: 100%; text-align: center;">+ Ajouter un Niveau</div>
               </div>
             </div>
