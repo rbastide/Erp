@@ -57,14 +57,14 @@ public class ResourceSheet {
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Skill> skills;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PedagologicalContent")
-    private PedagologicalContent pedagologicalContent;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PedagologicalContentId")
+    private List<PedagologicalContent> pedagologicalContent;
 
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate, PedagologicalContent pedagologicalContent) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.referencialTeacherID = referencialTeacherID;
@@ -201,11 +201,11 @@ public class ResourceSheet {
         return skills;
     }
 
-    public PedagologicalContent getPedagologicalContent() {
+    public List<PedagologicalContent> getPedagologicalContent() {
         return pedagologicalContent;
     }
 
-    public void setPedagologicalContent(PedagologicalContent pedagologicalContent) {
+    public void setPedagologicalContent(List<PedagologicalContent> pedagologicalContent) {
         this.pedagologicalContent = pedagologicalContent;
     }
 
