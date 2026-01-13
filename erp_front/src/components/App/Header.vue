@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router';
 import {onMounted, ref} from "vue";
 import '../../assets/css/variable.css';
 
-// Déclaration des props
 const props = defineProps({
   title: {
     type: String,

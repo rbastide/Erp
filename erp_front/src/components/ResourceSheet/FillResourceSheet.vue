@@ -8,7 +8,7 @@ import api from '@/services/api';
 const router = useRouter()
 const route = useRoute()
 
-const resourceId = ref();
+ref();
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
 let studentsFeedback = ref('');
@@ -292,31 +292,31 @@ const handleValider = async () => {
 
         <div class="pedagogic-group">
           <h3 class="group-label">CM</h3>
-          <textarea v-for="(c, i) in cmContents" :key="'cm-'+i" v-model="cmContents[i]" class="modern-textarea" :ref="el => { if (el) cmRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
+          <textarea v-for="(i) in cmContents" :key="'cm-'+i" v-model="cmContents[i]" class="modern-textarea" :ref="el => { if (el) cmRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
           <button class="btn-add-line" @click="addCM">+ Ajouter un bloc CM</button>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">TD</h3>
-          <textarea v-for="(c, i) in tdContents" :key="'td-'+i" v-model="tdContents[i]" class="modern-textarea" :ref="el => { if (el) tdRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
+          <textarea v-for="(i) in tdContents" :key="'td-'+i" v-model="tdContents[i]" class="modern-textarea" :ref="el => { if (el) tdRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
           <button class="btn-add-line" @click="addTD">+ Ajouter un bloc TD</button>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">TP</h3>
-          <textarea v-for="(c, i) in tpContents" :key="'tp-'+i" v-model="tpContents[i]" class="modern-textarea" :ref="el => { if (el) tpRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
+          <textarea v-for="(i) in tpContents" :key="'tp-'+i" v-model="tpContents[i]" class="modern-textarea" :ref="el => { if (el) tpRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
           <button class="btn-add-line" @click="addTP">+ Ajouter un bloc TP</button>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">DS</h3>
-          <textarea v-for="(c, i) in dsContents" :key="'ds-'+i" v-model="dsContents[i]" class="modern-textarea" :ref="el => { if (el) dsRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
+          <textarea v-for="(i) in dsContents" :key="'ds-'+i" v-model="dsContents[i]" class="modern-textarea" :ref="el => { if (el) dsRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
           <button class="btn-add-line" @click="addDS">+ Ajouter un bloc DS</button>
         </div>
 
         <div class="pedagogic-group">
           <h3 class="group-label">DS/TP</h3>
-          <textarea v-for="(c, i) in dstpContents" :key="'dstp-'+i" v-model="dstpContents[i]" class="modern-textarea" :ref="el => { if (el) dstpRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
+          <textarea v-for="(i) in dstpContents" :key="'dstp-'+i" v-model="dstpContents[i]" class="modern-textarea" :ref="el => { if (el) dstpRefs[i] = el as HTMLTextAreaElement }" placeholder="Saisissez ici..."></textarea>
           <button class="btn-add-line" @click="addDSTP">+ Ajouter un bloc DS/TP</button>
         </div>
       </section>
@@ -326,19 +326,19 @@ const handleValider = async () => {
 
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour pédagogique des professeurs :</label>
-          <textarea v-for="(c, i) in edFBContents" :key="'ed-'+i" v-model="edFBContents[i]" class="modern-textarea large" :ref="el => { if (el) edFBRefs[i] = el as HTMLTextAreaElement }"></textarea>
+          <textarea v-for="(i) in edFBContents" :key="'ed-'+i" v-model="edFBContents[i]" class="modern-textarea large" :ref="el => { if (el) edFBRefs[i] = el as HTMLTextAreaElement }"></textarea>
           <button class="btn-add-line" @click="addEducationalFeedback">+ Ajouter une ligne</button>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour des étudiants :</label>
-          <textarea v-for="(c, i) in stFBContents" :key="'st-'+i" v-model="stFBContents[i]" class="modern-textarea large" :ref="el => { if (el) stFBRefs[i] = el as HTMLTextAreaElement }"></textarea>
+          <textarea v-for="(i) in stFBContents" :key="'st-'+i" v-model="stFBContents[i]" class="modern-textarea large" :ref="el => { if (el) stFBRefs[i] = el as HTMLTextAreaElement }"></textarea>
           <button class="btn-add-line" @click="addStudentFeedback">+ Ajouter une ligne</button>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Voici les améliorations à apporter :</label>
-          <textarea v-for="(c, i) in upgradesContents" :key="'up-'+i" v-model="upgradesContents[i]" class="modern-textarea large" :ref="el => { if (el) upgradesRefs[i] = el as HTMLTextAreaElement }"></textarea>
+          <textarea v-for="(i) in upgradesContents" :key="'up-'+i" v-model="upgradesContents[i]" class="modern-textarea large" :ref="el => { if (el) upgradesRefs[i] = el as HTMLTextAreaElement }"></textarea>
           <button class="btn-add-line" @click="addUpgrades">+ Ajouter une ligne</button>
         </div>
       </section>
