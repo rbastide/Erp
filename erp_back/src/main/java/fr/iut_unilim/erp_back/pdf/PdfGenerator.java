@@ -11,6 +11,8 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import fr.iut_unilim.erp_back.entity.ResourceSheet;
+import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
@@ -18,8 +20,11 @@ import fr.iut_unilim.erp_back.pdf.view.PdfFeedbacks;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 
@@ -28,7 +33,8 @@ public class PdfGenerator {
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";
     public static final int DOCUMENT_FONT_SIZE = 10;
 
-    public static byte[] createPdf() {
+    @Nullable
+    public static byte[] createPdf(ResourceSheet resourceSheet) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PdfWriter writer = new PdfWriter(baos);
@@ -40,22 +46,22 @@ public class PdfGenerator {
         FooterHandler handler = new FooterHandler();
         pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-        if (!generateFirstPage(document)) return null;
+        if (!generateFirstPage(document, resourceSheet)) return null;
 
         document.add(new AreaBreak());
 
-        if (!generateSecondPage(document)) return null;
+        if (!generateSecondPage(document, resourceSheet)) return null;
 
         document.add(new AreaBreak());
 
-        if (!generateThirdPage(document)) return null;
+        if (!generateThirdPage(document, resourceSheet)) return null;
 
         document.close();
 
         return baos.toByteArray();
     }
 
-    private static boolean generateFirstPage(Document document) {
+    private static boolean generateFirstPage(Document document, ResourceSheet resourceSheet) {
         Table header = PdfHeader.create(IUT_ICON_PATH);
         if (header == null) {
             return false;
@@ -72,7 +78,7 @@ public class PdfGenerator {
         return true;
     }
 
-    private static boolean generateSecondPage(Document document) {
+    private static boolean generateSecondPage(Document document, ResourceSheet resourceSheet) {
         Table header = PdfHeader.create(IUT_ICON_PATH);
         if (header == null) {
             return false;
@@ -90,7 +96,7 @@ public class PdfGenerator {
         return true;
     }
 
-    private static boolean generateThirdPage(Document document) {
+    private static boolean generateThirdPage(Document document, ResourceSheet resourceSheet) {
         Table header = PdfHeader.create(IUT_ICON_PATH);
         if (header == null) {
             return false;
@@ -108,12 +114,13 @@ public class PdfGenerator {
 
         infoTable.setBorder(Border.NO_BORDER);
 
-        Cell dateCell = new Cell().add(new Paragraph("Date : 17 juillet 2025"))
+        Cell dateCell = new Cell().add(new Paragraph("Date : " + resourceSheet.getCreationDate()))
                 .setTextAlignment(TextAlignment.LEFT)
                 .setBorder(Border.NO_BORDER);
         infoTable.addCell(dateCell);
 
-        Cell refCell = new Cell().add(new Paragraph("Référent module : Thomas Hügel"))
+        List<String> referancialTeachers = resourceSheet.getTeachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
+        Cell refCell = new Cell().add(new Paragraph("Référent module : " + String.join(", ", referancialTeachers)))
                 .setTextAlignment(TextAlignment.RIGHT)
                 .setBorder(Border.NO_BORDER);
         infoTable.addCell(refCell);
@@ -121,5 +128,10 @@ public class PdfGenerator {
         document.add(infoTable);
 
         return true;
+    }
+
+    @NotNull
+    private static String mergeFirstNameAndLastName(@NotNull Teacher teacher) {
+        return teacher.getFirstname() + " " + teacher.getLastname();
     }
 }
