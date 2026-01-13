@@ -89,7 +89,7 @@ const handleValider = async () => {
     await api.post('/mccc/saveHourlyVolume', payload);
 
     mcccStore.registerMcccStore();
-    router.push('/mccc-menu');
+    await router.push('/mccc-menu');
 
   } catch (error) {
     console.error("Erreur lors de la sauvegarde :", error);
@@ -121,7 +121,6 @@ const handleRetour = () => {
                 v-model.number="(mcccStore as any)[type.key]"
                 min="0"
                 @input="() => { validateInput(type.key); mcccStore.registerMcccStore(); }"
-                @keypress="blockNegative"
             >
 
             <button type="button" class="step-btn" @click="updateHours(type.key, 1)">+</button>
@@ -156,15 +155,6 @@ const handleRetour = () => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-
-.instruction-text {
-  font-size: 28px;
-  color: #E92533;
-  margin-bottom: 50px;
-  font-weight: 500;
-  text-align: left;
-  width: 100%;
 }
 
 .hours-flex-container {
