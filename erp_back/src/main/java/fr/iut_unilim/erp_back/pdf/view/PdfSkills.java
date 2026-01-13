@@ -8,30 +8,16 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import fr.iut_unilim.erp_back.entity.CriticalLearning;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class PdfSkills {
     private static final float BORDER_WIDTH = 1.f;
 
-    private static final Map<String, List<String>> SKILLS_LABELS = new HashMap<>() {{
-        put("Concevoir et mettre en place une base de données à partir d'un cahier des charges client",
-                new ArrayList<>(Arrays.asList(
-                        "Mettre à jour et interroger une base de données relationnelle (en requêtes directes ou à travers une application)",
-                        "Visualiser des données",
-                        "Concevoir une base de données relationnelle à partir d'un cahier des charges"
-                ))
-        );
-        put("Concevoir et mettre en place une liaison front et back",
-                new ArrayList<>(Arrays.asList(
-                        "Mettre à jour et interroger une base de données relationnelle (en requêtes directes ou à travers une application)",
-                        "Visualiser des données",
-                        "Concevoir une base de données relationnelle à partir d'un cahier des charges"
-                )));
-    }};
-
-    public static Table create() {
+    public static Table create(@NotNull Set<CriticalLearning> criticalLearnings) {
         Table table = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25}));
         table.useAllAvailableWidth();
         table.setBorder(Border.NO_BORDER);
@@ -39,13 +25,14 @@ public class PdfSkills {
         table.addCell(CellUtils.createCenteredCell("Compétences", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
         table.addCell(CellUtils.createCenteredCell("Apprentissages critiques", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
 
-        addSkillsToTable(table);
+        addSkillsToTable(table, criticalLearnings);
 
         return table;
     }
 
-    private static void addSkillsToTable(Table table) {
-        for (Map.Entry<String, List<String>> skill : SKILLS_LABELS.entrySet()) {
+    private static void addSkillsToTable(Table table, Set<CriticalLearning> criticalLearnings) {
+        Map<String, List<String>> skills = flattenSkills(criticalLearnings);
+        for (Map.Entry<String, List<String>> skill : skills.entrySet()) {
             List<String> learnings = skill.getValue();
             int nbLearnings = learnings.size();
 
@@ -71,5 +58,18 @@ public class PdfSkills {
                 table.addCell(cellLearning);
             }
         }
+    }
+
+    private static Map<String, List<String>> flattenSkills(@NotNull Set<CriticalLearning> criticalLearnings) {
+        Map<String, List<String>> flattennedSkills = new HashMap<>();
+
+        for (CriticalLearning criticalLearning : criticalLearnings) {
+            String skillName = criticalLearning.getRankID().getSkillID().getSkillName();
+            List<String> criticalLearningsFromSkills = flattennedSkills.getOrDefault(skillName, new ArrayList<>());
+            criticalLearningsFromSkills.add(criticalLearning.getLearningTitle());
+            flattennedSkills.put(skillName, criticalLearningsFromSkills);
+        }
+
+        return flattennedSkills;
     }
 }

@@ -15,10 +15,12 @@ import java.util.Optional;
 public class PdfService {
     private final HourlyVolumeService hourlyVolumeService;
     private final ResourceService resourceService;
+    private final McccService mcccService;
 
-    public PdfService(HourlyVolumeService hourlyVolumeService, ResourceService resourceService) {
+    public PdfService(HourlyVolumeService hourlyVolumeService, ResourceService resourceService, McccService mcccService) {
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
+        this.mcccService = mcccService;
     }
 
     @Nullable
@@ -28,7 +30,7 @@ public class PdfService {
             return null;
         }
 
-        return PdfGenerator.createPdf(resourceSheetViewModel);
+        return PdfGenerator.createPdf(resourceSheetViewModel, mcccService);
     }
 
     @Nullable

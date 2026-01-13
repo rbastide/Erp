@@ -6,10 +6,14 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import fr.iut_unilim.erp_back.entity.HourlyVolume;
 import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
+import fr.iut_unilim.erp_back.service.McccService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static fr.iut_unilim.erp_back.pdf.PdfGenerator.decimalFormat;
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredParagraph;
@@ -17,13 +21,20 @@ import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredPara
 public class PdfFormationInfo {
     private static final String[] HOURS_CLASS_CORRESPONDANCE = new String[]{"CM", "TD", "TP"};
 
-    public static Table create(@NotNull Resource resource, @NotNull HourlyVolume hourlyVolume, @NotNull String referencialTeachersString) {
+    public static Table create(@NotNull Resource resource, @NotNull HourlyVolume hourlyVolume, @NotNull String referencialTeachersString, McccService mcccService) {
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{33, 33, 11, 11, 11}));
         infoTable.useAllAvailableWidth();
 
         infoTable.addCell(new Cell(1, 5).add(createCenteredParagraph("Semestre " + resource.getSemester())));
 
-        infoTable.addCell(CellUtils.createCenteredCell("UE 2.4"));
+        Set<Skill> skills = mcccService.getSkillsByResource(resource);
+        if (skills == null) {
+            return null;
+        }
+
+        List<String> skillsNames = skills.stream().map(Skill::getSkillName).toList();
+
+        infoTable.addCell(CellUtils.createCenteredCell(String.join(", ", skillsNames)));
 
         infoTable.addCell(CellUtils.createCenteredCell(resource.getName()));
 

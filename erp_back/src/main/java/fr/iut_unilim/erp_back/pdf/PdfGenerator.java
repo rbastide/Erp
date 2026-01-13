@@ -20,6 +20,7 @@ import fr.iut_unilim.erp_back.pdf.view.PdfFeedbacks;
 import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
+import fr.iut_unilim.erp_back.service.McccService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,7 @@ public class PdfGenerator {
     public static final int DOCUMENT_FONT_SIZE = 10;
 
     @Nullable
-    public static byte[] createPdf(ResourceSheetViewModel resourceSheet) {
+    public static byte[] createPdf(ResourceSheetViewModel resourceSheet, McccService mcccService) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PdfWriter writer = new PdfWriter(baos);
@@ -55,7 +56,7 @@ public class PdfGenerator {
         List<String> referancialTeachers = resourceSheet.teachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
         String referencialTeachersString = String.join(", ", referancialTeachers);
 
-        if (!generateFirstPage(document, resourceSheet, referencialTeachersString)) return null;
+        if (!generateFirstPage(document, resourceSheet, referencialTeachersString, mcccService)) return null;
 
         document.add(new AreaBreak());
 
@@ -70,7 +71,7 @@ public class PdfGenerator {
         return baos.toByteArray();
     }
 
-    private static boolean generateFirstPage(Document document, ResourceSheetViewModel resourceSheet, String referencialTeachersString) {
+    private static boolean generateFirstPage(Document document, ResourceSheetViewModel resourceSheet, String referencialTeachersString, McccService mcccService) {
         Table header = PdfHeader.create(IUT_ICON_PATH, resourceSheet);
         if (header == null) {
             return false;
@@ -79,11 +80,11 @@ public class PdfGenerator {
 
         document.add(header);
 
-        Table formationInfo = PdfFormationInfo.create(resourceSheet.resource(), resourceSheet.hourlyVolume(), referencialTeachersString);
+        Table formationInfo = PdfFormationInfo.create(resourceSheet.resource(), resourceSheet.hourlyVolume(), referencialTeachersString, mcccService);
         formationInfo.setMarginBottom(10);
         document.add(formationInfo);
 
-        PdfDescription.addToDocument(document, resourceSheet);
+        PdfDescription.addToDocument(document, resourceSheet, mcccService);
         return true;
     }
 
