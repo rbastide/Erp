@@ -11,6 +11,7 @@ const route = useRoute()
 const resourceId = ref();
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
+let studentsFeedback = ref('');
 
 let hours = ref({
   cm: 0,
@@ -85,9 +86,37 @@ const fetchHoursData = async () => {
   }
 };
 
+const fetchStudentsFeedbackData = async () => {
+  try {
+    const sheets = await api.get('/resourceSheet/getResourceSheet');
+    const studentsFeedbacks = await api.get('/studentFeedbacks/getAllStudentFeedbacks');
+
+    if (sheets.data && Array.isArray(sheets.data)) {
+
+      const sheetFound = sheets.data.find(sheet => sheet.resourceID === 1);
+
+      if (sheetFound) {
+        const feedbackId = sheetFound.studentFeedback;
+        studentsFeedback = studentsFeedbacks.data[feedbackId];
+
+        console.log(sheets.data, studentsFeedbacks.data);
+      } else {
+        console.warn("Aucune fiche trouvée pour la ressource");
+      }
+    }
+  } catch (error) {
+    if (error.sheets && error.sheets.status === 403) {
+      console.error("Accès refusé (Token expiré ?).");
+    } else {
+      console.error("Erreur chargement des données ResourceSheet :", error);
+    }
+  }
+};
+
 onMounted(() => {
   fetchResourceData();
   fetchHoursData();
+  fetchStudentsFeedbackData();
 });
 
 const handleRetour = () =>{ router.back()};

@@ -42,9 +42,6 @@ public class ResourceSheet {
     @Column(name = "mainGoal")
     private String mainGoal;
 
-    @Column(name = "content")
-    private String content;
-
     @Column(name = "linkedSAE")
     private Integer linkedSAE;
 
@@ -78,7 +75,6 @@ public class ResourceSheet {
         this.semester = semester;
         this.year = year;
         this.mainGoal = mainGoal;
-        this.content = content;
         this.linkedSAE = linkedSAE;
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
@@ -123,10 +119,6 @@ public class ResourceSheet {
 
     public void setMainGoal(String mainGoal) {
         this.mainGoal = mainGoal;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public void setLinkedSAE(Integer linkedSAE) {
@@ -187,10 +179,6 @@ public class ResourceSheet {
 
     public String getMainGoal() {
         return mainGoal;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public Integer getLinkedSAE() {

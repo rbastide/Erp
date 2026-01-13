@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.*;
@@ -7,13 +8,8 @@ import fr.iut_unilim.erp_back.service.ResourceSheetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import fr.iut_unilim.erp_back.dto.HistoryResponse;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/resourceSheet")
@@ -67,7 +63,6 @@ public class ResourceSheetController {
         sheet.setSemester(dto.getSemester());
         sheet.setYear(dto.getYear());
         sheet.setMainGoal(dto.getMainGoal());
-        sheet.setContent(dto.getContent());
 
         if (dto.getCreationDate() != null) {
             sheet.setCreationDate(dto.getCreationDate());
