@@ -38,7 +38,7 @@ const handleRetour = () => {
 };
 
 const handleFill = (code: string) => {
-  router.push({ path: '/fillressourcepage', query: { code: code } });
+  router.push({ path: '/fill-resource-sheet', query: { code: code } });
 }
 </script>
 

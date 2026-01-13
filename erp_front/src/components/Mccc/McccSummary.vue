@@ -39,7 +39,7 @@ const handleValider = async () => {
 
   } catch (error) {
     console.error("Erreur lors de la sauvegarde des MCCC :", error);
-    router.push("/errorSave");
+    router.push("/error-save");
   }
 };
 

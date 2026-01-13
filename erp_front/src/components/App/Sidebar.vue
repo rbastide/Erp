@@ -39,7 +39,7 @@ const handleSettings = () => router.push('/settings');
 const handleHelp = () => router.push('/help');
 
 const handleDeconnexion = () => {
-  router.push('/deconnexion');
+  router.push('/deconnection');
 };
 </script>
 

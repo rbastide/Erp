@@ -6,7 +6,7 @@ import Sidebar from '../App/Sidebar.vue';
 const router = useRouter();
 
 const handleRemplir = () => {
-  router.push('/mccc-ressource');
+  router.push('/mccc-resource');
 };
 
 const handleAfficher = () => {
@@ -18,7 +18,7 @@ const handleInscrire = () => {
 };
 
 const handleCompetenceCreating = () => {
-  router.push('/competence-creating');
+  router.push('/skill-creating');
 };
 
 const handleResources = () => {

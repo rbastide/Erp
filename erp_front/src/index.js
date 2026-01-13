@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import  {createRouter, createWebHistory} from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
 import ResourcePage from '@/components/ResourceSheet/ResourcePage.vue';
 import HomePage from './components/User/HomePage.vue';
@@ -72,22 +72,22 @@ const routes = [
         component: HelpPage
     },
     {
-        path: '/deconnexion',
+        path: '/deconnection',
         name: 'DeconnectionPage',
         component: DeconnectionPage
     },
     {
-        path: '/errorSave',
+        path: '/error-save',
         name: 'ErrorSavePage',
         component: ErrorSave
     },
     {
-        path: '/successfullySaved',
+        path: '/successfully-saved',
         name: 'SuccessfullySavedPage',
         component: SuccessfullySaved
     },
     {
-        path: '/fillRessourcePage',
+        path: '/fill-resource-sheet',
         name: 'FillResourceSheet',
         component: FillResourceSheet
     },
@@ -117,7 +117,7 @@ const routes = [
         component: SuccessfullyDeletedPage
     },
     {
-        path: '/mccc-ressource',
+        path: '/mccc-resource',
         name: 'McccResourcePage',
         component: McccResourcePage
     },
@@ -152,12 +152,12 @@ const routes = [
         component: McccSummaryPage
     },
     {
-        path: '/competence-creating',
+        path: '/skill-creating',
         name: 'SkillsGestionPage',
         component: SkillsGestion
     },
     {
-        path: '/ressource-sheet-history',
+        path: '/resource-sheet-history',
         name: 'ResourceSheetHistory',
         component: ResourceSheetHistory
     },
