@@ -5,7 +5,9 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
+import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static fr.iut_unilim.erp_back.pdf.PdfGenerator.BASE_PATH;
@@ -17,7 +19,7 @@ public class PdfHeader {
     private static final int HEADER_MULTIPLE_PARAGRAPH_FIXED_LEADING = 5;
 
     @Nullable
-    public static Table create(String iconPath) {
+    public static Table create(String iconPath, @NotNull ResourceSheetViewModel resourceSheet) {
         String imagePath = BASE_PATH + iconPath;
 
         ImageData dataLogoIut = createImageData(imagePath);
@@ -30,8 +32,8 @@ public class PdfHeader {
         cellIconIut.add(logoIut);
 
         String[] informationParagraphsLines = new String[]{"Référence : \t IU en FOR 001",
-                "Date de création : \t 13/04/2021",
-                "Date de modification : \t 17/07/2025"};
+                "Date de création : \t " + resourceSheet.creationDate(),
+                "Date de modification : \t " + resourceSheet.lastModificationDate()};
 
         Table table = new Table(UnitValue.createPercentArray(new float[]{30, 20, 20, 30}));
         table.useAllAvailableWidth();

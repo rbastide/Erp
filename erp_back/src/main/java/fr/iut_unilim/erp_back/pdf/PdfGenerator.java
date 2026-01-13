@@ -11,9 +11,9 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
+import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
 import fr.iut_unilim.erp_back.pdf.parts.PdfHours;
 import fr.iut_unilim.erp_back.pdf.view.PdfFeedbacks;
@@ -24,17 +24,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 
 public class PdfGenerator {
+    public static DecimalFormat decimalFormat = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.FRANCE));
+
     public static final String BASE_PATH = "erp_back/src/main/resources/";
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";
     public static final int DOCUMENT_FONT_SIZE = 10;
 
     @Nullable
-    public static byte[] createPdf(ResourceSheet resourceSheet) {
+    public static byte[] createPdf(ResourceSheetViewModel resourceSheet) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PdfWriter writer = new PdfWriter(baos);
@@ -43,10 +49,13 @@ public class PdfGenerator {
 
         Document document = new Document(pdf);
         document.setFontSize(DOCUMENT_FONT_SIZE);
-        FooterHandler handler = new FooterHandler();
+        FooterHandler handler = new FooterHandler(resourceSheet.resource().getNum(), new ArrayList<>());
         pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-        if (!generateFirstPage(document, resourceSheet)) return null;
+        List<String> referancialTeachers = resourceSheet.teachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
+        String referencialTeachersString = String.join(", ", referancialTeachers);
+
+        if (!generateFirstPage(document, resourceSheet, referencialTeachersString)) return null;
 
         document.add(new AreaBreak());
 
@@ -54,15 +63,15 @@ public class PdfGenerator {
 
         document.add(new AreaBreak());
 
-        if (!generateThirdPage(document, resourceSheet)) return null;
+        if (!generateThirdPage(document, resourceSheet, referencialTeachersString)) return null;
 
         document.close();
 
         return baos.toByteArray();
     }
 
-    private static boolean generateFirstPage(Document document, ResourceSheet resourceSheet) {
-        Table header = PdfHeader.create(IUT_ICON_PATH);
+    private static boolean generateFirstPage(Document document, ResourceSheetViewModel resourceSheet, String referencialTeachersString) {
+        Table header = PdfHeader.create(IUT_ICON_PATH, resourceSheet);
         if (header == null) {
             return false;
         }
@@ -70,16 +79,16 @@ public class PdfGenerator {
 
         document.add(header);
 
-        Table formationInfo = PdfFormationInfo.create();
+        Table formationInfo = PdfFormationInfo.create(resourceSheet.resource(), resourceSheet.hourlyVolume(), referencialTeachersString);
         formationInfo.setMarginBottom(10);
         document.add(formationInfo);
 
-        PdfDescription.addToDocument(document);
+        PdfDescription.addToDocument(document, resourceSheet);
         return true;
     }
 
-    private static boolean generateSecondPage(Document document, ResourceSheet resourceSheet) {
-        Table header = PdfHeader.create(IUT_ICON_PATH);
+    private static boolean generateSecondPage(Document document, ResourceSheetViewModel resourceSheet) {
+        Table header = PdfHeader.create(IUT_ICON_PATH, resourceSheet);
         if (header == null) {
             return false;
         }
@@ -88,16 +97,16 @@ public class PdfGenerator {
         document.add(header);
 
         document.add(createTitle("Heures :"));
-        document.add(PdfHours.create());
+        document.add(PdfHours.create(resourceSheet.resource().getNum(), resourceSheet.hourlyVolume()));
 
         document.add(createTitle("Contenu pédagogique :"));
-        document.add(PdfPedalogicalContent.create());
+        document.add(PdfPedalogicalContent.create(resourceSheet.pedagologicalContent()));
 
         return true;
     }
 
-    private static boolean generateThirdPage(Document document, ResourceSheet resourceSheet) {
-        Table header = PdfHeader.create(IUT_ICON_PATH);
+    private static boolean generateThirdPage(Document document, ResourceSheetViewModel resourceSheet, String referencialTeachersString) {
+        Table header = PdfHeader.create(IUT_ICON_PATH, resourceSheet);
         if (header == null) {
             return false;
         }
@@ -106,7 +115,7 @@ public class PdfGenerator {
         document.add(header);
 
         document.add(createTitle("Suivi de la ressource / module :"));
-        document.add(PdfFeedbacks.create());
+        document.add(PdfFeedbacks.create(resourceSheet.pedagologicalTeachersFeedbacks(), resourceSheet.studentsFeedbacks(), resourceSheet.improvementIdeas()));
 
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
         infoTable.useAllAvailableWidth();
@@ -114,13 +123,12 @@ public class PdfGenerator {
 
         infoTable.setBorder(Border.NO_BORDER);
 
-        Cell dateCell = new Cell().add(new Paragraph("Date : " + resourceSheet.getCreationDate()))
+        Cell dateCell = new Cell().add(new Paragraph("Date : " + resourceSheet.creationDate()))
                 .setTextAlignment(TextAlignment.LEFT)
                 .setBorder(Border.NO_BORDER);
         infoTable.addCell(dateCell);
 
-        List<String> referancialTeachers = resourceSheet.getTeachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
-        Cell refCell = new Cell().add(new Paragraph("Référent module : " + String.join(", ", referancialTeachers)))
+        Cell refCell = new Cell().add(new Paragraph("Référent module : " + referencialTeachersString))
                 .setTextAlignment(TextAlignment.RIGHT)
                 .setBorder(Border.NO_BORDER);
         infoTable.addCell(refCell);

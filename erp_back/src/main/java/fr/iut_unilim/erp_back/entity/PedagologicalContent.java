@@ -24,5 +24,25 @@ public class PedagologicalContent {
     private Long courseNumber;
 
     @Column(name = "Content")
-    private Long content;
+    private String content;
+
+    public Long getPedagologicalContentId() {
+        return PedagologicalContentId;
+    }
+
+    public ResourceSheet getRessourceSheetId() {
+        return ressourceSheetId;
+    }
+
+    public ClassType getClassTypeId() {
+        return classTypeId;
+    }
+
+    public Long getCourseNumber() {
+        return courseNumber;
+    }
+
+    public String getContent() {
+        return content;
+    }
 }

@@ -2,20 +2,22 @@ package fr.iut_unilim.erp_back.pdf.view;
 
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
+import fr.iut_unilim.erp_back.entity.Sae;
 
 import java.util.List;
 
 public class PdfSae {
-    private static final List<String> SAEs = List.of("S2.04", "S2.05");
+    public static Table create(List<Sae> saes) {
+        Table saesTable = new Table(UnitValue.createPercentArray(new float[]{20, 90}));
+        saesTable.useAllAvailableWidth();
 
-    public static Table create() {
-        Table saes = new Table(UnitValue.createPercentArray(new float[]{20, 90}));
-        saes.useAllAvailableWidth();
+        saesTable.addCell("SAÉ concernée(s) :");
+        StringBuilder mergedSaes = new StringBuilder();
+        for (Sae sae : saes) {
+            mergedSaes.append(sae.getNum());
+        }
+        saesTable.addCell(mergedSaes.toString());
 
-        saes.addCell("SAÉ concernée(s) :");
-        String mergedSaes = String.join(", ", SAEs);
-        saes.addCell(mergedSaes);
-
-        return saes;
+        return saesTable;
     }
 }
