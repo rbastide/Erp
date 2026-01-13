@@ -37,7 +37,7 @@ const filteredResources = computed(() => {
     const targetSem = query.substring(1);
     if (!targetSem) return resources.value;
     return resources.value.filter(res => {
-      const val = res.semestre || res.semester;
+      const val = res.semester || null;
       return val && val.toString() === targetSem;
     });
   }
