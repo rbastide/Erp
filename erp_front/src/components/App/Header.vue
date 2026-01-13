@@ -3,16 +3,6 @@ import { useRouter } from 'vue-router';
 import {onMounted, ref} from "vue";
 import '../../assets/css/variable.css';
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true
-  },
-  inline: {
-    type: String,
-  },
-});
-
 const isConnected = ref(false);
 
 const router = useRouter();

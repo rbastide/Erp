@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import { mcccStore } from "@/services/mcccStore.js";
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -91,16 +91,15 @@ const handleValider = () => {
     return;
   }
 
-  const selectedObjects = selectedTeacherIds.value.map(id => {
+  mcccStore.referents = selectedTeacherIds.value.map(id => {
     const user = allTeachers.value.find(u => u.teacherID === id);
+    user.firstname = undefined;
     if (!user) return null;
     return {
       lastname: user.lastname,
       firstname: user.firstname
     };
   }).filter(Boolean);
-
-  mcccStore.referents = selectedObjects;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };

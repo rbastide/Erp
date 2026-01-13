@@ -217,7 +217,7 @@ const handleValider = async () => {
   try {
     await api.post('/resourceSheet/resourceSheet', [payload]);
     alert("Fiche ressource enregistrée avec succès !");
-    router.push('/home');
+    await router.push('/home');
   } catch (error) {
     console.error("Erreur sauvegarde :", error);
     alert("Erreur lors de l'enregistrement de la fiche.");
@@ -249,7 +249,6 @@ const handleValider = async () => {
                   v-model.number="hours[key]"
                   class="box-input"
                   min="0"
-                  @keypress="blockNegative"
                   @input="validatePositive(key)"
               >
             </div>
@@ -263,7 +262,6 @@ const handleValider = async () => {
                   v-model.number="hours[key]"
                   class="box-input"
                   min="0"
-                  @keypress="blockNegative"
                   @input="validatePositive(key)"
               >
             </div>
@@ -281,7 +279,6 @@ const handleValider = async () => {
               v-model.number="hours.student"
               class="wide-input"
               min="0"
-              @keypress="blockNegative"
               @input="validatePositive('student')"
           >
         </div>
