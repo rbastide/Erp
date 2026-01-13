@@ -24,15 +24,6 @@ public class ResourceSheet {
     @Column(name = "hourlyVolumeID")
     private Long hourlyVolumeID;
 
-    @Column(name = "teachersFeedbackID")
-    private Long teachersFeedbackID;
-
-    @Column(name = "studentFeedbackID")
-    private Long studentFeedbackID;
-
-    @Column(name = "improvementsIdeaID")
-    private Long improvementsIDeaID;
-
     @Column(name = "semester")
     private int semester;
 
@@ -41,9 +32,6 @@ public class ResourceSheet {
 
     @Column(name = "mainGoal")
     private String mainGoal;
-
-    @Column(name = "linkedSAE")
-    private Integer linkedSAE;
 
     @Column(name = "creationDate")
     private Date creationDate;
@@ -57,25 +45,40 @@ public class ResourceSheet {
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Skill> skills;
 
+    @ManyToMany(mappedBy = "resourceSheets")
+    private List<Sae> Saes;
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "PedagologicalContentId")
     private List<PedagologicalContent> pedagologicalContent;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "improvementsIdeaID")
+    private List<ImprovementIdeas> improvementIdeas;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "studentFeedbackID")
+    private List<StudentsFeedbacks> studentsFeedbacks;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teachersFeedbackID")
+    private List<PedagologicalTeachersFeedbacks> teachersFeedbacks;
+
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, int semester, int year, String mainGoal, String content, List<Sae> Saes, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.referencialTeacherID = referencialTeacherID;
         this.hourlyVolumeID = hourlyVolumeID;
-        this.teachersFeedbackID = teachersFeedbackID;
-        this.studentFeedbackID = studentFeedbackID;
-        this.improvementsIDeaID = improvementsIDeaID;
+        this.teachersFeedbacks = teachersFeedbacks;
+        this.studentsFeedbacks = studentsFeedbacks;
+        this.improvementIdeas = improvementIdeas;
         this.semester = semester;
         this.year = year;
         this.mainGoal = mainGoal;
-        this.linkedSAE = linkedSAE;
+        this.Saes = Saes;
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
         this.pedagologicalContent = pedagologicalContent;
@@ -97,16 +100,16 @@ public class ResourceSheet {
         this.hourlyVolumeID = hourlyVolumeID;
     }
 
-    public void setTeachersFeedbackID(Long teachersReturnID) {
-        this.teachersFeedbackID = teachersReturnID;
+    public void setTeachersFeedbacks(List<PedagologicalTeachersFeedbacks> teachersFeedbacks) {
+        this.teachersFeedbacks = teachersFeedbacks;
     }
 
-    public void setStudentFeedbackID(Long studentReturnID) {
-        this.studentFeedbackID = studentReturnID;
+    public void setStudentsFeedbacks(List<StudentsFeedbacks> studentsFeedbacks) {
+        this.studentsFeedbacks = studentsFeedbacks;
     }
 
-    public void setImprovementsIDeaID(Long improvementsIDeaID) {
-        this.improvementsIDeaID = improvementsIDeaID;
+    public void setImprovementIdeas(List<ImprovementIdeas> improvementIdeas) {
+        this.improvementIdeas = improvementIdeas;
     }
 
     public void setSemester(int semester) {
@@ -119,10 +122,6 @@ public class ResourceSheet {
 
     public void setMainGoal(String mainGoal) {
         this.mainGoal = mainGoal;
-    }
-
-    public void setLinkedSAE(Integer linkedSAE) {
-        this.linkedSAE = linkedSAE;
     }
 
     public void setCreationDate(Date creationDate) {
@@ -141,6 +140,14 @@ public class ResourceSheet {
         this.skills = skills;
     }
 
+    public void setPedagologicalContent(List<PedagologicalContent> pedagologicalContent) {
+        this.pedagologicalContent = pedagologicalContent;
+    }
+
+    public void setSaes(List<Sae> saes) {
+        Saes = saes;
+    }
+
     public Long getSheetsID() {
         return sheetsID;
     }
@@ -153,20 +160,20 @@ public class ResourceSheet {
         return hourlyVolumeID;
     }
 
+    public List<StudentsFeedbacks> getStudentsFeedbacks() {
+        return studentsFeedbacks;
+    }
+
+    public List<PedagologicalTeachersFeedbacks> getTeachersFeedbacks() {
+        return teachersFeedbacks;
+    }
+
     public Long getReferencialTeacherID() {
         return referencialTeacherID;
     }
 
-    public Long getTeachersFeedbackID() {
-        return teachersFeedbackID;
-    }
-
-    public Long getStudentFeedbackID() {
-        return studentFeedbackID;
-    }
-
-    public Long getImprovementsIDeaID() {
-        return improvementsIDeaID;
+    public List<ImprovementIdeas> getImprovementIdeas() {
+        return improvementIdeas;
     }
 
     public int getSemester() {
@@ -179,10 +186,6 @@ public class ResourceSheet {
 
     public String getMainGoal() {
         return mainGoal;
-    }
-
-    public Integer getLinkedSAE() {
-        return linkedSAE;
     }
 
     public Date getCreationDate() {
@@ -205,13 +208,9 @@ public class ResourceSheet {
         return pedagologicalContent;
     }
 
-    public void setPedagologicalContent(List<PedagologicalContent> pedagologicalContent) {
-        this.pedagologicalContent = pedagologicalContent;
+    public List<Sae> getSaes() {
+        return Saes;
     }
-
-
-
-
 }
 
 
