@@ -11,8 +11,18 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.properties.TextAlignment;
 
+import java.util.List;
+
 public class FooterHandler extends AbstractPdfDocumentEventHandler implements IEventHandler {
     private static final int WIDTH_MARGIN = 60;
+
+    private final String resourceCode;
+    private final List<String> skillCodes;
+
+    public FooterHandler(String resourceCode, List<String> skillCodes) {
+        this.resourceCode = resourceCode;
+        this.skillCodes = skillCodes;
+    }
 
     @Override
     protected void onAcceptedEvent(AbstractPdfDocumentEvent event) {
@@ -23,6 +33,7 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler implements IE
         Rectangle pageSize = page.getPageSize();
         float textY = 20;
         float lineY = 40;
+        String mergedSkillCodes = String.join(",", skillCodes);
 
         PdfCanvas pdfCanvas = new PdfCanvas(page);
         pdfCanvas.moveTo(pageSize.getLeft() + WIDTH_MARGIN, lineY);
@@ -32,7 +43,7 @@ public class FooterHandler extends AbstractPdfDocumentEventHandler implements IE
 
         canvas.setBorderTop(new SolidBorder(1));
         canvas.showTextAligned("Page " + pageNumber, page.getPageSize().getWidth() - WIDTH_MARGIN, textY, TextAlignment.RIGHT);
-        canvas.showTextAligned("UE 2.4" + "/ R2.06", WIDTH_MARGIN, textY, TextAlignment.LEFT);
+        canvas.showTextAligned(mergedSkillCodes + " / " + resourceCode, WIDTH_MARGIN, textY, TextAlignment.LEFT);
 
         canvas.close();
     }

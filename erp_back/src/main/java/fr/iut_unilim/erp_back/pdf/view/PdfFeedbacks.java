@@ -4,31 +4,30 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
+import fr.iut_unilim.erp_back.entity.ImprovementIdeas;
+import fr.iut_unilim.erp_back.entity.PedagologicalTeachersFeedbacks;
+import fr.iut_unilim.erp_back.entity.StudentsFeedbacks;
+
+import java.util.List;
 
 public class PdfFeedbacks {
-    private static final String[] teamFeedbacks = {
-            "Les images utilisées sont à revoir",
-            "Certaines erreurs sont à corriger",
-            "Il faut s'assurer que chaque intervenant ait la même attente globale de la ressource"
-    };
-
-    private static final String[] studentsFeedbacks = {
-            "Plus d'exemples dans les CM",
-            "Des exercices qui couvrent mieux"
-    };
-
-    public static Table create() {
+    public static Table create(List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas) {
         Table feedbacks = new Table(UnitValue.createPercentArray(new float[]{20, 80}));
         feedbacks.useAllAvailableWidth();
 
-        feedbacks.addCell(new Cell(teamFeedbacks.length, 1).add(new Paragraph("Retour de l'équipe pédagogique")));
-        for (String teamFeedback : teamFeedbacks) {
-            feedbacks.addCell(teamFeedback);
+        feedbacks.addCell(new Cell(teachersFeedbacks.size(), 1).add(new Paragraph("Retour de l'équipe pédagogique")));
+        for (PedagologicalTeachersFeedbacks teacherFeedback : teachersFeedbacks) {
+            feedbacks.addCell(teacherFeedback.content());
         }
 
-        feedbacks.addCell(new Cell(studentsFeedbacks.length, 1).add(new Paragraph("Retour des étudiants")));
-        for (String studentFeedback : studentsFeedbacks) {
-            feedbacks.addCell(studentFeedback);
+        feedbacks.addCell(new Cell(studentsFeedbacks.size(), 1).add(new Paragraph("Retour des étudiants")));
+        for (StudentsFeedbacks studentFeedback : studentsFeedbacks) {
+            feedbacks.addCell(studentFeedback.content());
+        }
+
+        feedbacks.addCell(new Cell(studentsFeedbacks.size(), 1).add(new Paragraph("Idée d'améliorations")));
+        for (ImprovementIdeas improvementIdea : improvementIdeas) {
+            feedbacks.addCell(improvementIdea.idea());
         }
 
         return feedbacks;
