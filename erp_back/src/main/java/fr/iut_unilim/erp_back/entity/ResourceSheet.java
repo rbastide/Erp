@@ -33,9 +33,6 @@ public class ResourceSheet {
     @Column(name = "mainGoal")
     private String mainGoal;
 
-    @Column(name = "linkedSAE")
-    private Integer linkedSAE;
-
     @Column(name = "creationDate")
     private Date creationDate;
 
@@ -47,6 +44,9 @@ public class ResourceSheet {
 
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Skill> skills;
+
+    @ManyToMany(mappedBy = "resourceSheets")
+    private List<Sae> Saes;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "PedagologicalContentId")
@@ -67,7 +67,7 @@ public class ResourceSheet {
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, int semester, int year, String mainGoal, String content, List<Sae> Saes, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.referencialTeacherID = referencialTeacherID;
@@ -78,7 +78,7 @@ public class ResourceSheet {
         this.semester = semester;
         this.year = year;
         this.mainGoal = mainGoal;
-        this.linkedSAE = linkedSAE;
+        this.Saes = Saes;
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
         this.pedagologicalContent = pedagologicalContent;
@@ -124,10 +124,6 @@ public class ResourceSheet {
         this.mainGoal = mainGoal;
     }
 
-    public void setLinkedSAE(Integer linkedSAE) {
-        this.linkedSAE = linkedSAE;
-    }
-
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
@@ -146,6 +142,10 @@ public class ResourceSheet {
 
     public void setPedagologicalContent(List<PedagologicalContent> pedagologicalContent) {
         this.pedagologicalContent = pedagologicalContent;
+    }
+
+    public void setSaes(List<Sae> saes) {
+        Saes = saes;
     }
 
     public Long getSheetsID() {
@@ -188,10 +188,6 @@ public class ResourceSheet {
         return mainGoal;
     }
 
-    public Integer getLinkedSAE() {
-        return linkedSAE;
-    }
-
     public Date getCreationDate() {
         return creationDate;
     }
@@ -212,9 +208,9 @@ public class ResourceSheet {
         return pedagologicalContent;
     }
 
-
-
-
+    public List<Sae> getSaes() {
+        return Saes;
+    }
 }
 
 
