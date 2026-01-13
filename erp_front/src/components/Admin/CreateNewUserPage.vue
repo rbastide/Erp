@@ -7,11 +7,10 @@ import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
 
-// Ajout des refs pour le nom, prénom et email
 const username = ref('');
 const firstname = ref('');
 const lastname = ref('');
-const email = ref(''); // Nouveau champ
+const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const role = ref('');
@@ -29,7 +28,6 @@ const handleRegister = async () => {
     return;
   }
 
-  // Vérification que tous les champs sont remplis (y compris l'email)
   if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
@@ -39,7 +37,7 @@ const handleRegister = async () => {
     identifier: username.value,
     firstname: firstname.value,
     lastname: lastname.value,
-    email: email.value, // Ajout au payload
+    email: email.value,
     password: password.value,
     role: role.value
   };
