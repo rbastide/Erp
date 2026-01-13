@@ -22,6 +22,10 @@ public class ClassType {
         this.classType = classType;
     }
 
+    public ClassType(String classType) {
+        this.classType = classType;
+    }
+
     public Long getClassTypeId() {
         return classTypeId;
     }

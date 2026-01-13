@@ -21,7 +21,7 @@ public class ResourceSheetService {
         return resourceSheetRepository.findAll();
     }
 
-    public ResourceSheet addResourceSheet(ResourceSheet resourceSheet) {
+    public ResourceSheet save(ResourceSheet resourceSheet) {
         return resourceSheetRepository.save(resourceSheet);
     }
 

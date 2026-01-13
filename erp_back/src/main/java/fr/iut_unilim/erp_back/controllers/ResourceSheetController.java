@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
@@ -10,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("api/resourceSheet")
@@ -24,8 +27,9 @@ public class ResourceSheetController {
     private final PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository;
     private final StudentsFeedbacksRepository studentsFeedbacksRepository;
     private final ImprovementIdeasRepository improvementIdeasRepository;
+    private final ClassTypeRepository classTypeRepository;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, SaeRepository saeRepository, ResourceRepository resourceRepository, TeacherRepository teacherRepository, HourlyVolumeRepository hourlyVolumeRepository, PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository, StudentsFeedbacksRepository studentsFeedbacksRepository, ImprovementIdeasRepository improvementIdeasRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, SaeRepository saeRepository, ResourceRepository resourceRepository, TeacherRepository teacherRepository, HourlyVolumeRepository hourlyVolumeRepository, PedagologicalTeachersFeedbacksRepository pedagologicalTeachersFeedbacksRepository, StudentsFeedbacksRepository studentsFeedbacksRepository, ImprovementIdeasRepository improvementIdeasRepository, ClassTypeRepository classTypeRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.saeRepository = saeRepository;
@@ -35,6 +39,7 @@ public class ResourceSheetController {
         this.pedagologicalTeachersFeedbacksRepository = pedagologicalTeachersFeedbacksRepository;
         this.studentsFeedbacksRepository = studentsFeedbacksRepository;
         this.improvementIdeasRepository = improvementIdeasRepository;
+        this.classTypeRepository = classTypeRepository;
     }
 
     @GetMapping("/getResourceSheet")
@@ -43,106 +48,110 @@ public class ResourceSheetController {
         return ResponseEntity.ok(resourceSheetService.getAllResourceSheets());
     }
 
-    @PostMapping("/resourceSheet")
-    @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> editResourceSheet(@RequestBody List<ResourceSheetRequest> resSheetList) {
-        for (ResourceSheetRequest resSheet : resSheetList) {
-            ResourceSheet sheetToSave;
-            if (resSheet.getSheetsID() != null) {
-                sheetToSave = resourceSheetRepository.findById(resSheet.getSheetsID())
-                        .orElse(new ResourceSheet());
-            } else {
-                sheetToSave = new ResourceSheet();
+    @PostMapping("/resource-sheet")
+    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
+        ResourceSheet resourceSheet = new ResourceSheet();
+
+        Long resourceID = resourceSheetRequest.getResourceID();
+        if(resourceID==null){
+            return ResponseEntity.badRequest().body("resourceID is null");
+        }
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());
+
+        resourceSheet.setResourceID(resourceID);
+
+
+        Long hourlyVolumeID = resourceSheetRequest.getHourlyVolumeID();
+        if(hourlyVolumeID==null){
+            return ResponseEntity.badRequest().body("HourlyVolumeID is null");
+        }
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());
+
+        resourceSheet.setHourlyVolumeID(hourlyVolumeID);
+
+        List<String> teacherFeedbackID = resourceSheetRequest.getTeachersFeedbackID();
+        if(teacherFeedbackID==null){
+            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
+        }
+        List<PedagologicalTeachersFeedbacks> pedagologicalTeachersFeedbacks = new ArrayList<>();
+        for(String teacherFeedback : teacherFeedbackID){
+            PedagologicalTeachersFeedbacks pedagologicalTeachersFeedback = new PedagologicalTeachersFeedbacks();
+            pedagologicalTeachersFeedback.setContent(teacherFeedback);
+            pedagologicalTeachersFeedbacks.add(pedagologicalTeachersFeedback);
+        }
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setTeachersFeedbacks(pedagologicalTeachersFeedbacks);
+
+        List<String> studentFeedbackID = resourceSheetRequest.getStudentFeedbackID();
+        if(studentFeedbackID==null){
+            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
+        }
+        List<StudentsFeedbacks> studentsFeedbacks = new ArrayList<>();
+        for(String studentFeedback : studentFeedbackID){
+            StudentsFeedbacks studentFeedbacks = new StudentsFeedbacks();
+            studentFeedbacks.setContent(studentFeedback);
+            studentsFeedbacks.add(studentFeedbacks);
+        }
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setStudentsFeedbacks(studentsFeedbacks);
+
+        List<String> improvementIdeaId = resourceSheetRequest.getImprovementsIdeaID();
+        if(improvementIdeaId==null){
+            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
+        }
+        List<ImprovementIdeas> improvementsIdeas = new ArrayList<>();
+        for(String improvementIdea : improvementIdeaId){
+            ImprovementIdeas improvementIdeas = new ImprovementIdeas();
+            improvementIdeas.setIdea(improvementIdea);
+            improvementsIdeas.add(improvementIdeas);
+        }
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setImprovementIdeas(improvementsIdeas);
+
+        List<PedagologicalContent> pedagologicalContent = new ArrayList<>();
+
+        // On prépare le regex
+        String regex = "^(TP|CM|TD)\\s*(\\d+)\\s*:\\s*(.*)$";
+        Pattern pattern = Pattern.compile(regex);
+
+        for (String educationalContent : resourceSheetRequest.getPedagologicalContent()) {
+            Matcher matcher = pattern.matcher(educationalContent);
+
+            if (!matcher.find()) {
+                return ResponseEntity.badRequest().body("Invalid content !");
             }
-            Setter(resSheet, sheetToSave);
+
+            String typeName = matcher.group(1); // "TP", "TD" ou "CM"
+            String numero = matcher.group(2);
+            String description = matcher.group(3);
+
+            PedagologicalContent pedagologicalContentEntity = new PedagologicalContent();
+
+            // --- CORRECTION MAJEURE ICI ---
+            // On cherche l'objet en base de données au lieu d'en créer un nouveau
+            ClassType existingType = classTypeRepository.findByClassType(typeName)
+                    .orElseThrow(() -> new RuntimeException("Erreur : Le type de cours '" + typeName + "' n'existe pas en base de données."));
+
+            pedagologicalContentEntity.setClassTypeId(existingType); // existingType possède un ID valide
+            // ------------------------------
+
+            pedagologicalContentEntity.setContent(description);
+            pedagologicalContentEntity.setCourseNumber(Long.valueOf(numero));
+
+            pedagologicalContent.add(pedagologicalContentEntity);
         }
-        return ResponseEntity.ok().body("La fiche ressource a été sauvegardée avec succès");
+        resourceSheet.setPedagologicalContentId(pedagologicalContent);
+        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setPedagologicalContentId(pedagologicalContent);
+
+
+        resourceSheet.setCreationDate(null);
+
+        resourceSheet.setLastModificationDate(null);
+
+        resourceSheetService.save(resourceSheet);
+
+        return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
     }
 
-    private void Setter(ResourceSheetRequest dto, ResourceSheet sheet) {
-        sheet.setSemester(dto.getSemester());
-        sheet.setYear(dto.getYear());
-        sheet.setMainGoal(dto.getMainGoal());
 
-        if (dto.getCreationDate() != null) {
-            sheet.setCreationDate(dto.getCreationDate());
-        } else if (sheet.getCreationDate() == null) {
-            sheet.setCreationDate(new Date());
-        }
-        sheet.setLastModificationDate(new Date());
 
-        if (dto.getResourceID() != null) {
-            resourceRepository.findById(dto.getResourceID())
-                    .ifPresent(r -> sheet.setResourceID(r.getResourceID()));
-        } else {
-            sheet.setResourceID(null);
-        }
-
-        if (dto.getLinkedSaeID() != null) {
-            saeRepository.findById(dto.getLinkedSaeID())
-                    .ifPresent(s -> sheet.setLinkedSAE(s.getSaeID().intValue()));
-        } else {
-            sheet.setLinkedSAE(null);
-        }
-
-        if (dto.getReferencialTeacherID() != null) {
-            teacherRepository.findById(dto.getReferencialTeacherID())
-                    .ifPresent(t -> sheet.setReferencialTeacherID(t.getTeacherID()));
-        } else {
-            sheet.setReferencialTeacherID(null);
-        }
-
-        HourlyVolume volume;
-        if (dto.getHourlyVolumeID() != null) {
-            volume = hourlyVolumeRepository.findById(dto.getHourlyVolumeID())
-                    .orElse(new HourlyVolume());
-        } else {
-            volume = new HourlyVolume();
-        }
-        volume.setNbHoursCM(dto.getHoursCM());
-        volume.setNbHoursTD(dto.getHoursTD());
-        volume.setNbHoursTP(dto.getHoursTP());
-        volume.setNbHoursDS(dto.getHoursDS());
-        volume.setNbHoursDSTP(dto.getHoursDSTP());
-
-        volume = hourlyVolumeRepository.save(volume);
-        sheet.setHourlyVolumeID(volume.getHourlyVolID());
-
-        PedagologicalTeachersFeedbacks tFeedback;
-        if (dto.getTeachersFeedbackID() != null) {
-            tFeedback = pedagologicalTeachersFeedbacksRepository.findById(dto.getTeachersFeedbackID())
-                    .orElse(new PedagologicalTeachersFeedbacks());
-        } else {
-            tFeedback = new PedagologicalTeachersFeedbacks();
-        }
-        tFeedback.setContent(dto.getTeacherFeedbackContent());
-        tFeedback = pedagologicalTeachersFeedbacksRepository.save(tFeedback);
-        sheet.setTeachersFeedbackID(tFeedback.teachersFeedbackID());
-
-        StudentsFeedbacks sFeedback;
-        if (dto.getStudentFeedbackID() != null) {
-            sFeedback = studentsFeedbacksRepository.findById(dto.getStudentFeedbackID())
-                    .orElse(new StudentsFeedbacks());
-        } else {
-            sFeedback = new StudentsFeedbacks();
-        }
-        sFeedback.setContent(dto.getStudentFeedbackContent());
-        sFeedback = studentsFeedbacksRepository.save(sFeedback);
-        sheet.setStudentFeedbackID(sFeedback.studentsFeedbackID());
-
-        ImprovementIdeas ideas;
-        if (dto.getImprovementsIdeaID() != null) {
-            ideas = improvementIdeasRepository.findById(dto.getImprovementsIdeaID())
-                    .orElse(new ImprovementIdeas());
-        } else {
-            ideas = new ImprovementIdeas();
-        }
-        ideas.setIdea(dto.getImprovementIdeaContent());
-        ideas = improvementIdeasRepository.save(ideas);
-        sheet.setImprovementsIDeaID(ideas.improvementsIdeaID());
-
-        resourceSheetRepository.save(sheet);
-    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('TEACHER')")
@@ -179,8 +188,7 @@ public class ResourceSheetController {
                     sheet.getSheetsID(),
                     code,
                     name,
-                    dateToUse
-            ));
+                    dateToUse            ));
         }
 
         Collections.reverse(historyList);

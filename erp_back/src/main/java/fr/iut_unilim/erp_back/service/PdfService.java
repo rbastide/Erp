@@ -51,20 +51,20 @@ public class PdfService {
 
         List<ImprovementIdeas> improvementIdeas = resourceSheet.getImprovementIdeas();
 
-        int semester = resourceSheet.getSemester();
-        String mainGoal = resourceSheet.getMainGoal();
+        //int semester = resourceSheet.getSemester();
+        //String mainGoal = resourceSheet.getMainGoal();
 
-        List<Sae> saes = resourceSheet.getSaes();
+        //List<Sae> saes = resourceSheet.getSaes();
 
         Date creationDate = resourceSheet.getCreationDate();
         Date lastModificationDate = resourceSheet.getLastModificationDate();
 
-        List<Teacher> teachers = resourceSheet.getTeachers();
+        //List<Teacher> teachers = resourceSheet.getTeachers();
 
-        List<Skill> skills = resourceSheet.getSkills();
+        //List<Skill> skills = resourceSheet.getSkills();
 
-        List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContent();
-
-        return new ResourceSheetViewModel(resource.get(), hourlyVolume.get(), pedagologicalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, mainGoal, saes, creationDate, lastModificationDate, teachers, skills, pedagologicalContents);
+        //List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContent();
+        return null;
+        //return new ResourceSheetViewModel(resource.get(), hourlyVolume.get(), pedagologicalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, mainGoal, saes, creationDate, lastModificationDate, teachers, skills, pedagologicalContents);
     }
 }

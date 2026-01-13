@@ -11,27 +11,14 @@ public class ResourceSheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "sheetsID")
     private Long sheetsID;
 
     @Column(name = "resourceID")
     private Long resourceID;
 
-    @Column(name = "referencialTeacherID")
-    private Long referencialTeacherID;
-
     @Column(name = "hourlyVolumeID")
     private Long hourlyVolumeID;
-
-    @Column(name = "semester")
-    private int semester;
-
-    @Column(name = "year")
-    private int year;
-
-    @Column(name = "mainGoal")
-    private String mainGoal;
 
     @Column(name = "creationDate")
     private Date creationDate;
@@ -39,49 +26,35 @@ public class ResourceSheet {
     @Column(name = "lastModificationDate")
     private Date lastModificationDate;
 
-    @ManyToMany(mappedBy = "resourceSheets")
-    private List<Teacher> teachers;
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
+    private List<PedagologicalTeachersFeedbacks> teachersFeedbacks;
 
-    @ManyToMany(mappedBy = "resourceSheets")
-    private List<Skill> skills;
-
-    @ManyToMany(mappedBy = "resourceSheets")
-    private List<Sae> Saes;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PedagologicalContentId")
-    private List<PedagologicalContent> pedagologicalContent;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "improvementsIdeaID")
-    private List<ImprovementIdeas> improvementIdeas;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studentFeedbackID")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
     private List<StudentsFeedbacks> studentsFeedbacks;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teachersFeedbackID")
-    private List<PedagologicalTeachersFeedbacks> teachersFeedbacks;
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
+    private List<ImprovementIdeas> improvementIdeas;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "ressourceSheetId")
+    private List<PedagologicalContent> pedagologicalContentId;
 
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, int semester, int year, String mainGoal, String content, List<Sae> Saes, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
-        this.referencialTeacherID = referencialTeacherID;
         this.hourlyVolumeID = hourlyVolumeID;
         this.teachersFeedbacks = teachersFeedbacks;
         this.studentsFeedbacks = studentsFeedbacks;
         this.improvementIdeas = improvementIdeas;
-        this.semester = semester;
-        this.year = year;
-        this.mainGoal = mainGoal;
-        this.Saes = Saes;
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
-        this.pedagologicalContent = pedagologicalContent;
+        this.pedagologicalContentId = pedagologicalContent;
     }
 
     public void setSheetsID(Long sheetsID) {
@@ -90,10 +63,6 @@ public class ResourceSheet {
 
     public void setResourceID(Long resourceID) {
         this.resourceID = resourceID;
-    }
-
-    public void setReferencialTeacherID(Long referencialTeacherID) {
-        this.referencialTeacherID = referencialTeacherID;
     }
 
     public void setHourlyVolumeID(Long hourlyVolumeID) {
@@ -112,18 +81,6 @@ public class ResourceSheet {
         this.improvementIdeas = improvementIdeas;
     }
 
-    public void setSemester(int semester) {
-        this.semester = semester;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public void setMainGoal(String mainGoal) {
-        this.mainGoal = mainGoal;
-    }
-
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
@@ -132,20 +89,8 @@ public class ResourceSheet {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public void setTeachers(List<Teacher> teachers) {
-        this.teachers = teachers;
-    }
-
-    public void setSkills(List<Skill> skills) {
-        this.skills = skills;
-    }
-
-    public void setPedagologicalContent(List<PedagologicalContent> pedagologicalContent) {
-        this.pedagologicalContent = pedagologicalContent;
-    }
-
-    public void setSaes(List<Sae> saes) {
-        Saes = saes;
+    public void setPedagologicalContentId(List<PedagologicalContent> pedagologicalContent) {
+        this.pedagologicalContentId = pedagologicalContent;
     }
 
     public Long getSheetsID() {
@@ -168,24 +113,8 @@ public class ResourceSheet {
         return teachersFeedbacks;
     }
 
-    public Long getReferencialTeacherID() {
-        return referencialTeacherID;
-    }
-
     public List<ImprovementIdeas> getImprovementIdeas() {
         return improvementIdeas;
-    }
-
-    public int getSemester() {
-        return semester;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public String getMainGoal() {
-        return mainGoal;
     }
 
     public Date getCreationDate() {
@@ -196,21 +125,10 @@ public class ResourceSheet {
         return lastModificationDate;
     }
 
-    public List<Teacher> getTeachers() {
-        return teachers;
+    public List<PedagologicalContent> getPedagologicalContentId() {
+        return pedagologicalContentId;
     }
 
-    public List<Skill> getSkills() {
-        return skills;
-    }
-
-    public List<PedagologicalContent> getPedagologicalContent() {
-        return pedagologicalContent;
-    }
-
-    public List<Sae> getSaes() {
-        return Saes;
-    }
 }
 
 

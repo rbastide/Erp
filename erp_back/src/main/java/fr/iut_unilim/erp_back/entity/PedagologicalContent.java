@@ -45,4 +45,24 @@ public class PedagologicalContent {
     public String getContent() {
         return content;
     }
+
+    public void setPedagologicalContentId(Long pedagologicalContentId) {
+        PedagologicalContentId = pedagologicalContentId;
+    }
+
+    public void setRessourceSheetId(ResourceSheet ressourceSheetId) {
+        this.ressourceSheetId = ressourceSheetId;
+    }
+
+    public void setClassTypeId(ClassType classTypeId) {
+        this.classTypeId = classTypeId;
+    }
+
+    public void setCourseNumber(Long courseNumber) {
+        this.courseNumber = courseNumber;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
