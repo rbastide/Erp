@@ -8,7 +8,6 @@ const props = defineProps({
   settingsActive: { type: Boolean, default: false },
   helpActive: { type: Boolean, default: false },
   quitActive: { type: Boolean, default: false },
-  // Active le menu déroulant
   showDepartments: { type: Boolean, default: false },
 });
 
@@ -24,15 +23,14 @@ const updateRole = () => {
 
 onMounted(() => {
   updateRole();
-
-  // MODIFICATION ICI : Sélectionne le 1er département par défaut au chargement
-  // Uniquement si l'option est activée et que l'utilisateur a les droits
   if (props.showDepartments && userRole.value === 'SUPER_ADMIN') {
     selectedDept.value = 1;
   }
 });
 
-watchEffect(() => { updateRole(); });
+watchEffect(() => {
+  updateRole();
+});
 
 const handleDashboardClick = () => {
   if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
@@ -48,10 +46,7 @@ const selectDept = (id: number) => {
 
 const handleSettings = () => router.push('/settings');
 const handleHelp = () => router.push('/help');
-
-const handleDeconnexion = () => {
-  router.push('/deconnexion');
-};
+const handleDeconnexion = () => router.push('/deconnexion');
 </script>
 
 <template>
@@ -74,7 +69,6 @@ const handleDeconnexion = () => {
 
     <nav class="sidebar-nav">
       <div class="dropdown-container">
-
         <div
             class="nav-item main-item"
             :class="{ active: props.dashboardActive || props.dashboardAdminActive }"
@@ -97,15 +91,21 @@ const handleDeconnexion = () => {
 
         <div v-if="props.showDepartments && userRole === 'SUPER_ADMIN'" class="submenu">
           <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 1 }" @click="selectDept(1)">
-            <div class="icon-wrapper sub-icon"><div class="dot"></div></div>
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
             <span class="nav-text">Département 1</span>
           </div>
           <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 2 }" @click="selectDept(2)">
-            <div class="icon-wrapper sub-icon"><div class="dot"></div></div>
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
             <span class="nav-text">Département 2</span>
           </div>
           <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 3 }" @click="selectDept(3)">
-            <div class="icon-wrapper sub-icon"><div class="dot"></div></div>
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
             <span class="nav-text">Département 3</span>
           </div>
         </div>
@@ -113,7 +113,10 @@ const handleDeconnexion = () => {
 
       <div class="nav-item" :class="{ active: props.settingsActive }" @click="handleSettings">
         <div class="icon-wrapper">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
         </div>
         <span class="nav-text">Paramètres</span>
       </div>
@@ -121,11 +124,23 @@ const handleDeconnexion = () => {
 
     <div class="sidebar-footer">
       <div class="nav-item small" :class="{ active: props.helpActive }" @click="handleHelp">
-        <div class="icon-wrapper"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
         <span class="nav-text">Aide</span>
       </div>
       <div class="nav-item small logout" :class="{ active: props.quitActive }" @click="handleDeconnexion">
-        <div class="icon-wrapper"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
+        <div class="icon-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </div>
         <span class="nav-text">Déconnexion</span>
       </div>
     </div>
@@ -133,26 +148,117 @@ const handleDeconnexion = () => {
 </template>
 
 <style scoped>
-/* CSS D'ORIGINE PRÉSERVÉ */
-.sidebar { width: 80px; height: 100vh; position: fixed; left: 0; top: 0; background-color: #fff; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.05); z-index: 1000; font-family: 'Roboto', sans-serif; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
-.sidebar.expanded { width: 260px; }
-.sidebar-header { height: 172px; display: flex; align-items: center; padding-left: 24px; border-bottom: 1px solid #f0f0f0; background-color: #96111a; transition: background-color 0.3s ease; }
-.sidebar.expanded .sidebar-header { background-color: #ffffff; }
-.hamburger-icon { color: #ffffff; min-width: 32px; }
-.sidebar.expanded .hamburger-icon { color: #96111a; }
-.menu-title { font-size: x-large; font-weight: bold; color: #B51621; }
-.sidebar-nav { flex-grow: 1; display: flex; flex-direction: column; padding-top: 10px; }
-.nav-item { display: flex; align-items: center; padding: 15px 28px; cursor: pointer; color: #555; transition: all 0.2s ease; font-size: 16px; font-weight: 500; border-left: 4px solid transparent; white-space: nowrap; }
-.icon-wrapper { min-width: 24px; display: flex; align-items: center; justify-content: center; }
-.nav-text { margin-left: 20px; opacity: 0; transition: opacity 0.2s ease-in-out; }
-.sidebar.expanded .nav-text { opacity: 1; }
-.nav-item:hover { background-color: #f9f9f9; color: #B51621; }
-.nav-item.active { background-color: #fff0f1; color: #B51621; border-left-color: #B51621; }
-.sidebar-footer { padding-bottom: 20px; border-top: 1px solid #f0f0f0; }
-.logout:hover { color: #d32f2f; background-color: #ffebee; }
+.sidebar {
+  width: 80px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  font-family: 'Roboto', sans-serif;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
 
-/* MENU DÉROULANT ET SOUS-ITEMS */
-.dropdown-container { position: relative; }
+.sidebar.expanded {
+  width: 260px;
+}
+
+.sidebar-header {
+  height: 172px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #96111a;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar.expanded .sidebar-header {
+  background-color: #ffffff;
+}
+
+.hamburger-icon {
+  color: #ffffff;
+  min-width: 32px;
+}
+
+.sidebar.expanded .hamburger-icon {
+  color: #96111a;
+}
+
+.menu-title {
+  font-size: x-large;
+  font-weight: bold;
+  color: #B51621;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 28px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  font-weight: 500;
+  border-left: 4px solid transparent;
+  white-space: nowrap;
+}
+
+.icon-wrapper {
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-text {
+  margin-left: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.sidebar.expanded .nav-text {
+  opacity: 1;
+}
+
+.nav-item:hover {
+  background-color: #f9f9f9;
+  color: #B51621;
+}
+
+.nav-item.active {
+  background-color: #fff0f1;
+  color: #B51621;
+  border-left-color: #B51621;
+}
+
+.sidebar-footer {
+  padding-bottom: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.logout:hover {
+  color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.dropdown-container {
+  position: relative;
+}
+
 .submenu {
   max-height: 0;
   overflow: hidden;
@@ -160,23 +266,45 @@ const handleDeconnexion = () => {
   opacity: 0;
   background-color: #fafafa;
 }
+
 .dropdown-container:hover .submenu {
   max-height: 200px;
   opacity: 1;
 }
-.sub-item { padding: 10px 28px 10px 45px; font-size: 14px; }
-.sub-icon { min-width: 14px; }
-.dot { width: 6px; height: 6px; background-color: currentColor; border-radius: 50%; }
-.chevron-icon { margin-left: auto; transition: transform 0.3s ease; color: #999; }
-.dropdown-container:hover .chevron-icon { transform: rotate(180deg); }
 
-/* STYLE DISSOCIÉ POUR LES DÉPARTEMENTS */
+.sub-item {
+  padding: 10px 28px 10px 45px;
+  font-size: 14px;
+}
+
+.sub-icon {
+  min-width: 14px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.chevron-icon {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+  color: #999;
+}
+
+.dropdown-container:hover .chevron-icon {
+  transform: rotate(180deg);
+}
+
 .sub-item.sub-active {
   background-color: #f0f0f0;
   color: #B51621;
   font-weight: 700;
   border-left: 4px solid #B51621;
 }
+
 .sub-item.sub-active .dot {
   transform: scale(1.3);
 }
