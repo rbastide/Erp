@@ -70,7 +70,7 @@ const fetchHoursData = async () => {
           tp: vol.nbHoursTP,
           ds: vol.nbHoursDS,
           ds_tp: vol.nbHoursDSTP,
-          student: 0
+          student: vol.nbHoursDSTP + vol.nbHoursDS + vol.nbHoursTP + vol.nbHoursTD + vol.nbHoursCM
         };
 
         currentHourlyVolId.value = vol.hourlyVolID;
