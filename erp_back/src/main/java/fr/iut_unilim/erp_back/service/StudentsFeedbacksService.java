@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.repository.StudentsFeedbacksRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentsFeedbacksService {
@@ -15,7 +16,11 @@ public class StudentsFeedbacksService {
         this.studentsFeedbacksRepository = studentsFeedbacksRepository;
     }
 
-    public List<StudentsFeedbacks> findAll() {
+    public Optional<StudentsFeedbacks> getStudentFeedbacksFromId(Long id) {
+        return studentsFeedbacksRepository.findById(id);
+    }
+
+    public List<StudentsFeedbacks> getAll() {
         return studentsFeedbacksRepository.findAll();
     }
 }

@@ -26,6 +26,16 @@ public class StudentsFeedbacks {
     public Long studentsFeedbackID() { return studentFeedbackID; }
     public String content(){ return content; }
 
+
+
+    public Long getStudentFeedbackID() {
+        return studentFeedbackID;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
     public void setStudentFeedbackID(Long studentFeedbackID) {
         this.studentFeedbackID = studentFeedbackID;
     }
