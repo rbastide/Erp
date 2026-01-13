@@ -13,7 +13,7 @@ const searchQuery = ref('');
 const currentCompetence = ref({
   skillNum: null,
   skillName: '',
-  niveaux: [{ intitule: '', acs: [{ num: null, intitule: '' }] }],
+  niveaux: [{ title: '', acs: [{ num: null, title: '' }] }],
 });
 
 const editedCompetence = ref({ id: null, skillNum: null, skillName: '', niveaux: [] });
@@ -53,11 +53,11 @@ const syncWithBackend = async () => {
     niveaux: comp.niveaux.map((niv, nIdx) => ({
       id: niv.id || null,
       num: niv.num ? parseInt(niv.num) : (nIdx + 1),
-      intitule: niv.intitule || "",
+      title: niv.title || "",
       acs: niv.acs.map(ac => ({
         id: ac.id || null,
         num: ac.num ? ac.num.toString() : "",
-        intitule: ac.intitule || ""
+        title: ac.title || ""
       }))
     }))
   }));
@@ -76,7 +76,7 @@ const handleSaveNewCompetence = async () => {
   currentCompetence.value = {
     skillNum: null,
     skillName: '',
-    niveaux: [{ intitule: '', acs: [{ num: null, intitule: '' }] }]
+    niveaux: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
   await syncWithBackend();
 };
@@ -101,7 +101,7 @@ const handleDelete = async (index) => {
 
 const handleAddNiveau = () => {
   if (currentCompetence.value.niveaux.length < 3) {
-    currentCompetence.value.niveaux.push({ intitule: '', acs: [{ num: null, intitule: '' }] });
+    currentCompetence.value.niveaux.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
 
@@ -113,7 +113,7 @@ const removeNiveau = (i) => {
 
 const handleAddAc = (nivIdx) => {
   if (currentCompetence.value.niveaux[nivIdx].acs.length < 4) {
-    currentCompetence.value.niveaux[nivIdx].acs.push({ num: null, intitule: '' });
+    currentCompetence.value.niveaux[nivIdx].acs.push({ num: null, title: '' });
   }
 };
 
@@ -134,7 +134,7 @@ const handleCancelEdit = () => {
 
 const addLevelToEdit = () => {
   if (editedCompetence.value.niveaux.length < 3) {
-    editedCompetence.value.niveaux.push({ intitule: '', acs: [{ num: null, intitule: '' }] });
+    editedCompetence.value.niveaux.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
 
@@ -146,7 +146,7 @@ const removeLevelToEdit = (i) => {
 
 const addAcToEdit = (lvlI) => {
   if (editedCompetence.value.niveaux[lvlI].acs.length < 4) {
-    editedCompetence.value.niveaux[lvlI].acs.push({ num: null, intitule: '' });
+    editedCompetence.value.niveaux[lvlI].acs.push({ num: null, title: '' });
   }
 };
 
@@ -183,12 +183,12 @@ const handleValider = () => router.back();
               <label class="group-label">Niveau {{ nIndex + 1 }}</label>
               <button v-if="currentCompetence.niveaux.length > 1" @click="removeNiveau(nIndex)" class="btn-remove-item">✕</button>
             </div>
-            <input type="text" v-model="niveau.intitule" placeholder="Intitulé du niveau..." class="card-input">
+            <input type="text" v-model="niveau.title" placeholder="Intitulé du niveau..." class="card-input">
           </div>
           <div class="acs-container">
             <div v-for="(ac, aIndex) in niveau.acs" :key="aIndex" class="ac-row">
               <input type="number" v-model.number="ac.num" min="1" placeholder="N°" class="card-input ac-num">
-              <input type="text" v-model="ac.intitule" placeholder="Intitulé AC" class="card-input ac-name">
+              <input type="text" v-model="ac.title" placeholder="Intitulé AC" class="card-input ac-name">
               <button v-if="niveau.acs.length > 1" @click="removeAc(nIndex, aIndex)" class="btn-remove-item">✕</button>
             </div>
             <div class="add-ac-center-wrapper" v-if="niveau.acs.length < 4">
@@ -214,9 +214,9 @@ const handleValider = () => router.back();
             </div>
             <div class="card-body-scroll">
               <div v-for="(niv, nIdx) in comp.niveaux" :key="nIdx" class="level-block">
-                <p class="level-title">Niveau {{ niv.num }}: {{ niv.intitule }}</p>
+                <p class="level-title">Niveau {{ niv.num }}: {{ niv.title }}</p>
                 <ul class="ac-list">
-                  <li v-for="(ac, aIdx) in niv.acs" :key="aIdx">AC {{ ac.num }}: {{ ac.intitule }}</li>
+                  <li v-for="(ac, aIdx) in niv.acs" :key="aIdx">AC {{ ac.num }}: {{ ac.title }}</li>
                 </ul>
               </div>
             </div>
@@ -252,10 +252,10 @@ const handleValider = () => router.back();
                   <span class="field-label">Niveau {{ lIdx + 1 }}</span>
                   <button v-if="editedCompetence.niveaux.length > 1" @click="removeLevelToEdit(lIdx)" class="remove-ac">✕</button>
                 </div>
-                <input type="text" v-model="lvl.intitule" class="card-input compact" placeholder="Intitulé">
+                <input type="text" v-model="lvl.title" class="card-input compact" placeholder="Intitulé">
                 <div v-for="(ac, acIdx) in lvl.acs" :key="acIdx" class="ac-edit-row">
                   <input type="number" v-model.number="ac.num" min="1" class="card-input tiny">
-                  <input type="text" v-model="ac.intitule" class="card-input compact flex-1">
+                  <input type="text" v-model="ac.title" class="card-input compact flex-1">
                   <span @click="removeAcFromEdit(lIdx, acIdx)" class="remove-ac">✕</span>
                 </div>
                 <div class="add-ac-center-wrapper" v-if="lvl.acs.length < 4">
