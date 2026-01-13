@@ -37,9 +37,10 @@ public class Teacher {
         this.firstname = teacher.firstname();
     }
 
-    public Teacher(String lastname, String firstname) {
+    public Teacher(String lastname, String firstname,Long userID) {
         this.lastname = lastname;
         this.firstname = firstname;
+        this.userID = userID;
     }
 
     public Long getTeacherID() {

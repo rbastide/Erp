@@ -42,9 +42,6 @@ public class ResourceSheet {
     @Column(name = "mainGoal")
     private String mainGoal;
 
-    @Column(name = "content")
-    private String content;
-
     @Column(name = "linkedSAE")
     private Integer linkedSAE;
 
@@ -60,10 +57,14 @@ public class ResourceSheet {
     @ManyToMany(mappedBy = "resourceSheets")
     private List<Skill> skills;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PedagologicalContent")
+    private PedagologicalContent pedagologicalContent;
+
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate ) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersFeedbackID, Long studentFeedbackID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE, Date creationDate, Date lastModificationDate, PedagologicalContent pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.referencialTeacherID = referencialTeacherID;
@@ -74,10 +75,10 @@ public class ResourceSheet {
         this.semester = semester;
         this.year = year;
         this.mainGoal = mainGoal;
-        this.content = content;
         this.linkedSAE = linkedSAE;
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
+        this.pedagologicalContent = pedagologicalContent;
     }
 
     public void setSheetsID(Long sheetsID) {
@@ -118,10 +119,6 @@ public class ResourceSheet {
 
     public void setMainGoal(String mainGoal) {
         this.mainGoal = mainGoal;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public void setLinkedSAE(Integer linkedSAE) {
@@ -184,10 +181,6 @@ public class ResourceSheet {
         return mainGoal;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public Integer getLinkedSAE() {
         return linkedSAE;
     }
@@ -207,4 +200,19 @@ public class ResourceSheet {
     public List<Skill> getSkills() {
         return skills;
     }
+
+    public PedagologicalContent getPedagologicalContent() {
+        return pedagologicalContent;
+    }
+
+    public void setPedagologicalContent(PedagologicalContent pedagologicalContent) {
+        this.pedagologicalContent = pedagologicalContent;
+    }
+
+
+
+
 }
+
+
+

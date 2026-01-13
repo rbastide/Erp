@@ -8,9 +8,13 @@ import jakarta.persistence.*;
 public class Sae {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name ="saeID")
     private Long SaeID;
 
+    @Column(name = "num")
     private String num;
+
+    @Column(name = "title")
     private String title;
 
     public Sae(Long saeID, String num, String title) {
