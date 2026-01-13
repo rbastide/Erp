@@ -37,7 +37,7 @@ onMounted(() => {
   width: 127px;
   height: 127px;
   left: 364px;
-  top: 22.5px;
+  top: 1.40625rem;
 }
 .container-connexion p{
   position: absolute;
