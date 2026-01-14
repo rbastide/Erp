@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { mcccStore } from "@/services/mcccStore.js";
+import {useRouter} from 'vue-router';
+import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
-import { onMounted, ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import api from '@/services/api';
 import Sidebar from "../App/Sidebar.vue";
 
@@ -29,7 +29,7 @@ const handleValider = async () => {
 
     console.log("Envoi des données au back ", payload);
 
-    const response = await api.post('/mccc/save', payload);
+    const response = await api.post('/mccc/save/', payload);
 
     if (response.status === 200 || response.status === 201) {
       console.log("Sauvegarde réussie !");
@@ -45,7 +45,7 @@ const handleValider = async () => {
 
 const fetchSaes = async () => {
   try {
-    const response = await api.get('/sae/saes');
+    const response = await api.get('/sae/getAllSae');
     if (response.data) {
       allSaes.value = response.data;
     }

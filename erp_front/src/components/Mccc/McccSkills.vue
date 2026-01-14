@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import { mcccStore } from "@/services/mcccStore.js";
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -64,7 +64,7 @@ const addSkillDirectly = (skill) => {
 
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
-    ue: skill.skillName,
+    ue: skill.skillNum + " " + skill.skillName,
     niveau: defaultRank.title,
     skillNum: skill.skillNum,
     acs: defaultRank.acs.map(ac => ({
