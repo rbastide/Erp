@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router';
 import { onMounted, ref } from "vue";
 import '../../assets/css/variable.css';
 
-// Déclaration des props pour que title et inline soient reconnus
 defineProps({
   title: {
     type: String,
@@ -27,7 +26,7 @@ onMounted(() => {
   <header class="page-header">
     <div class="container-connexion">
       <img src="../../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
-      <p>{{ title }} <br> <span class="inline-text">{{ inline }}</span></p>
+      <p>{{ title }} <br> {{inline}}</p>
     </div>
   </header>
 </template>
