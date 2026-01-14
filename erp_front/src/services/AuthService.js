@@ -21,5 +21,20 @@ export default {
   logout() {
     localStorage.removeItem('user_token');
     mcccStore.clearMcccStore();
-  }
+  },
+
+  lastName : '',
+    firstName :'',
+
+    registerAuthService(){
+      localStorage.setItem("AuthService",JSON.stringify(this));
+    },
+
+    clearAuthService(){
+      this.lastName = '';
+      this.firstName = '';
+      localStorage.removeItem("AuthService");
+    }
+
+
 };
