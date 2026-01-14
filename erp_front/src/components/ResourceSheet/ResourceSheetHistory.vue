@@ -32,12 +32,10 @@ const fetchSheetData = async () => {
     const sheet = responseSheets.data.find((s: any) => s.sheetsID == sheetIdFromUrl)
 
     if (sheet) {
-      // Mapping des feedbacks
       contents.value.teacherFeedback = sheet.teachersFeedbacks?.map((f: any) => f.content).join('\n') || ''
       contents.value.studentFeedback = sheet.studentsFeedbacks?.map((f: any) => f.content).join('\n') || ''
       contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.idea).join('\n') || ''
 
-      // Mapping du contenu pédagogique (Inclusion de DS et DS/TP)
       if (sheet.pedagologicalContentId) {
         const pedago = sheet.pedagologicalContentId
         const formatContent = (type: string) => pedago
@@ -48,11 +46,10 @@ const fetchSheetData = async () => {
         contents.value.cm = formatContent('CM')
         contents.value.td = formatContent('TD')
         contents.value.tp = formatContent('TP')
-        contents.value.ds = formatContent('DS')      // Prêt pour le futur
-        contents.value.ds_tp = formatContent('DSTP') // Prêt pour le futur
+        contents.value.ds = formatContent('DS')
+        contents.value.ds_tp = formatContent('DS/TP')
       }
 
-      // Mapping des volumes horaires
       if (sheet.hourlyVolumeID) {
         const responseMccc = await api.get('/mccc/getMccc')
         const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
