@@ -162,11 +162,11 @@
 
       <p class="section-main-title" id="comp">Compétences & Objectifs</p>
 
-      <div class="big-square" v-for="(ueItem, ueIndex) in mcccStore.ue" :key="ueIndex">
+      <div class="big-square" v-for="(skill, sIdx) in mcccStore.acsGrouped" :key="sIdx">
 
-        <div class="ue-header" >
-          <span class="ue-prefix">{{ ueItem.includes(':') ? ueItem.split(":")[0] : 'UE' }}</span>
-          <h3 class="ue-title">{{ ueItem.includes(':') ? ueItem.split(":")[1] : ueItem }}</h3>
+        <div class="ue-header">
+          <span class="ue-prefix">Compétence {{ skill.skillNum }}</span>
+          <h3 class="ue-title">{{ skill.ue }}</h3>
         </div>
 
         <div class="table-container">
@@ -178,34 +178,28 @@
             </tr>
             </thead>
             <tbody>
-
-            <tr v-for="(group, grpIndex) in getGroupsForUE(ueItem)" :key="grpIndex">
+            <tr v-for="(lvl, lIdx) in skill.allLevels" :key="lIdx">
               <td class="lvl-number">
-                <span class="circle-number">{{ grpIndex + 1 }}</span>
+                <span class="circle-number">{{ lIdx + 1 }}</span>
               </td>
 
               <td class="lvl-data">
-                <div v-if="group.niveau" class="lvl-block">
+                <div class="lvl-block">
                   <p class="lvl-label">Intitulé du niveau</p>
-                  <p class="lvl-desc">{{ group.niveau }}</p>
+                  <p class="lvl-desc">{{ lvl.title }}</p>
                 </div>
 
-                <div v-if="group.acs && group.acs.length > 0" class="acs-block">
+                <div v-if="lvl.acs && lvl.acs.length > 0" class="acs-block">
                   <p class="lvl-label">Apprentissages critiques</p>
                   <ul class="ac-list">
-                    <li v-for="(ac, acIdx) in group.acs" :key="acIdx">
-                      <span class="ac-tag">AC 0{{ ac.learningNum }}</span>
+                    <li v-for="(ac, acIdx) in lvl.acs" :key="acIdx">
+                      <span class="ac-tag">AC {{ ac.learningNum }}</span>
                       {{ ac.learningTitle }}
                     </li>
                   </ul>
                 </div>
               </td>
             </tr>
-
-            <tr v-if="getGroupsForUE(ueItem).length === 0">
-              <td colspan="2" class="empty-table">Aucun niveau défini pour cette UE.</td>
-            </tr>
-
             </tbody>
           </table>
         </div>
