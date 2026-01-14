@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,97 +40,91 @@ public class ResourceSheetController {
 
     @PostMapping("/resource-sheet")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
-        ResourceSheet resourceSheet = new ResourceSheet();
 
-        Long resourceID = resourceSheetRequest.getResourceID();
-        if(resourceID==null){
-            return ResponseEntity.badRequest().body("resourceID is null");
+        ResourceSheet resourceSheet;
+        Long resourceSheetID = resourceSheetRequest.getSheetsID();
+
+        if (resourceSheetID != null && resourceSheetRepository.existsById(resourceSheetID)) {
+            resourceSheet = resourceSheetRepository.findById(resourceSheetID).get();
+
+            if(resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
+            if(resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
+            if(resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
+            if(resourceSheet.getPedagologicalContentId() != null) resourceSheet.getPedagologicalContentId().clear();
+
+        } else {
+            resourceSheet = new ResourceSheet();
+            resourceSheet.setCreationDate(new Date());
+
+            resourceSheet.setTeachersFeedbacks(new ArrayList<>());
+            resourceSheet.setStudentsFeedbacks(new ArrayList<>());
+            resourceSheet.setImprovementIdeas(new ArrayList<>());
+            resourceSheet.setPedagologicalContentId(new ArrayList<>());
         }
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());
 
-        resourceSheet.setResourceID(resourceID);
+        if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
+        resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
 
+        if (resourceSheetRequest.getHourlyVolumeID() == null) return ResponseEntity.badRequest().body("HourlyVolumeID is null");
+        resourceSheet.setHourlyVolumeID(resourceSheetRequest.getHourlyVolumeID());
 
-        Long hourlyVolumeID = resourceSheetRequest.getHourlyVolumeID();
-        if(hourlyVolumeID==null){
-            return ResponseEntity.badRequest().body("HourlyVolumeID is null");
-        }
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());
-
-        resourceSheet.setHourlyVolumeID(hourlyVolumeID);
-
-        List<String> teacherFeedbackID = resourceSheetRequest.getTeachersFeedbackID();
-        if(teacherFeedbackID==null){
-            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
-        }
-        List<PedagologicalTeachersFeedbacks> pedagologicalTeachersFeedbacks = new ArrayList<>();
-        for(String teacherFeedback : teacherFeedbackID){
-            PedagologicalTeachersFeedbacks pedagologicalTeachersFeedback = new PedagologicalTeachersFeedbacks();
-            pedagologicalTeachersFeedback.setContent(teacherFeedback);
-            pedagologicalTeachersFeedbacks.add(pedagologicalTeachersFeedback);
-        }
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setTeachersFeedbacks(pedagologicalTeachersFeedbacks);
-
-        List<String> studentFeedbackID = resourceSheetRequest.getStudentFeedbackID();
-        if(studentFeedbackID==null){
-            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
-        }
-        List<StudentsFeedbacks> studentsFeedbacks = new ArrayList<>();
-        for(String studentFeedback : studentFeedbackID){
-            StudentsFeedbacks studentFeedbacks = new StudentsFeedbacks();
-            studentFeedbacks.setContent(studentFeedback);
-            studentsFeedbacks.add(studentFeedbacks);
-        }
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setStudentsFeedbacks(studentsFeedbacks);
-
-        List<String> improvementIdeaId = resourceSheetRequest.getImprovementsIdeaID();
-        if(improvementIdeaId==null){
-            return ResponseEntity.badRequest().body("TeacherFeedbackID is null");
-        }
-        List<ImprovementIdeas> improvementsIdeas = new ArrayList<>();
-        for(String improvementIdea : improvementIdeaId){
-            ImprovementIdeas improvementIdeas = new ImprovementIdeas();
-            improvementIdeas.setIdea(improvementIdea);
-            improvementsIdeas.add(improvementIdeas);
-        }
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setImprovementIdeas(improvementsIdeas);
-
-        List<PedagologicalContent> pedagologicalContent = new ArrayList<>();
-
-        String regex = "^(TP|CM|TD)\\s*(\\d+)\\s*:\\s*(.*)$";
-        Pattern pattern = Pattern.compile(regex);
-
-        for (String educationalContent : resourceSheetRequest.getPedagologicalContent()) {
-            Matcher matcher = pattern.matcher(educationalContent);
-
-            if (!matcher.find()) {
-                return ResponseEntity.badRequest().body("Invalid content !");
+        List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
+        if (teacherFeedbacksReq != null) {
+            for (String content : teacherFeedbacksReq) {
+                PedagologicalTeachersFeedbacks item = new PedagologicalTeachersFeedbacks();
+                item.setContent(content);
+                resourceSheet.getTeachersFeedbacks().add(item);
             }
-
-            String typeName = matcher.group(1);
-            String numero = matcher.group(2);
-            String description = matcher.group(3);
-
-            PedagologicalContent pedagologicalContentEntity = new PedagologicalContent();
-
-            ClassType existingType = classTypeRepository.findByClassType(typeName)
-                    .orElseThrow(() -> new RuntimeException("Erreur : Le type '" + typeName + "' n'existe pas."));
-            pedagologicalContentEntity.setClassTypeId(existingType);
-
-            pedagologicalContentEntity.setContent(description);
-            pedagologicalContentEntity.setCourseNumber(Long.valueOf(numero));
-
-            pedagologicalContentEntity.setRessourceSheetId(resourceSheet);
-
-            pedagologicalContent.add(pedagologicalContentEntity);
         }
-        resourceSheet.setPedagologicalContentId(pedagologicalContent);
-        ErpBackApplication.LOGGER.info("Saving resource sheet with id " + resourceSheetRequest.getResourceID());        resourceSheet.setPedagologicalContentId(pedagologicalContent);
 
+        List<String> studentFeedbacksReq = resourceSheetRequest.getStudentFeedbackID();
+        if (studentFeedbacksReq != null) {
+            for (String content : studentFeedbacksReq) {
+                StudentsFeedbacks item = new StudentsFeedbacks();
+                item.setContent(content);
+                resourceSheet.getStudentsFeedbacks().add(item);
+            }
+        }
 
-        resourceSheet.setCreationDate(null);
+        List<String> ideasReq = resourceSheetRequest.getImprovementsIdeaID();
+        if (ideasReq != null) {
+            for (String content : ideasReq) {
+                ImprovementIdeas item = new ImprovementIdeas();
+                item.setIdea(content);
+                resourceSheet.getImprovementIdeas().add(item);
+            }
+        }
 
-        resourceSheet.setLastModificationDate(null);
+        if (resourceSheetRequest.getPedagologicalContent() != null) {
+            String regex = "^(TP|CM|TD)\\s*(\\d+)\\s*:\\s*(.*)$";
+            Pattern pattern = Pattern.compile(regex);
+
+            for (String educationalContent : resourceSheetRequest.getPedagologicalContent()) {
+                Matcher matcher = pattern.matcher(educationalContent);
+
+                if (!matcher.find()) {
+                    return ResponseEntity.badRequest().body("Contenu invalide : " + educationalContent);
+                }
+
+                String typeName = matcher.group(1);
+                String numero = matcher.group(2);
+                String description = matcher.group(3);
+
+                PedagologicalContent contentEntity = new PedagologicalContent();
+
+                ClassType existingType = classTypeRepository.findByClassType(typeName)
+                        .orElseThrow(() -> new RuntimeException("Type introuvable : " + typeName));
+                contentEntity.setClassTypeId(existingType);
+
+                contentEntity.setCourseNumber(Long.valueOf(numero));
+                contentEntity.setContent(description);
+                contentEntity.setRessourceSheetId(resourceSheet);
+
+                resourceSheet.getPedagologicalContentId().add(contentEntity);
+            }
+        }
+
+        resourceSheet.setLastModificationDate(new Date());
 
         resourceSheetService.save(resourceSheet);
 
