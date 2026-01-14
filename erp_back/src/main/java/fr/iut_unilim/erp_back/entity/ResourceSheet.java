@@ -27,7 +27,7 @@ public class ResourceSheet {
     private Date creationDate;
 
     @Column(name = "lastModificationDate")
-    @JsonFormat(pattern = "dd/MM/yyyy hh/mm/ss", timezone = "Europe/Paris")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
     private Date lastModificationDate;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
