@@ -2,7 +2,7 @@ package fr.iut_unilim.erp_back.controllers;
 
 
 import fr.iut_unilim.erp_back.ErpBackApplication;
-import fr.iut_unilim.erp_back.dto.McccResponse;
+import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.service.*;
 import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
@@ -44,7 +44,7 @@ public class McccController {
     }
 
     @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccResponse dto, Mccc mccc) {
+    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccRequest dto, Mccc mccc) {
         String creationDate = dto.getCreationDate();
         String editDate = dto.getEditDate();
         try {
@@ -65,7 +65,7 @@ public class McccController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveMccc(@RequestBody McccResponse dto) {
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
         Mccc mccc = new Mccc();
 
         List<Resource> resources = resourceService.getFromNum(dto.getResourceCode());
@@ -100,7 +100,7 @@ public class McccController {
     }
 
     @Nullable
-    private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccResponse dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
+    private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
         List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
         for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
@@ -158,7 +158,7 @@ public class McccController {
     }
 
     @NotNull
-    private Set<Sae> getSAEFromDto(McccResponse dto) {
+    private Set<Sae> getSAEFromDto(McccRequest dto) {
         Set<Sae> setSae = new HashSet<>();
         List<fr.iut_unilim.erp_back.tools.datastructures.SAE> saes = dto.getSaeCodes();
         for (fr.iut_unilim.erp_back.tools.datastructures.SAE sae : saes) {
@@ -174,7 +174,7 @@ public class McccController {
     }
 
     @NotNull
-    private Set<Teacher> getTeachersFromDto(McccResponse dto) {
+    private Set<Teacher> getTeachersFromDto(McccRequest dto) {
         Set<Teacher> setTeacher = new HashSet<>();
         fr.iut_unilim.erp_back.tools.datastructures.Teacher[] teachers = dto.getReferents();
         for (fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher : teachers) {
@@ -190,7 +190,7 @@ public class McccController {
     }
 
     @NotNull
-    private HourlyVolume getHourlyVolumeFromDto(McccResponse dto) {
+    private HourlyVolume getHourlyVolumeFromDto(McccRequest dto) {
         List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
         if (hourlyVolumes.isEmpty()) {
             return new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
