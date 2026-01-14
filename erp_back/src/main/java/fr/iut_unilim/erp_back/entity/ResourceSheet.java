@@ -23,11 +23,11 @@ public class ResourceSheet {
     private Long hourlyVolumeID;
 
     @Column(name = "creationDate")
-    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "Europe/Paris")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
     private Date creationDate;
 
     @Column(name = "lastModificationDate")
-    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "Europe/Paris")
+    @JsonFormat(pattern = "dd/MM/yyyy hh/mm/ss", timezone = "Europe/Paris")
     private Date lastModificationDate;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
