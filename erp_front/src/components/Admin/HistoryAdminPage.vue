@@ -1,67 +1,117 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 const searchQuery = ref('');
+const historyItems = ref([]);
+const isLoading = ref(true);
 
-const versions = ref([
-  { code: 'R1.01', title: 'Initiation au développement', date: '30/10/2022' },
-  { code: 'R1.02', title: 'Dév. interfaces web', date: '15/11/2019' },
-  { code: 'R1.03', title: 'Architecture des ordinateurs', date: '01/01/2018' },
-  { code: 'R2.01', title: 'Dév. orienté objets', date: '05/08/2017' },
-  { code: 'R2.02', title: 'Dév. d\'applications', date: '06/06/2017' },
-  { code: 'R2.04', title: 'Communication et fonctionnement', date: '08/05/2017' },
-  { code: 'R2.05', title: 'Gestion de projet', date: '01/12/2016' },
-  { code: 'R3.02', title: 'Dév. efficace', date: '15/05/2016' },
-  { code: 'R3.03', title: 'Analyse de données', date: '18/04/2016' },
-  { code: 'R4.01', title: 'Architecture logicielle', date: '14/02/2016' },
-]);
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR');
+};
+
+const fetchHistory = async () => {
+  try {
+    isLoading.value = true;
+    const response = await api.get('/resourceSheet/getHistory');
+    historyItems.value = response.data;
+  } catch (error) {
+    console.error("Erreur chargement historique :", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchHistory();
+});
 
 const filteredVersions = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
-  return versions.value.filter(item =>
-      item.code.toLowerCase().includes(query) ||
-      item.title.toLowerCase().includes(query) || // Recherche dans le titre
-      item.date.toLowerCase().includes(query)
+  if (!query) return historyItems.value;
+
+  return historyItems.value.filter((item: any) =>
+      (item.resourceCode && item.resourceCode.toLowerCase().includes(query)) ||
+      (item.resourceName && item.resourceName.toLowerCase().includes(query)) ||
+      (item.date && formatDate(item.date).includes(query))
   );
 });
 
 const handleRetour = () => router.back();
-const handleSupprimer = () => router.push('/supp-fiche');
+
+const handleShow = (item: any) => {
+  router.push({
+    path: '/resource-sheet-history',
+    query: {
+      id: item.sheetID || item.id,
+      code: item.resourceCode,
+      date: formatDate(item.date)
+    }
+  });
+};
+
+const handleDelete = async (id: number, code: string) => {
+  if (confirm(`Voulez-vous vraiment supprimer la fiche ressource ${code} ?`)) {
+    try {
+      await api.delete(`/resourceSheet/${id}`);
+      historyItems.value = historyItems.value.filter((item: any) => (item.sheetID || item.id) !== id);
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Une erreur est survenue lors de la suppression.");
+    }
+  }
+};
+
 const clearSearch = () => searchQuery.value = '';
 </script>
 
 <template>
-  <Sidebar/>
+  <Sidebar :showDepartments="true" :dashboardAdminActive="true" />
   <AppHeader title="Historique des fiches ressources" />
 
   <main class="main-content">
     <div class="container">
       <div class="version-list-container">
-        <div v-if="filteredVersions.length === 0" class="no-result">
-          <p>Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
-          <button @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
+
+        <div v-if="isLoading" class="no-result">
+          <p>Chargement de l'historique...</p>
         </div>
 
-        <ul class="version-list">
+        <div v-else-if="filteredVersions.length === 0" class="no-result">
+          <p v-if="searchQuery">Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
+          <p v-else>Aucun historique disponible.</p>
+          <button v-if="searchQuery" @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
+        </div>
+
+        <ul v-else class="version-list">
           <li
               v-for="(item, index) in filteredVersions"
               :key="index"
               class="version-item"
+              @click="handleShow(item)"
           >
             <div class="info-group">
-              <span class="version-code">{{ item.code }}</span>
-              <span class="version-title">{{ item.title }}</span>
-              <span class="version-date">{{ item.date }}</span>
+              <span class="version-code">{{ item.resourceCode }}</span>
+              <span class="version-title">{{ item.resourceName }}</span>
+              <span class="version-date">{{ formatDate(item.date) }}</span>
             </div>
 
-            <button class="btn-supp-container" @click="handleSupprimer" title="Supprimer la fiche">
-              <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-trash btn-supp" viewBox="0 0 16 16" fill="none">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+            <button
+                class="btn-icon-container delete"
+                @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
+                title="Supprimer la fiche"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
               </svg>
             </button>
           </li>
@@ -76,7 +126,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Chercher par nom, code ou date..."
+              placeholder="Chercher par code, nom ou date..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
@@ -120,6 +170,7 @@ const clearSearch = () => searchQuery.value = '';
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .version-item:hover {
@@ -159,29 +210,33 @@ const clearSearch = () => searchQuery.value = '';
   white-space: nowrap;
 }
 
-.btn-supp-container {
+.btn-icon-container {
   background: none;
   border: none;
   cursor: pointer;
   padding: 10px;
   border-radius: 50%;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 10px;
 }
 
-.btn-supp-container:hover {
-  background-color: #fff5f5;
+/* Nouveaux styles pour la suppression sans modifier l'existant */
+.btn-icon-container.delete:hover {
+  background-color: #ffebee;
 }
 
-.btn-supp {
-  width: 32px;
-  height: 32px;
-  fill: #64748b;
-  transition: fill 0.2s;
+.btn-icon-container.delete:hover .btn-icon {
+  color: #d32f2f;
 }
 
-.btn-supp-container:hover .btn-supp {
-  fill: #B51621;
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  color: #64748b;
+  transition: all 0.2s;
 }
 
 .no-result {
