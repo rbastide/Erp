@@ -13,8 +13,22 @@
 
   const handleValider = async () => {
     try {
+
+      const formattedAcs = mcccStore.acsGrouped.flatMap(skill =>
+          skill.allLevels.map((lvl, lvlIdx) => ({
+            resourceCode: mcccStore.resourceCode,
+            ue: `UE ${skill.skillNum} : ${skill.ue}`,
+
+            levels: `Niveau ${lvlIdx + 1} : ${lvl.title}`,
+
+            acs: lvl.acs.map(ac => ({
+              learningNum: ac.learningNum,
+              learningTitle: ac.learningTitle
+            }))
+          }))
+      );
       const payload = {
-        resourceID: mcccStore.resourceID,
+        resourceID: String(mcccStore.resourceID),
         creationDate: mcccStore.creationDate,
         editDate: mcccStore.editDate,
         hoursCM: mcccStore.hoursCM,
@@ -23,13 +37,15 @@
         hoursDS: mcccStore.hoursDS,
         hoursDSTP: mcccStore.hoursDSTP,
         saeCodes: mcccStore.saeCodes,
-        acsGrouped: mcccStore.acsGrouped,
+
+        acsGrouped: formattedAcs,
+
         referents: mcccStore.referents
       };
 
       console.log("Envoi des données au back ", payload);
 
-      const response = await api.post('/mccc/save/', payload);
+      const response = await api.post('/mccc/save', payload);
 
       if (response.status === 200 || response.status === 201) {
         console.log("Sauvegarde réussie !");
@@ -85,7 +101,7 @@
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const day = String(dateObj.getDate()).padStart(2, '0');
 
-        mcccStore.creationDate = `${year}/${month}/${day}`;
+        mcccStore.creationDate = `${day}/${month}/${year}`;
       } else {
         mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
       }

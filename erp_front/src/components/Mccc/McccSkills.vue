@@ -60,15 +60,22 @@ const addSkillDirectly = (skill) => {
     return;
   }
 
+  // REGARDEZ LA CONSOLE (F12) POUR VOIR LES VRAIS NOMS DES CHAMPS
+  console.log("Structure reçue de l'API (Niveau) :", skill.levels[0]);
+  console.log("Structure reçue de l'API (AC) :", skill.levels[0].acs[0]);
+
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
     ue: skill.skillName,
     skillNum: skill.skillNum,
     allLevels: skill.levels.map(level => ({
-      title: level.title || level.rankTitle,
+      // On essaie toutes les clés possibles pour le titre du niveau
+      title: level.title || level.name || level.label || level.levelTitle || level.rankTitle || "Niveau sans titre",
+
       acs: level.acs.map(ac => ({
-        learningNum: ac.num || ac.acNum,
-        learningTitle: ac.title || ac.acTitle
+        learningNum: ac.num || ac.acNum || ac.learningNum,
+        // On essaie toutes les clés possibles pour le titre de l'AC
+        learningTitle: ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "Titre manquant"
       }))
     }))
   };
