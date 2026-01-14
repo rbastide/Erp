@@ -81,7 +81,7 @@ const clearSearch = () => searchQuery.value = '';
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
         </div>
-        <button @click="handleRetour" class="btn-quitter">Retour</button>
+        <button @click="handleRetour" class="quit-btn">Retour</button>
       </div>
     </footer>
   </main>

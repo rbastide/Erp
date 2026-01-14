@@ -22,7 +22,7 @@ const handleBack = () => {
     <p class="text">Votre fiche ressource a bien été sauvegardée !</p>
   </main>
   <footer>
-    <div @click="handleBack" class="btn-quitter">Retour au menu</div>
+    <div @click="handleBack" class="quit-btn">Retour au menu</div>
   </footer>
 </template>
 

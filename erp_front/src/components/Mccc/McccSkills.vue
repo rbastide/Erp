@@ -64,7 +64,7 @@ const addSkillDirectly = (skill) => {
 
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
-    ue: skill.skillNum + " " + skill.skillName,
+    ue: skill.skillName,
     niveau: defaultRank.title,
     skillNum: skill.skillNum,
     acs: defaultRank.acs.map(ac => ({
