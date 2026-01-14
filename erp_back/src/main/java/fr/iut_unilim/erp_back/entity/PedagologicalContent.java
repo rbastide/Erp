@@ -1,6 +1,9 @@
 package fr.iut_unilim.erp_back.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,10 +17,12 @@ public class PedagologicalContent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ressourceSheetId")
+    @JsonBackReference
     private ResourceSheet ressourceSheetId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classTypeId")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ClassType classTypeId;
 
     @Column(name = "courseNumber")

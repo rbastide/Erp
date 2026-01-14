@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -31,18 +32,22 @@ public class ResourceSheet {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
+    @JsonManagedReference
     private List<PedagologicalTeachersFeedbacks> teachersFeedbacks;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
+    @JsonManagedReference
     private List<StudentsFeedbacks> studentsFeedbacks;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
+    @JsonManagedReference
     private List<ImprovementIdeas> improvementIdeas;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "ressourceSheetId")
+    @JsonManagedReference
     private List<PedagologicalContent> pedagologicalContentId;
 
     public ResourceSheet() {
