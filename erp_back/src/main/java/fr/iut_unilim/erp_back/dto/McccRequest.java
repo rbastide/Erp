@@ -6,7 +6,7 @@ import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
 
 import java.util.List;
 
-public class McccResponse {
+public class McccRequest {
     private String resourceCode;
 
     private int hoursCM;
