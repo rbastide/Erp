@@ -8,29 +8,24 @@ import api from '@/services/api';
 const router = useRouter()
 const route = useRoute()
 
-// --- Refs de données ---
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
-// Heures
 const hours = ref({
   cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0
 })
 
-// Contenus Pédagogiques (Initialisés avec une case vide pour l'affichage)
 const cmContents = ref([''])
 const tdContents = ref([''])
 const tpContents = ref([''])
 const dsContents = ref([''])
 const dstpContents = ref([''])
 
-// Feedbacks / Bilans
 const edFBContents = ref([''])
 const stFBContents = ref([''])
 const upgradesContents = ref([''])
 
-// Références DOM
 const cmRefs = ref<HTMLTextAreaElement[]>([])
 const tdRefs = ref<HTMLTextAreaElement[]>([])
 const tpRefs = ref<HTMLTextAreaElement[]>([])
@@ -40,20 +35,12 @@ const edFBRefs = ref<HTMLTextAreaElement[]>([])
 const stFBRefs = ref<HTMLTextAreaElement[]>([])
 const upgradesRefs = ref<HTMLTextAreaElement[]>([])
 
-// --- Logique métier CORRIGÉE ---
 
 const canAdd = (list: string[]) => {
-  // Sécurité : si la liste est vide ou indéfinie, on autorise l'ajout (pour initialiser)
   if (!list || list.length === 0) return true;
-
-  // On récupère le dernier élément
   const lastItem = list[list.length - 1];
-
-  // Sécurité : on utilise (lastItem || '') pour éviter le crash "trim of undefined"
   return (lastItem || '').trim().length > 0;
 }
-
-// --- API Calls ---
 
 const fetchResourceData = async () => {
   try {
@@ -109,12 +96,11 @@ const fetchResourceSheetData = async () => {
       );
 
       if (resourceData) {
-        // CORRECTION ICI : Ajout de || '' pour éviter les nulls dans les tableaux
         const getContentByType = (type: string) => {
           if (!resourceData.pedagologicalContentId) return [];
           return resourceData.pedagologicalContentId
               .filter((item: any) => item.classTypeId?.classType === type)
-              .map((item: any) => item.content || ''); // Sécurité anti-null
+              .map((item: any) => item.content || '');
         };
 
         const cm = getContentByType('CM');
@@ -135,7 +121,6 @@ const fetchResourceSheetData = async () => {
         const dstp = dstpRaw.map((item: any) => item.content || '');
         dstpContents.value = dstp.length > 0 ? dstp : [''];
 
-        // Idem pour les feedbacks
         if (resourceData.teachersFeedbacks) {
           const tFeedbacks = resourceData.teachersFeedbacks.map((f: any) => f.content || '');
           edFBContents.value = tFeedbacks.length > 0 ? tFeedbacks : [''];
@@ -162,8 +147,6 @@ onMounted(async () => {
   await fetchHoursData();
   await fetchResourceSheetData();
 });
-
-// --- Gestion des champs dynamiques ---
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {
   return async () => {
