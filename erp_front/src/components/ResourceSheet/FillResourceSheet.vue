@@ -90,10 +90,19 @@ const fetchHoursData = async () => {
 const fetchResourceSheetData = async () => {
   try {
     const response = await api.get('/resourceSheet/getResourceSheet');
+
     if (response.data && Array.isArray(response.data)) {
-      const resourceData = response.data.find((f: any) =>
+
+      const matchingSheets = response.data.filter((f: any) =>
           f.resourceID === currentResourceId.value
       );
+
+      matchingSheets.sort((a: any, b: any) => {
+        return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
+      });
+      console.log(matchingSheets);
+
+      const resourceData = matchingSheets.length > 0 ? matchingSheets.reverse()[0] : null;
 
       if (resourceData) {
         const getContentByType = (type: string) => {
@@ -118,6 +127,7 @@ const fetchResourceSheetData = async () => {
         const dstpRaw = resourceData.pedagologicalContentId?.filter((item: any) =>
             ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
         ) || [];
+
         const dstp = dstpRaw.map((item: any) => item.content || '');
         dstpContents.value = dstp.length > 0 ? dstp : [''];
 
@@ -130,7 +140,6 @@ const fetchResourceSheetData = async () => {
           const sFeedbacks = resourceData.studentsFeedbacks.map((f: any) => f.content || '');
           stFBContents.value = sFeedbacks.length > 0 ? sFeedbacks : [''];
         }
-
         if (resourceData.improvementIdeas) {
           const ideas = resourceData.improvementIdeas.map((i: any) => i.idea || i.content || '');
           upgradesContents.value = ideas.length > 0 ? ideas : [''];
@@ -140,7 +149,7 @@ const fetchResourceSheetData = async () => {
   } catch (error) {
     console.error("Erreur fiches ressources :", error);
   }
-}
+};
 
 onMounted(async () => {
   await fetchResourceData();
