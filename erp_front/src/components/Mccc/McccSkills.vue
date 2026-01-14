@@ -60,16 +60,16 @@ const addSkillDirectly = (skill) => {
     return;
   }
 
-  const defaultRank = skill.levels[0];
-
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
     ue: skill.skillName,
-    niveau: defaultRank.title,
     skillNum: skill.skillNum,
-    acs: defaultRank.acs.map(ac => ({
-      learningNum: parseInt(ac.num),
-      learningTitle: ac.title
+    allLevels: skill.levels.map(level => ({
+      title: level.title || level.rankTitle,
+      acs: level.acs.map(ac => ({
+        learningNum: ac.num || ac.acNum,
+        learningTitle: ac.title || ac.acTitle
+      }))
     }))
   };
 
@@ -109,11 +109,15 @@ const clearSearch = () => searchQuery.value = '';
             </div>
 
             <h3 class="card-title">{{ group.ue }}</h3>
-            <span class="rank-info">{{ group.niveau }}</span>
 
-            <div class="ac-details-list">
-              <div v-for="ac in group.acs" :key="ac.learningNum" class="ac-detail-item">
-                <strong>AC {{ ac.learningNum }} :</strong> {{ ac.learningTitle }}
+            <div v-for="(lvl, lIdx) in group.allLevels" :key="lIdx" class="level-entry">
+
+              <span class="rank-info-bold">Niveau {{ lIdx + 1 }} : {{ lvl.title }}</span>
+
+              <div class="ac-details-list">
+                <div v-for="ac in lvl.acs" :key="ac.learningNum" class="ac-detail-item">
+                  <strong>AC {{ ac.learningNum }} :</strong> {{ ac.learningTitle }}
+                </div>
               </div>
             </div>
           </div>
@@ -267,6 +271,30 @@ const clearSearch = () => searchQuery.value = '';
   text-align: center;
   margin: 0 0 5px 0;
   color: #333;
+}
+
+.level-entry {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.level-entry:not(:first-child) {
+  margin-top: 25px;
+  border-top: 1px dashed #ddd;
+  padding-top: 20px;
+}
+
+.rank-info-bold {
+  font-size: 0.95rem;
+  color: #B51621;
+  font-weight: 900;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.ac-details-list {
+  padding-left: 10px;
 }
 
 .rank-info {

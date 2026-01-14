@@ -10,74 +10,78 @@ const route = useRoute()
 
 const resourceCode = ref('')
 const resourceDate = ref('')
-const currentResourceId = ref<number | null>(null)
 
 const hours = ref({
-  cm: 0,
-  td: 0,
-  tp: 0,
-  ds: 0,
-  ds_tp: 0,
-  student: 0
+  cm: 0, td: 0, tp: 0, ds: 0, ds_tp: 0, student: 0
 })
 
 const contents = ref({
-  cm: 'Contenu des CM...',
-  td: 'Contenu des TD...',
-  tp: 'Contenu des TP...',
-  ds: "Modalités d'évaluation...",
-  ds_tp: 'Contenu DS/TP...',
-  teacherFeedback: 'Points forts, points faibles du semestre...',
-  studentFeedback: 'Synthèse des retours...',
-  upgrades: 'Modifications prévues...'
+  cm: '', td: '', tp: '', ds: '', ds_tp: '',
+  teacherFeedback: '', studentFeedback: '', upgrades: ''
 })
 
-const fetchResourceData = async () => {
+const fetchSheetData = async () => {
+  const sheetIdFromUrl = route.query.id
+  resourceCode.value = (route.query.code as string) || 'Inconnu'
+  resourceDate.value = (route.query.date as string) || ''
 
-  const targetCode = route.query.code as string
-  const targetDate = route.query.date as string
-
-  if (targetCode) resourceCode.value = targetCode
-  if (targetDate) resourceDate.value = targetDate
+  if (!sheetIdFromUrl) return
 
   try {
-    const response = await api.get('/resources/resources')
-    if (response.data && Array.isArray(response.data)) {
+    const responseSheets = await api.get('/resourceSheet/getResourceSheet')
+    const sheet = responseSheets.data.find((s: any) => s.sheetsID == sheetIdFromUrl)
 
-      if (targetCode) {
-        const found = response.data.find((r: any) => r.num === targetCode)
-        if (found) {
-          resourceCode.value = found.num
-          currentResourceId.value = found.resourceID || found.id
+    if (sheet) {
+      contents.value.teacherFeedback = sheet.teachersFeedbacks?.map((f: any) => f.content).join('\n') || ''
+      contents.value.studentFeedback = sheet.studentsFeedbacks?.map((f: any) => f.content).join('\n') || ''
+      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.idea).join('\n') || ''
+
+      if (sheet.pedagologicalContentId) {
+        const pedago = sheet.pedagologicalContentId
+        const formatContent = (type: string) => pedago
+            .filter((p: any) => p.classTypeId?.classType === type)
+            .map((p: any) => p.content)
+            .join('\n')
+
+        contents.value.cm = formatContent('CM')
+        contents.value.td = formatContent('TD')
+        contents.value.tp = formatContent('TP')
+        contents.value.ds = formatContent('DS')
+        contents.value.ds_tp = formatContent('DS/TP')
+      }
+
+      if (sheet.hourlyVolumeID) {
+        const responseMccc = await api.get('/mccc/getMccc')
+        const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
+
+        if (mcccMatch && mcccMatch.hourlyVolId) {
+          const v = mcccMatch.hourlyVolId
+          hours.value = {
+            cm: v.nbHoursCM || 0,
+            td: v.nbHoursTD || 0,
+            tp: v.nbHoursTP || 0,
+            ds: v.nbHoursDS || 0,
+            ds_tp: v.nbHoursDSTP || 0,
+            student: (v.nbHoursCM || 0) + (v.nbHoursTD || 0) + (v.nbHoursTP || 0) + (v.nbHoursDS || 0) + (v.nbHoursDSTP || 0)
+          }
         }
-      } else if (response.data.length > 0) {
-        const first = response.data[0]
-        resourceCode.value = first.num
-        currentResourceId.value = first.resourceID || first.id
       }
     }
   } catch (error) {
-    console.error("Erreur lors de la récupération de la ressource :", error)
+    console.error("Erreur technique lors de la récupération des données :", error)
   }
 }
 
 onMounted(() => {
-  fetchResourceData()
+  fetchSheetData()
 })
-
-const handleFermer = () => { router.back() }
-
-const handleExport = () => {
-  console.log("Export PDF demandé depuis l'historique...")
-}
 
 const totalGlobal = computed(() => {
-  return (hours.value.cm || 0) +
-      (hours.value.td || 0) +
-      (hours.value.ds || 0) +
-      (hours.value.tp || 0) +
-      (hours.value.ds_tp || 0)
+  return hours.value.cm + hours.value.td + hours.value.ds + hours.value.tp + hours.value.ds_tp
 })
+
+const handleFermer = () => router.back()
+const handleExport = () => console.log("Export PDF demandé...")
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -90,26 +94,24 @@ const hourConfig = {
 
 <template>
   <Sidebar/>
-  <AppHeader title="Fiche Ressource" :inline="`${resourceCode} du ${resourceDate}`" />
+  <AppHeader title="Consultation Ressource" :inline="`${resourceCode} du ${resourceDate}`" />
 
   <main class="main-content">
     <div class="container">
 
       <section class="form-card">
         <h2 class="section-title">Volume horaire global</h2>
-
         <div class="hours-grid-wrapper">
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }}</div>
+              <div class="box-static">{{ hours[key] }} h</div>
             </div>
           </div>
-
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }}</div>
+              <div class="box-static">{{ hours[key] }} h</div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
@@ -117,55 +119,26 @@ const hourConfig = {
             </div>
           </div>
         </div>
-
-        <div class="student-hour-row">
-          <label>Nombre d'heures par étudiant :</label>
-          <div class="box-static student-box">{{ hours.student }} h</div>
-        </div>
       </section>
 
       <section class="form-card">
         <h2 class="section-title">Contenu pédagogique</h2>
-
-        <div class="pedagogic-group">
-          <h3 class="group-label">CM</h3>
-          <div class="read-only-box">{{ contents.cm }}</div>
-        </div>
-
-        <div class="pedagogic-group">
-          <h3 class="group-label">TD</h3>
-          <div class="read-only-box">{{ contents.td }}</div>
-        </div>
-
-        <div class="pedagogic-group">
-          <h3 class="group-label">TP</h3>
-          <div class="read-only-box">{{ contents.tp }}</div>
-        </div>
-
-        <div class="pedagogic-group">
-          <h3 class="group-label">DS</h3>
-          <div class="read-only-box">{{ contents.ds }}</div>
-        </div>
-
-        <div class="pedagogic-group">
-          <h3 class="group-label">DS/TP</h3>
-          <div class="read-only-box">{{ contents.ds_tp }}</div>
+        <div v-for="type in (['cm', 'td', 'tp', 'ds', 'ds_tp'] as const)" :key="type" class="pedagogic-group">
+          <h3 class="group-label">{{ hourConfig[type].label }}</h3>
+          <div class="read-only-box">{{ contents[type] || 'Aucun contenu répertorié' }}</div>
         </div>
       </section>
 
       <section class="form-card accent">
         <h2 class="section-title">Bilans et Évolutions</h2>
-
         <div class="pedagogic-group">
           <label class="field-label">Retour pédagogique des professeurs :</label>
           <div class="read-only-box large">{{ contents.teacherFeedback }}</div>
         </div>
-
         <div class="pedagogic-group">
           <label class="field-label">Retour des étudiants :</label>
           <div class="read-only-box large">{{ contents.studentFeedback }}</div>
         </div>
-
         <div class="pedagogic-group">
           <label class="field-label">Améliorations à apporter :</label>
           <div class="read-only-box large">{{ contents.upgrades }}</div>
@@ -174,171 +147,29 @@ const hourConfig = {
 
       <div class="actions-footer">
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
-        <button @click="handleFermer" class="btn btn-primary">Fermer la fiche</button>
+        <button @click="handleFermer" class="btn btn-primary">Fermer</button>
       </div>
-
     </div>
   </main>
 </template>
 
 <style scoped>
-.main-content {
-  background-color: #f4f7f9;
-  min-height: 100vh;
-  padding: 240px 20px 60px;
-  font-family: 'Roboto', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.container { width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.form-card {
-  background: white;
-  border-radius: 12px;
-  padding: 35px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
-}
-
-.section-title {
-  color: #E92533;
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin-bottom: 25px;
-  border-left: 5px solid #E92533;
-  padding-left: 15px;
-}
-
-
-.hours-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-.mt-25 {
-  margin-top: 25px;
-}
-.hour-block {
-  flex: 1;
-  text-align: center;
-}
-.hour-block label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.box-static {
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  font-weight: 800;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #1e293b;
-}
-
-.total-highlight {
-  border: 2px solid #E92533;
-  color: #E92533;
-  background: #fff5f5;
-}
-
-.student-hour-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  border-top: 1px dashed #e2e8f0;
-  padding-top: 25px;
-}
-.student-hour-row label {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  font-weight: 500;
-  font-size: 1.1rem;
-}
-.student-box {
-  flex: 1;
-}
-
-.pedagogic-group {
-  margin-bottom: 35px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.group-label, .field-label {
-  align-self: flex-start;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #1e293b;
-}
-
-.read-only-box {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 15px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  background: #fdfdfd;
-  color: #546e7a;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  cursor: default;
-  min-height: 80px;
-}
-
-.large {
-  min-height: 110px;
-}
-
-.actions-footer {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 15px 45px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: transform 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn-primary {
-  background: #E92533;
-  color: white;
-}
-
-.btn-dark {
-  background: #333333;
-  color: white;
-  border: 2px solid #333333;
-}
-.btn-dark:hover {
-  background: #555555;
-  border-color: #555555;
-}
+.main-content { background-color: #f4f7f9; min-height: 100vh; padding: 240px 20px 60px; display: flex; flex-direction: column; align-items: center; }
+.container { width: 100%; max-width: 900px; }
+.form-card { background: white; border-radius: 12px; padding: 35px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+.section-title { color: #E92533; font-size: 1.4rem; border-left: 5px solid #E92533; padding-left: 15px; margin-bottom: 25px; }
+.hours-row { display: flex; justify-content: space-between; gap: 20px; }
+.mt-25 { margin-top: 25px; }
+.hour-block { flex: 1; text-align: center; }
+.hour-block label { display: block; font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; }
+.box-static { height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.total-highlight { border: 2px solid #E92533; color: #E92533; background: #fff5f5; }
+.pedagogic-group { margin-bottom: 35px; display: flex; flex-direction: column; width: 100%; }
+.group-label, .field-label { font-weight: 600; margin-bottom: 12px; }
+.read-only-box { padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fdfdfd; color: #546e7a; white-space: pre-wrap; min-height: 80px; }
+.large { min-height: 110px; }
+.actions-footer { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+.btn { padding: 15px 45px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; }
+.btn-primary { background: #E92533; color: white; }
+.btn-dark { background: #333333; color: white; }
 </style>
