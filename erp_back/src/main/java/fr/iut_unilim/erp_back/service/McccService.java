@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.CriticalLearning;
 import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Resource;
@@ -41,8 +42,9 @@ public class McccService {
         }
 
         Mccc currentMccc = mcccs.get(0);
+        ErpBackApplication.LOGGER.info(mcccs.toString());
         for (Mccc mccc : mcccs) {
-            if (mccc.getCreationDate().after(currentMccc.getCreationDate())) {
+            if (mccc.getLastModificationDate().before(currentMccc.getLastModificationDate())) {
                 currentMccc = mccc;
             }
         }
