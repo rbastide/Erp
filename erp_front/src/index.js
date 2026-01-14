@@ -112,7 +112,7 @@ const routes = [
         component: HistoryAdminPage
     },
     {
-        path: '/supp-sheet',
+        path: '/del-sheet',
         name: 'SuccessfullyDeletePage',
         component: SuccessfullyDeletedPage
     },
