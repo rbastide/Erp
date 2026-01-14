@@ -96,7 +96,7 @@ public class ResourceSheetController {
         }
 
         if (resourceSheetRequest.getPedagologicalContent() != null) {
-            String regex = "^(TP|CM|TD|DS|DSTP)\\s*(\\d+)\\s*:\\s*(.*)$";
+            String regex = "^(TP|CM|TD|DS|DS/TP)\\s*(\\d+)\\s*:\\s*(.*)$";
             Pattern pattern = Pattern.compile(regex);
 
             for (String educationalContent : resourceSheetRequest.getPedagologicalContent()) {
