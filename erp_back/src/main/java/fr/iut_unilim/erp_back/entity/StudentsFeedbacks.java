@@ -23,11 +23,6 @@ public class StudentsFeedbacks {
         this.content = content;
     }
 
-    public Long studentsFeedbackID() { return studentFeedbackID; }
-    public String content(){ return content; }
-
-
-
     public Long getStudentFeedbackID() {
         return studentFeedbackID;
     }
