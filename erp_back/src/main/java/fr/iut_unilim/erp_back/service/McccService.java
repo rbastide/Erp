@@ -32,32 +32,17 @@ public class McccService {
         return mcccRepository.findAll();
     }
 
-    @Nullable
-    public Mccc getCurrentMcccFromResource(Resource resource) {
-        List<Mccc> mcccs = mcccRepository.findByResourceId(resource);
-
-        if (mcccs.isEmpty()) {
-            return null;
-        }
-
-        Mccc currentMccc = mcccs.get(0);
-        for (Mccc mccc : mcccs) {
-            if (mccc.getCreationDate().after(currentMccc.getCreationDate())) {
-                currentMccc = mccc;
-            }
-        }
-        return currentMccc;
+    @NotNull
+    public Optional<Mccc> getCurrentMcccFromResource(Resource resource) {
+        return mcccRepository.findFirstByResourceIdOrderByLastModificationDateDesc(resource);
     }
 
     @Nullable
     public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
-        Mccc currentMccc = getCurrentMcccFromResource(resource);
+        Optional<Mccc> currentMccc = getCurrentMcccFromResource(resource);
 
-        if (currentMccc == null) {
-            return null;
-        }
+        return currentMccc.map(Mccc::getCriticalLearningsId).orElse(null);
 
-        return currentMccc.getCriticalLearningsId();
     }
 
     @Nullable

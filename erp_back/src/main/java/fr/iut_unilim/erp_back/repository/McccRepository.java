@@ -14,4 +14,6 @@ public interface McccRepository extends JpaRepository<Mccc, McccId> {
     List<Mccc> findByResourceId(Resource resourceId);
 
     Optional<Mccc> findByMcccId(Long mcccId);
+
+    Optional<Mccc> findFirstByResourceIdOrderByLastModificationDateDesc(Resource resourceId);
 }
