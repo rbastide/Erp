@@ -122,7 +122,6 @@ public class AuthController {
     }
 
     @GetMapping("/user-info")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUserInfo(@RequestBody String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
         Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
