@@ -107,7 +107,6 @@ public class McccController {
             ErpBackApplication.LOGGER.info(ueCode + " " + learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
-            System.out.println(ueCode + " " + learningRank.ue() + " " + learningRank.levels());
             Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels());
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le levels n'existe pas !");
 
