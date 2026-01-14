@@ -10,10 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class McccService {
@@ -77,5 +74,11 @@ public class McccService {
         }
 
         return skills;
+    }
+
+    @Nullable
+    public Date getCreationDateFromId(@NotNull Long id) {
+        Optional<Mccc> mccc = mcccRepository.findByMcccId(id);
+        return mccc.map(Mccc::getCreationDate).orElse(null);
     }
 }
