@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/resourceSheet")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
@@ -39,6 +40,7 @@ public class ResourceSheetController {
     }
 
     @PostMapping("/resource-sheet")
+    @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
 
         ResourceSheet resourceSheet;
