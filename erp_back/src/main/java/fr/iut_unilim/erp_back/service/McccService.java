@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.CriticalLearning;
 import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Resource;
@@ -33,33 +32,17 @@ public class McccService {
         return mcccRepository.findAll();
     }
 
-    @Nullable
-    public Mccc getCurrentMcccFromResource(Resource resource) {
-        List<Mccc> mcccs = mcccRepository.findByResourceId(resource);
-
-        if (mcccs.isEmpty()) {
-            return null;
-        }
-
-        Mccc currentMccc = mcccs.get(0);
-        ErpBackApplication.LOGGER.info(mcccs.toString());
-        for (Mccc mccc : mcccs) {
-            if (mccc.getLastModificationDate().before(currentMccc.getLastModificationDate())) {
-                currentMccc = mccc;
-            }
-        }
-        return currentMccc;
+    @NotNull
+    public Optional<Mccc> getCurrentMcccFromResource(Resource resource) {
+        return mcccRepository.findFirstByResourceIdOrderByLastModificationDateDesc(resource);
     }
 
     @Nullable
     public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
-        Mccc currentMccc = getCurrentMcccFromResource(resource);
+        Optional<Mccc> currentMccc = getCurrentMcccFromResource(resource);
 
-        if (currentMccc == null) {
-            return null;
-        }
+        return currentMccc.map(Mccc::getCriticalLearningsId).orElse(null);
 
-        return currentMccc.getCriticalLearningsId();
     }
 
     @Nullable
