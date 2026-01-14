@@ -12,11 +12,9 @@ public class PdfSae {
         saesTable.useAllAvailableWidth();
 
         saesTable.addCell("SAÉ concernée(s) :");
-        StringBuilder mergedSaes = new StringBuilder();
-        for (Sae sae : saes) {
-            mergedSaes.append(sae.getNum());
-        }
-        saesTable.addCell(mergedSaes.toString());
+        String mergedSaes = String.join(", ", saes.stream().map(Sae::getNum).toList());
+
+        saesTable.addCell(mergedSaes);
 
         return saesTable;
     }
