@@ -1,10 +1,20 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import {onMounted, ref} from "vue";
+import { onMounted, ref } from "vue";
 import '../../assets/css/variable.css';
 
-const isConnected = ref(false);
+defineProps({
+  title: {
+    type: String,
+    default: ''
+  },
+  inline: {
+    type: String,
+    default: ''
+  }
+});
 
+const isConnected = ref(false);
 const router = useRouter();
 
 onMounted(() => {
@@ -13,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="page-header" title="">
+  <header class="page-header">
     <div class="container-connexion">
       <img src="../../assets/uploads/Logo_unilim.png" alt="Logo Unilim">
       <p>{{ title }} <br> {{inline}}</p>

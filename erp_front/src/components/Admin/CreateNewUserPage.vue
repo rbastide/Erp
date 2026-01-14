@@ -149,7 +149,7 @@ const handleRegister = async () => {
   </main>
 
   <footer>
-    <div @click="handleRetour" class="btn-quitter">Retour</div>
+    <div @click="handleRetour" class="quit-btn">Retour</div>
   </footer>
 </template>
 

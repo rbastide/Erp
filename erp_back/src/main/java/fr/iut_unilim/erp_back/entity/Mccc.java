@@ -11,7 +11,7 @@ public class Mccc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mcccID")
-    private int mcccId;
+    private Long mcccId;
 
     @ManyToOne
     @JoinColumn(name = "hourlyVolID")
@@ -60,11 +60,11 @@ public class Mccc {
     public Mccc() {
     }
 
-    public int getMcccId() {
+    public Long getMcccId() {
         return mcccId;
     }
 
-    public void setMcccId(int mcccId) {
+    public void setMcccId(Long mcccId) {
         this.mcccId = mcccId;
     }
 

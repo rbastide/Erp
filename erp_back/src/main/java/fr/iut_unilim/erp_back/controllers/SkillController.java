@@ -81,11 +81,11 @@ public class SkillController {
     private void convertRankDtosToEntities(NewSkillDto skillDto, Skill skill) {
         for (LearningRankDto rankDto : skillDto.levels()) {
             Rank rank = (rankDto.id() != null)
-                    ? rankService.getRankFromId(rankDto.id()).orElse(new Rank(rankDto.num(), rankDto.intitule(), skill))
-                    : new Rank(rankDto.num(), rankDto.intitule(), skill);
+                    ? rankService.getRankFromId(rankDto.id()).orElse(new Rank(rankDto.num(), rankDto.title(), skill))
+                    : new Rank(rankDto.num(), rankDto.title(), skill);
 
             rank.setRankNum(rankDto.num());
-            rank.setRankTitle(rankDto.intitule());
+            rank.setRankTitle(rankDto.title());
             rank.setSkillID(skill);
             rank = rankRepository.save(rank);
 
@@ -96,11 +96,11 @@ public class SkillController {
     private void convertCriticalLearningDtosToEntities(LearningRankDto rankDto, Rank rank) {
         for (CriticalLearningDto acDto : rankDto.acs()) {
             CriticalLearning cl = (acDto.id() != null)
-                    ? criticalLearningService.getCriticalLearningFromId(acDto.id()).orElse(new CriticalLearning(acDto.num(), acDto.intitule(), rank))
-                    : new CriticalLearning(acDto.num(), acDto.intitule(), rank);
+                    ? criticalLearningService.getCriticalLearningFromId(acDto.id()).orElse(new CriticalLearning(acDto.num(), acDto.title(), rank))
+                    : new CriticalLearning(acDto.num(), acDto.title(), rank);
 
             cl.setLearningNum(acDto.num());
-            cl.setLearningTitle(acDto.intitule());
+            cl.setLearningTitle(acDto.title());
             cl.setRankID(rank);
             criticalLearningRepository.save(cl);
         }

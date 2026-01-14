@@ -26,22 +26,21 @@ public class PdfFormationInfo {
 
         infoTable.addCell(new Cell(1, 5).add(createCenteredParagraph("Semestre " + resource.getSemester())));
 
-        List<String> skillsNames = skills.stream().map(Skill::getSkillName).toList();
-
-        infoTable.addCell(CellUtils.createCenteredCell(String.join(", ", skillsNames)));
+        infoTable.addCell(CellUtils.createCenteredCell(resource.getNum()));
 
         infoTable.addCell(CellUtils.createCenteredCell(resource.getName()));
 
         double[] hours = new double[]{hourlyVolume.getNbHoursCM(), hourlyVolume.getNbHoursTD(), hourlyVolume.getNbHoursTP()};
         for (int i = 0; i < hours.length; i++) {
-            infoTable.addCell(CellUtils.createCenteredCell(hours[i] + "h " + HOURS_CLASS_CORRESPONDANCE[i]));
+            infoTable.addCell(CellUtils.createCenteredCell(decimalFormat.format(hours[i]) + "h " + HOURS_CLASS_CORRESPONDANCE[i]));
         }
 
         Cell cellTeachers = new Cell();
         cellTeachers.add(new Paragraph("Référents : " + referencialTeachersString));
         infoTable.addCell(cellTeachers);
 
-        infoTable.addCell(CellUtils.createCenteredCell(resource.getNum()));
+        List<String> skillsNames = skills.stream().map(Skill::getSkillName).toList();
+        infoTable.addCell(CellUtils.createCenteredCell(String.join(", ", skillsNames)));
 
         double totalHours = Arrays.stream(hours).sum();
         infoTable.addCell(CellUtils.createCenteredCell(decimalFormat.format(totalHours) + "h / étudiant", 1, 3));

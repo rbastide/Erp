@@ -6,8 +6,8 @@ import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
 
 import java.util.List;
 
-public class McccResponse {
-    private String resourceCode;
+public class McccRequest {
+    private Long resourceID;
 
     private int hoursCM;
     private int hoursTD;
@@ -24,8 +24,8 @@ public class McccResponse {
 
     private Teacher[] referents;
 
-    public String getResourceCode() {
-        return resourceCode;
+    public Long getResourceID() {
+        return resourceID;
     }
 
     public int getHoursCM() {

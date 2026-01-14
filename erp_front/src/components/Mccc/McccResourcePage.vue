@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { mcccStore } from '@/services/mcccStore';
+import {onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {mcccStore} from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -36,9 +36,10 @@ const handleRetour = () => {
   router.back();
 };
 
-const handleMccc = (code: string) => {
+const handleMccc = (code: string, id: number) => {
   mcccStore.loadMcccStore();
   mcccStore.resourceCode = code;
+  mcccStore.resourceID = id;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
@@ -57,10 +58,10 @@ const handleMccc = (code: string) => {
             v-for="res in resources"
             :key="res.resourceID"
             class="card-action"
-            @click="handleMccc(res.num)"
+            @click="handleMccc(res.num, res.resourceID)"
         >
           <div class="icon-circle">
-            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
@@ -75,7 +76,7 @@ const handleMccc = (code: string) => {
       </div>
 
       <div class="footer-actions">
-        <button @click="handleRetour" class="btn-quitter">Retour</button>
+        <button @click="handleRetour" class="quit-btn">Retour</button>
       </div>
     </main>
   </div>

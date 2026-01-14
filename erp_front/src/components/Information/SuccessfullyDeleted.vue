@@ -21,8 +21,8 @@ const handleOtherSheet = () => {
   </main>
   <footer>
     <div class="btn-container">
-      <div @click="handleBack" class="btn-quitter">Retour au menu</div>
-      <div @click="handleOtherSheet" class="btn-quitter">Supprimer une nouvelle fiche</div>
+      <div @click="handleBack" class="quit-btn">Retour au menu</div>
+      <div @click="handleOtherSheet" class="quit-btn">Supprimer une nouvelle fiche</div>
     </div>
   </footer>
 </template>

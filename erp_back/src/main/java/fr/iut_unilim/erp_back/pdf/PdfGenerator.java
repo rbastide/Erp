@@ -33,7 +33,7 @@ import java.util.Locale;
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 
 public class PdfGenerator {
-    public static DecimalFormat decimalFormat = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.FRANCE));
+    public final static DecimalFormat decimalFormat = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.FRANCE));
 
     public static final String BASE_PATH = "erp_back/src/main/resources/";
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";

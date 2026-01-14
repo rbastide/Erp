@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.pdf.PdfGenerator;
 import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
@@ -67,6 +68,7 @@ public class PdfService {
         Date lastModificationDate = resourceSheet.getLastModificationDate();
 
         Set<Teacher> teachers = mccc.getReferencialTeacherId();
+        ErpBackApplication.LOGGER.info(teachers.toString());
 
         Set<CriticalLearning> criticalLearnings = mccc.getCriticalLearningsId();
         Set<Skill> skills = mcccService.getSkillsByResource(resource);
@@ -74,6 +76,9 @@ public class PdfService {
         if (skills == null) {
             return null;
         }
+
+        ErpBackApplication.LOGGER.info(skills.toString());
+        ErpBackApplication.LOGGER.info(criticalLearnings.toString());
 
         List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContentId();
 
