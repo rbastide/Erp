@@ -77,7 +77,7 @@ const handleFill = (code: string) => {
       </div>
 
       <div class="footer-actions">
-        <button @click="handleRetour" class="btn-quitter">Retour</button>
+        <button @click="handleRetour" class="quit-btn">Retour</button>
       </div>
     </main>
   </div>
