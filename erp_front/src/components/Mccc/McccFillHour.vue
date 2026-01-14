@@ -5,10 +5,20 @@ import { mcccStore } from '@/services/mcccStore';
 import api from '@/services/api';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import CancelModal from '../Information/CancelModal.vue';
 
 mcccStore.loadMcccStore();
 const router = useRouter();
 const currentHourlyVolID = ref(null);
+const showModal = ref(false);
+
+const initialState = ref({
+  hoursCM: 0,
+  hoursTD: 0,
+  hoursTP: 0,
+  hoursDS: 0,
+  hoursDSTP: 0
+});
 
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
@@ -24,7 +34,6 @@ const fetchHourlyVolumes = async () => {
 
     if (response.data && response.data.length > 0) {
       const bddData = response.data[0];
-
       currentHourlyVolID.value = bddData.hourlyVolID;
 
       mcccStore.hoursCM = bddData.nbHoursCM;
@@ -41,73 +50,80 @@ const fetchHourlyVolumes = async () => {
 
 onMounted(async () => {
   mcccStore.loadMcccStore();
-  const isStoreEmpty = (
+
+  const hasLocalData = (
       (mcccStore.hoursCM || 0) +
       (mcccStore.hoursTD || 0) +
       (mcccStore.hoursTP || 0) +
       (mcccStore.hoursDS || 0) +
       (mcccStore.hoursDSTP || 0)
-  ) === 0;
-  if (isStoreEmpty) {
+  ) > 0;
+
+  if (!hasLocalData) {
     await fetchHourlyVolumes();
-  } else {
-    mcccStore.saveBackup();
   }
+
+  initialState.value = {
+    hoursCM: mcccStore.hoursCM || 0,
+    hoursTD: mcccStore.hoursTD || 0,
+    hoursTP: mcccStore.hoursTP || 0,
+    hoursDS: mcccStore.hoursDS || 0,
+    hoursDSTP: mcccStore.hoursDSTP || 0
+  };
 });
 
 const totalHeures = computed(() => {
-  return (mcccStore.hoursCM || 0) + (mcccStore.hoursTD || 0) + (mcccStore.hoursDS || 0) + (mcccStore.hoursTP || 0) + (mcccStore.hoursDSTP || 0);
+  return (mcccStore.hoursCM || 0) +
+      (mcccStore.hoursTD || 0) +
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursTP || 0) +
+      (mcccStore.hoursDSTP || 0);
 });
+
 const updateHours = (key: string, delta: number) => {
   const current = (mcccStore as any)[key] || 0;
   (mcccStore as any)[key] = Math.max(0, current + delta);
   mcccStore.registerMcccStore();
 };
+
 const validateInput = (key: string) => {
   const value = (mcccStore as any)[key];
   if (value === "" || value === null || value === undefined) {
     (mcccStore as any)[key] = 0;
-  }
-  else if (value < 0) {
+  } else if (value < 0) {
     (mcccStore as any)[key] = 0;
   }
 };
-const blockNegative = (evt: KeyboardEvent) => {
-  if (evt.key === '-') evt.preventDefault();
-};
 
 const handleValider = async () => {
-  try {
-    const payload = {
-      hourlyVolID: currentHourlyVolID.value,
-      nbHoursCM: mcccStore.hoursCM,
-      nbHoursTD: mcccStore.hoursTD,
-      nbHoursTP: mcccStore.hoursTP,
-      nbHoursDS: mcccStore.hoursDS,
-      nbHoursDSTP: mcccStore.hoursDSTP
-    };
-    await api.post('/mccc/saveHourlyVolume', payload);
-
-    mcccStore.registerMcccStore();
-    await router.push('/mccc-menu');
-
-  } catch (error) {
-    console.error("Erreur lors de la sauvegarde :", error);
-    alert("Une erreur est survenue lors de la sauvegarde des heures.");
-  }
+  mcccStore.registerMcccStore();
+  await router.push('/mccc-menu');
 };
 
 const handleRetour = () => {
-  router.push('/cancel-mccc');
+  showModal.value = true;
+};
+
+const onConfirmCancel = () => {
+  mcccStore.hoursCM = initialState.value.hoursCM;
+  mcccStore.hoursTD = initialState.value.hoursTD;
+  mcccStore.hoursTP = initialState.value.hoursTP;
+  mcccStore.hoursDS = initialState.value.hoursDS;
+  mcccStore.hoursDSTP = initialState.value.hoursDSTP;
+
+  mcccStore.registerMcccStore();
+
+  router.push('/mccc-menu');
 };
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader title="Heures par élève pour la" :inline = "mcccStore.resourceCode"/>
+  <AppHeader title="Heures par élève pour la" :inline="mcccStore.resourceCode"/>
 
   <main class="main-content">
     <div class="content-wrapper">
+
       <div class="hours-flex-container">
         <div v-for="type in hourTypes" :key="type.key" class="hour-card">
           <span class="card-label" :style="{ color: type.color }">{{ type.label }}</span>
@@ -136,7 +152,15 @@ const handleRetour = () => {
         <button @click="handleValider" class="btn btn-primary">Valider</button>
         <button @click="handleRetour" class="btn btn-outline">Annuler</button>
       </div>
+
     </div>
+
+    <CancelModal
+        v-if="showModal"
+        @confirm="onConfirmCancel"
+        @close="showModal = false"
+    />
+
   </main>
 </template>
 

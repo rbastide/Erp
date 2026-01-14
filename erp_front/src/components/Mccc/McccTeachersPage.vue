@@ -1,16 +1,19 @@
 <script setup>
-import {computed, onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import {mcccStore} from "@/services/mcccStore.js";
+import { mcccStore } from "@/services/mcccStore.js";
+import CancelModal from '../Information/CancelModal.vue';
 
 const router = useRouter();
 const searchQuery = ref('');
 const allTeachers = ref([]);
 const selectedTeacherIds = ref([]);
 const errorMessage = ref('');
+const showModal = ref(false);
+const initialState = ref([]);
 
 const fetchTeachers = async () => {
   try {
@@ -43,10 +46,12 @@ const fetchTeachers = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   mcccStore.loadMcccStore();
-  fetchTeachers();
+  await fetchTeachers();
   mcccStore.saveBackup();
+
+  initialState.value = [...selectedTeacherIds.value];
 });
 
 const selectedTeachersList = computed(() => {
@@ -103,15 +108,31 @@ const handleValider = () => {
 };
 
 const handleRetour = () => {
-  router.push('/cancel-mccc');
+  showModal.value = true;
+};
+
+const onConfirmCancel = () => {
+  selectedTeacherIds.value = [...initialState.value];
+
+  mcccStore.referents = selectedTeacherIds.value.map(id => {
+    const user = allTeachers.value.find(u => u.teacherID === id);
+    if (!user) return null;
+    return {
+      lastname: user.lastname,
+      firstname: user.firstname
+    };
+  }).filter(Boolean);
+
+  mcccStore.registerMcccStore();
+  router.push('/mccc-menu');
 };
 
 const clearSearch = () => searchQuery.value = '';
 </script>
 
 <template>
-  <Sidebar/>
-  <AppHeader title="Référents de la" :inline="mcccStore.resourceCode"/>
+  <Sidebar />
+  <AppHeader title="Référents de la" :inline="mcccStore.resourceCode" />
 
   <main class="main-content">
     <div class="content-wrapper">
@@ -133,13 +154,14 @@ const clearSearch = () => searchQuery.value = '';
               </div>
               <h3 class="teacher-name">{{ teacher.firstname }} {{ teacher.lastname }}</h3>
               <div class="check-indicator">
-                <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
             </div>
           </div>
         </div>
       </div>
-
 
       <div class="selection-section">
         <h2 class="section-title">Enseignants disponibles :</h2>
@@ -189,6 +211,12 @@ const clearSearch = () => searchQuery.value = '';
       </div>
     </footer>
 
+    <CancelModal
+        v-if="showModal"
+        @confirm="onConfirmCancel"
+        @close="showModal = false"
+    />
+
   </main>
 </template>
 
@@ -235,7 +263,7 @@ const clearSearch = () => searchQuery.value = '';
   background: white;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   border: 1px solid #e0e0e0;
   cursor: pointer;
   position: relative;
@@ -250,7 +278,7 @@ const clearSearch = () => searchQuery.value = '';
 
 .teacher-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border-color: #ccc;
 }
 
@@ -313,8 +341,13 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 @keyframes popIn {
-  0% { transform: scale(0); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .no-result {
@@ -361,9 +394,12 @@ const clearSearch = () => searchQuery.value = '';
     flex-direction: column;
     gap: 15px;
   }
-  .search-wrapper, .footer-buttons {
+
+  .search-wrapper,
+  .footer-buttons {
     width: 100%;
   }
+
   .footer-buttons {
     display: flex;
     justify-content: space-between;
@@ -435,7 +471,10 @@ const clearSearch = () => searchQuery.value = '';
   white-space: nowrap;
 }
 
-.btn-sys:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.btn-sys:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 
 .btn-sys.primary {
   background: linear-gradient(135deg, #B51621 0%, #d92533 100%);
@@ -447,6 +486,7 @@ const clearSearch = () => searchQuery.value = '';
   color: #555;
   border: 2px solid #e0e0e0;
 }
+
 .btn-sys.secondary:hover {
   border-color: #ccc;
   background-color: #f8f9fa;

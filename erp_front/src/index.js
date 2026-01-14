@@ -11,7 +11,7 @@ import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
 import CancelPageBackToDashboard from "./components/Information/CancelPageBackToDashboard.vue";
-import CancelPageMccc from "./components/Information/CancelPageMccc.vue";
+import CancelModal from "./components/Information/CancelModal.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletedPage from "./components/Information/SuccessfullyDeleted.vue";
 import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
@@ -99,7 +99,7 @@ const routes = [
     {
         path: '/cancel-mccc',
         name: 'CancelPageMccc',
-        component: CancelPageMccc
+        component: CancelModal
     },
     {
         path: '/mccc-menu',

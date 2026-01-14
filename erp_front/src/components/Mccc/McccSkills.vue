@@ -1,17 +1,19 @@
 <script setup>
-import {computed, onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import {mcccStore} from "@/services/mcccStore.js";
+import { mcccStore } from "@/services/mcccStore.js";
+import CancelModal from '../Information/CancelModal.vue';
 
 const router = useRouter();
 const searchQuery = ref('');
 const errorMessage = ref('');
 const isLoading = ref(true);
-
 const allSkills = ref([]);
+const showModal = ref(false);
+const initialState = ref([]);
 
 const fetchReferential = async () => {
   try {
@@ -27,10 +29,14 @@ const fetchReferential = async () => {
 
 onMounted(() => {
   mcccStore.loadMcccStore();
-  if (!Array.isArray(mcccStore.acsGrouped)) mcccStore.acsGrouped = [];
+  if (!Array.isArray(mcccStore.acsGrouped)) {
+    mcccStore.acsGrouped = [];
+  }
+
   fetchReferential();
-  mcccStore.loadMcccStore();
   mcccStore.saveBackup();
+
+  initialState.value = JSON.parse(JSON.stringify(mcccStore.acsGrouped));
 });
 
 const filteredSkills = computed(() => {
@@ -60,21 +66,14 @@ const addSkillDirectly = (skill) => {
     return;
   }
 
-  // REGARDEZ LA CONSOLE (F12) POUR VOIR LES VRAIS NOMS DES CHAMPS
-  console.log("Structure reçue de l'API (Niveau) :", skill.levels[0]);
-  console.log("Structure reçue de l'API (AC) :", skill.levels[0].acs[0]);
-
   const newSelection = {
     resourceCode: mcccStore.resourceCode,
     ue: skill.skillName,
     skillNum: skill.skillNum,
     allLevels: skill.levels.map(level => ({
-      // On essaie toutes les clés possibles pour le titre du niveau
       title: level.title || level.name || level.label || level.levelTitle || level.rankTitle || "Niveau sans titre",
-
       acs: level.acs.map(ac => ({
         learningNum: ac.num || ac.acNum || ac.learningNum,
-        // On essaie toutes les clés possibles pour le titre de l'AC
         learningTitle: ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "Titre manquant"
       }))
     }))
@@ -94,7 +93,16 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleCancel = () => router.push('/cancel-mccc');
+const handleRetour = () => {
+  showModal.value = true;
+};
+
+const onConfirmCancel = () => {
+  mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  mcccStore.registerMcccStore();
+  router.push('/mccc-menu');
+};
+
 const clearSearch = () => searchQuery.value = '';
 </script>
 
@@ -172,10 +180,16 @@ const clearSearch = () => searchQuery.value = '';
         </div>
         <div class="footer-buttons">
           <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleCancel" class="btn-sys secondary">Annuler</button>
+          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>
+
+    <CancelModal
+        v-if="showModal"
+        @confirm="onConfirmCancel"
+        @close="showModal = false"
+    />
   </main>
 </template>
 
