@@ -35,6 +35,9 @@ public class UniversityDepartment {
         this.universityName = universityName;
     }
 
+    public UniversityDepartment() {
+    }
+
     public Long getUniversityDepartmentID() {
         return universityDepartmentID;
     }
