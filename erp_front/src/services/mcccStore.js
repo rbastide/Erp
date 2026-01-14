@@ -1,6 +1,7 @@
 import {reactive} from 'vue';
 
 export const mcccStore = reactive({
+    resourceID: 0,
     resourceCode: '',
     hoursCM: 0,
     hoursTD: 0,
@@ -45,7 +46,8 @@ export const mcccStore = reactive({
             acsGrouped: JSON.parse(JSON.stringify(this.acsGrouped)),
             saeCodes: JSON.parse(JSON.stringify(this.saeCodes)),
             referents: JSON.parse(JSON.stringify(this.referents)),
-            resourceCode: this.resourceCode
+            resourceCode: this.resourceCode,
+            resourceID: this.resourceID
         };
 
         this.backup = JSON.stringify(dataToSave);
@@ -68,6 +70,7 @@ export const mcccStore = reactive({
             this.acsGrouped = oldData.acsGrouped || [];
             this.saeCodes = oldData.saeCodes || [];
             this.referents = oldData.referents || [];
+            this.resourceID = oldData.resourceID;
             this.resourceCode = oldData.resourceCode;
 
             this.backup = null;
@@ -81,6 +84,7 @@ export const mcccStore = reactive({
 
     clearMcccStore() {
         this.resourceCode = '';
+        this.resourceID = 0;
         this.hoursCM = 0;
         this.hoursTD = 0;
         this.hoursTP = 0;

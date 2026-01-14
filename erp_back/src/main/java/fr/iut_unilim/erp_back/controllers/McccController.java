@@ -68,10 +68,9 @@ public class McccController {
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
         Mccc mccc = new Mccc();
 
-        List<Resource> resources = resourceService.getFromNum(dto.getResourceCode());
-        if (!resources.isEmpty()) {
-            Resource resource = resources.get(0);
-            mccc.setResourceId(resource);
+        Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
+        if (canHaveResource.isPresent()) {
+            mccc.setResourceId(canHaveResource.get());
         } else {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
         }
