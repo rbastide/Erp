@@ -53,7 +53,6 @@ export const mcccStore = reactive({
         this.backup = JSON.stringify(dataToSave);
 
         this.registerMcccStore();
-        console.log("🔒 Backup V0 créé et sauvegardé.");
     },
 
     restoreBackup() {
