@@ -12,24 +12,35 @@ const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
-let hours = ref({
-  cm: 0,
-  td: 0,
-  ds: 0,
-  tp: 0,
-  ds_tp: 0,
-  student: 0
+const hours = ref({
+  cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0
 })
 
-const cmContents = ref(['']), cmRefs = ref<HTMLTextAreaElement[]>([])
-const tdContents = ref(['']), tdRefs = ref<HTMLTextAreaElement[]>([])
-const tpContents = ref(['']), tpRefs = ref<HTMLTextAreaElement[]>([])
-const dsContents = ref(['']), dsRefs = ref<HTMLTextAreaElement[]>([])
-const dstpContents = ref(['']), dstpRefs = ref<HTMLTextAreaElement[]>([])
+const cmContents = ref([''])
+const tdContents = ref([''])
+const tpContents = ref([''])
+const dsContents = ref([''])
+const dstpContents = ref([''])
 
-const edFBContents = ref(['']), edFBRefs = ref<HTMLTextAreaElement[]>([])
-const stFBContents = ref(['']), stFBRefs = ref<HTMLTextAreaElement[]>([])
-const upgradesContents = ref(['']), upgradesRefs = ref<HTMLTextAreaElement[]>([])
+const edFBContents = ref([''])
+const stFBContents = ref([''])
+const upgradesContents = ref([''])
+
+const cmRefs = ref<HTMLTextAreaElement[]>([])
+const tdRefs = ref<HTMLTextAreaElement[]>([])
+const tpRefs = ref<HTMLTextAreaElement[]>([])
+const dsRefs = ref<HTMLTextAreaElement[]>([])
+const dstpRefs = ref<HTMLTextAreaElement[]>([])
+const edFBRefs = ref<HTMLTextAreaElement[]>([])
+const stFBRefs = ref<HTMLTextAreaElement[]>([])
+const upgradesRefs = ref<HTMLTextAreaElement[]>([])
+
+
+const canAdd = (list: string[]) => {
+  if (!list || list.length === 0) return true;
+  const lastItem = list[list.length - 1];
+  return (lastItem || '').trim().length > 0;
+}
 
 const fetchResourceData = async () => {
   try {
@@ -76,17 +87,77 @@ const fetchHoursData = async () => {
   }
 };
 
+const fetchResourceSheetData = async () => {
+  try {
+    const response = await api.get('/resourceSheet/getResourceSheet');
+    if (response.data && Array.isArray(response.data)) {
+      const resourceData = response.data.find((f: any) =>
+          f.resourceID === currentResourceId.value
+      );
+
+      if (resourceData) {
+        const getContentByType = (type: string) => {
+          if (!resourceData.pedagologicalContentId) return [];
+          return resourceData.pedagologicalContentId
+              .filter((item: any) => item.classTypeId?.classType === type)
+              .map((item: any) => item.content || '');
+        };
+
+        const cm = getContentByType('CM');
+        cmContents.value = cm.length > 0 ? cm : [''];
+
+        const td = getContentByType('TD');
+        tdContents.value = td.length > 0 ? td : [''];
+
+        const tp = getContentByType('TP');
+        tpContents.value = tp.length > 0 ? tp : [''];
+
+        const ds = getContentByType('DS');
+        dsContents.value = ds.length > 0 ? ds : [''];
+
+        const dstpRaw = resourceData.pedagologicalContentId?.filter((item: any) =>
+            ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
+        ) || [];
+        const dstp = dstpRaw.map((item: any) => item.content || '');
+        dstpContents.value = dstp.length > 0 ? dstp : [''];
+
+        if (resourceData.teachersFeedbacks) {
+          const tFeedbacks = resourceData.teachersFeedbacks.map((f: any) => f.content || '');
+          edFBContents.value = tFeedbacks.length > 0 ? tFeedbacks : [''];
+        }
+
+        if (resourceData.studentsFeedbacks) {
+          const sFeedbacks = resourceData.studentsFeedbacks.map((f: any) => f.content || '');
+          stFBContents.value = sFeedbacks.length > 0 ? sFeedbacks : [''];
+        }
+
+        if (resourceData.improvementIdeas) {
+          const ideas = resourceData.improvementIdeas.map((i: any) => i.idea || i.content || '');
+          upgradesContents.value = ideas.length > 0 ? ideas : [''];
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Erreur fiches ressources :", error);
+  }
+}
+
 onMounted(async () => {
   await fetchResourceData();
   await fetchHoursData();
+  await fetchResourceSheetData();
 });
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {
   return async () => {
+    if (!canAdd(contentRef.value)) return;
+
     contentRef.value.push('')
     await nextTick()
     const lastIndex = contentRef.value.length - 1
-    elementRefs.value[lastIndex]?.focus()
+    if (elementRefs.value && elementRefs.value[lastIndex]) {
+      elementRefs.value[lastIndex].focus()
+    }
   }
 }
 
@@ -95,6 +166,7 @@ const addTD = createFieldManager(tdContents, tdRefs)
 const addTP = createFieldManager(tpContents, tpRefs)
 const addDS = createFieldManager(dsContents, dsRefs)
 const addDSTP = createFieldManager(dstpContents, dstpRefs)
+
 const addEducationalFeedback = createFieldManager(edFBContents, edFBRefs)
 const addStudentFeedback = createFieldManager(stFBContents, stFBRefs)
 const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
@@ -102,7 +174,7 @@ const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
 const handleValider = async () => {
   const formatForBackend = (type: string, list: string[]) => {
     return list
-        .map((content, index) => content.trim() ? `${type} ${index + 1} : ${content.trim()}` : null)
+        .map((content, index) => (content || '').trim() ? `${type} ${index + 1} : ${(content || '').trim()}` : null)
         .filter((item): item is string => item !== null);
   };
 
@@ -110,16 +182,16 @@ const handleValider = async () => {
     ...formatForBackend('CM', cmContents.value),
     ...formatForBackend('TD', tdContents.value),
     ...formatForBackend('TP', tpContents.value),
-    ...formatForBackend('TD', dsContents.value),
-    ...formatForBackend('TP', dstpContents.value)
+    ...formatForBackend('DS', dsContents.value),
+    ...formatForBackend('DS/TP', dstpContents.value)
   ];
 
   const payload = {
     resourceID: currentResourceId.value,
     hourlyVolumeID: currentHourlyVolId.value,
-    teachersFeedbackID: edFBContents.value.filter(t => t.trim()),
-    studentFeedbackID: stFBContents.value.filter(t => t.trim()),
-    improvementsIdeaID: upgradesContents.value.filter(t => t.trim()),
+    teachersFeedbackID: edFBContents.value.filter(t => (t || '').trim()),
+    studentFeedbackID: stFBContents.value.filter(t => (t || '').trim()),
+    improvementsIdeaID: upgradesContents.value.filter(t => (t || '').trim()),
     pedagologicalContent: allPedagogicalContent,
     semester: 1,
     year: new Date().getFullYear(),
@@ -140,7 +212,7 @@ const handleValider = async () => {
 const handleRetour = () => router.back();
 
 const totalGlobal = computed(() => {
-  return hours.value.cm + hours.value.td + hours.value.ds + hours.value.tp + hours.value.ds_tp;
+  return (hours.value.cm || 0) + (hours.value.td || 0) + (hours.value.ds || 0) + (hours.value.tp || 0) + (hours.value.ds_tp || 0);
 })
 
 const validatePositive = (key: keyof typeof hours.value) => {
@@ -154,6 +226,14 @@ const hourConfig = {
   ds: { label: 'DS', color: '#FFB74D' },
   ds_tp: { label: 'DS TP', color: '#BA68C8' }
 }
+
+const pedagogicalSections = computed(() => [
+  { type: 'CM', list: cmContents.value, addFn: addCM, refs: cmRefs },
+  { type: 'TD', list: tdContents.value, addFn: addTD, refs: tdRefs },
+  { type: 'TP', list: tpContents.value, addFn: addTP, refs: tpRefs },
+  { type: 'DS', list: dsContents.value, addFn: addDS, refs: dsRefs },
+  { type: 'DS/TP', list: dstpContents.value, addFn: addDSTP, refs: dstpRefs },
+]);
 </script>
 
 <template>
@@ -189,11 +269,26 @@ const hourConfig = {
       <section class="form-card">
         <h2 class="section-title">Voici le contenu pédagogique : *</h2>
 
-        <div v-for="(list, type) in { CM: cmContents, TD: tdContents, TP: tpContents, DS: dsContents, 'DS/TP': dstpContents }" :key="type" class="pedagogic-group">
-          <h3 class="group-label">{{ type }}</h3>
-          <textarea v-for="(index) in list" :key="index" v-model="list[index]" class="modern-textarea" placeholder="Saisissez ici..."></textarea>
-          <button class="btn-add-line" @click="type === 'CM' ? addCM() : type === 'TD' ? addTD() : type === 'TP' ? addTP() : type === 'DS' ? addDS() : addDSTP()">
-            + Ajouter un bloc {{ type }}
+        <div v-for="section in pedagogicalSections" :key="section.type" class="pedagogic-group">
+          <h3 class="group-label">{{ section.type }}</h3>
+
+          <div v-for="(content, index) in section.list" :key="index" class="content-block">
+            <label class="item-label">{{ section.type }} {{ index + 1 }}</label>
+            <textarea
+                v-model="section.list[index]"
+                :ref="(el) => { if(el) (section.refs.value as any)[index] = el }"
+                class="modern-textarea"
+                placeholder="Saisissez le contenu...">
+            </textarea>
+          </div>
+
+          <button
+              class="btn-add-line"
+              @click="section.addFn()"
+              :disabled="!canAdd(section.list)"
+              :class="{ 'disabled-btn': !canAdd(section.list) }"
+          >
+            + Ajouter un bloc {{ section.type }}
           </button>
         </div>
       </section>
@@ -203,20 +298,44 @@ const hourConfig = {
 
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour pédagogique des professeurs :</label>
-          <textarea v-for="(i) in edFBContents" :key="'ed-' + i" v-model="edFBContents[i]" class="modern-textarea large"></textarea>
-          <button class="btn-add-line" @click="addEducationalFeedback">+ Ajouter une ligne</button>
+          <div v-for="(content, index) in edFBContents" :key="index" class="content-block">
+             <textarea
+                 v-model="edFBContents[index]"
+                 :ref="(el) => { if(el) edFBRefs[index] = el as HTMLTextAreaElement }"
+                 class="modern-textarea large">
+            </textarea>
+          </div>
+          <button class="btn-add-line" @click="addEducationalFeedback" :disabled="!canAdd(edFBContents)" :class="{ 'disabled-btn': !canAdd(edFBContents) }">
+            + Ajouter une ligne
+          </button>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour des étudiants :</label>
-          <textarea v-for="(i) in stFBContents" :key="'st-' + i" v-model="stFBContents[i]" class="modern-textarea large"></textarea>
-          <button class="btn-add-line" @click="addStudentFeedback">+ Ajouter une ligne</button>
+          <div v-for="(content, index) in stFBContents" :key="index" class="content-block">
+            <textarea
+                v-model="stFBContents[index]"
+                :ref="(el) => { if(el) stFBRefs[index] = el as HTMLTextAreaElement }"
+                class="modern-textarea large">
+            </textarea>
+          </div>
+          <button class="btn-add-line" @click="addStudentFeedback" :disabled="!canAdd(stFBContents)" :class="{ 'disabled-btn': !canAdd(stFBContents) }">
+            + Ajouter une ligne
+          </button>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Voici les améliorations à apporter :</label>
-          <textarea v-for="(i) in upgradesContents" :key="'up-' + i" v-model="upgradesContents[i]" class="modern-textarea large"></textarea>
-          <button class="btn-add-line" @click="addUpgrades">+ Ajouter une ligne</button>
+          <div v-for="(content, index) in upgradesContents" :key="index" class="content-block">
+            <textarea
+                v-model="upgradesContents[index]"
+                :ref="(el) => { if(el) upgradesRefs[index] = el as HTMLTextAreaElement }"
+                class="modern-textarea large">
+            </textarea>
+          </div>
+          <button class="btn-add-line" @click="addUpgrades" :disabled="!canAdd(upgradesContents)" :class="{ 'disabled-btn': !canAdd(upgradesContents) }">
+            + Ajouter une ligne
+          </button>
         </div>
       </section>
 
@@ -326,16 +445,32 @@ const hourConfig = {
   margin-bottom: 35px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
 }
 
 .group-label,
 .field-label {
-  align-self: flex-start;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
   color: #1e293b;
+  width: 100%;
+}
+
+.content-block {
+  width: 100%;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  margin-left: 2px;
 }
 
 .modern-textarea {
@@ -345,7 +480,6 @@ const hourConfig = {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   font-size: 1rem;
-  margin-bottom: 10px;
   resize: vertical;
 }
 
@@ -365,6 +499,14 @@ const hourConfig = {
   cursor: pointer;
   padding: 8px 15px;
   color: #E92533;
+  align-self: center;
+  margin-top: 5px;
+  transition: all 0.2s;
+}
+
+.disabled-btn {
+  color: #cbd5e1;
+  cursor: not-allowed;
 }
 
 .actions-footer {
