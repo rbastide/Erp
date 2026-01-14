@@ -11,7 +11,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
@@ -56,17 +55,16 @@ public class PdfGenerator {
         List<String> referancialTeachers = resourceSheet.teachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
         String referencialTeachersString = String.join(", ", referancialTeachers);
 
-        ErpBackApplication.LOGGER.info("Generating PDF for resource " + resourceSheet.resource().getNum());
         if (!generateFirstPage(document, resourceSheet, referencialTeachersString)) return null;
 
         document.add(new AreaBreak());
-        ErpBackApplication.LOGGER.info("Generating PDF for resource " + resourceSheet.resource().getNum());
+
         if (!generateSecondPage(document, resourceSheet)) return null;
 
         document.add(new AreaBreak());
-        ErpBackApplication.LOGGER.info("Generating PDF for resource " + resourceSheet.resource().getNum());
+
         if (!generateThirdPage(document, resourceSheet, referencialTeachersString)) return null;
-        ErpBackApplication.LOGGER.info("Generating PDF for resource " + resourceSheet.resource().getNum());
+
         document.close();
 
         return baos.toByteArray();
