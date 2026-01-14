@@ -1,6 +1,6 @@
-<script setup>
-import {useRouter} from 'vue-router';
-import {onMounted, ref, watchEffect} from "vue";
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { onMounted, ref, watchEffect } from "vue";
 
 const props = defineProps({
   dashboardAdminActive: { type: Boolean, default: false },
@@ -8,11 +8,13 @@ const props = defineProps({
   settingsActive: { type: Boolean, default: false },
   helpActive: { type: Boolean, default: false },
   quitActive: { type: Boolean, default: false },
+  showDepartments: { type: Boolean, default: false },
 });
 
 const router = useRouter();
 const isExpanded = ref(false);
 const userRole = ref('');
+const selectedDept = ref<number | null>(null);
 
 const updateRole = () => {
   const role = localStorage.getItem('user_role');
@@ -21,6 +23,9 @@ const updateRole = () => {
 
 onMounted(() => {
   updateRole();
+  if (props.showDepartments && userRole.value === 'SUPER_ADMIN') {
+    selectedDept.value = 1;
+  }
 });
 
 watchEffect(() => {
@@ -35,12 +40,13 @@ const handleDashboardClick = () => {
   }
 };
 
+const selectDept = (id: number) => {
+  selectedDept.value = id;
+};
+
 const handleSettings = () => router.push('/settings');
 const handleHelp = () => router.push('/help');
-
-const handleDisconnection = () => {
-  router.push('/disconnection');
-};
+const handleDisconnection = () => router.push('/disconnection');
 </script>
 
 <template>
@@ -62,20 +68,47 @@ const handleDisconnection = () => {
     </div>
 
     <nav class="sidebar-nav">
-      <div
-          class="nav-item"
-          :class="{ active: props.dashboardActive || props.dashboardAdminActive }"
-          @click="handleDashboardClick"
-      >
-        <div class="icon-wrapper">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
+      <div class="dropdown-container">
+        <div
+            class="nav-item main-item"
+            :class="{ active: props.dashboardActive || props.dashboardAdminActive }"
+            @click="handleDashboardClick"
+        >
+          <div class="icon-wrapper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <span class="nav-text">Dashboard</span>
+
+          <svg v-if="isExpanded && props.showDepartments && userRole === 'SUPER_ADMIN'" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6"/>
           </svg>
         </div>
-        <span class="nav-text">Dashboard</span>
+
+        <div v-if="props.showDepartments && userRole === 'SUPER_ADMIN'" class="submenu">
+          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 1 }" @click="selectDept(1)">
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
+            <span class="nav-text">Département 1</span>
+          </div>
+          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 2 }" @click="selectDept(2)">
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
+            <span class="nav-text">Département 2</span>
+          </div>
+          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 3 }" @click="selectDept(3)">
+            <div class="icon-wrapper sub-icon">
+              <div class="dot"></div>
+            </div>
+            <span class="nav-text">Département 3</span>
+          </div>
+        </div>
       </div>
 
       <div class="nav-item" :class="{ active: props.settingsActive }" @click="handleSettings">
@@ -124,15 +157,17 @@ const handleDisconnection = () => {
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   z-index: 1000;
   font-family: 'Roboto', sans-serif;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
+
 .sidebar.expanded {
   width: 260px;
 }
+
 .sidebar-header {
   height: 172px;
   display: flex;
@@ -142,27 +177,33 @@ const handleDisconnection = () => {
   background-color: #96111a;
   transition: background-color 0.3s ease;
 }
+
 .sidebar.expanded .sidebar-header {
   background-color: #ffffff;
 }
+
 .hamburger-icon {
   color: #ffffff;
   min-width: 32px;
 }
+
 .sidebar.expanded .hamburger-icon {
   color: #96111a;
 }
+
 .menu-title {
   font-size: x-large;
   font-weight: bold;
   color: #B51621;
 }
+
 .sidebar-nav {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   padding-top: 10px;
 }
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -175,35 +216,96 @@ const handleDisconnection = () => {
   border-left: 4px solid transparent;
   white-space: nowrap;
 }
+
 .icon-wrapper {
   min-width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .nav-text {
   margin-left: 20px;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
+
 .sidebar.expanded .nav-text {
   opacity: 1;
 }
+
 .nav-item:hover {
   background-color: #f9f9f9;
   color: #B51621;
 }
+
 .nav-item.active {
   background-color: #fff0f1;
   color: #B51621;
   border-left-color: #B51621;
 }
+
 .sidebar-footer {
   padding-bottom: 20px;
   border-top: 1px solid #f0f0f0;
 }
+
 .logout:hover {
   color: #d32f2f;
   background-color: #ffebee;
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  background-color: #fafafa;
+}
+
+.dropdown-container:hover .submenu {
+  max-height: 200px;
+  opacity: 1;
+}
+
+.sub-item {
+  padding: 10px 28px 10px 45px;
+  font-size: 14px;
+}
+
+.sub-icon {
+  min-width: 14px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.chevron-icon {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+  color: #999;
+}
+
+.dropdown-container:hover .chevron-icon {
+  transform: rotate(180deg);
+}
+
+.sub-item.sub-active {
+  background-color: #f0f0f0;
+  color: #B51621;
+  font-weight: 700;
+  border-left: 4px solid #B51621;
+}
+
+.sub-item.sub-active .dot {
+  transform: scale(1.3);
 }
 </style>
