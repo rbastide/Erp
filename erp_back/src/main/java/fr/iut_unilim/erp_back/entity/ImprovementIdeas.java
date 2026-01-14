@@ -18,8 +18,8 @@ public class ImprovementIdeas {
     public ImprovementIdeas() {
     }
 
-    public Long improvementsIdeaID(){ return this.improvementsIdeaID; }
-    public String idea(){ return this.idea; }
+    public Long getImprovementsIdeaID(){ return this.improvementsIdeaID; }
+    public String getIdea(){ return this.idea; }
 
     public void setIdea(String idea) {
         this.idea = idea;

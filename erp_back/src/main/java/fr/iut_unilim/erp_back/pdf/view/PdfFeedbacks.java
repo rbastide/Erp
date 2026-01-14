@@ -17,17 +17,17 @@ public class PdfFeedbacks {
 
         feedbacks.addCell(new Cell(teachersFeedbacks.size(), 1).add(new Paragraph("Retour de l'équipe pédagogique")));
         for (PedagologicalTeachersFeedbacks teacherFeedback : teachersFeedbacks) {
-            feedbacks.addCell(teacherFeedback.content());
+            feedbacks.addCell(teacherFeedback.getContent());
         }
 
         feedbacks.addCell(new Cell(studentsFeedbacks.size(), 1).add(new Paragraph("Retour des étudiants")));
         for (StudentsFeedbacks studentFeedback : studentsFeedbacks) {
-            feedbacks.addCell(studentFeedback.content());
+            feedbacks.addCell(studentFeedback.getContent());
         }
 
         feedbacks.addCell(new Cell(improvementIdeas.size(), 1).add(new Paragraph("Idée d'améliorations")));
         for (ImprovementIdeas improvementIdea : improvementIdeas) {
-            feedbacks.addCell(improvementIdea.idea());
+            feedbacks.addCell(improvementIdea.getIdea());
         }
 
         return feedbacks;

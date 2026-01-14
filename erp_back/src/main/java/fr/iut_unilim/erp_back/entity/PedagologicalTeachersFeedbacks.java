@@ -24,7 +24,7 @@ public class PedagologicalTeachersFeedbacks {
     }
 
     public Long teachersFeedbackID() { return teachersFeedbackID; }
-    public String content(){ return content; }
+    public String getContent(){ return content; }
 
     public void setTeachersFeedbackID(Long teachersFeedbackID) {
         this.teachersFeedbackID = teachersFeedbackID;
