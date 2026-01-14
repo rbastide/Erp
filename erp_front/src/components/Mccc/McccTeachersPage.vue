@@ -92,7 +92,6 @@ const handleValider = () => {
 
   mcccStore.referents = selectedTeacherIds.value.map(id => {
     const user = allTeachers.value.find(u => u.teacherID === id);
-    user.firstname = undefined;
     if (!user) return null;
     return {
       lastname: user.lastname,

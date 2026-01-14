@@ -65,6 +65,7 @@ public class McccController {
     }
 
     @PostMapping("/save")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
         Mccc mccc = new Mccc();
 
@@ -232,5 +233,11 @@ public class McccController {
             return ResponseEntity.ok(hourlyVolume.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/getCreationDate/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
+        return ResponseEntity.ok(mcccService.getCreationDateFromId(id));
     }
 }
