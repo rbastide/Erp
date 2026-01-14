@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping("api/resourceSheet")
+@RequestMapping("/api/resourceSheet")
 public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
