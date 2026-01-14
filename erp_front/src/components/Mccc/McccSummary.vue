@@ -92,7 +92,7 @@
     mcccStore.loadMcccStore();
 
     try {
-      const response = await api.get('/mccc/getCreationDate/7');
+      const response = await api.get(`/mccc/getCreationDate/${mcccStore.resourceID}`);
 
       if (response.data) {
         const dateObj = new Date(response.data);
