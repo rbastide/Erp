@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.dto.EditUserRequest;
 import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
@@ -19,6 +20,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -118,7 +120,13 @@ public class AuthController {
         connectionRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/user-info")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    public ResponseEntity<?> getUserInfo(@RequestBody String identifier) {
+        Connection user = connectionRepository.findByIdentifier(identifier);
+        Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
+
+        return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
+    }
 }
-
-    
-

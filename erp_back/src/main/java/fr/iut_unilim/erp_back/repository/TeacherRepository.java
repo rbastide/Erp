@@ -18,7 +18,8 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     @Query("SELECT t.lastname FROM Teacher t WHERE t.teacherID = :id")
     String findLastnameByTeacherID(@Param("id") Long id);
 
-    // Idem pour le firstname
     @Query("SELECT t.firstname FROM Teacher t WHERE t.teacherID = :id")
     String findFirstnameByTeacherID(@Param("id") Long id);
+
+    Teacher findByUserID(Long userID);
 }
