@@ -47,6 +47,7 @@ const handleShow = (item: any) => {
   router.push({
     path: '/resource-sheet-history',
     query: {
+      id: item.sheetID,
       code: item.resourceCode,
       date: formatDate(item.date)
     }
