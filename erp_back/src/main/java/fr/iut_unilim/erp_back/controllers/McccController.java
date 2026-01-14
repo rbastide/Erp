@@ -104,7 +104,6 @@ public class McccController {
         List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
         for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
-            ErpBackApplication.LOGGER.info(ueCode + " " + learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
             Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels());
