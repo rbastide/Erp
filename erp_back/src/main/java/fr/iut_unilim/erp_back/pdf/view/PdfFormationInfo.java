@@ -8,7 +8,6 @@ import fr.iut_unilim.erp_back.entity.HourlyVolume;
 import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
-import fr.iut_unilim.erp_back.service.McccService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -21,16 +20,11 @@ import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredPara
 public class PdfFormationInfo {
     private static final String[] HOURS_CLASS_CORRESPONDANCE = new String[]{"CM", "TD", "TP"};
 
-    public static Table create(@NotNull Resource resource, @NotNull HourlyVolume hourlyVolume, @NotNull String referencialTeachersString, McccService mcccService) {
+    public static Table create(@NotNull Resource resource, @NotNull HourlyVolume hourlyVolume, @NotNull String referencialTeachersString, Set<Skill> skills) {
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{33, 33, 11, 11, 11}));
         infoTable.useAllAvailableWidth();
 
         infoTable.addCell(new Cell(1, 5).add(createCenteredParagraph("Semestre " + resource.getSemester())));
-
-        Set<Skill> skills = mcccService.getSkillsByResource(resource);
-        if (skills == null) {
-            return null;
-        }
 
         List<String> skillsNames = skills.stream().map(Skill::getSkillName).toList();
 

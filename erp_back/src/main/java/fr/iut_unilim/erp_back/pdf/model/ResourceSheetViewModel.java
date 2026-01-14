@@ -4,6 +4,7 @@ import fr.iut_unilim.erp_back.entity.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public record ResourceSheetViewModel(
         Resource resource,
@@ -12,12 +13,11 @@ public record ResourceSheetViewModel(
         List<StudentsFeedbacks> studentsFeedbacks,
         List<ImprovementIdeas> improvementIdeas,
         int semester,
-        String mainGoal,
-        List<Sae> saes,
+        Set<Sae> saes,
         Date creationDate,
         Date lastModificationDate,
-        List<Teacher> teachers,
-        List<Skill> skills,
-        List<PedagologicalContent> pedagologicalContent
-) {
+        Set<Teacher> teachers,
+        Set<CriticalLearning> criticalLearnings,
+        List<PedagologicalContent> pedagologicalContent,
+        Set<Skill> skills) {
 }

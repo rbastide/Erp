@@ -4,10 +4,10 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import fr.iut_unilim.erp_back.entity.Sae;
 
-import java.util.List;
+import java.util.Set;
 
 public class PdfSae {
-    public static Table create(List<Sae> saes) {
+    public static Table create(Set<Sae> saes) {
         Table saesTable = new Table(UnitValue.createPercentArray(new float[]{20, 90}));
         saesTable.useAllAvailableWidth();
 

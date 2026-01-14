@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PdfService {
@@ -30,15 +31,16 @@ public class PdfService {
             return null;
         }
 
-        return PdfGenerator.createPdf(resourceSheetViewModel, mcccService);
+        return PdfGenerator.createPdf(resourceSheetViewModel);
     }
 
     @Nullable
     private ResourceSheetViewModel createResourceSheetViewModel(@NotNull ResourceSheet resourceSheet) {
-        Optional<Resource> resource = resourceService.getResourceById(resourceSheet.getResourceID());
-        if (resource.isEmpty()) {
+        Optional<Resource> canHaveResource = resourceService.getResourceById(resourceSheet.getResourceID());
+        if (canHaveResource.isEmpty()) {
             return null;
         }
+        Resource resource = canHaveResource.get();
 
         Optional<HourlyVolume> hourlyVolume = hourlyVolumeService.findById(resourceSheet.getResourceID());
         if (hourlyVolume.isEmpty()) {
@@ -51,20 +53,30 @@ public class PdfService {
 
         List<ImprovementIdeas> improvementIdeas = resourceSheet.getImprovementIdeas();
 
-        //int semester = resourceSheet.getSemester();
-        //String mainGoal = resourceSheet.getMainGoal();
+        int semester = resource.getSemester();
 
-        //List<Sae> saes = resourceSheet.getSaes();
+        Mccc mccc = mcccService.getCurrentMcccFromResource(resource);
+
+        if (mccc == null) {
+            return null;
+        }
+
+        Set<Sae> saes = mccc.getSaesId();
 
         Date creationDate = resourceSheet.getCreationDate();
         Date lastModificationDate = resourceSheet.getLastModificationDate();
 
-        //List<Teacher> teachers = resourceSheet.getTeachers();
+        Set<Teacher> teachers = mccc.getReferencialTeacherId();
 
-        //List<Skill> skills = resourceSheet.getSkills();
+        Set<CriticalLearning> criticalLearnings = mccc.getCriticalLearningsId();
+        Set<Skill> skills = mcccService.getSkillsByResource(resource);
 
-        //List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContent();
-        return null;
-        //return new ResourceSheetViewModel(resource.get(), hourlyVolume.get(), pedagologicalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, mainGoal, saes, creationDate, lastModificationDate, teachers, skills, pedagologicalContents);
+        if (skills == null) {
+            return null;
+        }
+
+        List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContentId();
+
+        return new ResourceSheetViewModel(resource, hourlyVolume.get(), pedagologicalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, saes, creationDate, lastModificationDate, teachers, criticalLearnings, pedagologicalContents, skills);
     }
 }
