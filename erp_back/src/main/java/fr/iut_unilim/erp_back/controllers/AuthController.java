@@ -121,8 +121,8 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user-info")
-    public ResponseEntity<?> getUserInfo(@RequestBody String identifier) {
+    @GetMapping("/user-info/{identifier}")
+    public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
         Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
 
