@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.dto;
 
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
 import fr.iut_unilim.erp_back.tools.datastructures.SAE;
 import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
@@ -23,6 +24,8 @@ public class McccRequest {
     private List<LearningRank> acsGrouped;
 
     private Teacher[] referents;
+
+    private UniversityDepartment universityDepartment;
 
     public Long getResourceID() {
         return resourceID;
@@ -67,4 +70,6 @@ public class McccRequest {
     public Teacher[] getReferents() {
         return referents;
     }
+
+    public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
 }
