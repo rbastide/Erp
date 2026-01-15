@@ -91,7 +91,10 @@ const totalGlobal = computed(() => {
 })
 
 const handleFermer = () => router.back()
-const handleExport = () => console.log("Export PDF demandé...")
+const handleExport = () => {
+  api.get(`/pdf/resource-sheet/${route.query.id}`);
+  console.log(`Export PDF demandé pour ${route.query.id}`);
+}
 const handleModifier = () => router.push("fill-resource-sheet?code=" + resourceCode.value);
 
 const hourConfig = {
