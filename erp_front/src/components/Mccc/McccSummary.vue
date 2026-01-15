@@ -230,7 +230,7 @@ const getGroupsForUE = (ueName) => {
 
     <div class="container-btn">
       <button @click="handleValider" class="btn-sys btn-validate">Valider</button>
-      <button @click="handleRetour" class="btn-sys btn-cancel">Annuler</button>
+      <button @click="handleRetour" class="btn-sys btn-cancel">Retour</button>
     </div>
   </main>
 </template>

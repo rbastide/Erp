@@ -6,11 +6,10 @@ import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
-import DisconnectionPage from './components/Information/DisconnectionPage.vue';
+import LogoutModal from './components/Information/LogoutModal.vue';
 import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
-import CancelPageBackToDashboard from "./components/Information/CancelPageBackToDashboard.vue";
 import CancelModal from "./components/Information/CancelModal.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletedPage from "./components/Information/SuccessfullyDeleted.vue";
@@ -74,7 +73,7 @@ const routes = [
     {
         path: '/disconnection',
         name: 'DisconnectionPage',
-        component: DisconnectionPage
+        component: LogoutModal
     },
     {
         path: '/error-save',
@@ -90,16 +89,6 @@ const routes = [
         path: '/fill-resource-sheet',
         name: 'FillResourceSheet',
         component: FillResourceSheet
-    },
-    {
-        path: '/cancel',
-        name: 'CancelPage',
-        component: CancelPageBackToDashboard
-    },
-    {
-        path: '/cancel-mccc',
-        name: 'CancelPageMccc',
-        component: CancelModal
     },
     {
         path: '/mccc-menu',
