@@ -49,13 +49,14 @@ public class ResourceSheet {
     @JsonManagedReference
     private List<PedagologicalContent> pedagologicalContentId;
 
-    //@Column("universityDepartmentID")
-    //private UniversityDepartment universityDepartment;
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
 
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent, UniversityDepartment universityDepartment) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.hourlyVolumeID = hourlyVolumeID;
@@ -65,7 +66,7 @@ public class ResourceSheet {
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
         this.pedagologicalContentId = pedagologicalContent;
-        //this.universityDepartment = universityDepartment;
+        this.universityDepartment = universityDepartment;
     }
 
     public void setSheetsID(Long sheetsID) {
@@ -140,10 +141,13 @@ public class ResourceSheet {
         return pedagologicalContentId;
     }
 
-    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
 
-    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
-
+    public void setUniversityDepartment(UniversityDepartment universityDepartment) {
+        this.universityDepartment = universityDepartment;
+    }
 }
 
 
