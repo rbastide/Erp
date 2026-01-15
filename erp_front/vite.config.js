@@ -10,15 +10,22 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-      basicSsl()
+    basicSsl()
   ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-    server:{
-      https:true,
-        port:5173
+  server:{
+    https: true,
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "https://localhost:8443",
+        changeOrigin: true,
+        secure: false
+      }
     }
+  }
 })
