@@ -95,23 +95,16 @@ onMounted(async () => {
     const foundMccc = response.data.find(item => item.resourceId.resourceID == mcccStore.resourceID);
 
     if (foundMccc) {
-      const dateObj = new Date(foundMccc.creationDate);
-
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-
-      mcccStore.creationDate = `${day}/${month}/${year}`;
-
+      mcccStore.creationDate = new Date(foundMccc.creationDate).toLocaleDateString('fr-FR');
     } else {
-      mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
+      mcccStore.creationDate = new Date().toLocaleString('fr-FR');
     }
   } catch (error) {
     console.error("Erreur récup date création", error);
-    mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
+    mcccStore.creationDate = new Date().toLocaleString('fr-FR');
   }
 
-  mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
+  mcccStore.editDate = new Date().toLocaleString('fr-FR');
 
   mcccStore.registerMcccStore();
   await fetchSaes();
