@@ -5,11 +5,13 @@ import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 import CancelModal from '../Information/CancelModal.vue';
+import ModifSavedModal from '../Information/ModifSavedModal.vue';
 
 const router = useRouter()
 const route = useRoute()
 
 const showModal = ref(false);
+const showSuccessModal = ref(false);
 
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
@@ -198,8 +200,7 @@ const handleValider = async () => {
 
   try {
     await api.post('/resourceSheet/resource-sheet', payload);
-    alert("Fiche ressource enregistrée avec succès !");
-    await router.push('/home');
+    showSuccessModal.value = true;
   } catch (error: any) {
     const errorMsg = error.response?.data || "Erreur lors de l'enregistrement";
     console.error("Détails erreur :", error);
@@ -349,6 +350,10 @@ const pedagogicalSections = computed(() => [
         v-if="showModal"
         @confirm="onConfirmCancel"
         @close="showModal = false"
+    />
+
+    <ModifSavedModal
+        v-if="showSuccessModal"
     />
 
   </main>

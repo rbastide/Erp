@@ -68,7 +68,7 @@ const selectDept = (id: number) => {
 
 const handleSettings = () => router.push('/settings');
 const handleHelp = () => router.push('/help');
-const handleDisconnection = () => router.push('/disconnection');
+const handleDisconnection = () => router.push('/logout');
 </script>
 
 <template>

@@ -6,16 +6,13 @@ import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
-import LogoutModal from './components/Information/LogoutModal.vue';
-import ErrorSave from "./components/Information/ErrorSave.vue";
 import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
-import CancelModal from "./components/Information/CancelModal.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import SuccessfullyDeletedPage from "./components/Information/SuccessfullyDeleted.vue";
 import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
 import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
-import ModifSaved from "./components/Information/ModifSaved.vue";
+import ModifSavedModal from "./components/Information/ModifSavedModal.vue";
 import McccMenuPage from "./components/Mccc/McccMenuPage.vue";
 import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
@@ -27,6 +24,7 @@ import ResourcesGestion from "./components/Admin/ResourcesGestion.vue";
 import UsersGestion from "./components/Admin/UsersGestion.vue";
 import SaeGestion from "./components/Admin/SaeGestion.vue";
 import Settings from "./components/App/Settings.vue";
+import LogoutModal from "./components/Information/LogoutModal.vue";
 
 
 const routes = [
@@ -71,16 +69,6 @@ const routes = [
         component: HelpPage
     },
     {
-        path: '/disconnection',
-        name: 'DisconnectionPage',
-        component: LogoutModal
-    },
-    {
-        path: '/error-save',
-        name: 'ErrorSavePage',
-        component: ErrorSave
-    },
-    {
         path: '/successfully-saved',
         name: 'SuccessfullySavedPage',
         component: SuccessfullySaved
@@ -118,7 +106,7 @@ const routes = [
     {
         path: '/modif-saved',
         name: 'ModifSaved',
-        component: ModifSaved
+        component: ModifSavedModal
     },
     {
         path: '/mccc-teachers',
@@ -169,6 +157,11 @@ const routes = [
         path: '/settings',
         name: 'Settings',
         component: Settings
+    },
+    {
+        path:'/logout',
+        name: 'LogoutModal',
+        component: LogoutModal
     }
 ];
 

@@ -5,28 +5,31 @@ import AppHeader from '../App/Header.vue';
 import {onMounted, ref} from 'vue';
 import api from '@/services/api';
 import Sidebar from "../App/Sidebar.vue";
+import ErrorSaveModal from '../Information/ErrorSaveModal.vue';
+import ModifSavedModal from '../Information/ModifSavedModal.vue';
 
 const router = useRouter();
 const allSaes = ref([]);
-const hoursTotal = mcccStore.hoursCM + mcccStore.hoursDS + mcccStore.hoursTP + mcccStore.hoursTD + mcccStore.hoursDSTP
-const handleRetour = () => router.back();
+const hoursTotal = mcccStore.hoursCM + mcccStore.hoursDS + mcccStore.hoursTP + mcccStore.hoursTD + mcccStore.hoursDSTP;
+const showErrorModal = ref(false);
+const showSuccessModal = ref(false);
+
+const handleBack = () => router.back();
 
 const handleValider = async () => {
   try {
-
     const formattedAcs = mcccStore.acsGrouped.flatMap(skill =>
         skill.allLevels.map((lvl, lvlIdx) => ({
           resourceCode: mcccStore.resourceCode,
           ue: `UE ${skill.skillNum} : ${skill.ue}`,
-
           levels: `Niveau ${lvlIdx + 1} : ${lvl.title}`,
-
           acs: lvl.acs.map(ac => ({
             learningNum: ac.learningNum,
             learningTitle: ac.learningTitle
           }))
         }))
     );
+
     const payload = {
       resourceID: String(mcccStore.resourceID),
       creationDate: mcccStore.creationDate,
@@ -37,23 +40,20 @@ const handleValider = async () => {
       hoursDS: mcccStore.hoursDS,
       hoursDSTP: mcccStore.hoursDSTP,
       saeCodes: mcccStore.saeCodes,
-
       acsGrouped: formattedAcs,
-
       referents: mcccStore.referents
     };
 
     const response = await api.post('/mccc/save', payload);
 
     if (response.status === 200 || response.status === 201) {
-      console.log("Sauvegarde réussie !");
       mcccStore.clearMcccStore();
-      await router.push('/modif-saved');
+      showSuccessModal.value = true;
     }
 
   } catch (error) {
-    console.error("Erreur lors de la sauvegarde des MCCC :", error);
-    await router.push("/error-save");
+    console.error(error);
+    showErrorModal.value = true;
   }
 };
 
@@ -64,7 +64,7 @@ const fetchSaes = async () => {
       allSaes.value = response.data;
     }
   } catch (error) {
-    console.error("Erreur lors du chargement des SAE :", error);
+    console.error(error);
   }
 };
 
@@ -91,7 +91,6 @@ onMounted(async () => {
 
   try {
     const response = await api.get('/mccc/getMccc');
-
     const foundMccc = response.data.find(item => item.resourceId.resourceID == mcccStore.resourceID);
 
     if (foundMccc) {
@@ -100,12 +99,10 @@ onMounted(async () => {
       mcccStore.creationDate = new Date().toLocaleString('fr-FR');
     }
   } catch (error) {
-    console.error("Erreur récup date création", error);
     mcccStore.creationDate = new Date().toLocaleString('fr-FR');
   }
 
   mcccStore.editDate = new Date().toLocaleString('fr-FR');
-
   mcccStore.registerMcccStore();
   await fetchSaes();
 });
@@ -230,8 +227,17 @@ const getGroupsForUE = (ueName) => {
 
     <div class="container-btn">
       <button @click="handleValider" class="btn-sys btn-validate">Valider</button>
-      <button @click="handleRetour" class="btn-sys btn-cancel">Retour</button>
+      <button @click="handleBack" class="btn-sys btn-cancel">Retour</button>
     </div>
+
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
+    />
+
+    <ModifSavedModal
+        v-if="showSuccessModal"
+    />
   </main>
 </template>
 
