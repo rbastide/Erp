@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
 import api from '@/services/api'
@@ -91,9 +91,29 @@ const totalGlobal = computed(() => {
 })
 
 const handleFermer = () => router.back()
-const handleExport = () => {
-  api.get(`/pdf/resource-sheet/${route.query.id}`);
-  console.log(`Export PDF demandé pour ${route.query.id}`);
+const handleExport = async () => {
+  try {
+    const response = await api.get(`/pdf/resource-sheet/${route.query.id}`, {
+      responseType: 'blob'
+    });
+    const file = new Blob([response.data], {type: 'application/pdf'});
+    const fileURL = URL.createObjectURL(file);
+
+    const link = document.createElement('a');
+    link.href = fileURL;
+
+    const fileName = `fiche-ressource-${resourceCode.value}.pdf`;
+    link.setAttribute('download', fileName);
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(fileURL);
+
+  } catch (error) {
+    console.error("Erreur lors de la génération du PDF", error);
+  }
 }
 const handleModifier = () => router.push("fill-resource-sheet?code=" + resourceCode.value);
 
