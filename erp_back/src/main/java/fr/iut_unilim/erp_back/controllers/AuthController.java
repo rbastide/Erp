@@ -125,7 +125,6 @@ public class AuthController {
     @GetMapping("/user-info/{identifier}")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
-        ErpBackApplication.LOGGER.info("Getting user info for id: " + identifier);
         Connection user = connectionRepository.findByIdentifier(identifier);
         if (user == null) {
             return ResponseEntity.notFound().build();
