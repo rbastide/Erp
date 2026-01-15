@@ -21,6 +21,7 @@ public class Mccc {
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
 
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "McccSaes",
@@ -45,17 +46,21 @@ public class Mccc {
     )
     private Set<Teacher> referencialTeacherId;
 
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartmentId;
+
 
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
+    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartmentId) {
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
-        //this.universityDepartment = universityDepartment;
+        this.universityDepartmentId = universityDepartmentId;
     }
 
     public Mccc() {
@@ -125,7 +130,7 @@ public class Mccc {
         this.lastModificationDate = lastModificationDate;
     }
 
-    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+    public UniversityDepartment getUniversityDepartmentId() { return universityDepartmentId; }
 
-    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
+    public void setUniversityDepartmentId(UniversityDepartment universityDepartmentId) { this.universityDepartmentId = universityDepartmentId; }
 }
