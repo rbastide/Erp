@@ -90,16 +90,19 @@ onMounted(async () => {
   mcccStore.loadMcccStore();
 
   try {
-    const response = await api.get('/mccc/getCreationDate/7');
+    const response = await api.get('/mccc/getMccc');
 
-    if (response.data) {
-      const dateObj = new Date(response.data);
+    const foundMccc = response.data.find(item => item.resourceId.resourceID == mcccStore.resourceID);
+
+    if (foundMccc) {
+      const dateObj = new Date(foundMccc.creationDate);
 
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       const day = String(dateObj.getDate()).padStart(2, '0');
 
       mcccStore.creationDate = `${day}/${month}/${year}`;
+
     } else {
       mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
     }
@@ -107,6 +110,7 @@ onMounted(async () => {
     console.error("Erreur récup date création", error);
     mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
   }
+
   mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
 
   mcccStore.registerMcccStore();
