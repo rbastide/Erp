@@ -4,6 +4,8 @@ import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query; // <--- AJOUT
+import org.springframework.data.repository.query.Param; // <--- AJOUT
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +18,7 @@ public interface McccRepository extends JpaRepository<Mccc, McccId> {
     Optional<Mccc> findByMcccId(Long mcccId);
 
     Optional<Mccc> findFirstByResourceIdOrderByLastModificationDateDesc(Resource resourceId);
+
+    @Query("SELECT t.teacherID FROM Mccc m JOIN m.referencialTeacherId t WHERE m.mcccId = :mcccId")
+    List<Long> findTeacherIdsByMcccId(@Param("mcccId") Long mcccId);
 }

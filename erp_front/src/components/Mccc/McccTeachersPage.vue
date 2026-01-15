@@ -18,8 +18,8 @@ const initialState = ref([]);
 const fetchTeachers = async () => {
   try {
     const response = await api.get('/mccc/getTeachers');
-
     let teachersData = [];
+
     if (Array.isArray(response.data)) {
       teachersData = response.data;
     } else if (response.data && Array.isArray(response.data.content)) {
@@ -28,29 +28,61 @@ const fetchTeachers = async () => {
 
     allTeachers.value = teachersData.map(t => ({
       ...t,
-      teacherID: t.teacherID || t.id
+      teacherID: Number(t.teacherID || t.id)
     }));
 
-    if (mcccStore.referents && mcccStore.referents.length > 0) {
-      selectedTeacherIds.value = mcccStore.referents.map(ref => {
-        const found = allTeachers.value.find(t =>
-            t.lastname === ref.lastname && t.firstname === ref.firstname
-        );
-        return found ? found.teacherID : null;
-      }).filter(id => id !== null);
-    }
+    console.log("Tous les profs chargés :", allTeachers.value.length);
 
   } catch (error) {
-    console.error("Erreur API :", error);
+    console.error("Erreur API Teachers :", error);
     errorMessage.value = "Impossible de charger les enseignants.";
   }
+};
+
+const fetchLinkedTeachers = async () => {
+  const currentId = mcccStore.resourceID || mcccStore.hourlyVolID;
+  if (!currentId) return;
+
+  try {
+    const response = await api.get(`/mccc/getReferentIds/${currentId}`);
+
+    if (response.data && Array.isArray(response.data)) {
+      console.log("IDs reçus de l'API :", response.data);
+      selectedTeacherIds.value = response.data.map(id => Number(id));
+      updateStoreReferents();
+    }
+  } catch (error) {
+    console.warn("Erreur récupération liens profs", error);
+  }
+};
+
+const updateStoreReferents = () => {
+  mcccStore.referents = selectedTeacherIds.value.map(teacherId => {
+    const user = allTeachers.value.find(u => u.teacherID === teacherId);
+    return user ? { lastname: user.lastname, firstname: user.firstname } : null;
+  }).filter(Boolean);
 };
 
 onMounted(async () => {
   mcccStore.loadMcccStore();
   await fetchTeachers();
-  mcccStore.saveBackup();
+  const hasLocalEdits = mcccStore.referents && mcccStore.referents.length > 0;
 
+  if (hasLocalEdits) {
+    console.log("Utilisation des données du Store (navigation locale)");
+    selectedTeacherIds.value = mcccStore.referents.map(ref => {
+      const found = allTeachers.value.find(t =>
+          (t.lastname || "").toLowerCase() === (ref.lastname || "").toLowerCase() &&
+          (t.firstname || "").toLowerCase() === (ref.firstname || "").toLowerCase()
+      );
+      return found ? found.teacherID : null;
+    }).filter(id => id !== null);
+  } else {
+    console.log("Store vide, chargement depuis la BDD...");
+    await fetchLinkedTeachers();
+  }
+
+  mcccStore.saveBackup();
   initialState.value = [...selectedTeacherIds.value];
 });
 
@@ -60,7 +92,6 @@ const selectedTeachersList = computed(() => {
 
 const availableTeachersList = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
-
   return allTeachers.value.filter(teacher => {
     const isNotSelected = !selectedTeacherIds.value.includes(teacher.teacherID);
 
@@ -73,19 +104,13 @@ const availableTeachersList = computed(() => {
 });
 
 const toggleTeacher = (id) => {
-  errorMessage.value = '';
-  if (id === undefined || id === null) return;
-
-  if (selectedTeacherIds.value.includes(id)) {
-    selectedTeacherIds.value = selectedTeacherIds.value.filter(itemId => itemId !== id);
+  const idNumber = Number(id);
+  if (selectedTeacherIds.value.includes(idNumber)) {
+    selectedTeacherIds.value = selectedTeacherIds.value.filter(itemId => itemId !== idNumber);
   } else {
-    selectedTeacherIds.value.push(id);
+    selectedTeacherIds.value.push(idNumber);
   }
-
-  mcccStore.referents = selectedTeacherIds.value.map(teacherId => {
-    const user = allTeachers.value.find(u => u.teacherID === teacherId);
-    return user ? { lastname: user.lastname, firstname: user.firstname } : null;
-  }).filter(Boolean);
+  updateStoreReferents();
   mcccStore.registerMcccStore();
 };
 
@@ -94,15 +119,7 @@ const handleValider = () => {
     errorMessage.value = "Veuillez sélectionner au moins un référent.";
     return;
   }
-
-  mcccStore.referents = selectedTeacherIds.value.map(id => {
-    const user = allTeachers.value.find(u => u.teacherID === id);
-    if (!user) return null;
-    return {
-      lastname: user.lastname,
-      firstname: user.firstname
-    };
-  }).filter(Boolean);
+  updateStoreReferents();
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -113,16 +130,7 @@ const handleRetour = () => {
 
 const onConfirmCancel = () => {
   selectedTeacherIds.value = [...initialState.value];
-
-  mcccStore.referents = selectedTeacherIds.value.map(id => {
-    const user = allTeachers.value.find(u => u.teacherID === id);
-    if (!user) return null;
-    return {
-      lastname: user.lastname,
-      firstname: user.firstname
-    };
-  }).filter(Boolean);
-
+  updateStoreReferents();
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -136,7 +144,6 @@ const clearSearch = () => searchQuery.value = '';
 
   <main class="main-content">
     <div class="content-wrapper">
-
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
       <div class="selection-section" v-if="selectedTeachersList.length > 0">
@@ -188,7 +195,6 @@ const clearSearch = () => searchQuery.value = '';
           </div>
         </div>
       </div>
-
     </div>
 
     <footer class="sticky-footer">
@@ -198,7 +204,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher un enseignant via son nom ou prénom"
+              placeholder="Rechercher..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
@@ -211,12 +217,7 @@ const clearSearch = () => searchQuery.value = '';
       </div>
     </footer>
 
-    <CancelModal
-        v-if="showModal"
-        @confirm="onConfirmCancel"
-        @close="showModal = false"
-    />
-
+    <CancelModal v-if="showModal" @confirm="onConfirmCancel" @close="showModal = false" />
   </main>
 </template>
 
@@ -225,10 +226,10 @@ const clearSearch = () => searchQuery.value = '';
   background-color: #fcfcfc;
   min-height: 100vh;
   padding: 200px 20px 100px;
-  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Roboto', sans-serif;
 }
 
 .content-wrapper {
@@ -344,7 +345,6 @@ const clearSearch = () => searchQuery.value = '';
   0% {
     transform: scale(0);
   }
-
   100% {
     transform: scale(1);
   }
@@ -394,12 +394,10 @@ const clearSearch = () => searchQuery.value = '';
     flex-direction: column;
     gap: 15px;
   }
-
   .search-wrapper,
   .footer-buttons {
     width: 100%;
   }
-
   .footer-buttons {
     display: flex;
     justify-content: space-between;

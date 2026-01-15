@@ -24,6 +24,10 @@ public class McccService {
         return mcccRepository.findById(id);
     }
 
+    public Optional<Mccc> findById(Long id) {
+        return mcccRepository.findByMcccId(id);
+    }
+
     public void save(Mccc mccc) {
         mcccRepository.save(mccc);
     }
@@ -40,9 +44,7 @@ public class McccService {
     @Nullable
     public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
         Optional<Mccc> currentMccc = getCurrentMcccFromResource(resource);
-
         return currentMccc.map(Mccc::getCriticalLearningsId).orElse(null);
-
     }
 
     @Nullable
@@ -65,5 +67,9 @@ public class McccService {
     public Date getCreationDateFromId(@NotNull Long id) {
         Optional<Mccc> mccc = mcccRepository.findByMcccId(id);
         return mccc.map(Mccc::getCreationDate).orElse(null);
+    }
+
+    public List<Long> getTeacherIdsByMcccId(Long mcccId) {
+        return mcccRepository.findTeacherIdsByMcccId(mcccId);
     }
 }
