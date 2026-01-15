@@ -26,7 +26,7 @@ const handleLogin = async () => {
     if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
       await router.push('/home-admin');
     } else {
-      const response = await api.get('/user-info');
+      const response = await api.get(`auth/user-info/${username.value}`);
       AuthService.registerAuthService();
       console.log(response.data);
       await router.push('/home');

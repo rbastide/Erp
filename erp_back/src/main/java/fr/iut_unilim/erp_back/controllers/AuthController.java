@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -122,7 +123,9 @@ public class AuthController {
     }
 
     @GetMapping("/user-info/{identifier}")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
+        ErpBackApplication.LOGGER.info("Getting user info for id: " + identifier);
         Connection user = connectionRepository.findByIdentifier(identifier);
         if (user == null) {
             return ResponseEntity.notFound().build();
