@@ -34,6 +34,12 @@ public class Skill {
 
     public Skill() {}
 
+    public Skill(String skillName, int skillNum){
+        this.skillName = skillName;
+        this.skillNum = skillNum;
+    }
+
+
     public Skill(String skillName, int skillNum,List<ResourceSheet> resourceSheets, UniversityDepartment universityDepartment) {
         this.skillName = skillName;
         this.skillNum = skillNum;
