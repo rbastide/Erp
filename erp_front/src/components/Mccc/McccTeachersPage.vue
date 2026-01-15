@@ -40,12 +40,13 @@ const fetchTeachers = async () => {
 };
 
 const fetchLinkedTeachers = async () => {
-  const currentId = mcccStore.resourceID || mcccStore.hourlyVolID;
+  const currentId = mcccStore.resourceID || mcccStore.hourlyVolId;
   if (!currentId) return;
 
   try {
-    const response = await api.get(`/mccc/getReferentIds/${currentId}`);
-
+    console.log(currentId);
+    const response = await api.get(`mccc/getReferentIds/${currentId}`);
+    console.log(response)
     if (response.data && Array.isArray(response.data)) {
       console.log("IDs reçus de l'API :", response.data);
       selectedTeacherIds.value = response.data.map(id => Number(id));
