@@ -240,7 +240,6 @@ public class McccController {
 
     @GetMapping("/getReferentIds/{id}")
     public ResponseEntity<?> getReferentIds(@PathVariable Long id) {
-        // C'est beaucoup plus simple et sûr :
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
     }
