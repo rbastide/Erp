@@ -27,23 +27,29 @@ const fetchReferential = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   mcccStore.loadMcccStore();
+
   if (!Array.isArray(mcccStore.acsGrouped)) {
     mcccStore.acsGrouped = [];
   }
 
-  fetchReferential();
-  mcccStore.saveBackup();
+  await fetchReferential();
 
-  initialState.value = JSON.parse(JSON.stringify(mcccStore.acsGrouped));
+  if (mcccStore.acsGrouped.length === 0) {
+    console.log("Store vide, chargement depuis la BDD...");
+    await fetchLinkedSkills();
+  } else {
+    console.log("Données locales conservées.");
+  }
+
+  mcccStore.saveBackup();
 });
 
 const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
 
   return allSkills.value.filter(s => {
-    // On exclut ceux déjà sélectionnés
     const isAlreadySelected = mcccStore.acsGrouped.some(g => g.ue === s.skillName);
     if (isAlreadySelected) return false;
 
@@ -82,6 +88,77 @@ const addSkillDirectly = (skill) => {
 
   mcccStore.acsGrouped.unshift(newSelection);
   mcccStore.registerMcccStore();
+};
+const fetchLinkedSkills = async () => {
+  if (!mcccStore.resourceID) {
+    console.warn("Aucun ResourceID dans le store, abandon.");
+    return;
+  }
+  const targetId = String(mcccStore.resourceID);
+  console.log("🔍 Recherche des compétences pour resourceID :", targetId);
+
+  try {
+    const response = await api.get('/mccc/getMccc');
+
+    const currentMccc = response.data.find(m => {
+      return m.resourceId && String(m.resourceId.resourceID) === targetId;
+    });
+
+    if (!currentMccc) {
+      console.warn("Aucun MCCC trouvé dans la liste pour cet ID.");
+      return;
+    }
+
+    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
+      console.warn("⚠MCCC trouvé, mais liste criticalLearningsId vide.");
+      return;
+    }
+
+    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
+
+    const acsFromBdd = currentMccc.criticalLearningsId;
+    const groupedResult = [];
+
+    acsFromBdd.forEach(acItem => {
+      if (!acItem.rankID || !acItem.rankID.skillID) return;
+
+      const skillName = acItem.rankID.skillID.skillName;
+      const skillNum = acItem.rankID.skillID.skillNum;
+      const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
+
+      let existingSkill = groupedResult.find(g => g.ue === skillName);
+      if (!existingSkill) {
+        existingSkill = {
+          resourceCode: mcccStore.resourceCode,
+          ue: skillName,
+          skillNum: skillNum,
+          allLevels: []
+        };
+        groupedResult.push(existingSkill);
+      }
+
+      let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
+      if (!existingLevel) {
+        existingLevel = {
+          title: rankTitle,
+          acs: []
+        };
+        existingSkill.allLevels.push(existingLevel);
+      }
+
+      existingLevel.acs.push({
+        learningNum: acItem.learningNum,
+        learningTitle: acItem.learningTitle || "Sans titre"
+      });
+    });
+
+    mcccStore.acsGrouped = groupedResult;
+    mcccStore.registerMcccStore();
+    console.log("🎉 Store mis à jour avec succès :", mcccStore.acsGrouped);
+
+  } catch (error) {
+    console.error("Erreur chargement des compétences liées :", error);
+  }
 };
 
 const removeGroup = (index) => {
