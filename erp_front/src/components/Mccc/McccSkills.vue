@@ -37,14 +37,10 @@ onMounted(async () => {
   await fetchReferential();
 
   if (mcccStore.acsGrouped.length === 0) {
-    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedSkills();
-  } else {
-    console.log("Données locales conservées.");
-  }
 
   mcccStore.saveBackup();
-});
+}
 
 const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
@@ -91,11 +87,11 @@ const addSkillDirectly = (skill) => {
 };
 const fetchLinkedSkills = async () => {
   if (!mcccStore.resourceID) {
-    console.warn("Aucun ResourceID dans le store, abandon.");
+
+  }
     return;
   }
   const targetId = String(mcccStore.resourceID);
-  console.log("🔍 Recherche des compétences pour resourceID :", targetId);
 
   try {
     const response = await api.get('/mccc/getMccc');
@@ -105,16 +101,13 @@ const fetchLinkedSkills = async () => {
     });
 
     if (!currentMccc) {
-      console.warn("Aucun MCCC trouvé dans la liste pour cet ID.");
       return;
     }
 
     if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
-      console.warn("⚠MCCC trouvé, mais liste criticalLearningsId vide.");
       return;
     }
 
-    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
 
     const acsFromBdd = currentMccc.criticalLearningsId;
     const groupedResult = [];
@@ -154,12 +147,11 @@ const fetchLinkedSkills = async () => {
 
     mcccStore.acsGrouped = groupedResult;
     mcccStore.registerMcccStore();
-    console.log("🎉 Store mis à jour avec succès :", mcccStore.acsGrouped);
 
   } catch (error) {
     console.error("Erreur chargement des compétences liées :", error);
   }
-};
+});
 
 const removeGroup = (index) => {
   mcccStore.acsGrouped.splice(index, 1);
