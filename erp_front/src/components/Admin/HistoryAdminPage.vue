@@ -72,7 +72,7 @@ const clearSearch = () => searchQuery.value = '';
 </script>
 
 <template>
-  <Sidebar :showDepartments="true" :dashboardAdminActive="true" />
+  <Sidebar/>
   <AppHeader title="Historique des fiches ressources" />
 
   <main class="main-content">
