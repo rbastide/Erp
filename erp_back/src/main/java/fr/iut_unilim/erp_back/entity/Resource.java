@@ -18,12 +18,17 @@ public class Resource {
     @Column(name = "name")
     private String name;
 
+    @Column(name="semester")
+    private int semester;
+
     public Resource() {
     }
 
-    public Resource(String num, String name) {
+    public Resource(Long resourceID, String num, String name, int semester) {
+        this.resourceID = resourceID;
         this.num = num;
         this.name = name;
+        this.semester = semester;
     }
 
     public Long getResourceID() {
@@ -36,5 +41,23 @@ public class Resource {
 
     public String getName() {
         return name;
+    }
+
+    public int getSemester() {return semester;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSemester(int semester) {
+        this.semester = semester;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public void setResourceID(Long resourceID) {
+        this.resourceID = resourceID;
     }
 }

@@ -4,15 +4,17 @@ import com.jcraft.jsch.JSchException;
 import fr.iut_unilim.erp_back.tools.exceptions.UndefinedEnvironmentVariable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.logging.Logger;
 
 import static fr.iut_unilim.erp_back.startup.DatabaseConnectionManager.connectToDatabase;
 
+@EnableScheduling
 @SpringBootApplication
 public class ErpBackApplication {
 
-    private static final Logger LOGGER = Logger.getLogger(ErpBackApplication.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(ErpBackApplication.class.getName());
 
     public static void main(String[] args) {
         startApplication(args);

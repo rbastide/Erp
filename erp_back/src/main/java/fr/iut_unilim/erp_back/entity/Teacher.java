@@ -11,13 +11,16 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacherID")
-    private Long id;
+    private Long teacherID;
 
     @Column(name = "lastname")
     private String lastname;
 
     @Column(name = "firstname")
     private String firstname;
+
+    @JoinColumn(name = "userID")
+    private Long userID;
 
     @ManyToMany
     @JoinTable(
@@ -29,13 +32,19 @@ public class Teacher {
 
     public Teacher() {}
 
-    public Teacher(String lastname, String firstname) {
-        this.lastname = lastname;
-        this.firstname = firstname;
+    public Teacher(fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher) {
+        this.lastname = teacher.lastname();
+        this.firstname = teacher.firstname();
     }
 
-    public Long getId() {
-        return id;
+    public Teacher(String lastname, String firstname,Long userID) {
+        this.lastname = lastname;
+        this.firstname = firstname;
+        this.userID = userID;
+    }
+
+    public Long getTeacherID() {
+        return teacherID;
     }
 
     public String getLastname() {
@@ -44,5 +53,25 @@ public class Teacher {
 
     public String getFirstname() {
         return firstname;
+    }
+
+    public Long getuserID() {
+        return userID;
+    }
+
+    public void setTeacherID(Long id) {
+        this.teacherID = id;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public void setuserID(Long userID) {
+        this.userID = userID;
     }
 }

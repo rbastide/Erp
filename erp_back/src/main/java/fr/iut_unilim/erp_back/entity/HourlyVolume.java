@@ -8,7 +8,6 @@ public class HourlyVolume {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "hourlyVolID")
     private Long hourlyVolID;
 
@@ -30,8 +29,7 @@ public class HourlyVolume {
     public HourlyVolume() {
     }
 
-    public HourlyVolume(Long hourlyVolID, int nbHoursCM, int nbHoursDS, int nbHoursDSTP, int nbHoursTP, int nbHoursTD) {
-        this.hourlyVolID = hourlyVolID;
+    public HourlyVolume(int nbHoursCM, int nbHoursDS, int nbHoursDSTP, int nbHoursTP, int nbHoursTD) {
         this.nbHoursCM = nbHoursCM;
         this.nbHoursDSTP = nbHoursDSTP;
         this.nbHoursDS = nbHoursDS;
@@ -39,10 +37,34 @@ public class HourlyVolume {
         this.nbHoursTD = nbHoursTD;
     }
 
-    public Long hourlyVolID() { return hourlyVolID; }
-    public int nbHoursCM() { return nbHoursCM; }
-    public int nbHoursDSTP() { return nbHoursDSTP; }
-    public int nbHoursDS() { return nbHoursDS; }
-    public int nbHoursTP() { return nbHoursTP; }
-    public int nbHoursTD() { return nbHoursTD; }
+    public void setHourlyVolID(Long hourlyVolID) {
+        this.hourlyVolID = hourlyVolID;
+    }
+
+    public void setNbHoursCM(int nbHoursCM) {
+        this.nbHoursCM = nbHoursCM;
+    }
+
+    public void setNbHoursDSTP(int nbHoursDSTP) {
+        this.nbHoursDSTP = nbHoursDSTP;
+    }
+
+    public void setNbHoursDS(int nbHoursDS) {
+        this.nbHoursDS = nbHoursDS;
+    }
+
+    public void setNbHoursTP(int nbHoursTP) {
+        this.nbHoursTP = nbHoursTP;
+    }
+
+    public void setNbHoursTD(int nbHoursTD) {
+        this.nbHoursTD = nbHoursTD;
+    }
+
+    public Long getHourlyVolID() { return hourlyVolID; }
+    public int getNbHoursCM() { return nbHoursCM; }
+    public int getNbHoursDSTP() { return nbHoursDSTP; }
+    public int getNbHoursDS() { return nbHoursDS; }
+    public int getNbHoursTP() { return nbHoursTP; }
+    public int getNbHoursTD() { return nbHoursTD; }
 }

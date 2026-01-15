@@ -1,89 +1,142 @@
 package fr.iut_unilim.erp_back.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ResourceSheet")
+@Table(name = "ResourceSheets")
 public class ResourceSheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "sheetsID")
     private Long sheetsID;
 
     @Column(name = "resourceID")
     private Long resourceID;
 
-    @Column(name = "referencialTeacherID")
-    private Long referencialTeacherID;
-
     @Column(name = "hourlyVolumeID")
     private Long hourlyVolumeID;
 
-    @Column(name = "teachersReturnID")
-    private Long teachersReturnID;
-
-    @Column(name = "studentReturnID")
-    private Long studentReturnID;
-
-    @Column(name = "improvementsIdeaID")
-    private Long improvementsIDeaID;
-
-    @Column(name = "semester")
-    private int semester;
-
-    @Column(name = "year")
-    private int year;
-
-    @Column(name = "mainGoal")
-    private String mainGoal;
-
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "linkedSAE")
-    private int linkedSAE;
-
     @Column(name = "creationDate")
-    private String creationDate;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
+    private Date creationDate;
 
-    @ManyToMany(mappedBy = "resourceSheets")
-    private List<Teacher> teachers;
+    @Column(name = "lastModificationDate")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
+    private Date lastModificationDate;
 
-    @ManyToMany(mappedBy = "resourceSheets")
-    private List<Skill> skills;
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
+    @JsonManagedReference
+    private List<PedagologicalTeachersFeedbacks> teachersFeedbacks;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
+    @JsonManagedReference
+    private List<StudentsFeedbacks> studentsFeedbacks;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @JoinColumn(name = "sheetID")
+    @JsonManagedReference
+    private List<ImprovementIdeas> improvementIdeas;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "ressourceSheetId")
+    @JsonManagedReference
+    private List<PedagologicalContent> pedagologicalContentId;
 
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long referencialTeacherID, Long hourlyVolumeID, Long teachersReturnID, Long studentReturnID, Long improvementsIDeaID, int semester, int year, String mainGoal, String content, int linkedSAE) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<PedagologicalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<PedagologicalContent> pedagologicalContent) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
-        this.referencialTeacherID = referencialTeacherID;
         this.hourlyVolumeID = hourlyVolumeID;
-        this.teachersReturnID = teachersReturnID;
-        this.studentReturnID = studentReturnID;
-        this.improvementsIDeaID = improvementsIDeaID;
-        this.semester = semester;
-        this.year = year;
-        this.mainGoal = mainGoal;
-        this.content = content;
-        this.linkedSAE = linkedSAE;
+        this.teachersFeedbacks = teachersFeedbacks;
+        this.studentsFeedbacks = studentsFeedbacks;
+        this.improvementIdeas = improvementIdeas;
+        this.creationDate = creationDate;
+        this.lastModificationDate = lastModificationDate;
+        this.pedagologicalContentId = pedagologicalContent;
     }
 
-    public Long sheetsID() { return sheetsID; }
-    public Long resourceID() { return resourceID; }
-    public Long referencialTeacherID() { return referencialTeacherID; }
-    public Long hourlyVolumeID() { return hourlyVolumeID; }
-    public Long teachersReturnID() { return teachersReturnID; }
-    public Long studentReturnID() { return studentReturnID; }
-    public Long improvementsID() { return improvementsIDeaID; }
-    public int semester() { return semester; }
-    public int year() { return year; }
-    public String mainGoal() { return mainGoal; }
-    public String content() { return content; }
-    public int linkedSAE() { return linkedSAE; }
+    public void setSheetsID(Long sheetsID) {
+        this.sheetsID = sheetsID;
+    }
+
+    public void setResourceID(Long resourceID) {
+        this.resourceID = resourceID;
+    }
+
+    public void setHourlyVolumeID(Long hourlyVolumeID) {
+        this.hourlyVolumeID = hourlyVolumeID;
+    }
+
+    public void setTeachersFeedbacks(List<PedagologicalTeachersFeedbacks> teachersFeedbacks) {
+        this.teachersFeedbacks = teachersFeedbacks;
+    }
+
+    public void setStudentsFeedbacks(List<StudentsFeedbacks> studentsFeedbacks) {
+        this.studentsFeedbacks = studentsFeedbacks;
+    }
+
+    public void setImprovementIdeas(List<ImprovementIdeas> improvementIdeas) {
+        this.improvementIdeas = improvementIdeas;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setLastModificationDate(Date lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
+    }
+
+    public void setPedagologicalContentId(List<PedagologicalContent> pedagologicalContent) {
+        this.pedagologicalContentId = pedagologicalContent;
+    }
+
+    public Long getSheetsID() {
+        return sheetsID;
+    }
+
+    public Long getResourceID() {
+        return resourceID;
+    }
+
+    public Long getHourlyVolumeID() {
+        return hourlyVolumeID;
+    }
+
+    public List<StudentsFeedbacks> getStudentsFeedbacks() {
+        return studentsFeedbacks;
+    }
+
+    public List<PedagologicalTeachersFeedbacks> getTeachersFeedbacks() {
+        return teachersFeedbacks;
+    }
+
+    public List<ImprovementIdeas> getImprovementIdeas() {
+        return improvementIdeas;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getLastModificationDate() {
+        return lastModificationDate;
+    }
+
+    public List<PedagologicalContent> getPedagologicalContentId() {
+        return pedagologicalContentId;
+    }
+
 }
+
+
+

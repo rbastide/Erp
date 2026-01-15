@@ -1,8 +1,15 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.dto.ResourceResponse;
+import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.service.ResourceService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -10,8 +17,54 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final ResourceRepository resourceRepository;
 
-    public ResourceController(ResourceService resourceService) {
+    public ResourceController(ResourceService resourceService, ResourceRepository resourceRepository) {
         this.resourceService = resourceService;
+        this.resourceRepository = resourceRepository;
     }
+
+    @GetMapping("/resources")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    public ResponseEntity<?> getResource() {
+        return ResponseEntity.ok(resourceService.getAllResources());
+    }
+
+    @PostMapping("/editResource")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList) {
+        for (ResourceResponse res : resList) {
+            if (res.getResourceID() != null) {
+                Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
+
+                if (existingResource.isPresent()) {
+                    Resource resourceToUpdate = existingResource.get();
+                    resourceToUpdate.setNum(res.getNum());
+                    resourceToUpdate.setName(res.getName());
+                    resourceToUpdate.setSemester(res.getSemestre());
+                    resourceRepository.save(resourceToUpdate);
+                    continue;
+                }
+            }
+            Resource newResource = new Resource();
+            newResource.setNum(res.getNum());
+            newResource.setName(res.getName());
+            newResource.setSemester(res.getSemestre());
+            resourceRepository.save(newResource);
+        }
+        return ResponseEntity.ok().body("Ressources traitées avec succès");
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deleteResource(@PathVariable Long id) {
+        if (!resourceRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        resourceRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

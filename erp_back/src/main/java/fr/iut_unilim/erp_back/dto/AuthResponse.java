@@ -2,10 +2,15 @@ package fr.iut_unilim.erp_back.dto;
 
 public class AuthResponse {
     private String token;
+    private String role;
     private String type = "Bearer";
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public void setType(String type) {
@@ -14,6 +19,10 @@ public class AuthResponse {
 
     public String getToken() {
         return token;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public String getType() {
