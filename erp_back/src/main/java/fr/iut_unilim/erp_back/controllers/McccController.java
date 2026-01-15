@@ -94,14 +94,14 @@ public class McccController {
 
         try {
             if (dto.getEditDate() != null) {
-                Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(dto.getEditDate());
+                Date editableDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getEditDate());
                 mccc.setLastModificationDate(editableDate);
             } else {
                 mccc.setLastModificationDate(new Date());
             }
             if (mccc.getCreationDate() == null) {
                 if (dto.getCreationDate() != null) {
-                    Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dto.getCreationDate());
+                    Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getCreationDate());
                     mccc.setCreationDate(date);
                 } else {
                     mccc.setCreationDate(new Date());
