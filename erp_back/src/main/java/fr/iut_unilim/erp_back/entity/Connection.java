@@ -23,17 +23,19 @@ public class Connection {
     @Column(name = "email")
     private String email;
 
-    //@Column("universityDepartmentID")
-    //private UniversityDepartment universityDepartment;
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
 
-    public Connection() {}
+    public Connection() {
+    }
 
-    public Connection(String identifier, String hashedPassword, String role, String email) {
+    public Connection(String identifier, String hashedPassword, String role, String email, UniversityDepartment universityDepartment) {
         this.identifier = identifier;
         this.hashedPassword = hashedPassword;
         this.role = role;
         this.email = email;
-        //this.universityDepartment = universityDepartment;
+        this.universityDepartment = universityDepartment;
     }
 
     public Long getId() {
@@ -51,18 +53,32 @@ public class Connection {
     public String getRole() {
         return role;
     }
-    public String getEmail() {return email;}
+
+    public String getEmail() {
+        return email;
+    }
 
     public void setPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 
-    public void setIdentifier(String identifier) { this.identifier = identifier; }
-    public void setRole(String role) { this.role = role; }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-    public void setEmail(String email) { this.email = email; }
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
+
+    public void setUniversityDepartment(UniversityDepartment universityDepartment) {
+        this.universityDepartment = universityDepartment;
+    }
 }
