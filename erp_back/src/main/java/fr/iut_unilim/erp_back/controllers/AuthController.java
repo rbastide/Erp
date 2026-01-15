@@ -124,7 +124,14 @@ public class AuthController {
     @GetMapping("/user-info/{identifier}")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
+        if (teacher == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
     }
