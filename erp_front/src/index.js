@@ -6,13 +6,10 @@ import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
-import SuccessfullySaved from "./components/Information/SuccessfullySaved.vue";
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
 import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
-import SuccessfullyDeletedPage from "./components/Information/SuccessfullyDeleted.vue";
 import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
 import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
-import ModifSavedModal from "./components/Information/ModifSavedModal.vue";
 import McccMenuPage from "./components/Mccc/McccMenuPage.vue";
 import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
@@ -69,11 +66,6 @@ const routes = [
         component: HelpPage
     },
     {
-        path: '/successfully-saved',
-        name: 'SuccessfullySavedPage',
-        component: SuccessfullySaved
-    },
-    {
         path: '/fill-resource-sheet',
         name: 'FillResourceSheet',
         component: FillResourceSheet
@@ -89,11 +81,6 @@ const routes = [
         component: HistoryAdminPage
     },
     {
-        path: '/del-sheet',
-        name: 'SuccessfullyDeletePage',
-        component: SuccessfullyDeletedPage
-    },
-    {
         path: '/mccc-resource',
         name: 'McccResourcePage',
         component: McccResourcePage
@@ -102,11 +89,6 @@ const routes = [
         path: '/mccc-hours',
         name: 'McccFillHourPage',
         component: McccFillHourPage
-    },
-    {
-        path: '/modif-saved',
-        name: 'ModifSaved',
-        component: ModifSavedModal
     },
     {
         path: '/mccc-teachers',
