@@ -27,6 +27,79 @@ const fetchReferential = async () => {
   }
 };
 
+const fetchLinkedSkills = async () => {
+  if (!mcccStore.resourceID) {
+    console.warn("Aucun ResourceID dans le store, abandon.");
+    return;
+  }
+
+  const targetId = String(mcccStore.resourceID);
+  console.log("Recherche des compétences pour resourceID :", targetId);
+
+  try {
+    const response = await api.get('/mccc/getMccc');
+
+    const currentMccc = response.data.find(m => {
+      return m.resourceId && String(m.resourceId.resourceID) === targetId;
+    });
+
+    if (!currentMccc) {
+      console.warn("Aucun MCCC trouvé dans la liste pour cet ID.");
+      return;
+    }
+
+    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
+      console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
+      return;
+    }
+
+    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
+
+    const acsFromBdd = currentMccc.criticalLearningsId;
+    const groupedResult = [];
+
+    acsFromBdd.forEach(acItem => {
+      if (!acItem.rankID || !acItem.rankID.skillID) return;
+
+      const skillName = acItem.rankID.skillID.skillName;
+      const skillNum = acItem.rankID.skillID.skillNum;
+      const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
+
+      let existingSkill = groupedResult.find(g => g.ue === skillName);
+      if (!existingSkill) {
+        existingSkill = {
+          resourceCode: mcccStore.resourceCode,
+          ue: skillName,
+          skillNum: skillNum,
+          allLevels: []
+        };
+        groupedResult.push(existingSkill);
+      }
+
+      let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
+      if (!existingLevel) {
+        existingLevel = {
+          title: rankTitle,
+          acs: []
+        };
+        existingSkill.allLevels.push(existingLevel);
+      }
+
+      existingLevel.acs.push({
+        learningNum: acItem.learningNum,
+        learningTitle: acItem.learningTitle || "Sans titre"
+      });
+    });
+
+    mcccStore.acsGrouped = groupedResult;
+    mcccStore.registerMcccStore();
+    console.log("Store ACs mis à jour depuis BDD :", mcccStore.acsGrouped);
+
+  } catch (error) {
+    console.error("Erreur chargement des compétences liées :", error);
+  }
+};
+
 onMounted(async () => {
   mcccStore.loadMcccStore();
 
@@ -37,10 +110,15 @@ onMounted(async () => {
   await fetchReferential();
 
   if (mcccStore.acsGrouped.length === 0) {
+    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedSkills();
+  } else {
+    console.log("Compétences chargées depuis le Store local");
+  }
 
   mcccStore.saveBackup();
-}
+  initialState.value = JSON.parse(JSON.stringify(mcccStore.acsGrouped));
+});
 
 const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
@@ -85,73 +163,6 @@ const addSkillDirectly = (skill) => {
   mcccStore.acsGrouped.unshift(newSelection);
   mcccStore.registerMcccStore();
 };
-const fetchLinkedSkills = async () => {
-  if (!mcccStore.resourceID) {
-
-  }
-    return;
-  }
-  const targetId = String(mcccStore.resourceID);
-
-  try {
-    const response = await api.get('/mccc/getMccc');
-
-    const currentMccc = response.data.find(m => {
-      return m.resourceId && String(m.resourceId.resourceID) === targetId;
-    });
-
-    if (!currentMccc) {
-      return;
-    }
-
-    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
-      return;
-    }
-
-
-    const acsFromBdd = currentMccc.criticalLearningsId;
-    const groupedResult = [];
-
-    acsFromBdd.forEach(acItem => {
-      if (!acItem.rankID || !acItem.rankID.skillID) return;
-
-      const skillName = acItem.rankID.skillID.skillName;
-      const skillNum = acItem.rankID.skillID.skillNum;
-      const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
-
-      let existingSkill = groupedResult.find(g => g.ue === skillName);
-      if (!existingSkill) {
-        existingSkill = {
-          resourceCode: mcccStore.resourceCode,
-          ue: skillName,
-          skillNum: skillNum,
-          allLevels: []
-        };
-        groupedResult.push(existingSkill);
-      }
-
-      let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
-      if (!existingLevel) {
-        existingLevel = {
-          title: rankTitle,
-          acs: []
-        };
-        existingSkill.allLevels.push(existingLevel);
-      }
-
-      existingLevel.acs.push({
-        learningNum: acItem.learningNum,
-        learningTitle: acItem.learningTitle || "Sans titre"
-      });
-    });
-
-    mcccStore.acsGrouped = groupedResult;
-    mcccStore.registerMcccStore();
-
-  } catch (error) {
-    console.error("Erreur chargement des compétences liées :", error);
-  }
-});
 
 const removeGroup = (index) => {
   mcccStore.acsGrouped.splice(index, 1);
@@ -168,7 +179,9 @@ const handleRetour = () => {
 };
 
 const onConfirmCancel = () => {
-  mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  if (initialState.value) {
+    mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  }
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -339,9 +352,9 @@ const clearSearch = () => searchQuery.value = '';
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  min-height: 220px; /* Augmenté pour accueillir le contenu */
+  min-height: 220px;
   position: relative;
-  justify-content: flex-start; /* Aligne le contenu vers le haut */
+  justify-content: flex-start;
 }
 
 .admin-card:hover {
@@ -384,7 +397,6 @@ const clearSearch = () => searchQuery.value = '';
   color: #333;
 }
 
-/* Styles pour le détail des compétences */
 .level-entry {
   width: 100%;
   padding: 10px 0;
@@ -425,7 +437,6 @@ const clearSearch = () => searchQuery.value = '';
   color: #B51621;
 }
 
-/* Bouton supprimer (carte sélectionnée) */
 .btn-remove-absolute {
   position: absolute;
   top: 10px;
@@ -444,7 +455,6 @@ const clearSearch = () => searchQuery.value = '';
   z-index: 10;
 }
 
-/* Nouveau style pour le bouton Ajouter en bas */
 .btn-add-footer {
   margin-top: 25px;
   padding: 8px 20px;
@@ -472,7 +482,6 @@ const clearSearch = () => searchQuery.value = '';
   margin-top: 10px;
 }
 
-/* Footer et Recherche (Inchangé) */
 .sticky-footer {
   position: fixed;
   bottom: 0;
