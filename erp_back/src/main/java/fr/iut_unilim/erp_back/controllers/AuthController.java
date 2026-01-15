@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -11,7 +10,9 @@ import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -58,7 +59,7 @@ public class AuthController {
         user.setEmail(req.getEmail());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(req.getRole());
-        
+
         Connection connection = connectionRepository.save(user);
 
         if ("TEACHER".equalsIgnoreCase(req.getRole())) {
@@ -78,9 +79,17 @@ public class AuthController {
                 String subject = auth.getName();
                 String token = jwtUtils.generateToken(subject);
                 AuthResponse resp = new AuthResponse();
-                resp.setToken(token);
                 resp.setRole(auth.getAuthorities().iterator().next().getAuthority());
-                return ResponseEntity.ok(resp);
+                ResponseCookie cookie = ResponseCookie.from("auth_token", token)
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/")
+                        .sameSite("Lax")
+                        .build();
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(resp);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         } catch (AuthenticationException e) {
@@ -136,5 +145,20 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        ResponseCookie cookie = ResponseCookie.from("auth_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body("Déconnexion réussie");
     }
 }

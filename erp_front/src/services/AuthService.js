@@ -1,5 +1,6 @@
 import apiClient from './api';
-import { mcccStore } from "@/services/mcccStore.js";
+import api from './api';
+import {mcccStore} from "@/services/mcccStore.js";
 import {reactive} from "vue";
 
 export default {
@@ -10,23 +11,20 @@ export default {
   async login(credentials) {
     const response = await apiClient.post('/auth/login', credentials);
 
-    if (response.data.token) {
-      localStorage.setItem('user_token', response.data.token);
-    }
     if (response.data.role) {
       localStorage.setItem('user_role', response.data.role);
     }
 
-      authStore.firstName = response.data.firstname || response.data.firstName;
-      authStore.lastName = response.data.lastname || response.data.lastName;
+    authStore.firstName = response.data.firstname || response.data.firstName;
+    authStore.lastName = response.data.lastname || response.data.lastName;
 
-      authStore.save();
+    authStore.save();
 
     return response.data;
   },
 
-  logout() {
-    localStorage.removeItem('user_token');
+  async logout() {
+    await api.post('/auth/logout');
     localStorage.removeItem('user_role');
     authStore.clear();
     mcccStore.clearMcccStore();
