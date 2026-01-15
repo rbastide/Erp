@@ -65,13 +65,22 @@ public class McccController {
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
-        Mccc mccc = new Mccc();
-
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
-        if (canHaveResource.isPresent()) {
-            mccc.setResourceId(canHaveResource.get());
-        } else {
+        if (canHaveResource.isEmpty()) {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
+        }
+
+        Mccc mccc;
+        List<Mccc> allMcccs = mcccService.getAllMccc();
+        Optional<Mccc> existingMccc = allMcccs.stream()
+                .filter(m -> m.getResourceId().getResourceID().equals(dto.getResourceID()))
+                .findFirst();
+
+        if (existingMccc.isPresent()) {
+            mccc = existingMccc.get();
+        } else {
+            mccc = new Mccc();
+            mccc.setResourceId(canHaveResource.get());
         }
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
@@ -83,8 +92,24 @@ public class McccController {
         HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
         mccc.setHourlyVolId(hourlyVolume);
 
-        ResponseEntity<Object> doDatesHasCrashed = getCreationdateAndEditDateFromDto(dto, mccc);
-        if (doDatesHasCrashed != null) return doDatesHasCrashed;
+        try {
+            if (dto.getEditDate() != null) {
+                Date editableDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getEditDate());
+                mccc.setLastModificationDate(editableDate);
+            } else {
+                mccc.setLastModificationDate(new Date());
+            }
+            if (mccc.getCreationDate() == null) {
+                if (dto.getCreationDate() != null) {
+                    Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getCreationDate());
+                    mccc.setCreationDate(date);
+                } else {
+                    mccc.setCreationDate(new Date());
+                }
+            }
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
+        }
 
         Set<CriticalLearning> setCriticalLearnings = new HashSet<>();
         ResponseEntity<Object> doCriticalLearningHasCrashed = fillCriticalLearnings(dto, setCriticalLearnings);
@@ -94,7 +119,7 @@ public class McccController {
 
         mcccService.save(mccc);
 
-        return ResponseEntity.ok("MCCC sauvegardée avec succès !");
+        return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
 
     @Nullable
@@ -240,7 +265,6 @@ public class McccController {
 
     @GetMapping("/getReferentIds/{id}")
     public ResponseEntity<?> getReferentIds(@PathVariable Long id) {
-        // C'est beaucoup plus simple et sûr :
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
     }

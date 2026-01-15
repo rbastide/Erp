@@ -29,18 +29,36 @@ const hourTypes = [
 ];
 
 const fetchHourlyVolumes = async () => {
-  try {
-    const response = await api.get('/mccc/getHourlyVolumes');
+  if (!mcccStore.resourceID) return;
 
-    if (response.data && response.data.length > 0) {
-      const bddData = response.data[0];
+  const targetId = String(mcccStore.resourceID);
+  console.log("Récupération des heures pour resourceID:", targetId);
+
+  try {
+    const response = await api.get('/mccc/getMccc');
+
+    const currentMccc = response.data.find((m: any) =>
+        m.resourceId && String(m.resourceId.resourceID) === targetId
+    );
+
+    if (currentMccc && currentMccc.hourlyVolId) {
+      console.log("Heures trouvées en BDD :", currentMccc.hourlyVolId);
+      const bddData = currentMccc.hourlyVolId;
+
       currentHourlyVolID.value = bddData.hourlyVolID;
 
-      mcccStore.hoursCM = bddData.nbHoursCM;
-      mcccStore.hoursTD = bddData.nbHoursTD;
-      mcccStore.hoursTP = bddData.nbHoursTP;
-      mcccStore.hoursDS = bddData.nbHoursDS;
-      mcccStore.hoursDSTP = bddData.nbHoursDSTP;
+      mcccStore.hoursCM = bddData.nbHoursCM || 0;
+      mcccStore.hoursTD = bddData.nbHoursTD || 0;
+      mcccStore.hoursTP = bddData.nbHoursTP || 0;
+      mcccStore.hoursDS = bddData.nbHoursDS || 0;
+      mcccStore.hoursDSTP = bddData.nbHoursDSTP || 0;
+    } else {
+      console.log("Pas d'heures trouvées, mise à zéro.");
+      mcccStore.hoursCM = 0;
+      mcccStore.hoursTD = 0;
+      mcccStore.hoursTP = 0;
+      mcccStore.hoursDS = 0;
+      mcccStore.hoursDSTP = 0;
     }
     mcccStore.saveBackup();
   } catch (error) {
@@ -59,7 +77,9 @@ onMounted(async () => {
       (mcccStore.hoursDSTP || 0)
   ) > 0;
 
-  if (!hasLocalData) {
+  if (hasLocalData) {
+    console.log("Utilisation des heures du store local");
+  } else {
     await fetchHourlyVolumes();
   }
 

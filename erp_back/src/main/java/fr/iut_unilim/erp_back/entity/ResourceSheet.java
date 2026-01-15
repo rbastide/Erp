@@ -49,6 +49,9 @@ public class ResourceSheet {
     @JsonManagedReference
     private List<PedagologicalContent> pedagologicalContentId;
 
+    //@Column("universityDepartmentID")
+    //private UniversityDepartment universityDepartment;
+
     public ResourceSheet() {
     }
 
@@ -62,6 +65,7 @@ public class ResourceSheet {
         this.creationDate = creationDate;
         this.lastModificationDate = lastModificationDate;
         this.pedagologicalContentId = pedagologicalContent;
+        //this.universityDepartment = universityDepartment;
     }
 
     public void setSheetsID(Long sheetsID) {
@@ -135,6 +139,10 @@ public class ResourceSheet {
     public List<PedagologicalContent> getPedagologicalContentId() {
         return pedagologicalContentId;
     }
+
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 
 }
 

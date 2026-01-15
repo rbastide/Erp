@@ -1,5 +1,7 @@
 import apiClient from './api';
-import { mcccStore } from "@/services/mcccStore.js";
+import api from './api';
+import {mcccStore} from "@/services/mcccStore.js";
+import {reactive} from "vue";
 
 export default {
   register(user) {
@@ -9,19 +11,22 @@ export default {
   async login(credentials) {
     const response = await apiClient.post('/auth/login', credentials);
 
-    if (response.data.token) {
-      localStorage.setItem('user_token', response.data.token);
-    }
     if (response.data.role) {
       localStorage.setItem('user_role', response.data.role);
     }
+
+    authStore.firstName = response.data.firstname || response.data.firstName;
+    authStore.lastName = response.data.lastname || response.data.lastName;
+
+    authStore.save();
+
     return response.data;
   },
 
-  logout() {
-    localStorage.removeItem('user_token');
+  async logout() {
+    await api.post('/auth/logout');
     localStorage.removeItem('user_role');
-    this.clearAuthService();
+    authStore.clear();
     mcccStore.clearMcccStore();
   },
 
@@ -36,17 +41,7 @@ export default {
   },
 
   loadAuthService() {
-    const storedData = localStorage.getItem("AuthService");
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        this.lastName = parsedData.lastName || '';
-        this.firstName = parsedData.firstName || '';
-      } catch (e) {
-        console.error("Erreur lors du chargement de AuthService :", e);
-        this.clearAuthService();
-      }
-    }
+    authStore.load();
   },
 
   clearAuthService() {
@@ -55,3 +50,34 @@ export default {
     localStorage.removeItem("AuthService");
   }
 };
+
+export const authStore = reactive({
+    firstName: '',
+    lastName: '',
+
+    save() {
+        localStorage.setItem("AuthService", JSON.stringify({
+            firstName: this.firstName,
+            lastName: this.lastName
+        }));
+    },
+
+    load() {
+        const stored = localStorage.getItem("AuthService");
+        if (stored) {
+            try {
+                const data = JSON.parse(stored);
+                this.firstName = data.firstName || '';
+                this.lastName = data.lastName || '';
+            } catch (e) {
+                console.error("Erreur chargement AuthStore", e);
+            }
+        }
+    },
+
+    clear() {
+        this.firstName = '';
+        this.lastName = '';
+        localStorage.removeItem("AuthService");
+    }
+});

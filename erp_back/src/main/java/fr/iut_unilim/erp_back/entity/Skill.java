@@ -28,11 +28,15 @@ public class Skill {
     )
     private List<ResourceSheet> resourceSheets;
 
+    //@Column("universityDepartmentID")
+    //private UniversityDepartment universityDepartment;
+
     public Skill() {}
 
     public Skill(String skillName, int skillNum) {
         this.skillName = skillName;
         this.skillNum = skillNum;
+        //this.universityDepartment = universityDepartment;
     }
 
     public Long getSkillID() {
@@ -51,6 +55,8 @@ public class Skill {
         return skillNum;
     }
 
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
     public void setSkillID(Long skillID) {
         this.skillID = skillID;
     }
@@ -66,4 +72,6 @@ public class Skill {
     public void setResourceSheets(List<ResourceSheet> resourceSheets) {
         this.resourceSheets = resourceSheets;
     }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 }

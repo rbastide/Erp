@@ -40,19 +40,25 @@ const fetchTeachers = async () => {
 };
 
 const fetchLinkedTeachers = async () => {
-  const currentId = mcccStore.resourceID || mcccStore.hourlyVolID;
-  if (!currentId) return;
-
+  if (!mcccStore.resourceID) return;
+  const targetResourceId = String(mcccStore.resourceID);
   try {
-    const response = await api.get(`/mccc/getReferentIds/${currentId}`);
+    const mcccResponse = await api.get('/mccc/getMccc');
+
+    const foundMccc = mcccResponse.data.find(m =>
+        m.resourceId && String(m.resourceId.resourceID) === targetResourceId
+    );
+    if (!foundMccc || !foundMccc.mcccId) return;
+    const realMcccId = foundMccc.mcccId;
+
+    const response = await api.get(`mccc/getReferentIds/${realMcccId}`);
 
     if (response.data && Array.isArray(response.data)) {
-      console.log("IDs reçus de l'API :", response.data);
       selectedTeacherIds.value = response.data.map(id => Number(id));
       updateStoreReferents();
     }
   } catch (error) {
-    console.warn("Erreur récupération liens profs", error);
+    console.error("Erreur lors de la récupération des enseignants liés au MCCC :", error);
   }
 };
 

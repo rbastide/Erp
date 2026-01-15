@@ -38,11 +38,14 @@ onMounted(async () => {
   await fetchSAEs();
 
   if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0) {
+
     if (typeof mcccStore.saeCodes[0] === 'object') {
       selectedSaeIds.value = mcccStore.saeCodes.map(item => item.saeCode);
     } else {
       selectedSaeIds.value = [...mcccStore.saeCodes];
     }
+  } else {
+    await fetchLinkedSAEs();
   }
 
   initialState.value = [...selectedSaeIds.value];
@@ -56,6 +59,34 @@ const getSaeBySemester = (semesterNumber) => {
     const match = sae.id.match(/S?(\d)\./);
     return match && parseInt(match[1]) === semesterNumber;
   });
+};
+
+const fetchLinkedSAEs = async () => {
+  if (!mcccStore.resourceID) return;
+  const targetId = String(mcccStore.resourceID);
+
+  try{
+    const response = await api.get('/mccc/getMccc');
+
+
+    const currentMccc = response.data.find(m =>
+        m.resourceId && String(m.resourceId.resourceID) === targetId
+    );
+
+    if (currentMccc && currentMccc.saesId && currentMccc.saesId.length > 0) {
+
+      selectedSaeIds.value = currentMccc.saesId.map(s => s.num);
+
+      mcccStore.saeCodes = currentMccc.saesId.map(s => ({
+        saeCode: s.num,
+        saeName: s.title
+      }));
+
+      mcccStore.registerMcccStore();
+    }
+  } catch (error) {
+    console.error("Erreur chargement des SAE liées :", error);
+  }
 };
 
 const toggleSae = (saeId) => {

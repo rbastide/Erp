@@ -27,15 +27,96 @@ const fetchReferential = async () => {
   }
 };
 
-onMounted(() => {
+const fetchLinkedSkills = async () => {
+  if (!mcccStore.resourceID) {
+    console.warn("Aucun ResourceID dans le store, abandon.");
+    return;
+  }
+
+  const targetId = String(mcccStore.resourceID);
+  console.log("Recherche des compétences pour resourceID :", targetId);
+
+  try {
+    const response = await api.get('/mccc/getMccc');
+
+    const currentMccc = response.data.find(m => {
+      return m.resourceId && String(m.resourceId.resourceID) === targetId;
+    });
+
+    if (!currentMccc) {
+      console.warn("Aucun MCCC trouvé dans la liste pour cet ID.");
+      return;
+    }
+
+    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
+      console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
+      return;
+    }
+
+    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
+
+    const acsFromBdd = currentMccc.criticalLearningsId;
+    const groupedResult = [];
+
+    acsFromBdd.forEach(acItem => {
+      if (!acItem.rankID || !acItem.rankID.skillID) return;
+
+      const skillName = acItem.rankID.skillID.skillName;
+      const skillNum = acItem.rankID.skillID.skillNum;
+      const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
+
+      let existingSkill = groupedResult.find(g => g.ue === skillName);
+      if (!existingSkill) {
+        existingSkill = {
+          resourceCode: mcccStore.resourceCode,
+          ue: skillName,
+          skillNum: skillNum,
+          allLevels: []
+        };
+        groupedResult.push(existingSkill);
+      }
+
+      let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
+      if (!existingLevel) {
+        existingLevel = {
+          title: rankTitle,
+          acs: []
+        };
+        existingSkill.allLevels.push(existingLevel);
+      }
+
+      existingLevel.acs.push({
+        learningNum: acItem.learningNum,
+        learningTitle: acItem.learningTitle || "Sans titre"
+      });
+    });
+
+    mcccStore.acsGrouped = groupedResult;
+    mcccStore.registerMcccStore();
+    console.log("Store ACs mis à jour depuis BDD :", mcccStore.acsGrouped);
+
+  } catch (error) {
+    console.error("Erreur chargement des compétences liées :", error);
+  }
+};
+
+onMounted(async () => {
   mcccStore.loadMcccStore();
+
   if (!Array.isArray(mcccStore.acsGrouped)) {
     mcccStore.acsGrouped = [];
   }
 
-  fetchReferential();
-  mcccStore.saveBackup();
+  await fetchReferential();
 
+  if (mcccStore.acsGrouped.length === 0) {
+    console.log("Store vide, chargement depuis la BDD...");
+    await fetchLinkedSkills();
+  } else {
+    console.log("Compétences chargées depuis le Store local");
+  }
+
+  mcccStore.saveBackup();
   initialState.value = JSON.parse(JSON.stringify(mcccStore.acsGrouped));
 });
 
@@ -98,7 +179,9 @@ const handleRetour = () => {
 };
 
 const onConfirmCancel = () => {
-  mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  if (initialState.value) {
+    mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  }
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -126,9 +209,7 @@ const clearSearch = () => searchQuery.value = '';
             <h3 class="card-title">{{ group.ue }}</h3>
 
             <div v-for="(lvl, lIdx) in group.allLevels" :key="lIdx" class="level-entry">
-
               <span class="rank-info-bold">Niveau {{ lIdx + 1 }} : {{ lvl.title }}</span>
-
               <div class="ac-details-list">
                 <div v-for="ac in lvl.acs" :key="ac.learningNum" class="ac-detail-item">
                   <strong>AC {{ ac.learningNum }} :</strong> {{ ac.learningTitle }}
@@ -150,11 +231,33 @@ const clearSearch = () => searchQuery.value = '';
                :key="skill.id"
                class="admin-card"
                @click="addSkillDirectly(skill)">
+
             <div class="icon-circle">
               {{ skill.skillNum }}
             </div>
             <h3 class="card-title">{{ skill.skillName }}</h3>
-            <span class="click-info">+ Ajouter</span>
+
+            <div v-if="skill.levels && skill.levels.length > 0">
+              <div v-for="(level, lIdx) in skill.levels" :key="lIdx" class="level-entry">
+                <span class="rank-info-bold">
+                  Niveau {{ lIdx + 1 }} : {{ level.title || level.name || level.label || level.levelTitle || "Sans titre" }}
+                </span>
+
+                <div class="ac-details-list">
+                  <div v-for="ac in level.acs" :key="ac.id || ac.num" class="ac-detail-item">
+                    <strong>AC {{ ac.num || ac.acNum || ac.learningNum }} :</strong>
+                    {{ ac.title || ac.name || ac.label || ac.learningTitle }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="no-content-warning">
+              Aucun niveau associé
+            </div>
+
+            <div class="btn-add-footer">
+              + Ajouter
+            </div>
           </div>
         </div>
 
@@ -249,8 +352,9 @@ const clearSearch = () => searchQuery.value = '';
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  min-height: 160px;
+  min-height: 220px;
   position: relative;
+  justify-content: flex-start;
 }
 
 .admin-card:hover {
@@ -263,7 +367,6 @@ const clearSearch = () => searchQuery.value = '';
   border-color: #B51621;
   background-color: #fff5f5;
   cursor: default;
-  min-height: 220px;
 }
 
 .icon-circle {
@@ -290,7 +393,7 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 1rem;
   font-weight: 700;
   text-align: center;
-  margin: 0 0 5px 0;
+  margin: 0 0 15px 0;
   color: #333;
 }
 
@@ -315,21 +418,9 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .ac-details-list {
-  padding-left: 10px;
-}
-
-.rank-info {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.ac-details-list {
   width: 100%;
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(181, 22, 33, 0.2);
+  margin-top: 5px;
+  padding-left: 5px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -339,7 +430,7 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 0.75rem;
   color: #444;
   text-align: left;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
 .ac-detail-item strong {
@@ -362,6 +453,33 @@ const clearSearch = () => searchQuery.value = '';
   justify-content: center;
   font-size: 12px;
   z-index: 10;
+}
+
+.btn-add-footer {
+  margin-top: 25px;
+  padding: 8px 20px;
+  background-color: transparent;
+  color: #B51621;
+  border: 1px solid #B51621;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  max-width: 120px;
+}
+
+.admin-card:hover .btn-add-footer {
+  background-color: #B51621;
+  color: white;
+}
+
+.no-content-warning {
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+  margin-top: 10px;
 }
 
 .sticky-footer {

@@ -13,7 +13,7 @@ public class Mccc {
     @Column(name = "mcccID")
     private Long mcccId;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "hourlyVolID")
     private HourlyVolume hourlyVolId;
 
@@ -55,6 +55,7 @@ public class Mccc {
         this.saesId = saesId;
         this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
+        //this.universityDepartment = universityDepartment;
     }
 
     public Mccc() {
@@ -123,4 +124,8 @@ public class Mccc {
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
+
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 }

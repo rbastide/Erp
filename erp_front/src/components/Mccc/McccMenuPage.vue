@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import { mcccStore } from '@/services/mcccStore';
+import CancelModal from '../Information/CancelModal.vue';
 
 const router = useRouter();
+const showModal = ref(false);
+const userRole = ref('');
 
-const handleRetour = () => {
-  router.push('/cancel');
+const handleBack = () => {
+  showModal.value = true;
+};
+
+const onConfirmCancel = () => {
+  mcccStore.restoreBackup(); // On remet les données comme avant
+
+  if (userRole.value === "ADMIN" || userRole.value === 'SUPER_ADMIN'){
+    router.push('/home-admin');
+  } else {
+    router.push('/home');
+  }
 };
 
 const handleHours = () => {
@@ -36,6 +49,7 @@ const handleCompetences = () => {
 onMounted(() => {
   mcccStore.loadMcccStore();
   mcccStore.saveBackup();
+  userRole.value = localStorage.getItem('user_role') || 'user';
 });
 
 </script>
@@ -79,8 +93,14 @@ onMounted(() => {
 
       <div class="container-btn">
         <button @click="handleValider" class="btn-sys primary">Valider</button>
-        <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
+        <button @click="handleBack" class="btn-sys secondary">Annuler</button>
       </div>
+
+      <CancelModal
+          v-if="showModal"
+          @confirm="onConfirmCancel"
+          @close="showModal = false"
+      />
     </main>
   </div>
 </template>

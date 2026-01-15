@@ -4,28 +4,28 @@ import { useRouter, useRoute } from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import CancelModal from '../Information/CancelModal.vue';
+import ModifSavedModal from '../Information/ModifSavedModal.vue';
 
 const router = useRouter()
 const route = useRoute()
+
+const showModal = ref(false);
+const showSuccessModal = ref(false);
 
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
-const hours = ref({
-  cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0
-})
-
+const hours = ref({ cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0 })
 const cmContents = ref([''])
 const tdContents = ref([''])
 const tpContents = ref([''])
 const dsContents = ref([''])
 const dstpContents = ref([''])
-
 const edFBContents = ref([''])
 const stFBContents = ref([''])
 const upgradesContents = ref([''])
-
 const cmRefs = ref<HTMLTextAreaElement[]>([])
 const tdRefs = ref<HTMLTextAreaElement[]>([])
 const tpRefs = ref<HTMLTextAreaElement[]>([])
@@ -34,7 +34,6 @@ const dstpRefs = ref<HTMLTextAreaElement[]>([])
 const edFBRefs = ref<HTMLTextAreaElement[]>([])
 const stFBRefs = ref<HTMLTextAreaElement[]>([])
 const upgradesRefs = ref<HTMLTextAreaElement[]>([])
-
 
 const canAdd = (list: string[]) => {
   if (!list || list.length === 0) return true;
@@ -100,7 +99,6 @@ const fetchResourceSheetData = async () => {
       matchingSheets.sort((a: any, b: any) => {
         return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
       });
-      console.log(matchingSheets);
 
       const resourceData = matchingSheets.length > 0 ? matchingSheets.reverse()[0] : null;
 
@@ -114,20 +112,16 @@ const fetchResourceSheetData = async () => {
 
         const cm = getContentByType('CM');
         cmContents.value = cm.length > 0 ? cm : [''];
-
         const td = getContentByType('TD');
         tdContents.value = td.length > 0 ? td : [''];
-
         const tp = getContentByType('TP');
         tpContents.value = tp.length > 0 ? tp : [''];
-
         const ds = getContentByType('DS');
         dsContents.value = ds.length > 0 ? ds : [''];
 
         const dstpRaw = resourceData.pedagologicalContentId?.filter((item: any) =>
             ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
         ) || [];
-
         const dstp = dstpRaw.map((item: any) => item.content || '');
         dstpContents.value = dstp.length > 0 ? dstp : [''];
 
@@ -135,7 +129,6 @@ const fetchResourceSheetData = async () => {
           const tFeedbacks = resourceData.teachersFeedbacks.map((f: any) => f.content || '');
           edFBContents.value = tFeedbacks.length > 0 ? tFeedbacks : [''];
         }
-
         if (resourceData.studentsFeedbacks) {
           const sFeedbacks = resourceData.studentsFeedbacks.map((f: any) => f.content || '');
           stFBContents.value = sFeedbacks.length > 0 ? sFeedbacks : [''];
@@ -160,7 +153,6 @@ onMounted(async () => {
 const createFieldManager = (contentRef: any, elementRefs: any) => {
   return async () => {
     if (!canAdd(contentRef.value)) return;
-
     contentRef.value.push('')
     await nextTick()
     const lastIndex = contentRef.value.length - 1
@@ -175,7 +167,6 @@ const addTD = createFieldManager(tdContents, tdRefs)
 const addTP = createFieldManager(tpContents, tpRefs)
 const addDS = createFieldManager(dsContents, dsRefs)
 const addDSTP = createFieldManager(dstpContents, dstpRefs)
-
 const addEducationalFeedback = createFieldManager(edFBContents, edFBRefs)
 const addStudentFeedback = createFieldManager(stFBContents, stFBRefs)
 const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
@@ -209,8 +200,7 @@ const handleValider = async () => {
 
   try {
     await api.post('/resourceSheet/resource-sheet', payload);
-    alert("Fiche ressource enregistrée avec succès !");
-    await router.push('/home');
+    showSuccessModal.value = true;
   } catch (error: any) {
     const errorMsg = error.response?.data || "Erreur lors de l'enregistrement";
     console.error("Détails erreur :", error);
@@ -218,7 +208,14 @@ const handleValider = async () => {
   }
 };
 
-const handleRetour = () => router.back();
+const handleRetour = () => {
+  showModal.value = true;
+};
+
+const onConfirmCancel = () => {
+  router.back();
+};
+
 
 const totalGlobal = computed(() => {
   return (hours.value.cm || 0) + (hours.value.td || 0) + (hours.value.ds || 0) + (hours.value.tp || 0) + (hours.value.ds_tp || 0);
@@ -277,10 +274,8 @@ const pedagogicalSections = computed(() => [
 
       <section class="form-card">
         <h2 class="section-title">Voici le contenu pédagogique : *</h2>
-
         <div v-for="section in pedagogicalSections" :key="section.type" class="pedagogic-group">
           <h3 class="group-label">{{ section.type }}</h3>
-
           <div v-for="(content, index) in section.list" :key="index" class="content-block">
             <label class="item-label">{{ section.type }} {{ index + 1 }}</label>
             <textarea
@@ -290,7 +285,6 @@ const pedagogicalSections = computed(() => [
                 placeholder="Saisissez le contenu...">
             </textarea>
           </div>
-
           <button
               class="btn-add-line"
               @click="section.addFn()"
@@ -304,7 +298,6 @@ const pedagogicalSections = computed(() => [
 
       <section class="form-card accent">
         <h2 class="section-title">Bilans et Évolutions</h2>
-
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour pédagogique des professeurs :</label>
           <div v-for="(content, index) in edFBContents" :key="index" class="content-block">
@@ -318,7 +311,6 @@ const pedagogicalSections = computed(() => [
             + Ajouter une ligne
           </button>
         </div>
-
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour des étudiants :</label>
           <div v-for="(content, index) in stFBContents" :key="index" class="content-block">
@@ -353,6 +345,17 @@ const pedagogicalSections = computed(() => [
         <button @click="handleRetour" class="btn btn-outline">Annuler</button>
       </div>
     </div>
+
+    <CancelModal
+        v-if="showModal"
+        @confirm="onConfirmCancel"
+        @close="showModal = false"
+    />
+
+    <ModifSavedModal
+        v-if="showSuccessModal"
+    />
+
   </main>
 </template>
 
@@ -366,20 +369,17 @@ const pedagogicalSections = computed(() => [
   flex-direction: column;
   align-items: center;
 }
-
 .container {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
 }
-
 .required-legend {
   text-align: right;
   color: #E92533;
   font-size: 0.9rem;
   margin-bottom: 10px;
 }
-
 .form-card {
   background: white;
   border-radius: 12px;
@@ -388,7 +388,6 @@ const pedagogicalSections = computed(() => [
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
 }
-
 .section-title {
   color: #E92533;
   font-size: 1.4rem;
@@ -397,22 +396,18 @@ const pedagogicalSections = computed(() => [
   border-left: 5px solid #E92533;
   padding-left: 15px;
 }
-
 .hours-row {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
-
 .mt-25 {
   margin-top: 25px;
 }
-
 .hour-block {
   flex: 1;
   text-align: center;
 }
-
 .hour-block label {
   display: block;
   font-size: 0.9rem;
@@ -420,7 +415,6 @@ const pedagogicalSections = computed(() => [
   margin-bottom: 8px;
   text-transform: uppercase;
 }
-
 .box-input {
   width: 100%;
   background: #f8fafc;
@@ -431,7 +425,6 @@ const pedagogicalSections = computed(() => [
   font-weight: 800;
   text-align: center;
 }
-
 .box-static {
   height: 45px;
   display: flex;
@@ -443,13 +436,11 @@ const pedagogicalSections = computed(() => [
   background: #f8fafc;
   border: 1px solid #e2e8f0;
 }
-
 .total-highlight {
   border: 2px solid #E92533;
   color: #E92533;
   background: #fff5f5;
 }
-
 .pedagogic-group {
   margin-bottom: 35px;
   display: flex;
@@ -457,7 +448,6 @@ const pedagogicalSections = computed(() => [
   align-items: flex-start;
   width: 100%;
 }
-
 .group-label,
 .field-label {
   font-weight: 600;
@@ -465,14 +455,12 @@ const pedagogicalSections = computed(() => [
   color: #1e293b;
   width: 100%;
 }
-
 .content-block {
   width: 100%;
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
-
 .item-label {
   font-size: 0.85rem;
   font-weight: 700;
@@ -481,7 +469,6 @@ const pedagogicalSections = computed(() => [
   text-transform: uppercase;
   margin-left: 2px;
 }
-
 .modern-textarea {
   width: 100%;
   box-sizing: border-box;
@@ -491,16 +478,13 @@ const pedagogicalSections = computed(() => [
   font-size: 1rem;
   resize: vertical;
 }
-
 .modern-textarea:focus {
   border-color: #E92533;
   outline: none;
 }
-
 .large {
   min-height: 110px;
 }
-
 .btn-add-line {
   background: transparent;
   border: none;
@@ -512,12 +496,10 @@ const pedagogicalSections = computed(() => [
   margin-top: 5px;
   transition: all 0.2s;
 }
-
 .disabled-btn {
   color: #cbd5e1;
   cursor: not-allowed;
 }
-
 .actions-footer {
   display: flex;
   justify-content: center;
@@ -525,7 +507,6 @@ const pedagogicalSections = computed(() => [
   margin-top: 20px;
   margin-bottom: 40px;
 }
-
 .btn {
   padding: 15px 45px;
   border-radius: 10px;
@@ -534,12 +515,10 @@ const pedagogicalSections = computed(() => [
   border: none;
   transition: transform 0.2s;
 }
-
 .btn-primary {
   background: #E92533;
   color: white;
 }
-
 .btn-outline {
   background: white;
   color: #E92533;

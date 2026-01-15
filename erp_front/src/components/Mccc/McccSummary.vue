@@ -2,31 +2,41 @@
 import {useRouter} from 'vue-router';
 import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import api from '@/services/api';
 import Sidebar from "../App/Sidebar.vue";
+import ErrorSaveModal from '../Information/ErrorSaveModal.vue';
+import ModifSavedModal from '../Information/ModifSavedModal.vue';
 
 const router = useRouter();
 const allSaes = ref([]);
-const hoursTotal = mcccStore.hoursCM + mcccStore.hoursDS + mcccStore.hoursTP + mcccStore.hoursTD + mcccStore.hoursDSTP
-const handleRetour = () => router.back();
+const showErrorModal = ref(false);
+const showSuccessModal = ref(false);
+
+const hoursTotal = computed(() => {
+  return (mcccStore.hoursCM || 0) +
+      (mcccStore.hoursDS || 0) +
+      (mcccStore.hoursTP || 0) +
+      (mcccStore.hoursTD || 0) +
+      (mcccStore.hoursDSTP || 0);
+});
+
+const handleBack = () => router.back();
 
 const handleValider = async () => {
   try {
-
     const formattedAcs = mcccStore.acsGrouped.flatMap(skill =>
         skill.allLevels.map((lvl, lvlIdx) => ({
           resourceCode: mcccStore.resourceCode,
           ue: `UE ${skill.skillNum} : ${skill.ue}`,
-
           levels: `Niveau ${lvlIdx + 1} : ${lvl.title}`,
-
           acs: lvl.acs.map(ac => ({
             learningNum: ac.learningNum,
             learningTitle: ac.learningTitle
           }))
         }))
     );
+
     const payload = {
       resourceID: String(mcccStore.resourceID),
       creationDate: mcccStore.creationDate,
@@ -37,23 +47,20 @@ const handleValider = async () => {
       hoursDS: mcccStore.hoursDS,
       hoursDSTP: mcccStore.hoursDSTP,
       saeCodes: mcccStore.saeCodes,
-
       acsGrouped: formattedAcs,
-
       referents: mcccStore.referents
     };
 
     const response = await api.post('/mccc/save', payload);
 
     if (response.status === 200 || response.status === 201) {
-      console.log("Sauvegarde réussie !");
       mcccStore.clearMcccStore();
-      await router.push('/modif-saved');
+      showSuccessModal.value = true;
     }
 
   } catch (error) {
-    console.error("Erreur lors de la sauvegarde des MCCC :", error);
-    await router.push("/error-save");
+    console.error(error);
+    showErrorModal.value = true;
   }
 };
 
@@ -64,7 +71,7 @@ const fetchSaes = async () => {
       allSaes.value = response.data;
     }
   } catch (error) {
-    console.error("Erreur lors du chargement des SAE :", error);
+    console.error(error);
   }
 };
 
@@ -72,13 +79,10 @@ const getSaeDisplay = (saeItem) => {
   if (typeof saeItem === 'object' && saeItem !== null) {
     const code = saeItem.saeCode || saeItem.code || saeItem.num;
     const name = saeItem.saeName || saeItem.title || saeItem.name || '';
-
-    if (code) {
-      return `${code} - ${name}`;
-    }
+    if (code) return `${code} - ${name}`;
   }
-  const found = allSaes.value.find((s) => s.num === saeItem || s.code === saeItem);
 
+  const found = allSaes.value.find((s) => s.num === saeItem || s.code === saeItem);
   if (found) {
     const title = found.title || found.name || '';
     return `${found.num || found.code} - ${title}`;
@@ -86,31 +90,102 @@ const getSaeDisplay = (saeItem) => {
   return String(saeItem);
 };
 
+const loadDataFromBddIfEmpty = async () => {
+  if (!mcccStore.resourceID) return;
+  const targetId = String(mcccStore.resourceID);
+
+  try {
+    const response = await api.get('/mccc/getMccc');
+    const currentMccc = response.data.find(m =>
+        m.resourceId && String(m.resourceId.resourceID) === targetId
+    );
+
+    if (!currentMccc) return;
+
+    const localHoursEmpty = (mcccStore.hoursCM + mcccStore.hoursTD + mcccStore.hoursTP + mcccStore.hoursDS + mcccStore.hoursDSTP) === 0;
+    if (localHoursEmpty && currentMccc.hourlyVolId) {
+      mcccStore.hoursCM = currentMccc.hourlyVolId.nbHoursCM || 0;
+      mcccStore.hoursTD = currentMccc.hourlyVolId.nbHoursTD || 0;
+      mcccStore.hoursTP = currentMccc.hourlyVolId.nbHoursTP || 0;
+      mcccStore.hoursDS = currentMccc.hourlyVolId.nbHoursDS || 0;
+      mcccStore.hoursDSTP = currentMccc.hourlyVolId.nbHoursDSTP || 0;
+    }
+
+    if ((!mcccStore.saeCodes || mcccStore.saeCodes.length === 0) && currentMccc.saesId) {
+      mcccStore.saeCodes = currentMccc.saesId.map(s => ({
+        saeCode: s.num,
+        saeName: s.title
+      }));
+    }
+
+    if ((!mcccStore.referents || mcccStore.referents.length === 0) && currentMccc.referencialTeacherId) {
+      mcccStore.referents = currentMccc.referencialTeacherId.map(t => ({
+        firstname: t.firstname,
+        lastname: t.lastname
+      }));
+    }
+
+    if ((!mcccStore.acsGrouped || mcccStore.acsGrouped.length === 0) && currentMccc.criticalLearningsId) {
+      const groupedResult = [];
+
+      currentMccc.criticalLearningsId.forEach(acItem => {
+        if (!acItem.rankID || !acItem.rankID.skillID) return;
+
+        const skillName = acItem.rankID.skillID.skillName;
+        const skillNum = acItem.rankID.skillID.skillNum;
+        const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
+
+        let existingSkill = groupedResult.find(g => g.ue === skillName);
+        if (!existingSkill) {
+          existingSkill = {
+            resourceCode: mcccStore.resourceCode,
+            ue: skillName,
+            skillNum: skillNum,
+            allLevels: []
+          };
+          groupedResult.push(existingSkill);
+        }
+
+        let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
+        if (!existingLevel) {
+          existingLevel = { title: rankTitle, acs: [] };
+          existingSkill.allLevels.push(existingLevel);
+        }
+
+        existingLevel.acs.push({
+          learningNum: acItem.learningNum,
+          learningTitle: acItem.learningTitle || "Sans titre"
+        });
+      });
+
+      mcccStore.acsGrouped = groupedResult;
+    }
+
+    if (currentMccc.creationDate) {
+      mcccStore.creationDate = new Date(currentMccc.creationDate).toLocaleString('fr-FR');
+    } else {
+      mcccStore.creationDate = new Date().toLocaleString('fr-FR');
+    }
+
+  } catch (error) {
+    console.error("Erreur chargement données BDD :", error);
+  }
+};
+
 onMounted(async () => {
   mcccStore.loadMcccStore();
 
-  try {
-    const response = await api.get('/mccc/getCreationDate/7');
+  if (!mcccStore.saeCodes) mcccStore.saeCodes = [];
+  if (!mcccStore.referents) mcccStore.referents = [];
+  if (!mcccStore.acsGrouped) mcccStore.acsGrouped = [];
 
-    if (response.data) {
-      const dateObj = new Date(response.data);
+  await fetchSaes();
 
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
+  await loadDataFromBddIfEmpty();
 
-      mcccStore.creationDate = `${day}/${month}/${year}`;
-    } else {
-      mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
-    }
-  } catch (error) {
-    console.error("Erreur récup date création", error);
-    mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
-  }
-  mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
+  mcccStore.editDate = new Date().toLocaleString('fr-FR');
 
   mcccStore.registerMcccStore();
-  await fetchSaes();
 });
 
 const getGroupsForUE = (ueName) => {
@@ -233,8 +308,17 @@ const getGroupsForUE = (ueName) => {
 
     <div class="container-btn">
       <button @click="handleValider" class="btn-sys btn-validate">Valider</button>
-      <button @click="handleRetour" class="btn-sys btn-cancel">Annuler</button>
+      <button @click="handleBack" class="btn-sys btn-cancel">Retour</button>
     </div>
+
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
+    />
+
+    <ModifSavedModal
+        v-if="showSuccessModal"
+    />
   </main>
 </template>
 

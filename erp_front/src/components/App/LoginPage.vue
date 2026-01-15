@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import AuthService from '../../services/AuthService.js';
+import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
 import api from "@/services/api.js";
 
@@ -27,8 +27,9 @@ const handleLogin = async () => {
       await router.push('/home-admin');
     } else {
       const response = await api.get(`auth/user-info/${username.value}`);
-      AuthService.registerAuthService();
-      console.log(response.data);
+      authStore.firstName = response.data.firstname;
+      authStore.lastName = response.data.lastname
+      authStore.save();
       await router.push('/home');
     }
 
