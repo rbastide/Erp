@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
+import api from "@/services/api.js";
 
 const router = useRouter();
 const username = ref('');
@@ -25,6 +26,9 @@ const handleLogin = async () => {
     if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
       await router.push('/home-admin');
     } else {
+      const response = await api.get('/user-info');
+      AuthService.registerAuthService();
+      console.log(response.data);
       await router.push('/home');
     }
 
