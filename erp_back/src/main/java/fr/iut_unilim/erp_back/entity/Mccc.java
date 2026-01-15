@@ -48,19 +48,19 @@ public class Mccc {
 
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
-    private UniversityDepartment universityDepartmentId;
+    private UniversityDepartment universityDepartment;
 
 
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartmentId) {
+    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
-        this.universityDepartmentId = universityDepartmentId;
+        this.universityDepartment = universityDepartment;
     }
 
     public Mccc() {
@@ -130,7 +130,7 @@ public class Mccc {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public UniversityDepartment getUniversityDepartmentId() { return universityDepartmentId; }
+    public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
 
-    public void setUniversityDepartmentId(UniversityDepartment universityDepartmentId) { this.universityDepartmentId = universityDepartmentId; }
+    public void setUniversityDepartment(UniversityDepartment universityDepartmentId) { this.universityDepartment = universityDepartmentId; }
 }
