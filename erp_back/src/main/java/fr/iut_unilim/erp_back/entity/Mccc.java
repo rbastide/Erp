@@ -13,7 +13,7 @@ public class Mccc {
     @Column(name = "mcccID")
     private Long mcccId;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "hourlyVolID")
     private HourlyVolume hourlyVolId;
 
@@ -43,10 +43,6 @@ public class Mccc {
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
-
-    //@Column("universityDepartmentID")
-    //private UniversityDepartment universityDepartment;
-
     private Set<Teacher> referencialTeacherId;
 
 
