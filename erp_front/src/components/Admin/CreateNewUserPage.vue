@@ -4,11 +4,13 @@ import { useRouter } from 'vue-router';
 import AuthService from '../../services/AuthService.js';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from "@/services/api.js";
 
 const router = useRouter();
 
 const username = ref('');
 const firstname = ref('');
+const universityDepartment = ref('');
 const lastname = ref('');
 const email = ref('');
 const password = ref('');
@@ -20,6 +22,19 @@ const handleRetour = () => {
   router.back();
 };
 
+const fetchDepartments = async () => {
+  try {
+    const response = await api.get('/universityDepartment/getUniversityDepartments');
+    universityDepartments.value = response.data;
+
+    if (props.showDepartments && userRole.value === 'SUPER_ADMIN' && universityDepartments.value.length > 0) {
+      selectedDept.value = universityDepartments.value[0].universityDepartmentID;
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des départements :", error);
+  }
+};
+
 const handleRegister = async () => {
   errorMessage.value = '';
 
@@ -28,7 +43,7 @@ const handleRegister = async () => {
     return;
   }
 
-  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value) {
+  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value || !universityDepartment.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
   }
@@ -39,7 +54,8 @@ const handleRegister = async () => {
     lastname: lastname.value,
     email: email.value,
     password: password.value,
-    role: role.value
+    role: role.value,
+    universityDepartment : universityDepartment.value
   };
 
   try {
@@ -83,6 +99,17 @@ const handleRegister = async () => {
             v-model="firstname"
             required
         />
+      </div>
+
+      <div class="form-group">
+        <label for="universityDepartment">Département de l'utilisateur</label>
+        <select id="universityDepartment" v-model="universityDepartment" required>
+          <option value="" disabled selected>-- Veuillez choisir un département --</option>
+          <option value="Informatique">Informatique</option>
+          <option value="Technique-de-Commercialisation">Technique de Commercialisation</option>
+          <option value="Génie Mécanique et Productive">Vacataire</option>
+          <option value="TEACHER">Professeur</option>
+        </select>
       </div>
 
       <div class="form-group">
