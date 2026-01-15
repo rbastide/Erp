@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { onMounted, ref, watchEffect } from "vue";
+import api from '@/services/api';
 
 const props = defineProps({
   dashboardAdminActive: { type: Boolean, default: false },
@@ -15,16 +16,37 @@ const router = useRouter();
 const isExpanded = ref(false);
 const userRole = ref('');
 const selectedDept = ref<number | null>(null);
+const universityDepartments = ref<any[]>([]);
 
 const updateRole = () => {
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
 };
 
+const formatDeptName = (name: string) => {
+  if (name.trim().indexOf(' ') !== -1) {
+    return name.replace(/[^A-ZÀ-ÖØ-Þ]/g, '');
+  }
+  return name;
+};
+
+const fetchDepartments = async () => {
+  try {
+    const response = await api.get('/universityDepartment/getUniversityDepartments');
+    universityDepartments.value = response.data;
+
+    if (props.showDepartments && userRole.value === 'SUPER_ADMIN' && universityDepartments.value.length > 0) {
+      selectedDept.value = universityDepartments.value[0].universityDepartmentID;
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des départements :", error);
+  }
+};
+
 onMounted(() => {
   updateRole();
-  if (props.showDepartments && userRole.value === 'SUPER_ADMIN') {
-    selectedDept.value = 1;
+  if (props.showDepartments && (userRole.value === 'SUPER_ADMIN' || userRole.value === 'ADMIN')) {
+    fetchDepartments();
   }
 });
 
@@ -84,29 +106,23 @@ const handleDisconnection = () => router.push('/disconnection');
           </div>
           <span class="nav-text">Dashboard</span>
 
-          <svg v-if="isExpanded && props.showDepartments && userRole === 'SUPER_ADMIN'" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg v-if="isExpanded && props.showDepartments && userRole === 'SUPER_ADMIN' && universityDepartments.length > 0" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </div>
 
         <div v-if="props.showDepartments && userRole === 'SUPER_ADMIN'" class="submenu">
-          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 1 }" @click="selectDept(1)">
+          <div
+              v-for="dept in universityDepartments"
+              :key="dept.universityDepartmentID"
+              class="nav-item sub-item"
+              :class="{ 'sub-active': selectedDept === dept.universityDepartmentID }"
+              @click="selectDept(dept.universityDepartmentID)"
+          >
             <div class="icon-wrapper sub-icon">
               <div class="dot"></div>
             </div>
-            <span class="nav-text">Département 1</span>
-          </div>
-          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 2 }" @click="selectDept(2)">
-            <div class="icon-wrapper sub-icon">
-              <div class="dot"></div>
-            </div>
-            <span class="nav-text">Département 2</span>
-          </div>
-          <div class="nav-item sub-item" :class="{ 'sub-active': selectedDept === 3 }" @click="selectDept(3)">
-            <div class="icon-wrapper sub-icon">
-              <div class="dot"></div>
-            </div>
-            <span class="nav-text">Département 3</span>
+            <span class="nav-text">{{ formatDeptName(dept.universityDepartmentName) }}</span>
           </div>
         </div>
       </div>
@@ -268,7 +284,7 @@ const handleDisconnection = () => router.push('/disconnection');
 }
 
 .dropdown-container:hover .submenu {
-  max-height: 200px;
+  max-height: 400px;
   opacity: 1;
 }
 

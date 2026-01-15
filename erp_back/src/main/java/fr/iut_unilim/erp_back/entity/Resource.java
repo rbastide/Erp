@@ -21,6 +21,9 @@ public class Resource {
     @Column(name="semester")
     private int semester;
 
+    //@Column("universityDepartmentID")
+    //private UniversityDepartment universityDepartment;
+
     public Resource() {
     }
 
@@ -29,6 +32,7 @@ public class Resource {
         this.num = num;
         this.name = name;
         this.semester = semester;
+        //this.universityDepartment = universityDepartment;
     }
 
     public Long getResourceID() {
@@ -60,4 +64,8 @@ public class Resource {
     public void setResourceID(Long resourceID) {
         this.resourceID = resourceID;
     }
+
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 }

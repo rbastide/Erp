@@ -43,6 +43,10 @@ public class Mccc {
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
+
+    //@Column("universityDepartmentID")
+    //private UniversityDepartment universityDepartment;
+
     private Set<Teacher> referencialTeacherId;
 
 
@@ -55,6 +59,7 @@ public class Mccc {
         this.saesId = saesId;
         this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
+        //this.universityDepartment = universityDepartment;
     }
 
     public Mccc() {
@@ -123,4 +128,8 @@ public class Mccc {
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
+
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 }

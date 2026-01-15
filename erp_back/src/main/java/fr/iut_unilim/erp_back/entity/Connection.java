@@ -23,6 +23,9 @@ public class Connection {
     @Column(name = "email")
     private String email;
 
+    //@Column("universityDepartmentID")
+    //private UniversityDepartment universityDepartment;
+
     public Connection() {}
 
     public Connection(String identifier, String hashedPassword, String role, String email) {
@@ -30,6 +33,7 @@ public class Connection {
         this.hashedPassword = hashedPassword;
         this.role = role;
         this.email = email;
+        //this.universityDepartment = universityDepartment;
     }
 
     public Long getId() {
@@ -58,4 +62,7 @@ public class Connection {
 
     public void setEmail(String email) { this.email = email; }
 
+    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
 }
