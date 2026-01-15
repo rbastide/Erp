@@ -4,7 +4,7 @@ import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import {onMounted} from "vue";
 import api from "@/services/api.js";
-import AuthService from "@/services/AuthService.js";
+import AuthService, {authStore} from "@/services/AuthService.js";
 
 const router = useRouter();
 
@@ -21,14 +21,14 @@ const fetchUserData = async () => {
 
 onMounted(() => {
   fetchUserData();
-  AuthService.loadAuthService();
+  authStore.load();
 });
 </script>
 
 <template>
   <Sidebar :dashboardActive="true"/>
   <div class="page-container">
-    <AppHeader title="Bonjour," :inline="AuthService.lastName + ' ' + AuthService.firstName" />
+    <AppHeader title="Bonjour," :inline="authStore.lastName + ' ' + authStore.firstName" />
 
     <main class="main-content">
       <div class="card-action" @click="handleFill">
