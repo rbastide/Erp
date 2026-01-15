@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="js">
 import {useRouter} from 'vue-router';
 import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
@@ -100,7 +100,12 @@ const loadDataFromBddIfEmpty = async () => {
         m.resourceId && String(m.resourceId.resourceID) === targetId
     );
 
-    if (!currentMccc) return;
+    if (!currentMccc) {
+      mcccStore.creationDate = new Date().toLocaleString('fr-FR');
+      return;
+    }
+
+    mcccStore.creationDate = new Date(currentMccc.creationDate).toLocaleString('fr-FR');
 
     const localHoursEmpty = (mcccStore.hoursCM + mcccStore.hoursTD + mcccStore.hoursTP + mcccStore.hoursDS + mcccStore.hoursDSTP) === 0;
     if (localHoursEmpty && currentMccc.hourlyVolId) {
@@ -160,13 +165,6 @@ const loadDataFromBddIfEmpty = async () => {
 
       mcccStore.acsGrouped = groupedResult;
     }
-
-    if (currentMccc.creationDate) {
-      mcccStore.creationDate = new Date(currentMccc.creationDate).toLocaleString('fr-FR');
-    } else {
-      mcccStore.creationDate = new Date().toLocaleString('fr-FR');
-    }
-
   } catch (error) {
     console.error("Erreur chargement données BDD :", error);
   }
