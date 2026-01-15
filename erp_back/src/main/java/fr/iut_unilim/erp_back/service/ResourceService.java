@@ -27,7 +27,7 @@ public class ResourceService {
         List<Resource> resources = resourceRepository.findAll();
         List<ResourceResponse> resourceResponses = new ArrayList<>();
         for (Resource resource : resources) {
-            ResourceResponse resourceResponse = new ResourceResponse(resource.getResourceID(),resource.getNum(),resource.getName(),resource.getSemester());
+            ResourceResponse resourceResponse = new ResourceResponse(resource.getResourceID(),resource.getNum(),resource.getName(),resource.getSemester(),resource.getUniversityDepartment());
             resourceResponses.add(resourceResponse);
         }
         return resourceResponses;
