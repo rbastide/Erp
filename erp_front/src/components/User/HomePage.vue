@@ -2,6 +2,9 @@
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import {onMounted} from "vue";
+import api from "@/services/api.js";
+import AuthService from "@/services/AuthService.js";
 
 const router = useRouter();
 
@@ -12,12 +15,20 @@ const handleFill = () => {
 const handleAfficher = () => {
   router.push('/history');
 };
+
+const fetchUserData = async () => {
+}
+
+onMounted(() => {
+  fetchUserData();
+  AuthService.loadAuthService();
+});
 </script>
 
 <template>
   <Sidebar :dashboardActive="true"/>
   <div class="page-container">
-    <AppHeader title="Bonjour," inline="Prénom NOM" />
+    <AppHeader title="Bonjour," :inline="AuthService.lastName + ' ' + AuthService.firstName" />
 
     <main class="main-content">
       <div class="card-action" @click="handleFill">
