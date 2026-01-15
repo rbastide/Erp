@@ -5,6 +5,11 @@ import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
 import api from '@/services/api'
 
+let isAdmin = false;
+const role = localStorage.getItem('user_role');
+console.log(role);
+isAdmin = role == 'SUPER_ADMIN';
+
 const router = useRouter()
 const route = useRoute()
 
@@ -87,6 +92,7 @@ const totalGlobal = computed(() => {
 
 const handleFermer = () => router.back()
 const handleExport = () => console.log("Export PDF demandé...")
+const handleModifier = () => router.push("fill-resource-sheet?code=" + resourceCode.value);
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -157,7 +163,8 @@ const hourConfig = {
 
       <div class="actions-footer">
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
-        <button @click="handleFermer" class="btn btn-primary">Fermer</button>
+        <button @click="handleFermer" class="btn btn-primary">Fermer et Valider</button>
+        <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier</button>
       </div>
     </div>
   </main>
