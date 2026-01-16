@@ -27,7 +27,7 @@ public class PdfFeedbacks {
 
         feedbacks.addCell(new Cell(improvementIdeas.size(), 1).add(new Paragraph("Idée d'améliorations")));
         for (ImprovementIdeas improvementIdea : improvementIdeas) {
-            feedbacks.addCell(improvementIdea.getIdea());
+            feedbacks.addCell(improvementIdea.getIdeaContent());
         }
 
         return feedbacks;

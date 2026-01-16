@@ -66,7 +66,7 @@ public class PdfSkills {
         for (CriticalLearning criticalLearning : criticalLearnings) {
             String skillName = criticalLearning.getRankID().getSkillID().getSkillName();
             List<String> criticalLearningsFromSkills = flattennedSkills.getOrDefault(skillName, new ArrayList<>());
-            criticalLearningsFromSkills.add(criticalLearning.getLearningTitle());
+            criticalLearningsFromSkills.add(criticalLearning.getCriticalLearningTitle());
             flattennedSkills.put(skillName, criticalLearningsFromSkills);
         }
 

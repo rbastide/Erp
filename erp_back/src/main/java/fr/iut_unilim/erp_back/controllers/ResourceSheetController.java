@@ -99,7 +99,7 @@ public class ResourceSheetController {
         if (ideasReq != null) {
             for (String content : ideasReq) {
                 ImprovementIdeas item = new ImprovementIdeas();
-                item.setIdea(content);
+                item.setIdeaContent(content);
                 resourceSheet.getImprovementIdeas().add(item);
             }
         }

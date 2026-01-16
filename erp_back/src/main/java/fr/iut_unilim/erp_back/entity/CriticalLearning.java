@@ -14,11 +14,11 @@ public class CriticalLearning {
     @Column(name = "criticalLearningID")
     private Long criticalLearningID;
 
-    @Column(name = "learningNum")
-    private int learningNum;
+    @Column(name = "criticalLearningNum")
+    private int criticalLearningNum;
 
-    @Column(name = "learningTitle")
-    private String learningTitle;
+    @Column(name = "criticalLearningTitle")
+    private String criticalLearningTitle;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "rankID")
@@ -26,9 +26,9 @@ public class CriticalLearning {
 
     public CriticalLearning() {}
 
-    public CriticalLearning(int learningNum, String learningTitle, Rank rankID) {
-        this.learningNum = learningNum;
-        this.learningTitle = learningTitle;
+    public CriticalLearning(int criticalLearningNum, String criticalLearningTitle, Rank rankID) {
+        this.criticalLearningNum = criticalLearningNum;
+        this.criticalLearningTitle = criticalLearningTitle;
         this.rankID = rankID;
     }
 
@@ -40,12 +40,12 @@ public class CriticalLearning {
         return criticalLearningID;
     }
 
-    public int getLearningNum() {
-        return learningNum;
+    public int getCriticalLearningNum() {
+        return criticalLearningNum;
     }
 
-    public String getLearningTitle() {
-        return learningTitle;
+    public String getCriticalLearningTitle() {
+        return criticalLearningTitle;
     }
 
     public Rank getRankID() {
@@ -56,12 +56,12 @@ public class CriticalLearning {
         this.criticalLearningID = learningID;
     }
 
-    public void setLearningNum(int learningNum) {
-        this.learningNum = learningNum;
+    public void setCriticalLearningNum(int learningNum) {
+        this.criticalLearningNum = learningNum;
     }
 
-    public void setLearningTitle(String learningTitle) {
-        this.learningTitle = learningTitle;
+    public void setCriticalLearningTitle(String learningTitle) {
+        this.criticalLearningTitle = learningTitle;
     }
 
     public void setRankID(Rank rankID) {

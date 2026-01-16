@@ -110,8 +110,8 @@ public class SkillController {
                     ? criticalLearningService.getCriticalLearningFromId(acDto.id()).orElse(new CriticalLearning(acDto.num(), acDto.title(), rank))
                     : new CriticalLearning(acDto.num(), acDto.title(), rank);
 
-            cl.setLearningNum(acDto.num());
-            cl.setLearningTitle(acDto.title());
+            cl.setCriticalLearningNum(acDto.num());
+            cl.setCriticalLearningTitle(acDto.title());
             cl.setRankID(rank);
             criticalLearningRepository.save(cl);
         }
