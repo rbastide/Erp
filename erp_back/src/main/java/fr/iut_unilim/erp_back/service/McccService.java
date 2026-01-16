@@ -1,9 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.entity.CriticalLearning;
-import fr.iut_unilim.erp_back.entity.Mccc;
-import fr.iut_unilim.erp_back.entity.Resource;
-import fr.iut_unilim.erp_back.entity.Skill;
+import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.McccRepository;
 import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +12,11 @@ import java.util.*;
 @Service
 public class McccService {
     private final McccRepository mcccRepository;
+    private final ConnectionService connectionService;
 
-    public McccService(McccRepository mcccRepository) {
+    public McccService(McccRepository mcccRepository, ConnectionService connectionService) {
         this.mcccRepository = mcccRepository;
+        this.connectionService = connectionService;
     }
 
     public Optional<Mccc> getMcccById(McccId id) {
@@ -34,6 +33,13 @@ public class McccService {
 
     public List<Mccc> getAllMccc() {
         return mcccRepository.findAll();
+    }
+
+    public List<Mccc> getAllMcccFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        return mcccRepository.findAllByUniversityDepartment(department);
     }
 
     @NotNull
