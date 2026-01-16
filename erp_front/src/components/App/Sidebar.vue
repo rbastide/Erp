@@ -71,6 +71,7 @@ const handleDashboardClick = () => {
 const selectDept = async (id: number) => {
   selectedDept.value = id;
   await api.patch(`/auth/users/department/${id}`)
+  window.location.reload();
 };
 
 const handleSettings = () => router.push('/settings');

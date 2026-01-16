@@ -168,7 +168,7 @@ public class AuthController {
     }
 
     @GetMapping("/user/department")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUserDepartment(Authentication authentication) {
         Connection user = connectionRepository.findByIdentifier(authentication.getName());
         return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));

@@ -42,7 +42,7 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <AppHeader title="Connexion"/>
+  <AppHeader title="Connexion" :login-page="true"/>
   <main class="main-content">
 
     <div class="brand-header">
