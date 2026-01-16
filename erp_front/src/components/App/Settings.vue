@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
 import Sidebar from './Sidebar.vue';
+import SettingsSavedModal from '../Information/SettingsSavedModal.vue';
 
 const router = useRouter();
 const isDarkMode = ref(false);
 const notificationsEnabled = ref(true);
+const showSavedModal = ref(false);
 
 onMounted(() => {
   const savedTheme = localStorage.getItem('user_theme');
@@ -25,7 +27,12 @@ const toggleTheme = () => {
 };
 
 const handleSave = () => {
-  alert("Paramètres enregistrés");
+  showSavedModal.value = true;
+};
+
+const handleModalClose = () => {
+  showSavedModal.value = false;
+  router.back();
 };
 </script>
 
@@ -84,6 +91,12 @@ const handleSave = () => {
       </div>
 
     </div>
+
+    <SettingsSavedModal
+        v-if="showSavedModal"
+        @close="handleModalClose"
+    />
+
   </div>
 </template>
 
