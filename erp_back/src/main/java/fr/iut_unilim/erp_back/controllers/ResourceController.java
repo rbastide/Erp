@@ -2,7 +2,9 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.ResourceResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.repository.McccRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.ResourceService;
@@ -21,11 +23,13 @@ public class ResourceController {
     private final ResourceService resourceService;
     private final ResourceRepository resourceRepository;
     private final ConnectionService connectionService;
+    private final McccRepository mcccRepository;
 
-    public ResourceController(ResourceService resourceService, ResourceRepository resourceRepository, ConnectionService connectionService) {
+    public ResourceController(ResourceService resourceService, ResourceRepository resourceRepository, ConnectionService connectionService, McccRepository mcccRepository) {
         this.resourceService = resourceService;
         this.resourceRepository = resourceRepository;
         this.connectionService = connectionService;
+        this.mcccRepository = mcccRepository;
     }
 
     @GetMapping("/resources")
@@ -72,12 +76,13 @@ public class ResourceController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteResource(@PathVariable Long id) {
-        if (!resourceRepository.existsById(id)) {
+        Optional<Resource> resource = resourceRepository.findById(id);
+        if (resource.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        List<Mccc> mccc = mcccRepository.findByResourceId(resource.get());
+        mcccRepository.deleteAll(mccc);
         resourceRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
-
-
 }
