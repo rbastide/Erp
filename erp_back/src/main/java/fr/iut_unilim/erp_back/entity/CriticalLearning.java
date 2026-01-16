@@ -11,8 +11,8 @@ public class CriticalLearning {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    @Column(name = "learningID")
-    private Long learningID;
+    @Column(name = "criticalLearningID")
+    private Long criticalLearningID;
 
     @Column(name = "learningNum")
     private int learningNum;
@@ -36,8 +36,8 @@ public class CriticalLearning {
         this(criticalLearning.learningNum(), criticalLearning.learningTitle(), rankID);
     }
 
-    public Long getLearningID() {
-        return learningID;
+    public Long getCriticalLearningID() {
+        return criticalLearningID;
     }
 
     public int getLearningNum() {
@@ -52,8 +52,8 @@ public class CriticalLearning {
         return rankID;
     }
 
-    public void setLearningID(Long learningID) {
-        this.learningID = learningID;
+    public void setCriticalLearningID(Long learningID) {
+        this.criticalLearningID = learningID;
     }
 
     public void setLearningNum(int learningNum) {

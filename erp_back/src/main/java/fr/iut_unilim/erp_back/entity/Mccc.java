@@ -34,7 +34,7 @@ public class Mccc {
     @JoinTable(
             name = "McccCriticalLearning",
             joinColumns = @JoinColumn(name = "mcccID"),
-            inverseJoinColumns = @JoinColumn(name = "learningID")
+            inverseJoinColumns = @JoinColumn(name = "criticalLearningID")
     )
     private Set<CriticalLearning> criticalLearningsId;
 
