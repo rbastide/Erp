@@ -4,11 +4,15 @@ import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import DeleteSkillModal from '../Information/DeleteSkillModal.vue';
 
 const router = useRouter();
 const finalSkills = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
+
+const showDeleteModal = ref(false);
+const skillToDelete = ref(null);
 
 const currentSkill = ref({
   skillNum: null,
@@ -74,14 +78,23 @@ const saveModification = async (index) => {
   await syncWithBackend(finalSkills.value[index]);
 };
 
-const handleDelete = async (index) => {
-  const target = finalSkills.value[index];
-  if (!confirm(`Supprimer "${target.skillName}" ?`)) return;
+const handleDelete = (index) => {
+  skillToDelete.value = { index, skill: finalSkills.value[index] };
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = async () => {
+  if (!skillToDelete.value) return;
+  const { index, skill } = skillToDelete.value;
+
   try {
-    if (target.id) await api.delete(`/skill/skills/${target.id}`);
+    if (skill.id) await api.delete(`/skill/skills/${skill.id}`);
     finalSkills.value.splice(index, 1);
+    showDeleteModal.value = false;
+    skillToDelete.value = null;
   } catch (error) {
     console.error(error);
+    alert("Erreur lors de la suppression.");
   }
 };
 
@@ -271,6 +284,13 @@ const handleValider = () => router.back();
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
+
+    <DeleteSkillModal
+        v-if="showDeleteModal"
+        :skillName="skillToDelete?.skill?.skillName"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
+    />
   </div>
 </template>
 

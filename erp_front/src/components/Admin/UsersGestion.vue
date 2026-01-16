@@ -4,14 +4,16 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import ErrorSaveModal from "@/components/Information/ErrorSaveModal.vue";
+import DeleteUserModal from '../Information/DeleteUserModal.vue';
 
 const router = useRouter();
 
 const users = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
-const showErrorModal = ref(false);
+
+const showDeleteModal = ref(false);
+const userToDelete = ref(null);
 
 const editedUser = reactive({
   id: null,
@@ -60,19 +62,26 @@ const filteredUsers = computed(() => {
   );
 });
 
+const handleDelete = (id, identifier) => {
+  userToDelete.value = { id, identifier };
+  showDeleteModal.value = true;
+};
 
-const handleDelete = async (id, identifier) => {
-  if (confirm(`Voulez-vous vraiment supprimer l'utilisateur "${identifier}" ?`)) {
-    try {
-      await api.delete(`/auth/users/${id}`);
-      users.value = users.value.filter(u => u.id !== id);
-      if (editedUser.id === id) {
-        handleCancel();
-      }
-    } catch (error) {
-      console.error("Erreur suppression :", error);
-      showErrorModal.value = true;
+const confirmDeletion = async () => {
+  if (!userToDelete.value) return;
+  const id = userToDelete.value.id;
+
+  try {
+    await api.delete(`/auth/users/${id}`);
+    users.value = users.value.filter(u => u.id !== id);
+    if (editedUser.id === id) {
+      handleCancel();
     }
+    showDeleteModal.value = false;
+    userToDelete.value = null;
+  } catch (error) {
+    console.error("Erreur suppression :", error);
+    alert("Erreur lors de la suppression.");
   }
 };
 
@@ -102,7 +111,7 @@ const saveModification = async (  ) => {
 
     handleCancel();
   } catch (error) {
-    showErrorModal.value = true;
+    alert("Erreur lors de la mise à jour.");
   }
 };
 
@@ -236,9 +245,12 @@ const handleAddUser = () => router.push('/new-user');
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
-    <ErrorSaveModal
-        v-if="showErrorModal"
-        @close="showErrorModal = false"
+
+    <DeleteUserModal
+        v-if="showDeleteModal"
+        :identifier="userToDelete?.identifier"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
     />
   </div>
 </template>
@@ -262,6 +274,7 @@ const handleAddUser = () => router.push('/new-user');
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
   width: 100%;
   max-width: 1200px;
   margin-bottom: 50px;

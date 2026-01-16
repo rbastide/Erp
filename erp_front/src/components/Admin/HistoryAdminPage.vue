@@ -4,11 +4,15 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import DeleteHistoryModal from '../Information/DeleteHistoryModal.vue';
 
 const router = useRouter();
 const searchQuery = ref('');
 const historyItems = ref([]);
 const isLoading = ref(true);
+
+const showDeleteModal = ref(false);
+const itemToDelete = ref<{ id: number, code: string } | null>(null);
 
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
@@ -56,15 +60,23 @@ const handleShow = (item: any) => {
   });
 };
 
-const handleDelete = async (id: number, code: string) => {
-  if (confirm(`Voulez-vous vraiment supprimer la fiche ressource ${code} ?`)) {
-    try {
-      await api.delete(`/resourceSheet/${id}`);
-      historyItems.value = historyItems.value.filter((item: any) => (item.sheetID || item.id) !== id);
-    } catch (error) {
-      console.error("Erreur lors de la suppression :", error);
-      alert("Une erreur est survenue lors de la suppression.");
-    }
+const handleDelete = (id: number, code: string) => {
+  itemToDelete.value = { id, code };
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = async () => {
+  if (!itemToDelete.value) return;
+  const id = itemToDelete.value.id;
+
+  try {
+    await api.delete(`/resourceSheet/${id}`);
+    historyItems.value = historyItems.value.filter((item: any) => (item.sheetID || item.id) !== id);
+    showDeleteModal.value = false;
+    itemToDelete.value = null;
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    alert("Une erreur est survenue lors de la suppression.");
   }
 };
 
@@ -134,6 +146,13 @@ const clearSearch = () => searchQuery.value = '';
         <button @click="handleRetour" class="quit-btn">Retour</button>
       </div>
     </footer>
+
+    <DeleteHistoryModal
+        v-if="showDeleteModal"
+        :code="itemToDelete?.code"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
+    />
   </main>
 </template>
 
@@ -223,7 +242,6 @@ const clearSearch = () => searchQuery.value = '';
   margin-left: 10px;
 }
 
-/* Nouveaux styles pour la suppression sans modifier l'existant */
 .btn-icon-container.delete:hover {
   background-color: #ffebee;
 }
