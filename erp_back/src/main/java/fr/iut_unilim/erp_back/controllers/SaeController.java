@@ -1,11 +1,14 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.SaeRequest;
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Sae;
 import fr.iut_unilim.erp_back.repository.SaeRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,10 +20,12 @@ public class SaeController {
 
     private final SaeService saeService;
     private final SaeRepository saeRepository;
+    private final ConnectionService connectionService;
 
-    public SaeController(SaeService saeService, SaeRepository saeRepository) {
+    public SaeController(SaeService saeService, SaeRepository saeRepository, ConnectionService connectionService) {
         this.saeService = saeService;
         this.saeRepository = saeRepository;
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/getAllSae")
@@ -31,8 +36,7 @@ public class SaeController {
 
     @PostMapping("/addSae")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> addSae(@RequestBody List<SaeRequest> saeRequest) {
-
+    public ResponseEntity<?> addSae(@RequestBody List<SaeRequest> saeRequest, Authentication authentication) {
         for (SaeRequest sae : saeRequest) {
             Optional<Sae> existingSaes = saeRepository.findById(sae.getSaeID());
 
@@ -45,6 +49,7 @@ public class SaeController {
                 Sae newSae = new Sae();
                 newSae.setNum(sae.getNum());
                 newSae.setTitle(sae.getTitle());
+                handleDepartment(newSae, authentication);
                 saeRepository.save(newSae);
             }
         }
@@ -60,5 +65,13 @@ public class SaeController {
         }
         saeService.deleteSaeById(id);
         return ResponseEntity.ok().body("La SAE a bien été supprimée");
+    }
+
+    private void handleDepartment(Sae sae, Authentication authentication) {
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        if (connection == null) return;
+
+        sae.setUniversityDepartment(connection.getUniversityDepartment());
     }
 }

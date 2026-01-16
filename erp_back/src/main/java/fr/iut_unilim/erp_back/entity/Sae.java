@@ -17,6 +17,10 @@ public class Sae {
     @Column(name = "title")
     private String title;
 
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
+
     public Sae(Long saeID, String num, String title) {
         SaeID = saeID;
         this.num = num;
@@ -53,5 +57,13 @@ public class Sae {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
+
+    public void setUniversityDepartment(UniversityDepartment universityDepartment) {
+        this.universityDepartment = universityDepartment;
     }
 }
