@@ -39,8 +39,8 @@ public class ResourceSheetController {
 
     @GetMapping("/getResourceSheet")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getResourceSheet() {
-        return ResponseEntity.ok(resourceSheetService.getAllResourceSheets());
+    public ResponseEntity<?> getResourceSheet(Authentication authentication) {
+        return ResponseEntity.ok(resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/resource-sheet")
@@ -188,8 +188,8 @@ public class ResourceSheetController {
 
     @GetMapping("/getHistory")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<List<HistoryResponse>> getHistory() {
-        List<ResourceSheet> sheets = resourceSheetRepository.findAll();
+    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
+        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
         List<HistoryResponse> historyList = new ArrayList<>();
 
         for (ResourceSheet sheet : sheets) {
