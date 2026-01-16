@@ -120,7 +120,7 @@ public class ResourceSheetController {
         List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
         if (teacherFeedbacksReq != null) {
             for (String content : teacherFeedbacksReq) {
-                PedagologicalTeachersFeedbacks item = new PedagologicalTeachersFeedbacks();
+                EducationalTeachersFeedbacks item = new EducationalTeachersFeedbacks();
                 item.setContent(content);
                 resourceSheet.getTeachersFeedbacks().add(item);
             }
@@ -133,23 +133,23 @@ public class ResourceSheetController {
         resourceSheet.setTeachersFeedbacks(new ArrayList<>());
         resourceSheet.setStudentsFeedbacks(new ArrayList<>());
         resourceSheet.setImprovementIdeas(new ArrayList<>());
-        resourceSheet.setPedagologicalContentId(new ArrayList<>());
+        resourceSheet.setEducationalContentID(new ArrayList<>());
     }
 
     private static void clearExistingContent(ResourceSheet resourceSheet) {
         if (resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
         if (resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
         if (resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
-        if (resourceSheet.getPedagologicalContentId() != null) resourceSheet.getPedagologicalContentId().clear();
+        if (resourceSheet.getEducationalContentID() != null) resourceSheet.getEducationalContentID().clear();
     }
 
     @Nullable
     private ResponseEntity<String> handleEducationalContent(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        if (resourceSheetRequest.getPedagologicalContent() != null) {
+        if (resourceSheetRequest.getEducationalContent() != null) {
             String regex = "^(TP|CM|TD|DS|DS/TP)\\s*(\\d+)\\s*:\\s*(.*)$";
             Pattern pattern = Pattern.compile(regex);
 
-            for (String educationalContent : resourceSheetRequest.getPedagologicalContent()) {
+            for (String educationalContent : resourceSheetRequest.getEducationalContent()) {
                 Matcher matcher = pattern.matcher(educationalContent);
 
                 if (!matcher.find()) {
@@ -160,7 +160,7 @@ public class ResourceSheetController {
                 String numero = matcher.group(2);
                 String description = matcher.group(3);
 
-                PedagologicalContent contentEntity = new PedagologicalContent();
+                EducationalContent contentEntity = new EducationalContent();
 
                 ClassType existingType = classTypeRepository.findByClassType(typeName)
                         .orElseThrow(() -> new RuntimeException("Type introuvable : " + typeName));
@@ -170,7 +170,7 @@ public class ResourceSheetController {
                 contentEntity.setContent(description);
                 contentEntity.setRessourceSheetId(resourceSheet);
 
-                resourceSheet.getPedagologicalContentId().add(contentEntity);
+                resourceSheet.getEducationalContentID().add(contentEntity);
             }
         }
         return null;

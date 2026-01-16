@@ -45,7 +45,7 @@ const fetchSheetData = async () => {
     if (sheet) {
       contents.value.teacherFeedback = sheet.teachersFeedbacks?.map((f: any) => f.content) || []
       contents.value.studentFeedback = sheet.studentsFeedbacks?.map((f: any) => f.content) || []
-      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.idea || i.content) || []
+      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.ideaContent || i.content) || []
 
       if (sheet.pedagologicalContentId) {
         const pedago = sheet.pedagologicalContentId

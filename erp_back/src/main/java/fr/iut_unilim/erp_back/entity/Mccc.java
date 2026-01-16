@@ -50,7 +50,6 @@ public class Mccc {
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
 
-
     private Date creationDate;
     private Date lastModificationDate;
 

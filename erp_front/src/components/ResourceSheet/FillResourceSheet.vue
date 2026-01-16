@@ -134,7 +134,7 @@ const fetchResourceSheetData = async () => {
           stFBContents.value = sFeedbacks.length > 0 ? sFeedbacks : [''];
         }
         if (resourceData.improvementIdeas) {
-          const ideas = resourceData.improvementIdeas.map((i: any) => i.idea || i.content || '');
+          const ideas = resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content || '');
           upgradesContents.value = ideas.length > 0 ? ideas : [''];
         }
       }

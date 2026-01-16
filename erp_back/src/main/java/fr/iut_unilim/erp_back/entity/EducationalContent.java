@@ -2,18 +2,17 @@ package fr.iut_unilim.erp_back.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="PedagologicalContent")
-public class PedagologicalContent {
+@Table(name = "EducationalContent")
+public class EducationalContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PedagologicalContentId")
-    private Long PedagologicalContentId;
+    @Column(name = "educationalContentId")
+    private Long educationalContentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ressourceSheetId")
@@ -31,8 +30,8 @@ public class PedagologicalContent {
     @Column(name = "Content")
     private String content;
 
-    public Long getPedagologicalContentId() {
-        return PedagologicalContentId;
+    public Long getEducationalContentId() {
+        return educationalContentId;
     }
 
     public ResourceSheet getRessourceSheetId() {
@@ -51,8 +50,8 @@ public class PedagologicalContent {
         return content;
     }
 
-    public void setPedagologicalContentId(Long pedagologicalContentId) {
-        PedagologicalContentId = pedagologicalContentId;
+    public void setEducationalContentId(Long educationalContentId) {
+        this.educationalContentId = educationalContentId;
     }
 
     public void setRessourceSheetId(ResourceSheet ressourceSheetId) {
