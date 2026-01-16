@@ -41,12 +41,21 @@ public class ConnectionService {
                     connection.getIdentifier(),
                     connection.getRole(),
                     connection.getEmail(),
-
                     lastname,
                     firstname
             ));
         }
         return userResponses;
+    }
+
+    public List<UserResponse> getAllConnectionFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        if (department == null) return new ArrayList<>();
+
+        List<Connection> connections = connectionRepository.findAllByUniversityDepartment(department);
+        return convertToUserResponse(connections);
     }
 
     public Connection findByIdentifier(@NotNull String identifier) {
@@ -60,5 +69,30 @@ public class ConnectionService {
         connection.setUniversityDepartment(universityDepartment.get());
         connectionRepository.save(connection);
         return true;
+    }
+
+    private List<UserResponse> convertToUserResponse(List<Connection> connections) {
+        List<UserResponse> userResponses = new ArrayList<>();
+        for (Connection connection : connections) {
+            userResponses.add(convertToUserResponse(connection));
+        }
+        return userResponses;
+    }
+
+    private UserResponse convertToUserResponse(Connection connection) {
+        String lastname = teacherRepository.findLastnameByTeacherID(connection.getId());
+        String firstname = teacherRepository.findFirstnameByTeacherID(connection.getId());
+
+        if (lastname == null) lastname = "";
+        if (firstname == null) firstname = "";
+
+        return new UserResponse(
+                connection.getId(),
+                connection.getIdentifier(),
+                connection.getRole(),
+                connection.getEmail(),
+                lastname,
+                firstname
+        );
     }
 }

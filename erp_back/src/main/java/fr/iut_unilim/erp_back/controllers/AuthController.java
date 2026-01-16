@@ -117,8 +117,10 @@ public class AuthController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getUsers() {
-        return ResponseEntity.ok(connectionService.getAllConnections());
+    public ResponseEntity<?> getUsers(Authentication authentication) {
+        String userIdentifier = authentication.getName();
+
+        return ResponseEntity.ok(connectionService.getAllConnectionFromDepartment(userIdentifier));
     }
 
     @DeleteMapping("/users/{id}")
