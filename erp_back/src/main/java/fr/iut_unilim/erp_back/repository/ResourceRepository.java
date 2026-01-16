@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.repository;
 
 import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,5 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
     List<Resource> findByNum(String num);
 
-
+    List<Resource> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
 }

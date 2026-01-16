@@ -30,8 +30,8 @@ public class ResourceController {
 
     @GetMapping("/resources")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getResource() {
-        return ResponseEntity.ok(resourceService.getAllResources());
+    public ResponseEntity<?> getResource(Authentication authentication) {
+        return ResponseEntity.ok(resourceService.getAllResourceSheetsFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/editResource")
