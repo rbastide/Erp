@@ -18,13 +18,16 @@ public class SaeController {
     private final SaeService saeService;
     private final SaeRepository saeRepository;
 
-    public SaeController(SaeService saeService, SaeRepository saeRepository) { this.saeService = saeService;
+    public SaeController(SaeService saeService, SaeRepository saeRepository) {
+        this.saeService = saeService;
         this.saeRepository = saeRepository;
     }
 
     @GetMapping("/getAllSae")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getAllSae() { return ResponseEntity.ok(saeService.getAllSaes()); }
+    public ResponseEntity<?> getAllSae() {
+        return ResponseEntity.ok(saeService.getAllSaes());
+    }
 
     @PostMapping("/addSae")
     @PreAuthorize("hasAuthority('ADMIN')")

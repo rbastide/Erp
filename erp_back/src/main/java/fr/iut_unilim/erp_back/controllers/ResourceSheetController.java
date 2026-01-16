@@ -68,7 +68,8 @@ public class ResourceSheetController {
         if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
         resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
 
-        if (resourceSheetRequest.getHourlyVolumeID() == null) return ResponseEntity.badRequest().body("HourlyVolumeID is null");
+        if (resourceSheetRequest.getHourlyVolumeID() == null)
+            return ResponseEntity.badRequest().body("HourlyVolumeID is null");
         resourceSheet.setHourlyVolumeID(resourceSheetRequest.getHourlyVolumeID());
 
         handleTeacherFeedbacks(resourceSheetRequest, resourceSheet);
@@ -210,7 +211,7 @@ public class ResourceSheetController {
                     sheet.getSheetsID(),
                     code,
                     name,
-                    dateToUse            ));
+                    dateToUse));
         }
 
         Collections.reverse(historyList);
