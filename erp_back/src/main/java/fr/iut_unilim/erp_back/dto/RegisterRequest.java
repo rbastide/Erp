@@ -1,5 +1,7 @@
 package fr.iut_unilim.erp_back.dto;
 
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
+
 public class RegisterRequest {
     private String identifier;
     private String password;
@@ -7,6 +9,7 @@ public class RegisterRequest {
     private String email;
     private String firstname;
     private String lastname;
+    private UniversityDepartment universityDepartment;
 
     public String getIdentifier() {
         return identifier;
@@ -23,6 +26,9 @@ public class RegisterRequest {
     public String getEmail() {return email;}
     public String getFirstname() {return firstname;}
     public String getLastname() {return lastname;}
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
 
     public void setRole(String role) {
         this.role = role;
