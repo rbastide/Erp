@@ -1,17 +1,17 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.*;
+import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
+import fr.iut_unilim.erp_back.repository.ResourceRepository;
+import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,22 +46,13 @@ public class ResourceSheetController {
         ResourceSheet resourceSheet;
         Long resourceSheetID = resourceSheetRequest.getSheetsID();
 
-        if (resourceSheetID != null && resourceSheetRepository.existsById(resourceSheetID)) {
-            resourceSheet = resourceSheetRepository.findById(resourceSheetID).get();
-
-            if(resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
-            if(resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
-            if(resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
-            if(resourceSheet.getPedagologicalContentId() != null) resourceSheet.getPedagologicalContentId().clear();
-
+        Optional<ResourceSheet> canHaveResourceSheet = resourceSheetRepository.findById(resourceSheetID);
+        if (canHaveResourceSheet.isPresent()) {
+            resourceSheet = canHaveResourceSheet.get();
+            clearExistingContent(resourceSheet);
         } else {
             resourceSheet = new ResourceSheet();
-            resourceSheet.setCreationDate(new Date());
-
-            resourceSheet.setTeachersFeedbacks(new ArrayList<>());
-            resourceSheet.setStudentsFeedbacks(new ArrayList<>());
-            resourceSheet.setImprovementIdeas(new ArrayList<>());
-            resourceSheet.setPedagologicalContentId(new ArrayList<>());
+            initDefaultValues(resourceSheet);
         }
 
         if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
@@ -70,24 +61,21 @@ public class ResourceSheetController {
         if (resourceSheetRequest.getHourlyVolumeID() == null) return ResponseEntity.badRequest().body("HourlyVolumeID is null");
         resourceSheet.setHourlyVolumeID(resourceSheetRequest.getHourlyVolumeID());
 
-        List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
-        if (teacherFeedbacksReq != null) {
-            for (String content : teacherFeedbacksReq) {
-                PedagologicalTeachersFeedbacks item = new PedagologicalTeachersFeedbacks();
-                item.setContent(content);
-                resourceSheet.getTeachersFeedbacks().add(item);
-            }
-        }
+        handleTeacherFeedbacks(resourceSheetRequest, resourceSheet);
+        handleStudentFeedbacks(resourceSheetRequest, resourceSheet);
+        handleImprovementIdeasFeedbacks(resourceSheetRequest, resourceSheet);
 
-        List<String> studentFeedbacksReq = resourceSheetRequest.getStudentFeedbackID();
-        if (studentFeedbacksReq != null) {
-            for (String content : studentFeedbacksReq) {
-                StudentsFeedbacks item = new StudentsFeedbacks();
-                item.setContent(content);
-                resourceSheet.getStudentsFeedbacks().add(item);
-            }
-        }
+        ResponseEntity<String> educationalContent = handleEducationalContent(resourceSheetRequest, resourceSheet);
+        if (educationalContent != null) return educationalContent;
 
+        resourceSheet.setLastModificationDate(new Date());
+
+        resourceSheetService.save(resourceSheet);
+
+        return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
+    }
+
+    private static void handleImprovementIdeasFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
         List<String> ideasReq = resourceSheetRequest.getImprovementsIdeaID();
         if (ideasReq != null) {
             for (String content : ideasReq) {
@@ -96,7 +84,48 @@ public class ResourceSheetController {
                 resourceSheet.getImprovementIdeas().add(item);
             }
         }
+    }
 
+    private static void handleStudentFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
+        List<String> studentFeedbacksReq = resourceSheetRequest.getStudentFeedbackID();
+        if (studentFeedbacksReq != null) {
+            for (String content : studentFeedbacksReq) {
+                StudentsFeedbacks item = new StudentsFeedbacks();
+                item.setContent(content);
+                resourceSheet.getStudentsFeedbacks().add(item);
+            }
+        }
+    }
+
+    private static void handleTeacherFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
+        List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
+        if (teacherFeedbacksReq != null) {
+            for (String content : teacherFeedbacksReq) {
+                PedagologicalTeachersFeedbacks item = new PedagologicalTeachersFeedbacks();
+                item.setContent(content);
+                resourceSheet.getTeachersFeedbacks().add(item);
+            }
+        }
+    }
+
+    private static void initDefaultValues(ResourceSheet resourceSheet) {
+        resourceSheet.setCreationDate(new Date());
+
+        resourceSheet.setTeachersFeedbacks(new ArrayList<>());
+        resourceSheet.setStudentsFeedbacks(new ArrayList<>());
+        resourceSheet.setImprovementIdeas(new ArrayList<>());
+        resourceSheet.setPedagologicalContentId(new ArrayList<>());
+    }
+
+    private static void clearExistingContent(ResourceSheet resourceSheet) {
+        if (resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
+        if (resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
+        if (resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
+        if (resourceSheet.getPedagologicalContentId() != null) resourceSheet.getPedagologicalContentId().clear();
+    }
+
+    @Nullable
+    private ResponseEntity<String> handleEducationalContent(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
         if (resourceSheetRequest.getPedagologicalContent() != null) {
             String regex = "^(TP|CM|TD|DS|DS/TP)\\s*(\\d+)\\s*:\\s*(.*)$";
             Pattern pattern = Pattern.compile(regex);
@@ -125,16 +154,8 @@ public class ResourceSheetController {
                 resourceSheet.getPedagologicalContentId().add(contentEntity);
             }
         }
-
-        resourceSheet.setLastModificationDate(new Date());
-
-        resourceSheetService.save(resourceSheet);
-
-        return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
+        return null;
     }
-
-
-
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('TEACHER')")
