@@ -21,7 +21,7 @@ public class UniversityDepartmentController {
     }
 
     @GetMapping("/getUniversityDepartments")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<?> getUniversityDepartments() {
         return ResponseEntity.ok(universityDepartmentRepository.findAll());
     }
@@ -35,7 +35,7 @@ public class UniversityDepartmentController {
     }
 
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
     public ResponseEntity<?> deleteUniversityDepartment(@PathVariable Long id) {
 
         if (!universityDepartmentRepository.existsById(id)) {
