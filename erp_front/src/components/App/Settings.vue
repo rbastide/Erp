@@ -55,7 +55,7 @@ const handleModalClose = () => {
         <div class="setting-row">
           <div class="text-info">
             <span class="label">Mode Sombre</span>
-            <span class="desc">Interface sombre (plus doux pour les yeux)</span>
+            <span class="desc">Interface sombre (plus douce pour les yeux)</span>
           </div>
 
           <label class="switch">
