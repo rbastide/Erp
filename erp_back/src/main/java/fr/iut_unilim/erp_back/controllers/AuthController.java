@@ -128,9 +128,15 @@ public class AuthController {
 
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        if (!connectionRepository.existsById(id)) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
+        Optional<Connection> userToDelete = connectionRepository.findById(id);
+        if (userToDelete.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        String userToDeleteIdentifier = userToDelete.get().getIdentifier();
+        if (userToDeleteIdentifier.equals(authentication.getName())) {
+            return ResponseEntity.badRequest().body("Impossible de supprimer votre propre compte");
         }
 
         Teacher teacher = teacherService.getTeacherInfoByUser(id);
