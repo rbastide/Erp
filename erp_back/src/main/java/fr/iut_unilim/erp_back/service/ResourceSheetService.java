@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
@@ -29,7 +28,6 @@ public class ResourceSheetService {
     public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
-        ErpBackApplication.LOGGER.info("Department : " + department);
 
         return resourceSheetRepository.findAllByUniversityDepartment(department);
     }
