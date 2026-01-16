@@ -20,14 +20,6 @@ public class Skill {
     @Column(name = "skillName")
     private String skillName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "ResourceSheetSkills",
-            joinColumns = @JoinColumn(name = "skillID"),
-            inverseJoinColumns = @JoinColumn(name = "sheetID")
-    )
-    private List<ResourceSheet> resourceSheets;
-
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
@@ -40,10 +32,9 @@ public class Skill {
     }
 
 
-    public Skill(String skillName, int skillNum,List<ResourceSheet> resourceSheets, UniversityDepartment universityDepartment) {
+    public Skill(String skillName, int skillNum, UniversityDepartment universityDepartment) {
         this.skillName = skillName;
         this.skillNum = skillNum;
-        this.resourceSheets = resourceSheets;
         this.universityDepartment = universityDepartment;
     }
 
@@ -73,10 +64,6 @@ public class Skill {
 
     public void setSkillName(String skillName) {
         this.skillName = skillName;
-    }
-
-    public void setResourceSheets(List<ResourceSheet> resourceSheets) {
-        this.resourceSheets = resourceSheets;
     }
 
     public UniversityDepartment getUniversityDepartment() {
