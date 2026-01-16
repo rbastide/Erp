@@ -45,22 +45,8 @@ const filteredSkills = computed(() => {
   );
 });
 
-const syncWithBackend = async () => {
-  const payload = finalSkills.value.map(comp => ({
-    id: comp.id || null,
-    skillNum: comp.skillNum ? comp.skillNum.toString() : "",
-    skillName: comp.skillName || "",
-    levels: comp.levels.map((niv, nIdx) => ({
-      id: niv.id || null,
-      num: niv.num ? parseInt(niv.num) : (nIdx + 1),
-      title: niv.title || "",
-      acs: niv.acs.map(ac => ({
-        id: ac.id || null,
-        num: ac.num ? ac.num.toString() : "",
-        title: ac.title || ""
-      }))
-    }))
-  }));
+const syncWithBackend = async (skill) => {
+  const payload = [skill];
 
   try {
     await api.post('/skill/skills', payload);
@@ -72,19 +58,20 @@ const syncWithBackend = async () => {
 
 const handleSaveNewCompetence = async () => {
   if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
+  const currentSkillToAdd = currentSkill.value;
   finalSkills.value.unshift(JSON.parse(JSON.stringify(currentSkill.value)));
   currentSkill.value = {
     skillNum: null,
     skillName: '',
     levels: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
-  await syncWithBackend();
+  await syncWithBackend(currentSkillToAdd);
 };
 
 const saveModification = async (index) => {
   finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
   editingIndex.value = null;
-  await syncWithBackend();
+  await syncWithBackend(finalSkills.value[index]);
 };
 
 const handleDelete = async (index) => {
@@ -93,7 +80,6 @@ const handleDelete = async (index) => {
   try {
     if (target.id) await api.delete(`/skill/skills/${target.id}`);
     finalSkills.value.splice(index, 1);
-    await syncWithBackend();
   } catch (error) {
     console.error(error);
   }
