@@ -247,8 +247,8 @@ public class McccController {
     }
 
     @GetMapping("/getTeachers")
-    public ResponseEntity<?> getTeachers() {
-        return ResponseEntity.ok(teacherService.getAllTeachers());
+    public ResponseEntity<?> getTeachers(Authentication authentication) {
+        return ResponseEntity.ok(teacherService.getAllTeachersFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getSaes")
