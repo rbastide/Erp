@@ -1,7 +1,7 @@
 <script setup>
-import { useRouter } from 'vue-router';
-import { onMounted, ref } from 'vue';
-import { mcccStore } from "@/services/mcccStore.js";
+import {useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {mcccStore} from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -66,7 +66,7 @@ const fetchLinkedSAEs = async () => {
   const targetId = String(mcccStore.resourceID);
 
   try{
-    const response = await api.get('/mccc/getMccc');
+    const response = await api.get('/mccc/mcccs');
 
 
     const currentMccc = response.data.find(m =>

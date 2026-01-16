@@ -61,7 +61,7 @@ const fetchSheetData = async () => {
       }
 
       if (sheet.hourlyVolumeID) {
-        const responseMccc = await api.get('/mccc/getMccc')
+        const responseMccc = await api.get('/mccc/mcccs')
         const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
 
         if (mcccMatch && mcccMatch.hourlyVolId) {

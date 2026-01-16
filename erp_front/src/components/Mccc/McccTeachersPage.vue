@@ -1,10 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import { mcccStore } from "@/services/mcccStore.js";
+import {mcccStore} from "@/services/mcccStore.js";
 import CancelModal from '../Information/CancelModal.vue';
 
 const router = useRouter();
@@ -43,7 +43,7 @@ const fetchLinkedTeachers = async () => {
   if (!mcccStore.resourceID) return;
   const targetResourceId = String(mcccStore.resourceID);
   try {
-    const mcccResponse = await api.get('/mccc/getMccc');
+    const mcccResponse = await api.get('/mccc/mcccs');
 
     const foundMccc = mcccResponse.data.find(m =>
         m.resourceId && String(m.resourceId.resourceID) === targetResourceId

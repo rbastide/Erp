@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, nextTick, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import {computed, nextTick, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -62,7 +62,7 @@ const fetchResourceData = async () => {
 
 const fetchHoursData = async () => {
   try {
-    const response = await api.get('/mccc/getMccc');
+    const response = await api.get('/mccc/mcccs');
     if (response.data && Array.isArray(response.data)) {
       const mcccFound = response.data.find((m: any) =>
           m.resourceId && m.resourceId.num === resourceCode.value

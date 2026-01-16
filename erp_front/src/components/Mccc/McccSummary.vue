@@ -95,7 +95,7 @@ const loadDataFromBddIfEmpty = async () => {
   const targetId = String(mcccStore.resourceID);
 
   try {
-    const response = await api.get('/mccc/getMccc');
+    const response = await api.get('/mccc/mcccs');
     const currentMccc = response.data.find(m =>
         m.resourceId && String(m.resourceId.resourceID) === targetId
     );

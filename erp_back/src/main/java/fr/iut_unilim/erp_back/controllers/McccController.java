@@ -59,7 +59,7 @@ public class McccController {
         return null;
     }
 
-    @GetMapping("/getMccc")
+    @GetMapping("/mcccs")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getMccc(Authentication authentication) {
         return ResponseEntity.ok(mcccService.getAllMcccFromDepartment(authentication.getName()));
