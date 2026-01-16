@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -29,8 +30,9 @@ public class McccController {
     private final SkillService skillService;
     private final RankService rankService;
     private final CriticalLearningService criticalLearningService;
+    private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService) {
+    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService, ConnectionService connectionService) {
         this.mcccService = mcccService;
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
@@ -39,6 +41,7 @@ public class McccController {
         this.skillService = skillService;
         this.rankService = rankService;
         this.criticalLearningService = criticalLearningService;
+        this.connectionService = connectionService;
     }
 
     @Nullable
@@ -64,24 +67,15 @@ public class McccController {
 
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
         }
 
-        Mccc mccc;
-        List<Mccc> allMcccs = mcccService.getAllMccc();
-        Optional<Mccc> existingMccc = allMcccs.stream()
-                .filter(m -> m.getResourceId().getResourceID().equals(dto.getResourceID()))
-                .findFirst();
+        Mccc mccc = getCurrentMccc(dto, canHaveResource);
 
-        if (existingMccc.isPresent()) {
-            mccc = existingMccc.get();
-        } else {
-            mccc = new Mccc();
-            mccc.setResourceId(canHaveResource.get());
-        }
+        handleDepartment(mccc, authentication);
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
@@ -121,6 +115,32 @@ public class McccController {
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
+
+    @NotNull
+    private Mccc getCurrentMccc(McccRequest dto, Optional<Resource> canHaveResource) {
+        Mccc mccc;
+        List<Mccc> allMcccs = mcccService.getAllMccc();
+        Optional<Mccc> existingMccc = allMcccs.stream()
+                .filter(m -> m.getResourceId().getResourceID().equals(dto.getResourceID()))
+                .findFirst();
+
+        if (existingMccc.isPresent()) {
+            mccc = existingMccc.get();
+        } else {
+            mccc = new Mccc();
+            mccc.setResourceId(canHaveResource.get());
+        }
+        return mccc;
+    }
+
+    private void handleDepartment(Mccc mccc, Authentication authentication) {
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        if (connection == null) return;
+
+        mccc.setUniversityDepartment(connection.getUniversityDepartment());
+    }
+
 
     @Nullable
     private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
