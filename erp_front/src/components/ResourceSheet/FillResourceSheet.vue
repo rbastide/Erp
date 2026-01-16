@@ -6,12 +6,14 @@ import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 import CancelModal from '../Information/CancelModal.vue';
 import ModifSavedModal from '../Information/ModifSavedModal.vue';
+import ErrorSaveModal from '../Information/ErrorSaveModal.vue';
 
 const router = useRouter()
 const route = useRoute()
 
 const showModal = ref(false);
 const showSuccessModal = ref(false);
+const showErrorModal = ref(false);
 
 const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
@@ -204,7 +206,7 @@ const handleValider = async () => {
   } catch (error: any) {
     const errorMsg = error.response?.data || "Erreur lors de l'enregistrement";
     console.error("Détails erreur :", error);
-    alert(`Erreur : ${errorMsg}`);
+    showErrorModal.value = true;
   }
 };
 
@@ -354,6 +356,11 @@ const pedagogicalSections = computed(() => [
 
     <ModifSavedModal
         v-if="showSuccessModal"
+    />
+
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
     />
 
   </main>

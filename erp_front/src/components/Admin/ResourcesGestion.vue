@@ -4,12 +4,14 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import ErrorSaveModal from "@/components/Information/ErrorSaveModal.vue";
 
 const router = useRouter();
 const resources = ref([]);
 const editingIndex = ref(null);
 const isAdding = ref(false);
 const searchQuery = ref('');
+const showErrorModal = ref(false);
 
 const editedResource = reactive({
   resourceID: null,
@@ -55,7 +57,7 @@ const handleDelete = async (resourceID, num) => {
       await api.delete(`resources/${resourceID}`);
       resources.value = resources.value.filter(res => res.resourceID !== resourceID);
     } catch (error) {
-      alert("Erreur lors de la suppression.");
+      showErrorModal.value = true;
     }
   }
 };
@@ -91,7 +93,7 @@ const saveResource = async () => {
     await fetchResources();
     handleCancel();
   } catch (error) {
-    alert("Erreur lors de l'enregistrement.");
+    showErrorModal.value = true;
   }
 };
 
@@ -232,6 +234,10 @@ const handleValider = () => router.push('/home-admin');
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
+    />
   </div>
 </template>
 

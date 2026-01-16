@@ -4,6 +4,7 @@ import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import ErrorSaveModal from "@/components/Information/ErrorSaveModal.vue";
 
 const router = useRouter();
 
@@ -11,6 +12,7 @@ const saes = ref([]);
 const editingIndex = ref(null);
 const showAddForm = ref(false);
 const searchQuery = ref('');
+const showErrorModal = ref(false);
 
 const newSae = reactive({
   num: '',
@@ -90,7 +92,7 @@ const handleDelete = async (saeID) => {
       handleCancel();
     } catch (error) {
       console.error(error);
-      alert("Erreur lors de la suppression.");
+      showErrorModal.value = true;
     }
   }
 };
@@ -118,7 +120,7 @@ const saveSae = async (isNew = false) => {
     }
   } catch (error) {
     console.error(error);
-    alert("Erreur lors de l'enregistrement.");
+    showErrorModal.value = true;
   }
 };
 </script>
@@ -217,7 +219,10 @@ const saveSae = async (isNew = false) => {
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
-
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
+    />
   </div>
 </template>
 
