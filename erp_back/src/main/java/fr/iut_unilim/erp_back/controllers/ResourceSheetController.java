@@ -6,10 +6,12 @@ import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -25,12 +27,14 @@ public class ResourceSheetController {
     private final ResourceSheetRepository resourceSheetRepository;
     private final ResourceRepository resourceRepository;
     private final ClassTypeRepository classTypeRepository;
+    private final ConnectionService connectionService;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ClassTypeRepository classTypeRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ClassTypeRepository classTypeRepository, ConnectionService connectionService) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.resourceRepository = resourceRepository;
         this.classTypeRepository = classTypeRepository;
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/getResourceSheet")
@@ -41,19 +45,25 @@ public class ResourceSheetController {
 
     @PostMapping("/resource-sheet")
     @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
-
+    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
         ResourceSheet resourceSheet;
         Long resourceSheetID = resourceSheetRequest.getSheetsID();
 
-        Optional<ResourceSheet> canHaveResourceSheet = resourceSheetRepository.findById(resourceSheetID);
-        if (canHaveResourceSheet.isPresent()) {
-            resourceSheet = canHaveResourceSheet.get();
-            clearExistingContent(resourceSheet);
+        if (resourceSheetID != null) {
+            Optional<ResourceSheet> canHaveResourceSheet = resourceSheetRepository.findById(resourceSheetID);
+            if (canHaveResourceSheet.isPresent()) {
+                resourceSheet = canHaveResourceSheet.get();
+                clearExistingContent(resourceSheet);
+            } else {
+                resourceSheet = new ResourceSheet();
+                initDefaultValues(resourceSheet);
+            }
         } else {
             resourceSheet = new ResourceSheet();
             initDefaultValues(resourceSheet);
         }
+
+        handleDepartment(resourceSheet, authentication);
 
         if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
         resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
@@ -73,6 +83,14 @@ public class ResourceSheetController {
         resourceSheetService.save(resourceSheet);
 
         return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
+    }
+
+    private void handleDepartment(ResourceSheet resourceSheet, Authentication authentication) {
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        if (connection == null) return;
+
+        resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
     }
 
     private static void handleImprovementIdeasFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {

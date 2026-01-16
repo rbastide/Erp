@@ -1,11 +1,10 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.dto.TeacherRequest;
 import fr.iut_unilim.erp_back.dto.UserResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.TeacherRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,5 +43,9 @@ public class ConnectionService {
             ));
         }
         return userResponses;
+    }
+
+    public Connection findByIdentifier(@NotNull String identifier) {
+        return connectionRepository.findByIdentifier(identifier);
     }
 }
