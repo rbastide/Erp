@@ -47,8 +47,8 @@ public class SkillController {
 
     @GetMapping("/skills")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getAllSkills() {
-        List<Skill> skills = skillService.getAllSkills();
+    public ResponseEntity<?> getAllSkills(Authentication authentication) {
+        List<Skill> skills = skillService.getAllSkillsFromDepartment(authentication.getName());
         return ResponseEntity.ok(convertSkillEntitiesToDtos(skills));
     }
 

@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.repository;
 
 import fr.iut_unilim.erp_back.entity.Skill;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,4 +12,6 @@ public interface SkillRepository extends JpaRepository<Skill, Long>{
     List<Skill> findBySkillName(String skillName);
 
     List<Skill> findBySkillNum(int skillNum);
+
+    List<Skill> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
 }
