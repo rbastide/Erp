@@ -149,6 +149,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
     }
 
+    @GetMapping("/user/department")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<?> getUserDepartment(Authentication authentication) {
+        Connection user = connectionRepository.findByIdentifier(authentication.getName());
+        return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from("auth_token", "")

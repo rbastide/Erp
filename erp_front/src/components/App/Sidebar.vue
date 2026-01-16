@@ -34,18 +34,24 @@ const fetchDepartments = async () => {
   try {
     const response = await api.get('/universityDepartment/getUniversityDepartments');
     universityDepartments.value = response.data;
-
-    if (props.showDepartments && userRole.value === 'SUPER_ADMIN' && universityDepartments.value.length > 0) {
-      selectedDept.value = universityDepartments.value[0].universityDepartmentID;
-    }
   } catch (error) {
     console.error("Erreur lors de la récupération des départements :", error);
   }
 };
 
+const fetchCurrentDepartment = async () => {
+  try {
+    const response = await api.get('/auth/user/department');
+    selectedDept.value = response.data.departmentId;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des départements :", error);
+  }
+}
+
 onMounted(() => {
   updateRole();
   if (props.showDepartments && (userRole.value === 'SUPER_ADMIN' || userRole.value === 'ADMIN')) {
+    fetchCurrentDepartment();
     fetchDepartments();
   }
 });
