@@ -3,8 +3,9 @@ package fr.iut_unilim.erp_back.service;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Teacher;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.TeacherRepository;
-import org.apache.catalina.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,13 +14,22 @@ import java.util.List;
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final ConnectionService connectionService;
 
-    public TeacherService(TeacherRepository teacherRepository) {
+    public TeacherService(TeacherRepository teacherRepository, ConnectionService connectionService) {
         this.teacherRepository = teacherRepository;
+        this.connectionService = connectionService;
     }
 
     public List<Teacher> getAllTeachers() {
         return teacherRepository.findAll();
+    }
+
+    public List<Teacher> getAllTeachersFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        return teacherRepository.findAllByUniversityDepartment(department);
     }
 
     public List<Teacher> findByLastname(String lastname) {

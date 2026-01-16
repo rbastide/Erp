@@ -2,18 +2,18 @@ package fr.iut_unilim.erp_back.pdf.view;
 
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import fr.iut_unilim.erp_back.entity.PedagologicalContent;
+import fr.iut_unilim.erp_back.entity.EducationalContent;
 
 import java.util.List;
 
 public class PdfPedalogicalContent {
-    public static Table create(List<PedagologicalContent> pedagologicalContents) {
+    public static Table create(List<EducationalContent> educationalContents) {
         Table pedalogicalContent = new Table(1);
         pedalogicalContent.useAllAvailableWidth();
 
-        for (PedagologicalContent pedagologicalContent : pedagologicalContents) {
-            String contentType = pedagologicalContent.getClassTypeId().getClassType() + " " + pedagologicalContent.getCourseNumber();
-            Paragraph paragraph = new Paragraph(contentType + " : " + pedagologicalContent.getContent());
+        for (EducationalContent educationalContent : educationalContents) {
+            String contentType = educationalContent.getClassTypeId().getClassType() + " " + educationalContent.getCourseNumber();
+            Paragraph paragraph = new Paragraph(contentType + " : " + educationalContent.getContent());
             pedalogicalContent.addCell(paragraph);
         }
 

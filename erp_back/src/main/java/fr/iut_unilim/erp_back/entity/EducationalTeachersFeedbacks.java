@@ -3,8 +3,8 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "PedagologicalTeachersFeedbacks")
-public class PedagologicalTeachersFeedbacks {
+@Table(name = "EducationalTeachersFeedbacks")
+public class EducationalTeachersFeedbacks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +15,10 @@ public class PedagologicalTeachersFeedbacks {
     @Column(name = "content")
     private String content;
 
-    public PedagologicalTeachersFeedbacks() {
+    public EducationalTeachersFeedbacks() {
     }
 
-    public PedagologicalTeachersFeedbacks(Long teachersFeedbackID, String content) {
+    public EducationalTeachersFeedbacks(Long teachersFeedbackID, String content) {
         this.teachersFeedbackID = teachersFeedbackID;
         this.content = content;
     }

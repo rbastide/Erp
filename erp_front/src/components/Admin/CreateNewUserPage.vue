@@ -1,20 +1,23 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AuthService from '../../services/AuthService.js';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import api from "@/services/api.js";
 
 const router = useRouter();
 
 const username = ref('');
 const firstname = ref('');
+const universityDepartment = ref('');
 const lastname = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const role = ref('');
 const errorMessage = ref('');
+const universityDepartments = ref([]);
 
 const handleRetour = () => {
   router.back();
@@ -28,7 +31,7 @@ const handleRegister = async () => {
     return;
   }
 
-  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value) {
+  if (!username.value || !password.value || !role.value || !firstname.value || !lastname.value || !email.value || !universityDepartment.value) {
     errorMessage.value = "Veuillez remplir tous les champs.";
     return;
   }
@@ -39,7 +42,8 @@ const handleRegister = async () => {
     lastname: lastname.value,
     email: email.value,
     password: password.value,
-    role: role.value
+    role: role.value,
+    universityDepartment : universityDepartment.value
   };
 
   try {
@@ -55,6 +59,11 @@ const handleRegister = async () => {
     }
   }
 };
+
+onMounted(async () => {
+  const response = await api.get('/universityDepartment/getUniversityDepartments');
+  universityDepartments.value = response.data;
+})
 </script>
 
 <template>
@@ -83,6 +92,16 @@ const handleRegister = async () => {
             v-model="firstname"
             required
         />
+      </div>
+
+      <div class="form-group">
+        <label for="universityDepartment">Département de l'utilisateur</label>
+        <select id="universityDepartment" v-model="universityDepartment" required>
+          <option value="" disabled selected>-- Veuillez choisir un département --</option>
+          <option v-for="dept in universityDepartments" :key="dept" :value="dept">
+            {{ dept.universityDepartmentName }}
+          </option>
+        </select>
       </div>
 
       <div class="form-group">

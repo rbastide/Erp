@@ -2,12 +2,16 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.model.CriticalLearningModel;
+import fr.iut_unilim.erp_back.model.LearningRankModel;
+import fr.iut_unilim.erp_back.model.SaeModel;
+import fr.iut_unilim.erp_back.model.TeacherModel;
 import fr.iut_unilim.erp_back.service.*;
-import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -29,8 +33,9 @@ public class McccController {
     private final SkillService skillService;
     private final RankService rankService;
     private final CriticalLearningService criticalLearningService;
+    private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService) {
+    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService, ConnectionService connectionService) {
         this.mcccService = mcccService;
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
@@ -39,6 +44,7 @@ public class McccController {
         this.skillService = skillService;
         this.rankService = rankService;
         this.criticalLearningService = criticalLearningService;
+        this.connectionService = connectionService;
     }
 
     @Nullable
@@ -56,32 +62,23 @@ public class McccController {
         return null;
     }
 
-    @GetMapping("/getMccc")
+    @GetMapping("/mcccs")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getMccc() {
-        return ResponseEntity.ok(mcccService.getAllMccc());
+    public ResponseEntity<?> getMccc(Authentication authentication) {
+        return ResponseEntity.ok(mcccService.getAllMcccFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto) {
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
         }
 
-        Mccc mccc;
-        List<Mccc> allMcccs = mcccService.getAllMccc();
-        Optional<Mccc> existingMccc = allMcccs.stream()
-                .filter(m -> m.getResourceId().getResourceID().equals(dto.getResourceID()))
-                .findFirst();
+        Mccc mccc = getCurrentMccc(dto, canHaveResource);
 
-        if (existingMccc.isPresent()) {
-            mccc = existingMccc.get();
-        } else {
-            mccc = new Mccc();
-            mccc.setResourceId(canHaveResource.get());
-        }
+        handleDepartment(mccc, authentication);
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
@@ -122,10 +119,36 @@ public class McccController {
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
 
+    @NotNull
+    private Mccc getCurrentMccc(McccRequest dto, Optional<Resource> canHaveResource) {
+        Mccc mccc;
+        List<Mccc> allMcccs = mcccService.getAllMccc();
+        Optional<Mccc> existingMccc = allMcccs.stream()
+                .filter(m -> m.getResourceId().getResourceID().equals(dto.getResourceID()))
+                .findFirst();
+
+        if (existingMccc.isPresent()) {
+            mccc = existingMccc.get();
+        } else {
+            mccc = new Mccc();
+            mccc.setResourceId(canHaveResource.get());
+        }
+        return mccc;
+    }
+
+    private void handleDepartment(Mccc mccc, Authentication authentication) {
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        if (connection == null) return;
+
+        mccc.setUniversityDepartment(connection.getUniversityDepartment());
+    }
+
+
     @Nullable
     private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
-        for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
+        List<LearningRankModel> acs = dto.getAcsGrouped();
+        for (LearningRankModel learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
@@ -160,9 +183,9 @@ public class McccController {
         return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
     }
 
-    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRank learningRank, Rank correspondedRank) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
-        for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning : criticalLearnings) {
+    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
+        List<CriticalLearningModel> criticalLearnings = learningRank.acs();
+        for (CriticalLearningModel criticalLearning : criticalLearnings) {
             CriticalLearning newCriticalLearning = verifyPresenceOfCriticalLearning(criticalLearning, correspondedRank);
             setAcs.add(newCriticalLearning);
         }
@@ -170,7 +193,7 @@ public class McccController {
 
 
     @NotNull
-    private CriticalLearning verifyPresenceOfCriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rank) {
+    private CriticalLearning verifyPresenceOfCriticalLearning(CriticalLearningModel criticalLearning, Rank rank) {
         List<CriticalLearning> criticalLearnings = criticalLearningService.getCriticalLearningsWithNumAndTitleAndRank(criticalLearning.learningNum(), criticalLearning.learningTitle(), rank);
         if (criticalLearnings.isEmpty()) {
             return new CriticalLearning(criticalLearning, rank);
@@ -182,8 +205,8 @@ public class McccController {
     @NotNull
     private Set<Sae> getSAEFromDto(McccRequest dto) {
         Set<Sae> setSae = new HashSet<>();
-        List<fr.iut_unilim.erp_back.tools.datastructures.SAE> saes = dto.getSaeCodes();
-        for (fr.iut_unilim.erp_back.tools.datastructures.SAE sae : saes) {
+        List<SaeModel> saes = dto.getSaeCodes();
+        for (SaeModel sae : saes) {
             List<Sae> correspondedSaes = saeService.getSaeByNum(sae.saeCode());
             if (!correspondedSaes.isEmpty()) {
                 setSae.add(correspondedSaes.get(0));
@@ -198,8 +221,8 @@ public class McccController {
     @NotNull
     private Set<Teacher> getTeachersFromDto(McccRequest dto) {
         Set<Teacher> setTeacher = new HashSet<>();
-        fr.iut_unilim.erp_back.tools.datastructures.Teacher[] teachers = dto.getReferents();
-        for (fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher : teachers) {
+        TeacherModel[] teachers = dto.getReferents();
+        for (TeacherModel teacher : teachers) {
             List<Teacher> correspondedTeachers = teacherService.findByFirstnameAndLastname(teacher.firstname(), teacher.lastname());
             if (!correspondedTeachers.isEmpty()) {
                 setTeacher.add(correspondedTeachers.get(0));
@@ -227,13 +250,13 @@ public class McccController {
     }
 
     @GetMapping("/getTeachers")
-    public ResponseEntity<?> getTeachers() {
-        return ResponseEntity.ok(teacherService.getAllTeachers());
+    public ResponseEntity<?> getTeachers(Authentication authentication) {
+        return ResponseEntity.ok(teacherService.getAllTeachersFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getSaes")
-    public ResponseEntity<?> getSaes() {
-        return ResponseEntity.ok(saeService.getAllSaes());
+    public ResponseEntity<?> getSaes(Authentication authentication) {
+        return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getHourlyVolumes")

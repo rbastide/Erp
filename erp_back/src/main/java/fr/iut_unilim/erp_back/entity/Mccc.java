@@ -34,7 +34,7 @@ public class Mccc {
     @JoinTable(
             name = "McccCriticalLearning",
             joinColumns = @JoinColumn(name = "mcccID"),
-            inverseJoinColumns = @JoinColumn(name = "learningID")
+            inverseJoinColumns = @JoinColumn(name = "criticalLearningID")
     )
     private Set<CriticalLearning> criticalLearningsId;
 
@@ -46,15 +46,20 @@ public class Mccc {
     )
     private Set<Teacher> referencialTeacherId;
 
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
+
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId) {
+    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalLearningsId = criticalLearningsId;
         this.referencialTeacherId = referencialTeacherId;
+        this.universityDepartment = universityDepartment;
     }
 
     public Mccc() {
@@ -123,4 +128,8 @@ public class Mccc {
     public void setLastModificationDate(Date lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
+
+    public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    public void setUniversityDepartment(UniversityDepartment universityDepartmentId) { this.universityDepartment = universityDepartmentId; }
 }

@@ -21,18 +21,20 @@ public class Resource {
     @Column(name="semester")
     private int semester;
 
-    //@Column("universityDepartmentID")
-    //private UniversityDepartment universityDepartment;
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
 
     public Resource() {
     }
 
-    public Resource(Long resourceID, String num, String name, int semester) {
+    public Resource(Long resourceID, String num, String name, int semester,UniversityDepartment universityDepartment) {
         this.resourceID = resourceID;
         this.num = num;
         this.name = name;
         this.semester = semester;
-        //this.universityDepartment = universityDepartment;
+        this.universityDepartment = universityDepartment;
+
     }
 
     public Long getResourceID() {
@@ -65,7 +67,11 @@ public class Resource {
         this.resourceID = resourceID;
     }
 
-    //public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
 
-    //public void setUinversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment }
+    public void setUniversityDepartment(UniversityDepartment universityDepartmentId) {
+        this.universityDepartment = universityDepartmentId;
+    }
 }

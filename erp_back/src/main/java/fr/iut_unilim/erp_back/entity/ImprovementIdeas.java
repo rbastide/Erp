@@ -12,17 +12,20 @@ public class ImprovementIdeas {
     @Column(name = "improvementsIdeaID")
     private Long improvementsIdeaID;
 
-    @Column(name = "idea")
-    private String idea;
+    @Column(name = "ideaContent")
+    private String ideaContent;
 
     public ImprovementIdeas() {
     }
 
     public Long getImprovementsIdeaID(){ return this.improvementsIdeaID; }
-    public String getIdea(){ return this.idea; }
 
-    public void setIdea(String idea) {
-        this.idea = idea;
+    public String getIdeaContent() {
+        return this.ideaContent;
+    }
+
+    public void setIdeaContent(String idea) {
+        this.ideaContent = idea;
     }
 
     public void setImprovementsIdeaID(Long improvementsIdeaID) {

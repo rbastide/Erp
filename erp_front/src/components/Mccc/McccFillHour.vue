@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { mcccStore } from '@/services/mcccStore';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {mcccStore} from '@/services/mcccStore';
 import api from '@/services/api';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -35,7 +35,7 @@ const fetchHourlyVolumes = async () => {
   console.log("Récupération des heures pour resourceID:", targetId);
 
   try {
-    const response = await api.get('/mccc/getMccc');
+    const response = await api.get('/mccc/mcccs');
 
     const currentMccc = response.data.find((m: any) =>
         m.resourceId && String(m.resourceId.resourceID) === targetId

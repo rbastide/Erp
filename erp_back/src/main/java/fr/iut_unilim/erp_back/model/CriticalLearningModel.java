@@ -1,8 +1,8 @@
-package fr.iut_unilim.erp_back.tools.datastructures;
+package fr.iut_unilim.erp_back.model;
 
 import org.jetbrains.annotations.NotNull;
 
-public record CriticalLearning(int learningNum, String learningTitle) {
+public record CriticalLearningModel(int learningNum, String learningTitle) {
     @NotNull
     @Override
     public String toString() {

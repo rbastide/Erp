@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
+import fr.iut_unilim.erp_back.model.TeacherModel;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class Teacher {
 
     public Teacher() {}
 
-    public Teacher(fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher) {
+    public Teacher(TeacherModel teacher) {
         this.lastname = teacher.lastname();
         this.firstname = teacher.firstname();
     }

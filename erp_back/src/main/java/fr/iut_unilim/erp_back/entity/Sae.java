@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
-import fr.iut_unilim.erp_back.tools.datastructures.SAE;
+import fr.iut_unilim.erp_back.model.SaeModel;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +17,10 @@ public class Sae {
     @Column(name = "title")
     private String title;
 
+    @ManyToOne
+    @JoinColumn(name = "universityDepartmentID")
+    private UniversityDepartment universityDepartment;
+
     public Sae(Long saeID, String num, String title) {
         SaeID = saeID;
         this.num = num;
@@ -26,7 +30,7 @@ public class Sae {
     public Sae() {
     }
 
-    public Sae(SAE sae) {
+    public Sae(SaeModel sae) {
         this.num = sae.saeCode();
         this.title = sae.saeName();
     }
@@ -53,5 +57,13 @@ public class Sae {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public UniversityDepartment getUniversityDepartment() {
+        return universityDepartment;
+    }
+
+    public void setUniversityDepartment(UniversityDepartment universityDepartment) {
+        this.universityDepartment = universityDepartment;
     }
 }

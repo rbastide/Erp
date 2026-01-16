@@ -8,6 +8,7 @@ import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpHeaders;
@@ -36,15 +37,17 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final TeacherService teacherService;
+    private final TeacherRepository teacherRepository;
 
 
-    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService, TeacherRepository teacherRepository) {
         this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.teacherService = teacherService;
+        this.teacherRepository = teacherRepository;
     }
 
     @PostMapping("/register")
@@ -117,15 +120,28 @@ public class AuthController {
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getUsers() {
-        return ResponseEntity.ok(connectionService.getAllConnections());
+    public ResponseEntity<?> getUsers(Authentication authentication) {
+        String userIdentifier = authentication.getName();
+
+        return ResponseEntity.ok(connectionService.getAllConnectionFromDepartment(userIdentifier));
     }
 
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        if (!connectionRepository.existsById(id)) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
+        Optional<Connection> userToDelete = connectionRepository.findById(id);
+        if (userToDelete.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        String userToDeleteIdentifier = userToDelete.get().getIdentifier();
+        if (userToDeleteIdentifier.equals(authentication.getName())) {
+            return ResponseEntity.badRequest().body("Impossible de supprimer votre propre compte");
+        }
+
+        Teacher teacher = teacherService.getTeacherInfoByUser(id);
+        if (teacher != null) {
+            teacherRepository.delete(teacher);
         }
         connectionRepository.deleteById(id);
         return ResponseEntity.ok().build();
@@ -147,6 +163,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
     }
 
+    @GetMapping("/user/department")
+    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    public ResponseEntity<?> getUserDepartment(Authentication authentication) {
+        Connection user = connectionRepository.findByIdentifier(authentication.getName());
+        return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from("auth_token", "")
@@ -160,5 +183,17 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("Déconnexion réussie");
+    }
+
+    @PatchMapping("/users/department/{departmentId}")
+    public ResponseEntity<?> updateUserDepartment(@PathVariable Long departmentId, Authentication authentication) {
+        String userIdentifier = authentication.getName();
+
+        boolean wentGood = connectionService.updateDepartment(userIdentifier, departmentId);
+
+        if (wentGood) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("Département inconnu");
     }
 }

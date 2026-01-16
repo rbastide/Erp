@@ -45,7 +45,7 @@ const fetchSheetData = async () => {
     if (sheet) {
       contents.value.teacherFeedback = sheet.teachersFeedbacks?.map((f: any) => f.content) || []
       contents.value.studentFeedback = sheet.studentsFeedbacks?.map((f: any) => f.content) || []
-      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.idea || i.content) || []
+      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.ideaContent || i.content) || []
 
       if (sheet.pedagologicalContentId) {
         const pedago = sheet.pedagologicalContentId
@@ -61,7 +61,7 @@ const fetchSheetData = async () => {
       }
 
       if (sheet.hourlyVolumeID) {
-        const responseMccc = await api.get('/mccc/getMccc')
+        const responseMccc = await api.get('/mccc/mcccs')
         const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
 
         if (mcccMatch && mcccMatch.hourlyVolId) {

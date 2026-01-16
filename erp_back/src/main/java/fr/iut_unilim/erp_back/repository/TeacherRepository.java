@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.repository;
 
 import fr.iut_unilim.erp_back.entity.Teacher;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +23,9 @@ public interface TeacherRepository extends JpaRepository<Teacher, Long> {
     String findFirstnameByTeacherID(@Param("id") Long id);
 
     Teacher findByUserID(Long userID);
+
+    @Query("SELECT t FROM Teacher t, Connection c " +
+            "WHERE t.userID = c.id " +
+            "AND c.universityDepartment = :universityDepartment")
+    List<Teacher> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
 }

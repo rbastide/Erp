@@ -9,7 +9,7 @@ import java.util.Set;
 public record ResourceSheetViewModel(
         Resource resource,
         HourlyVolume hourlyVolume,
-        List<PedagologicalTeachersFeedbacks> pedagologicalTeachersFeedbacks,
+        List<EducationalTeachersFeedbacks> educationalTeachersFeedbacks,
         List<StudentsFeedbacks> studentsFeedbacks,
         List<ImprovementIdeas> improvementIdeas,
         int semester,
@@ -18,6 +18,6 @@ public record ResourceSheetViewModel(
         Date lastModificationDate,
         Set<Teacher> teachers,
         Set<CriticalLearning> criticalLearnings,
-        List<PedagologicalContent> pedagologicalContent,
+        List<EducationalContent> educationalContent,
         Set<Skill> skills) {
 }

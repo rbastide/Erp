@@ -1,6 +1,8 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -12,13 +14,22 @@ import java.util.Optional;
 public class ResourceSheetService {
 
     private final ResourceSheetRepository resourceSheetRepository;
+    private final ConnectionService connectionService;
 
-    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository) {
+    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService) {
         this.resourceSheetRepository = resourceSheetRepository;
+        this.connectionService = connectionService;
     }
 
     public List<ResourceSheet> getAllResourceSheets() {
         return resourceSheetRepository.findAll();
+    }
+
+    public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        return resourceSheetRepository.findAllByUniversityDepartment(department);
     }
 
     public ResourceSheet save(ResourceSheet resourceSheet) {

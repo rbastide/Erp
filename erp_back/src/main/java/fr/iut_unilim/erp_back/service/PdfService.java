@@ -47,7 +47,7 @@ public class PdfService {
             return null;
         }
 
-        List<PedagologicalTeachersFeedbacks> pedagologicalTeachersFeedbacks = resourceSheet.getTeachersFeedbacks();
+        List<EducationalTeachersFeedbacks> educationalTeachersFeedbacks = resourceSheet.getTeachersFeedbacks();
 
         List<StudentsFeedbacks> studentsFeedbacks = resourceSheet.getStudentsFeedbacks();
 
@@ -77,8 +77,8 @@ public class PdfService {
             return null;
         }
 
-        List<PedagologicalContent> pedagologicalContents = resourceSheet.getPedagologicalContentId();
+        List<EducationalContent> educationallContents = resourceSheet.getEducationalContentID();
 
-        return new ResourceSheetViewModel(resource, hourlyVolume.get(), pedagologicalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, saes, creationDate, lastModificationDate, teachers, criticalLearnings, pedagologicalContents, skills);
+        return new ResourceSheetViewModel(resource, hourlyVolume.get(), educationalTeachersFeedbacks, studentsFeedbacks, improvementIdeas, semester, saes, creationDate, lastModificationDate, teachers, criticalLearnings, educationallContents, skills);
     }
 }

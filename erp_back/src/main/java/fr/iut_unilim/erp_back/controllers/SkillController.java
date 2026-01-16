@@ -3,18 +3,21 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.CriticalLearningDto;
 import fr.iut_unilim.erp_back.dto.LearningRankDto;
 import fr.iut_unilim.erp_back.dto.NewSkillDto;
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.CriticalLearning;
 import fr.iut_unilim.erp_back.entity.Rank;
 import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.repository.CriticalLearningRepository;
 import fr.iut_unilim.erp_back.repository.RankRepository;
 import fr.iut_unilim.erp_back.repository.SkillRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.CriticalLearningService;
 import fr.iut_unilim.erp_back.service.RankService;
 import fr.iut_unilim.erp_back.service.SkillService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,27 +33,29 @@ public class SkillController {
     private final CriticalLearningService criticalLearningService;
     private final SkillRepository skillRepository;
     private final RankRepository rankRepository;
+    private final ConnectionService connectionService;
 
-    public SkillController(SkillService skillService, RankService rankService, CriticalLearningRepository criticalLearningRepository, CriticalLearningService criticalLearningService, SkillRepository skillRepository, RankRepository rankRepository) {
+    public SkillController(SkillService skillService, RankService rankService, CriticalLearningRepository criticalLearningRepository, CriticalLearningService criticalLearningService, SkillRepository skillRepository, RankRepository rankRepository, ConnectionService connectionService) {
         this.skillService = skillService;
         this.rankService = rankService;
         this.criticalLearningRepository = criticalLearningRepository;
         this.criticalLearningService = criticalLearningService;
         this.skillRepository = skillRepository;
         this.rankRepository = rankRepository;
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/skills")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getAllSkills() {
-        List<Skill> skills = skillService.getAllSkills();
+    public ResponseEntity<?> getAllSkills(Authentication authentication) {
+        List<Skill> skills = skillService.getAllSkillsFromDepartment(authentication.getName());
         return ResponseEntity.ok(convertSkillEntitiesToDtos(skills));
     }
 
     @PostMapping("/skills")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos) {
-        convertSkillDtosToEntities(skillsDtos);
+    public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos, Authentication authentication) {
+        convertSkillDtosToEntities(skillsDtos, authentication);
         return ResponseEntity.ok().build();
     }
 
@@ -60,15 +65,21 @@ public class SkillController {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        List<Rank> ranks = rankService.getRanksFromSkill(skillService.getSkillsFromId(id).get());
+        for (Rank rank : ranks) {
+            List<CriticalLearning> criticalLearnings = criticalLearningRepository.findByRankID(rank);
+            criticalLearningRepository.deleteAll(criticalLearnings);
+        }
+        rankRepository.deleteAll(ranks);
         skillRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
-    private void convertSkillDtosToEntities(@NotNull List<NewSkillDto> skillsDtos) {
+    private void convertSkillDtosToEntities(@NotNull List<NewSkillDto> skillsDtos, Authentication authentication) {
         for (NewSkillDto skillDto : skillsDtos) {
-            Skill skill = (skillDto.id() != null)
-                    ? skillService.getSkillsFromId(skillDto.id()).orElse(new Skill(skillDto.skillName(), skillDto.skillNum()))
-                    : new Skill(skillDto.skillName(), skillDto.skillNum());
+            Skill defaultSkill = new Skill(skillDto.skillName(), skillDto.skillNum());
+            handleDepartment(defaultSkill, authentication);
+            Skill skill = (skillDto.id() != null) ? skillService.getSkillsFromId(skillDto.id()).orElse(defaultSkill) : defaultSkill;
 
             skill.setSkillName(skillDto.skillName());
             skill.setSkillNum(skillDto.skillNum());
@@ -99,11 +110,19 @@ public class SkillController {
                     ? criticalLearningService.getCriticalLearningFromId(acDto.id()).orElse(new CriticalLearning(acDto.num(), acDto.title(), rank))
                     : new CriticalLearning(acDto.num(), acDto.title(), rank);
 
-            cl.setLearningNum(acDto.num());
-            cl.setLearningTitle(acDto.title());
+            cl.setCriticalLearningNum(acDto.num());
+            cl.setCriticalLearningTitle(acDto.title());
             cl.setRankID(rank);
             criticalLearningRepository.save(cl);
         }
+    }
+
+    private void handleDepartment(Skill resourceSheet, Authentication authentication) {
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        if (connection == null) return;
+
+        resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
     }
 
     @NotNull

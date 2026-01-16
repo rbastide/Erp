@@ -100,7 +100,7 @@ public class PdfGenerator {
         document.add(PdfHours.create(resourceSheet.resource().getNum(), resourceSheet.hourlyVolume()));
 
         document.add(createTitle("Contenu pédagogique :"));
-        document.add(PdfPedalogicalContent.create(resourceSheet.pedagologicalContent()));
+        document.add(PdfPedalogicalContent.create(resourceSheet.educationalContent()));
 
         return true;
     }
@@ -115,7 +115,7 @@ public class PdfGenerator {
         document.add(header);
 
         document.add(createTitle("Suivi de la ressource / module :"));
-        document.add(PdfFeedbacks.create(resourceSheet.pedagologicalTeachersFeedbacks(), resourceSheet.studentsFeedbacks(), resourceSheet.improvementIdeas()));
+        document.add(PdfFeedbacks.create(resourceSheet.educationalTeachersFeedbacks(), resourceSheet.studentsFeedbacks(), resourceSheet.improvementIdeas()));
 
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}));
         infoTable.useAllAvailableWidth();

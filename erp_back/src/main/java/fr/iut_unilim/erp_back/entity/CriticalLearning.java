@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.entity;
 
 
+import fr.iut_unilim.erp_back.model.CriticalLearningModel;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,57 +11,57 @@ public class CriticalLearning {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    @Column(name = "learningID")
-    private Long learningID;
+    @Column(name = "criticalLearningID")
+    private Long criticalLearningID;
 
-    @Column(name = "learningNum")
-    private int learningNum;
+    @Column(name = "criticalLearningNum")
+    private int criticalLearningNum;
 
-    @Column(name = "learningTitle")
-    private String learningTitle;
+    @Column(name = "criticalLearningTitle")
+    private String criticalLearningTitle;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "rankID")
     private Rank rankID;
 
     public CriticalLearning() {}
 
-    public CriticalLearning(int learningNum, String learningTitle, Rank rankID) {
-        this.learningNum = learningNum;
-        this.learningTitle = learningTitle;
+    public CriticalLearning(int criticalLearningNum, String criticalLearningTitle, Rank rankID) {
+        this.criticalLearningNum = criticalLearningNum;
+        this.criticalLearningTitle = criticalLearningTitle;
         this.rankID = rankID;
     }
 
-    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rankID) {
+    public CriticalLearning(CriticalLearningModel criticalLearning, Rank rankID) {
         this(criticalLearning.learningNum(), criticalLearning.learningTitle(), rankID);
     }
 
-    public Long getLearningID() {
-        return learningID;
+    public Long getCriticalLearningID() {
+        return criticalLearningID;
     }
 
-    public int getLearningNum() {
-        return learningNum;
+    public int getCriticalLearningNum() {
+        return criticalLearningNum;
     }
 
-    public String getLearningTitle() {
-        return learningTitle;
+    public String getCriticalLearningTitle() {
+        return criticalLearningTitle;
     }
 
     public Rank getRankID() {
         return rankID;
     }
 
-    public void setLearningID(Long learningID) {
-        this.learningID = learningID;
+    public void setCriticalLearningID(Long learningID) {
+        this.criticalLearningID = learningID;
     }
 
-    public void setLearningNum(int learningNum) {
-        this.learningNum = learningNum;
+    public void setCriticalLearningNum(int learningNum) {
+        this.criticalLearningNum = learningNum;
     }
 
-    public void setLearningTitle(String learningTitle) {
-        this.learningTitle = learningTitle;
+    public void setCriticalLearningTitle(String learningTitle) {
+        this.criticalLearningTitle = learningTitle;
     }
 
     public void setRankID(Rank rankID) {

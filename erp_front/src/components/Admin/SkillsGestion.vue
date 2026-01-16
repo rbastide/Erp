@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -45,22 +45,8 @@ const filteredSkills = computed(() => {
   );
 });
 
-const syncWithBackend = async () => {
-  const payload = finalSkills.value.map(comp => ({
-    id: comp.id || null,
-    skillNum: comp.skillNum ? comp.skillNum.toString() : "",
-    skillName: comp.skillName || "",
-    levels: comp.levels.map((niv, nIdx) => ({
-      id: niv.id || null,
-      num: niv.num ? parseInt(niv.num) : (nIdx + 1),
-      title: niv.title || "",
-      acs: niv.acs.map(ac => ({
-        id: ac.id || null,
-        num: ac.num ? ac.num.toString() : "",
-        title: ac.title || ""
-      }))
-    }))
-  }));
+const syncWithBackend = async (skill) => {
+  const payload = [skill];
 
   try {
     await api.post('/skill/skills', payload);
@@ -72,19 +58,20 @@ const syncWithBackend = async () => {
 
 const handleSaveNewCompetence = async () => {
   if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
+  const currentSkillToAdd = currentSkill.value;
   finalSkills.value.unshift(JSON.parse(JSON.stringify(currentSkill.value)));
   currentSkill.value = {
     skillNum: null,
     skillName: '',
     levels: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
-  await syncWithBackend();
+  await syncWithBackend(currentSkillToAdd);
 };
 
 const saveModification = async (index) => {
   finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
   editingIndex.value = null;
-  await syncWithBackend();
+  await syncWithBackend(finalSkills.value[index]);
 };
 
 const handleDelete = async (index) => {
@@ -93,7 +80,6 @@ const handleDelete = async (index) => {
   try {
     if (target.id) await api.delete(`/skill/skills/${target.id}`);
     finalSkills.value.splice(index, 1);
-    await syncWithBackend();
   } catch (error) {
     console.error(error);
   }
@@ -279,7 +265,8 @@ const handleValider = () => router.back();
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" v-model="searchQuery" placeholder="Charcher par nom ou par numéro (ex : #3)" class="search-input" />
+          <input type="text" v-model="searchQuery" placeholder="Chercher par nom ou par numéro (ex : #3)"
+                 class="search-input"/>
         </div>
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
