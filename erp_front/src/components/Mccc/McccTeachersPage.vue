@@ -22,17 +22,11 @@ const fetchTeachers = async () => {
 
     if (Array.isArray(response.data)) {
       teachersData = response.data;
-    } else if (response.data && Array.isArray(response.data.content)) {
-      teachersData = response.data.content;
     }
-
     allTeachers.value = teachersData.map(t => ({
       ...t,
-      teacherID: Number(t.teacherID || t.id)
+      teacherID: Number(t.teacherID)
     }));
-
-    console.log("Tous les profs chargés :", allTeachers.value.length);
-
   } catch (error) {
     console.error("Erreur API Teachers :", error);
     errorMessage.value = "Impossible de charger les enseignants.";
@@ -210,7 +204,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher..."
+              placeholder="Rechercher par nom ou prénom"
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>

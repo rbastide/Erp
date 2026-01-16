@@ -6,11 +6,7 @@ import Sidebar from './Sidebar.vue';
 const router = useRouter();
 
 const handleRetour = () => {
-  if (localStorage.getItem('user_token') === null) {
-    router.push('/login');
-  } else {
     router.back();
-  }
 };
 </script>
 

@@ -6,7 +6,9 @@ import fr.iut_unilim.erp_back.dto.EditUserRequest;
 import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Teacher;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
@@ -52,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req,Authentication authentication) {
         if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
         }
@@ -62,6 +64,8 @@ public class AuthController {
         user.setEmail(req.getEmail());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(req.getRole());
+        user.setUniversityDepartment(req.getUniversityDepartment());
+
 
         Connection connection = connectionRepository.save(user);
 
@@ -164,7 +168,7 @@ public class AuthController {
     }
 
     @GetMapping("/user/department")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUserDepartment(Authentication authentication) {
         Connection user = connectionRepository.findByIdentifier(authentication.getName());
         return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));

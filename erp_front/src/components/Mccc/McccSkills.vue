@@ -6,6 +6,7 @@ import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 import {mcccStore} from "@/services/mcccStore.js";
 import CancelModal from '../Information/CancelModal.vue';
+import ErrorSkillModal from '../Information/ErrorSkillModal.vue';
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -13,6 +14,7 @@ const errorMessage = ref('');
 const isLoading = ref(true);
 const allSkills = ref([]);
 const showModal = ref(false);
+const showSkillErrorModal = ref(false);
 const initialState = ref([]);
 
 const fetchReferential = async () => {
@@ -143,7 +145,7 @@ const filteredSkills = computed(() => {
 
 const addSkillDirectly = (skill) => {
   if (!skill.levels || skill.levels.length === 0) {
-    alert("Cette compétence n'a pas de niveaux définis en base.");
+    showSkillErrorModal.value = true;
     return;
   }
 
@@ -292,6 +294,11 @@ const clearSearch = () => searchQuery.value = '';
         v-if="showModal"
         @confirm="onConfirmCancel"
         @close="showModal = false"
+    />
+
+    <ErrorSkillModal
+        v-if="showSkillErrorModal"
+        @close="showSkillErrorModal = false"
     />
   </main>
 </template>
@@ -606,5 +613,80 @@ const clearSearch = () => searchQuery.value = '';
   .footer-buttons {
     justify-content: space-between;
   }
+}
+
+:global(body.dark-mode) .main-content {
+  background-color: #252525;
+}
+:global(body.dark-mode) .section-title {
+  color: #ef5350;
+}
+:global(body.dark-mode) .separator-line {
+  background: #444;
+}
+:global(body.dark-mode) .admin-card {
+  background: #333;
+  border-color: #444;
+}
+:global(body.dark-mode) .admin-card:hover {
+  background-color: #383838;
+  border-color: #ef5350;
+}
+:global(body.dark-mode) .is-selected-summary {
+  background-color: rgba(239, 83, 80, 0.15);
+  border-color: #ef5350;
+}
+:global(body.dark-mode) .icon-circle {
+  background: rgba(255,255,255,0.05);
+  color: #ef5350;
+}
+:global(body.dark-mode) .selected-icon,
+:global(body.dark-mode) .admin-card:hover .icon-circle {
+  background: #B51621;
+  color: white;
+}
+:global(body.dark-mode) .card-title {
+  color: #ffffff;
+}
+:global(body.dark-mode) .level-entry:not(:first-child) {
+  border-top-color: #444;
+}
+:global(body.dark-mode) .rank-info-bold {
+  color: #ef5350;
+}
+:global(body.dark-mode) .ac-detail-item {
+  color: #bbb;
+}
+:global(body.dark-mode) .ac-detail-item strong {
+  color: #ef5350;
+}
+:global(body.dark-mode) .btn-add-footer {
+  color: #ef5350;
+  border-color: #ef5350;
+}
+:global(body.dark-mode) .admin-card:hover .btn-add-footer {
+  background-color: #B51621;
+  color: white;
+}
+:global(body.dark-mode) .sticky-footer {
+  background: #333;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+:global(body.dark-mode) .search-input {
+  background: #444;
+  border-color: #555;
+  color: white;
+}
+:global(body.dark-mode) .search-input:focus {
+  border-color: #ef5350;
+  background: #333;
+}
+:global(body.dark-mode) .clear-input-btn {
+  background: #555;
+  color: #fff;
+}
+:global(body.dark-mode) .loading,
+:global(body.dark-mode) .no-result {
+  color: #777;
 }
 </style>

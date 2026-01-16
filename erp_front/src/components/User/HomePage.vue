@@ -3,8 +3,7 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import {onMounted} from "vue";
-import api from "@/services/api.js";
-import AuthService, {authStore} from "@/services/AuthService.js";
+import {authStore} from "@/services/AuthService.js";
 
 const router = useRouter();
 
@@ -12,15 +11,11 @@ const handleFill = () => {
   router.push('/resource');
 };
 
-const handleAfficher = () => {
+const handleHistory = () => {
   router.push('/history');
 };
 
-const fetchUserData = async () => {
-}
-
 onMounted(() => {
-  fetchUserData();
   authStore.load();
 });
 </script>
@@ -38,7 +33,7 @@ onMounted(() => {
         <p>Remplir une fiche ressource</p>
       </div>
 
-      <div class="card-action" @click="handleAfficher">
+      <div class="card-action" @click="handleHistory">
         <div class="icon-circle">
           <svg width="48" height="48" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
         </div>

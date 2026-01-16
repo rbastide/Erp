@@ -21,7 +21,7 @@ public class UniversityDepartmentController {
     }
 
     @GetMapping("/getUniversityDepartments")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
     public ResponseEntity<?> getUniversityDepartments() {
         return ResponseEntity.ok(universityDepartmentRepository.findAll());
     }

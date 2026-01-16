@@ -4,12 +4,16 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import DeleteResourceModal from '../Information/DeleteResourceModal.vue';
 
 const router = useRouter();
 const resources = ref([]);
 const editingIndex = ref(null);
 const isAdding = ref(false);
 const searchQuery = ref('');
+
+const showDeleteModal = ref(false);
+const resourceToDelete = ref(null);
 
 const editedResource = reactive({
   resourceID: null,
@@ -49,14 +53,23 @@ const filteredResources = computed(() => {
   });
 });
 
-const handleDelete = async (resourceID, num) => {
-  if (confirm(`Supprimer la ressource ${num} ?`)) {
-    try {
-      await api.delete(`resources/${resourceID}`);
-      resources.value = resources.value.filter(res => res.resourceID !== resourceID);
-    } catch (error) {
-      alert("Erreur lors de la suppression.");
-    }
+const handleDelete = (resource) => {
+  resourceToDelete.value = resource;
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = async () => {
+  if (!resourceToDelete.value) return;
+
+  const id = resourceToDelete.value.resourceID;
+
+  try {
+    await api.delete(`resources/${id}`);
+    resources.value = resources.value.filter(res => res.resourceID !== id);
+    showDeleteModal.value = false;
+    resourceToDelete.value = null;
+  } catch (error) {
+    alert("Erreur lors de la suppression.");
   }
 };
 
@@ -202,7 +215,7 @@ const handleValider = () => router.push('/home-admin');
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                 </button>
-                <button class="action-btn-mini delete" @click="handleDelete(resource.resourceID, resource.num)">
+                <button class="action-btn-mini delete" @click="handleDelete(resource)">
                   <svg width="16" height="16" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2.5" fill="none">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -232,6 +245,14 @@ const handleValider = () => router.push('/home-admin');
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
+
+    <DeleteResourceModal
+        v-if="showDeleteModal"
+        :resourceNum="resourceToDelete?.num"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
+    />
+
   </div>
 </template>
 

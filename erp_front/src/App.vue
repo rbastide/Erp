@@ -46,7 +46,7 @@ body.dark-mode .sidebar,
 body.dark-mode .sidebar-header,
 body.dark-mode .sticky-footer,
 body.dark-mode .app-footer {
-  background-color: #333333 !important;
+  background: #333333 !important;
   border-color: #444444 !important;
   color: #ffffff !important;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
@@ -74,13 +74,22 @@ body.dark-mode .version-item,
 body.dark-mode .card,
 body.dark-mode .summary,
 body.dark-mode .error-card,
-body.dark-mode .info-footer {
+body.dark-mode .info-footer,
+body.dark-mode .modal-card,
+body.dark-mode .admin-card,
+body.dark-mode .is-selected-summary {
   background-color: #333333 !important;
   border-color: #444444 !important;
   color: #ffffff !important;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
 }
 
+body.dark-mode .admin-card:hover {
+  background-color: #3a3a3a !important;
+  border-color: #ef5350 !important;
+}
+
+body.dark-mode .is-selected-summary,
 body.dark-mode .skill-card-resume {
   background-color: rgba(239, 83, 80, 0.15) !important;
   border-color: #ef5350 !important;
@@ -113,7 +122,9 @@ body.dark-mode #title,
 body.dark-mode .group-label,
 body.dark-mode .field-label,
 body.dark-mode .lvl-label,
-body.dark-mode .level-title {
+body.dark-mode .level-title,
+body.dark-mode .modal-card h2,
+body.dark-mode .card-title {
   color: #ffffff !important;
 }
 
@@ -130,7 +141,11 @@ body.dark-mode .section-header,
 body.dark-mode .summary-code,
 body.dark-mode .footer-value,
 body.dark-mode .total-number,
-body.dark-mode .ac-tag {
+body.dark-mode .ac-tag,
+body.dark-mode .rank-info-bold,
+body.dark-mode .btn-add-footer,
+body.dark-mode .selected-title,
+body.dark-mode .ac-detail-item strong {
   color: #ef5350 !important;
 }
 
@@ -147,7 +162,10 @@ body.dark-mode .no-result,
 body.dark-mode .summary-label,
 body.dark-mode .footer-label,
 body.dark-mode .separator-text,
-body.dark-mode .sub-label {
+body.dark-mode .sub-label,
+body.dark-mode .ac-detail-item,
+body.dark-mode .loading,
+body.dark-mode .no-content-warning {
   color: #bbbbbb !important;
 }
 
@@ -208,7 +226,6 @@ body.dark-mode .total-highlight {
   border-color: #ef5350 !important;
 }
 
-/* --- TABLES --- */
 body.dark-mode .competence-table,
 body.dark-mode .competence-table th,
 body.dark-mode .competence-table td,
@@ -220,6 +237,10 @@ body.dark-mode .competence-table th {
   background-color: #2a2a2a !important;
   color: #ef5350 !important;
   border-bottom-color: #444 !important;
+}
+
+body.dark-mode .level-entry:not(:first-child) {
+  border-top-color: #444 !important;
 }
 
 body.dark-mode .competence-table td {
@@ -234,19 +255,23 @@ body.dark-mode .back-btn,
 body.dark-mode .login-button,
 body.dark-mode .btn-primary,
 body.dark-mode .save-btn,
-body.dark-mode .btn-validate {
+body.dark-mode .btn-validate,
+body.dark-mode .btn-modal,
+body.dark-mode .btn-modal.primary {
   background-color: #d32f2f !important;
   color: #fff !important;
   border: none !important;
 }
 
-body.dark-mode .btn-sys.primary {
+body.dark-mode .btn-sys.primary,
+body.dark-mode .btn-modal.primary {
   background: linear-gradient(135deg, #c62828 0%, #ef5350 100%) !important;
   color: #ffffff !important;
 }
 
 body.dark-mode .btn-sys.secondary,
-body.dark-mode .btn-cancel {
+body.dark-mode .btn-cancel,
+body.dark-mode .btn-modal.secondary {
   background-color: #444444 !important;
   color: #ffffff !important;
   border: 1px solid #555555 !important;
@@ -258,13 +283,16 @@ body.dark-mode .btn-new-user:hover,
 body.dark-mode .back-btn:hover,
 body.dark-mode .login-button:hover,
 body.dark-mode .btn-primary:hover,
-body.dark-mode .save-btn:hover {
+body.dark-mode .save-btn:hover,
+body.dark-mode .btn-modal:hover,
+body.dark-mode .btn-modal.primary:hover {
   background-color: #ef5350 !important;
   transform: translateY(-2px);
 }
 
 body.dark-mode .btn-sys.secondary:hover,
-body.dark-mode .btn-cancel:hover {
+body.dark-mode .btn-cancel:hover,
+body.dark-mode .btn-modal.secondary:hover {
   background-color: #555555 !important;
   color: #ef5350 !important;
 }
@@ -294,16 +322,27 @@ body.dark-mode .btn-clear-link,
 body.dark-mode .btn-add-line,
 body.dark-mode .add-teacher-button,
 body.dark-mode .card-ok,
-body.dark-mode .close-icon:hover {
+body.dark-mode .close-icon:hover,
+body.dark-mode .btn-add-footer {
   background-color: transparent !important;
   color: #ef5350 !important;
   border-color: #ef5350 !important;
 }
-body.dark-mode .btn-outline:hover {
+body.dark-mode .btn-outline:hover,
+body.dark-mode .admin-card:hover .btn-add-footer {
   background-color: rgba(239, 83, 80, 0.1) !important;
 }
 
-/* --- ICONS & BADGES --- */
+body.dark-mode .admin-card:hover .btn-add-footer {
+  background-color: #B51621 !important;
+  color: white !important;
+}
+
+body.dark-mode .btn-remove-absolute {
+  background-color: #ef5350 !important;
+  color: white !important;
+}
+
 body.dark-mode .icon-circle {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ef5350 !important;
@@ -312,6 +351,17 @@ body.dark-mode .icon-circle {
 body.dark-mode .icon-circle.success {
   background-color: rgba(76, 175, 80, 0.15) !important;
   color: #66bb6a !important;
+}
+
+body.dark-mode .icon-circle.error {
+  background-color: rgba(239, 83, 80, 0.15) !important;
+  color: #ef5350 !important;
+}
+
+body.dark-mode .selected-icon,
+body.dark-mode .admin-card:hover .icon-circle {
+  background-color: #B51621 !important;
+  color: white !important;
 }
 
 body.dark-mode .role-badge {
@@ -329,6 +379,29 @@ body.dark-mode .nav-item.active {
 }
 body.dark-mode .nav-item.active {
   border-left-color: #ef5350 !important;
+}
+
+body.dark-mode .submenu {
+  background-color: #252525 !important;
+}
+
+body.dark-mode .sub-item {
+  color: #bbbbbb !important;
+}
+
+body.dark-mode .sub-item:hover {
+  background-color: #333333 !important;
+  color: #ef5350 !important;
+}
+
+body.dark-mode .sub-item.sub-active {
+  background-color: #333333 !important;
+  color: #ef5350 !important;
+  border-left-color: #ef5350 !important;
+}
+
+body.dark-mode .chevron-icon {
+  color: #aaaaaa !important;
 }
 
 body.dark-mode .separator,
@@ -359,7 +432,7 @@ body.dark-mode input:checked + .slider {
 body.dark-mode .hamburger-icon,
 body.dark-mode .nav-text,
 body.dark-mode .sidebar.expanded .hamburger-icon,
-body.dark-mode .sidebar.expanded .nav-text{
+body.dark-mode .sidebar.expanded .nav-text {
   color: #ef5350 !important;
 }
 
