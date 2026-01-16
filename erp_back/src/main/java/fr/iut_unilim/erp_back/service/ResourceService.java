@@ -32,7 +32,7 @@ public class ResourceService {
         return convertToResourceResponse(resources);
     }
 
-    public List<ResourceResponse> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
+    public List<ResourceResponse> getAllResourceFromDepartment(@NotNull String identifier) {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
