@@ -194,7 +194,7 @@ const handleValider = async () => {
     teachersFeedbackID: edFBContents.value.filter(t => (t || '').trim()),
     studentFeedbackID: stFBContents.value.filter(t => (t || '').trim()),
     improvementsIdeaID: upgradesContents.value.filter(t => (t || '').trim()),
-    pedagologicalContent: allPedagogicalContent,
+    educationalContent: allPedagogicalContent,
     semester: 1,
     year: new Date().getFullYear(),
     mainGoal: "Objectif pédagogique principal"
