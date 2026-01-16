@@ -102,7 +102,7 @@ const saveModification = async (  ) => {
 
     handleCancel();
   } catch (error) {
-    alert("Erreur lors de la mise à jour.");
+    showErrorModal.value = true;
   }
 };
 
@@ -261,7 +261,7 @@ const handleAddUser = () => router.push('/new-user');
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); : 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   width: 100%;
   max-width: 1200px;
   margin-bottom: 50px;
