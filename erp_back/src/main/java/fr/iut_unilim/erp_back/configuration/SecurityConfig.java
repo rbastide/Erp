@@ -2,6 +2,7 @@ package fr.iut_unilim.erp_back.configuration;
 
 import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -24,6 +25,9 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
+
+    @Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
         this.customUserDetailsService = customUserDetailsService;
@@ -68,12 +72,9 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         var config = new org.springframework.web.cors.CorsConfiguration();
-        config.setAllowedOrigins(java.util.List.of(
-                "http://localhost:5173",
-                "https://localhost:5173"
-        ));
+        config.setAllowedOriginPatterns(java.util.List.of("*"));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(java.util.List.of("Content-Type"));
+        config.setAllowedHeaders(java.util.List.of("*"));
         config.setAllowCredentials(true);
 
         var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
