@@ -18,7 +18,7 @@ public class Rank {
     @Column(name = "rankTitle")
     private String rankTitle;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "skillID")
     private Skill skillID;
 

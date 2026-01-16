@@ -65,6 +65,12 @@ public class SkillController {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        List<Rank> ranks = rankService.getRanksFromSkill(skillService.getSkillsFromId(id).get());
+        for (Rank rank : ranks) {
+            List<CriticalLearning> criticalLearnings = criticalLearningRepository.findByRankID(rank);
+            criticalLearningRepository.deleteAll(criticalLearnings);
+        }
+        rankRepository.deleteAll(ranks);
         skillRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }

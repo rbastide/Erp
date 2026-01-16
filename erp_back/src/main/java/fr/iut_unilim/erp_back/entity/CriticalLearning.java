@@ -19,7 +19,7 @@ public class CriticalLearning {
     @Column(name = "learningTitle")
     private String learningTitle;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "rankID")
     private Rank rankID;
 
