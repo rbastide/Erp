@@ -28,7 +28,7 @@ const handleLogin = async () => {
     } else {
       const response = await api.get(`auth/user-info/${username.value}`);
       authStore.firstName = response.data.firstname;
-      authStore.lastName = response.data.lastname
+      authStore.lastName = response.data.lastname;
       authStore.save();
       await router.push('/home');
     }
@@ -42,7 +42,7 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <AppHeader title="Connexion" :deconnexion="false"/>
+  <AppHeader title="Connexion"/>
   <main class="main-content">
 
     <div class="brand-header">
