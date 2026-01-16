@@ -8,6 +8,7 @@ import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpHeaders;
@@ -36,15 +37,17 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final TeacherService teacherService;
+    private final TeacherRepository teacherRepository;
 
 
-    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService, TeacherRepository teacherRepository) {
         this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.teacherService = teacherService;
+        this.teacherRepository = teacherRepository;
     }
 
     @PostMapping("/register")
@@ -128,6 +131,11 @@ public class AuthController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         if (!connectionRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }
+
+        Teacher teacher = teacherService.getTeacherInfoByUser(id);
+        if (teacher != null) {
+            teacherRepository.delete(teacher);
         }
         connectionRepository.deleteById(id);
         return ResponseEntity.ok().build();
