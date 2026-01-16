@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -279,7 +279,8 @@ const handleValider = () => router.back();
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" v-model="searchQuery" placeholder="Charcher par nom ou par numéro (ex : #3)" class="search-input" />
+          <input type="text" v-model="searchQuery" placeholder="Chercher par nom ou par numéro (ex : #3)"
+                 class="search-input"/>
         </div>
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
