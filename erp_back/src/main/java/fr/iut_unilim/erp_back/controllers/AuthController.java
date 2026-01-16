@@ -161,4 +161,16 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body("Déconnexion réussie");
     }
+
+    @PatchMapping("/users/department/{departmentId}")
+    public ResponseEntity<?> updateUserDepartment(@PathVariable Long departmentId, Authentication authentication) {
+        String userIdentifier = authentication.getName();
+
+        boolean wentGood = connectionService.updateDepartment(userIdentifier, departmentId);
+
+        if (wentGood) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("Département inconnu");
+    }
 }

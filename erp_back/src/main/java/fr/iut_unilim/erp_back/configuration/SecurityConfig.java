@@ -72,7 +72,7 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://localhost:5173"
         ));
-        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(java.util.List.of("Content-Type"));
         config.setAllowCredentials(true);
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { onMounted, ref, watchEffect } from "vue";
+import {useRouter} from 'vue-router';
+import {onMounted, ref, watchEffect} from "vue";
 import api from '@/services/api';
 
 const props = defineProps({
@@ -62,8 +62,9 @@ const handleDashboardClick = () => {
   }
 };
 
-const selectDept = (id: number) => {
+const selectDept = async (id: number) => {
   selectedDept.value = id;
+  await api.patch(`/auth/users/department/${id}`)
 };
 
 const handleSettings = () => router.push('/settings');
