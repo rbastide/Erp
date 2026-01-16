@@ -4,12 +4,14 @@ import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import ErrorSaveModal from "@/components/Information/ErrorSaveModal.vue";
 
 const router = useRouter();
 
 const users = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
+const showErrorModal = ref(false);
 
 const editedUser = reactive({
   id: null,
@@ -69,7 +71,7 @@ const handleDelete = async (id, identifier) => {
       }
     } catch (error) {
       console.error("Erreur suppression :", error);
-      alert("Erreur lors de la suppression.");
+      showErrorModal.value = true;
     }
   }
 };
@@ -234,6 +236,10 @@ const handleAddUser = () => router.push('/new-user');
         <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
+    <ErrorSaveModal
+        v-if="showErrorModal"
+        @close="showErrorModal = false"
+    />
   </div>
 </template>
 
