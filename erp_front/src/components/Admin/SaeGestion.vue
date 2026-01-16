@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -25,7 +25,7 @@ const editedSae = reactive({
 
 const fetchSaes = async () => {
   try {
-    const response = await api.get('/sae/getAllSae');
+    const response = await api.get('/sae/saes');
     if (Array.isArray(response.data)) {
       saes.value = response.data;
     } else if (response.data && Array.isArray(response.data.content)) {

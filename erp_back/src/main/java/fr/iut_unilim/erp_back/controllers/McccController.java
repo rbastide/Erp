@@ -252,8 +252,8 @@ public class McccController {
     }
 
     @GetMapping("/getSaes")
-    public ResponseEntity<?> getSaes() {
-        return ResponseEntity.ok(saeService.getAllSaes());
+    public ResponseEntity<?> getSaes(Authentication authentication) {
+        return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getHourlyVolumes")

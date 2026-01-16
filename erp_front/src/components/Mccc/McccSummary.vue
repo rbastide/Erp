@@ -66,7 +66,7 @@ const handleValider = async () => {
 
 const fetchSaes = async () => {
   try {
-    const response = await api.get('/sae/getAllSae');
+    const response = await api.get('/sae/saes');
     if (response.data) {
       allSaes.value = response.data;
     }

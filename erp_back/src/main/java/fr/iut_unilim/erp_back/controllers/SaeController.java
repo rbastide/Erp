@@ -28,10 +28,10 @@ public class SaeController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping("/getAllSae")
+    @GetMapping("/saes")
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getAllSae() {
-        return ResponseEntity.ok(saeService.getAllSaes());
+    public ResponseEntity<?> getAllSae(Authentication authentication) {
+        return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/addSae")
