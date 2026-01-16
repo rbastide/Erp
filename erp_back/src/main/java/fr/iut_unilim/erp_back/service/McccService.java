@@ -1,8 +1,8 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.model.McccId;
 import fr.iut_unilim.erp_back.repository.McccRepository;
-import fr.iut_unilim.erp_back.tools.datastructures.McccId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;

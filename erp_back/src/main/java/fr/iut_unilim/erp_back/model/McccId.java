@@ -1,4 +1,4 @@
-package fr.iut_unilim.erp_back.tools.datastructures;
+package fr.iut_unilim.erp_back.model;
 
 import java.io.Serializable;
 

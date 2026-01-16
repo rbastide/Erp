@@ -1,10 +1,10 @@
-package fr.iut_unilim.erp_back.tools.datastructures;
+package fr.iut_unilim.erp_back.model;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record LearningRank(String resourceCode, String ue, String levels, List<CriticalLearning> acs) {
+public record LearningRankModel(String resourceCode, String ue, String levels, List<CriticalLearningModel> acs) {
     @NotNull
     @Override
     public String toString() {

@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
-import fr.iut_unilim.erp_back.tools.datastructures.SAE;
+import fr.iut_unilim.erp_back.model.SaeModel;
 import jakarta.persistence.*;
 
 @Entity
@@ -30,7 +30,7 @@ public class Sae {
     public Sae() {
     }
 
-    public Sae(SAE sae) {
+    public Sae(SaeModel sae) {
         this.num = sae.saeCode();
         this.title = sae.saeName();
     }

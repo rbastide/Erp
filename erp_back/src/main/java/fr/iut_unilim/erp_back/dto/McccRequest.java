@@ -1,9 +1,9 @@
 package fr.iut_unilim.erp_back.dto;
 
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
-import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
-import fr.iut_unilim.erp_back.tools.datastructures.SAE;
-import fr.iut_unilim.erp_back.tools.datastructures.Teacher;
+import fr.iut_unilim.erp_back.model.LearningRankModel;
+import fr.iut_unilim.erp_back.model.SaeModel;
+import fr.iut_unilim.erp_back.model.TeacherModel;
 
 import java.util.List;
 
@@ -19,11 +19,11 @@ public class McccRequest {
     private String creationDate;
     private String editDate;
 
-    private List<SAE> saeCodes;
+    private List<SaeModel> saeCodes;
 
-    private List<LearningRank> acsGrouped;
+    private List<LearningRankModel> acsGrouped;
 
-    private Teacher[] referents;
+    private TeacherModel[] referents;
 
     private UniversityDepartment universityDepartment;
 
@@ -59,15 +59,15 @@ public class McccRequest {
         return editDate;
     }
 
-    public List<SAE> getSaeCodes() {
+    public List<SaeModel> getSaeCodes() {
         return saeCodes;
     }
 
-    public List<LearningRank> getAcsGrouped() {
+    public List<LearningRankModel> getAcsGrouped() {
         return acsGrouped;
     }
 
-    public Teacher[] getReferents() {
+    public TeacherModel[] getReferents() {
         return referents;
     }
 

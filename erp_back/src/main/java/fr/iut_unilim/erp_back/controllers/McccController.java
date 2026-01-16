@@ -2,8 +2,11 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.model.CriticalLearningModel;
+import fr.iut_unilim.erp_back.model.LearningRankModel;
+import fr.iut_unilim.erp_back.model.SaeModel;
+import fr.iut_unilim.erp_back.model.TeacherModel;
 import fr.iut_unilim.erp_back.service.*;
-import fr.iut_unilim.erp_back.tools.datastructures.LearningRank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -144,8 +147,8 @@ public class McccController {
 
     @Nullable
     private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.LearningRank> acs = dto.getAcsGrouped();
-        for (fr.iut_unilim.erp_back.tools.datastructures.LearningRank learningRank : acs) {
+        List<LearningRankModel> acs = dto.getAcsGrouped();
+        for (LearningRankModel learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
 
@@ -180,9 +183,9 @@ public class McccController {
         return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
     }
 
-    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRank learningRank, Rank correspondedRank) {
-        List<fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning> criticalLearnings = learningRank.acs();
-        for (fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning : criticalLearnings) {
+    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
+        List<CriticalLearningModel> criticalLearnings = learningRank.acs();
+        for (CriticalLearningModel criticalLearning : criticalLearnings) {
             CriticalLearning newCriticalLearning = verifyPresenceOfCriticalLearning(criticalLearning, correspondedRank);
             setAcs.add(newCriticalLearning);
         }
@@ -190,7 +193,7 @@ public class McccController {
 
 
     @NotNull
-    private CriticalLearning verifyPresenceOfCriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rank) {
+    private CriticalLearning verifyPresenceOfCriticalLearning(CriticalLearningModel criticalLearning, Rank rank) {
         List<CriticalLearning> criticalLearnings = criticalLearningService.getCriticalLearningsWithNumAndTitleAndRank(criticalLearning.learningNum(), criticalLearning.learningTitle(), rank);
         if (criticalLearnings.isEmpty()) {
             return new CriticalLearning(criticalLearning, rank);
@@ -202,8 +205,8 @@ public class McccController {
     @NotNull
     private Set<Sae> getSAEFromDto(McccRequest dto) {
         Set<Sae> setSae = new HashSet<>();
-        List<fr.iut_unilim.erp_back.tools.datastructures.SAE> saes = dto.getSaeCodes();
-        for (fr.iut_unilim.erp_back.tools.datastructures.SAE sae : saes) {
+        List<SaeModel> saes = dto.getSaeCodes();
+        for (SaeModel sae : saes) {
             List<Sae> correspondedSaes = saeService.getSaeByNum(sae.saeCode());
             if (!correspondedSaes.isEmpty()) {
                 setSae.add(correspondedSaes.get(0));
@@ -218,8 +221,8 @@ public class McccController {
     @NotNull
     private Set<Teacher> getTeachersFromDto(McccRequest dto) {
         Set<Teacher> setTeacher = new HashSet<>();
-        fr.iut_unilim.erp_back.tools.datastructures.Teacher[] teachers = dto.getReferents();
-        for (fr.iut_unilim.erp_back.tools.datastructures.Teacher teacher : teachers) {
+        TeacherModel[] teachers = dto.getReferents();
+        for (TeacherModel teacher : teachers) {
             List<Teacher> correspondedTeachers = teacherService.findByFirstnameAndLastname(teacher.firstname(), teacher.lastname());
             if (!correspondedTeachers.isEmpty()) {
                 setTeacher.add(correspondedTeachers.get(0));

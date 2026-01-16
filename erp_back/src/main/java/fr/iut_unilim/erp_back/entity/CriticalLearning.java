@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.entity;
 
 
+import fr.iut_unilim.erp_back.model.CriticalLearningModel;
 import jakarta.persistence.*;
 
 @Entity
@@ -31,7 +32,7 @@ public class CriticalLearning {
         this.rankID = rankID;
     }
 
-    public CriticalLearning(fr.iut_unilim.erp_back.tools.datastructures.CriticalLearning criticalLearning, Rank rankID) {
+    public CriticalLearning(CriticalLearningModel criticalLearning, Rank rankID) {
         this(criticalLearning.learningNum(), criticalLearning.learningTitle(), rankID);
     }
 
