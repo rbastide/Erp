@@ -22,6 +22,7 @@ import UsersGestion from "./components/Admin/UsersGestion.vue";
 import SaeGestion from "./components/Admin/SaeGestion.vue";
 import Settings from "./components/App/Settings.vue";
 import LogoutModal from "./components/Information/LogoutModal.vue";
+import RoleGestion from "@/components/Admin/RoleGestion.vue";
 
 
 const routes = [
@@ -144,6 +145,11 @@ const routes = [
         path:'/logout',
         name: 'LogoutModal',
         component: LogoutModal
+    },
+    {
+        path:'/role-gestion',
+        name: RoleGestion,
+        component: RoleGestion
     }
 ];
 
