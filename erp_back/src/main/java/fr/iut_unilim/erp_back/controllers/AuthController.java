@@ -33,6 +33,7 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    public static final String TEACHER = "TEACHER";
     private final ConnectionRepository connectionRepository;
     private final ConnectionService connectionService;
     private final PasswordEncoder passwordEncoder;
@@ -69,7 +70,7 @@ public class AuthController {
 
         Connection connection = connectionRepository.save(user);
 
-        if ("TEACHER".equalsIgnoreCase(req.getRole())) {
+        if (TEACHER.equalsIgnoreCase(req.getRole())) {
             teacherService.createTeacherFromRegister(req, connection);
         }
 
