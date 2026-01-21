@@ -537,4 +537,65 @@ body.dark-mode .remove-ac {
 body.dark-mode .remove-ac:hover {
   color: #ef5350 !important;
 }
+
+body.dark-mode .simple-line-input {
+  background-color: #444444 !important;
+  border-color: #555555 !important;
+  color: #ffffff !important;
+}
+body.dark-mode .simple-line-input:focus {
+  border-color: #ef5350 !important;
+  background-color: #333333 !important;
+  box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.2) !important;
+}
+
+body.dark-mode .delete-btn {
+  color: #ef9a9a !important;
+}
+body.dark-mode .delete-btn:hover {
+  color: #ef5350 !important;
+  background-color: rgba(239, 83, 80, 0.1) !important;
+  border-radius: 50%;
+}
+
+body.dark-mode .rich-editor-wrapper {
+  border-color: #555555 !important;
+  background-color: #333333 !important;
+}
+
+body.dark-mode .rich-toolbar {
+  background-color: #2a2a2a !important;
+  border-bottom-color: #555555 !important;
+}
+
+body.dark-mode .rich-toolbar button {
+  background-color: #444444 !important;
+  border-color: #555555 !important;
+  color: #bbbbbb !important;
+}
+
+body.dark-mode .rich-toolbar button:hover {
+  background-color: #555555 !important;
+  color: #ffffff !important;
+  border-color: #ef5350 !important;
+}
+
+body.dark-mode .rich-toolbar button.is-active {
+  background-color: rgba(239, 83, 80, 0.2) !important;
+  color: #ef5350 !important;
+  border-color: #ef5350 !important;
+}
+
+body.dark-mode .rich-editor-content {
+  color: #e0e0e0 !important;
+  background-color: #333333 !important;
+}
+
+body.dark-mode .rich-editor-content:focus {
+  background-color: #383838 !important;
+}
+
+body.dark-mode .sep {
+  background-color: #555555 !important;
+}
 </style>
