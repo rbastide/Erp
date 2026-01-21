@@ -28,6 +28,10 @@ const handleResources = () => {
 const handleAddSae = () => {
   router.push('/sae-gestion');
 };
+
+const handleRole = () => {
+  router.push('/role-gestion')
+};
 </script>
 
 <template>
@@ -78,6 +82,15 @@ const handleAddSae = () => {
             <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
           </div>
           <p>Gestion des SAEs</p>
+        </div>
+
+        <div class="card-action" @click="handleRole">
+          <div class="icon-circle">
+            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <p>Gestion des roles</p>
         </div>
 
       </div>
