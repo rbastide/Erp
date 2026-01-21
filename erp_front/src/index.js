@@ -23,6 +23,8 @@ import SaeGestion from "./components/Admin/SaeGestion.vue";
 import Settings from "./components/App/Settings.vue";
 import LogoutModal from "./components/Information/LogoutModal.vue";
 import RoleGestion from "@/components/Admin/RoleGestion.vue";
+import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
+import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
 
 
 const routes = [
@@ -150,6 +152,16 @@ const routes = [
         path:'/role-gestion',
         name: RoleGestion,
         component: RoleGestion
+    },
+    {
+        path:'/to-validate',
+        name: SheetsToValidate,
+        component: SheetsToValidate
+    },
+    {
+        path:'/resource-sheet-to-validate',
+        name: ResourceSheetToValidate,
+        component: ResourceSheetToValidate
     }
 ];
 
