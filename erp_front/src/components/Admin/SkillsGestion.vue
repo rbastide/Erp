@@ -4,706 +4,689 @@ import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
-import {mcccStore} from "@/services/mcccStore.js";
-import CancelModal from '../Information/CancelModal.vue';
-import ErrorSkillModal from '../Information/ErrorSkillModal.vue';
+import DeleteSkillModal from '../Information/DeleteSkillModal.vue';
 
 const router = useRouter();
+const finalSkills = ref([]);
+const editingIndex = ref(null);
 const searchQuery = ref('');
-const errorMessage = ref('');
-const isLoading = ref(true);
-const allSkills = ref([]);
-const showModal = ref(false);
-const showSkillErrorModal = ref(false);
-const initialState = ref([]);
 
-const fetchReferential = async () => {
-  try {
-    isLoading.value = true;
-    const response = await api.get('/skill/skills');
-    allSkills.value = response.data;
-  } catch (error) {
-    errorMessage.value = "Erreur lors du chargement des données.";
-  } finally {
-    isLoading.value = false;
-  }
-};
+const showDeleteModal = ref(false);
+const skillToDelete = ref(null);
 
-const fetchLinkedSkills = async () => {
-  if (!mcccStore.resourceID) {
-    console.warn("Aucun ResourceID dans le store, abandon.");
-    return;
-  }
-
-  const targetId = String(mcccStore.resourceID);
-  console.log("Recherche des compétences pour resourceID :", targetId);
-
-  try {
-    const response = await api.get('/mccc/mcccs');
-
-    const currentMccc = response.data.find(m => {
-      return m.resourceId && String(m.resourceId.resourceID) === targetId;
-    });
-
-    if (!currentMccc) {
-      console.warn("Aucun MCCC trouvé dans la liste pour cet ID.");
-      return;
-    }
-
-    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
-      console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
-      return;
-    }
-
-    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
-
-    const acsFromBdd = currentMccc.criticalLearningsId;
-    const groupedResult = [];
-
-    acsFromBdd.forEach(acItem => {
-      if (!acItem.rankID || !acItem.rankID.skillID) return;
-
-      const skillName = acItem.rankID.skillID.skillName;
-      const skillNum = acItem.rankID.skillID.skillNum;
-      const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
-
-      let existingSkill = groupedResult.find(g => g.ue === skillName);
-      if (!existingSkill) {
-        existingSkill = {
-          resourceCode: mcccStore.resourceCode,
-          ue: skillName,
-          skillNum: skillNum,
-          allLevels: []
-        };
-        groupedResult.push(existingSkill);
-      }
-
-      let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
-      if (!existingLevel) {
-        existingLevel = {
-          title: rankTitle,
-          acs: []
-        };
-        existingSkill.allLevels.push(existingLevel);
-      }
-
-      existingLevel.acs.push({
-        learningNum: acItem.learningNum,
-        learningTitle: acItem.learningTitle || "Sans titre"
-      });
-    });
-
-    mcccStore.acsGrouped = groupedResult;
-    mcccStore.registerMcccStore();
-    console.log("Store ACs mis à jour depuis BDD :", mcccStore.acsGrouped);
-
-  } catch (error) {
-    console.error("Erreur chargement des compétences liées :", error);
-  }
-};
-
-onMounted(async () => {
-  mcccStore.loadMcccStore();
-
-  if (!Array.isArray(mcccStore.acsGrouped)) {
-    mcccStore.acsGrouped = [];
-  }
-
-  await fetchReferential();
-
-  if (mcccStore.acsGrouped.length === 0) {
-    console.log("Store vide, chargement depuis la BDD...");
-    await fetchLinkedSkills();
-  } else {
-    console.log("Compétences chargées depuis le Store local");
-  }
-
-  mcccStore.saveBackup();
-  initialState.value = JSON.parse(JSON.stringify(mcccStore.acsGrouped));
+const currentSkill = ref({
+  skillNum: null,
+  skillName: '',
+  levels: [{ title: '', acs: [{ num: null, title: '' }] }],
 });
+
+const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
+
+const fetchSkills = async () => {
+  try {
+    const response = await api.get('/skill/skills');
+    finalSkills.value = response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(fetchSkills);
 
 const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return finalSkills.value;
 
-  return allSkills.value.filter(s => {
-    const isAlreadySelected = mcccStore.acsGrouped.some(g => g.ue === s.skillName);
-    if (isAlreadySelected) return false;
+  if (query.startsWith('#')) {
+    const numSearch = query.substring(1);
+    return finalSkills.value.filter(c =>
+        c.skillNum?.toString().includes(numSearch)
+    );
+  }
 
-    if (!query) return true;
+  return finalSkills.value.filter(c => {
+    const matchSkill = (c.skillName && c.skillName.toLowerCase().includes(query)) ||
+        (c.skillNum && c.skillNum.toString().includes(query));
 
-    if (query.startsWith('#')) {
-      const numToSearch = query.substring(1);
-      return s.skillNum?.toString().includes(numToSearch);
-    }
+    if (matchSkill) return true;
 
-    if (s.skillName.toLowerCase().includes(query) || s.skillNum?.toString().includes(query)) {
-      return true;
-    }
-
-    if (s.levels && Array.isArray(s.levels)) {
-      return s.levels.some(level => {
+    if (c.levels && Array.isArray(c.levels)) {
+      return c.levels.some(level => {
         if (level.acs && Array.isArray(level.acs)) {
           return level.acs.some(ac => {
-            const title = ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "";
-            const num = ac.num || ac.acNum || ac.learningNum || "";
-            return (
-                String(title).toLowerCase().includes(query) ||
-                String(num).toLowerCase().includes(query)
-            );
+            const title = (ac.title || ac.learningTitle || ac.name || '').toLowerCase();
+            const num = (ac.num || ac.learningNum || ac.acNum || '').toString().toLowerCase();
+            return title.includes(query) || num.includes(query);
           });
         }
         return false;
       });
     }
-
     return false;
   });
 });
 
-const addSkillDirectly = (skill) => {
-  if (!skill.levels || skill.levels.length === 0) {
-    showSkillErrorModal.value = true;
-    return;
-  }
+const syncWithBackend = async (skill) => {
+  const payload = [skill];
 
-  const newSelection = {
-    resourceCode: mcccStore.resourceCode,
-    ue: skill.skillName,
-    skillNum: skill.skillNum,
-    allLevels: skill.levels.map(level => ({
-      title: level.title || level.name || level.label || level.levelTitle || level.rankTitle || "Niveau sans titre",
-      acs: level.acs.map(ac => ({
-        learningNum: ac.num || ac.acNum || ac.learningNum,
-        learningTitle: ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "Titre manquant"
-      }))
-    }))
+  try {
+    await api.post('/skill/skills', payload);
+    await fetchSkills();
+  } catch (error) {
+    alert("Erreur synchronisation : " + (error.response?.data?.message || error.message));
+  }
+};
+
+const handleSaveNewCompetence = async () => {
+  if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
+  const currentSkillToAdd = currentSkill.value;
+  finalSkills.value.unshift(JSON.parse(JSON.stringify(currentSkill.value)));
+  currentSkill.value = {
+    skillNum: null,
+    skillName: '',
+    levels: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
-
-  mcccStore.acsGrouped.unshift(newSelection);
-  mcccStore.registerMcccStore();
+  await syncWithBackend(currentSkillToAdd);
 };
 
-const removeGroup = (index) => {
-  mcccStore.acsGrouped.splice(index, 1);
-  mcccStore.registerMcccStore();
+const saveModification = async (index) => {
+  finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
+  editingIndex.value = null;
+  await syncWithBackend(finalSkills.value[index]);
 };
 
-const handleValider = () => {
-  mcccStore.registerMcccStore();
-  router.push('/mccc-menu');
+const handleDelete = (index) => {
+  skillToDelete.value = { index, skill: finalSkills.value[index] };
+  showDeleteModal.value = true;
 };
 
-const handleRetour = () => {
-  showModal.value = true;
-};
+const confirmDeletion = async () => {
+  if (!skillToDelete.value) return;
+  const { index, skill } = skillToDelete.value;
 
-const onConfirmCancel = () => {
-  if (initialState.value) {
-    mcccStore.acsGrouped = JSON.parse(JSON.stringify(initialState.value));
+  try {
+    if (skill.id) await api.delete(`/skill/skills/${skill.id}`);
+    finalSkills.value.splice(index, 1);
+    showDeleteModal.value = false;
+    skillToDelete.value = null;
+  } catch (error) {
+    console.error(error);
+    alert("Erreur lors de la suppression.");
   }
-  mcccStore.registerMcccStore();
-  router.push('/mccc-menu');
 };
 
-const clearSearch = () => searchQuery.value = '';
+const handleAddNiveau = () => {
+  if (currentSkill.value.levels.length < 3) {
+    currentSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
+  }
+};
+
+const removeNiveau = (i) => {
+  if (currentSkill.value.levels.length > 1) {
+    currentSkill.value.levels.splice(i, 1);
+  }
+};
+
+const handleAddAc = (nivIdx) => {
+  if (currentSkill.value.levels[nivIdx].acs.length < 4) {
+    currentSkill.value.levels[nivIdx].acs.push({ num: null, title: '' });
+  }
+};
+
+const removeAc = (nivIdx, acIdx) => {
+  if (currentSkill.value.levels[nivIdx].acs.length > 1) {
+    currentSkill.value.levels[nivIdx].acs.splice(acIdx, 1);
+  }
+};
+
+const handleModif = (comp, index) => {
+  editingIndex.value = index;
+  editedSkill.value = JSON.parse(JSON.stringify(comp));
+};
+
+const handleCancelEdit = () => {
+  editingIndex.value = null;
+};
+
+const addLevelToEdit = () => {
+  if (editedSkill.value.levels.length < 3) {
+    editedSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
+  }
+};
+
+const removeLevelToEdit = (i) => {
+  if (editedSkill.value.levels.length > 1) {
+    editedSkill.value.levels.splice(i, 1);
+  }
+};
+
+const addAcToEdit = (lvlI) => {
+  if (editedSkill.value.levels[lvlI].acs.length < 4) {
+    editedSkill.value.levels[lvlI].acs.push({ num: null, title: '' });
+  }
+};
+
+const removeAcFromEdit = (lvlI, acI) => {
+  editedSkill.value.levels[lvlI].acs.splice(acI, 1);
+};
+
+const handleValider = () => router.back();
 </script>
 
 <template>
-  <Sidebar/>
-  <AppHeader title="Compétences" :inline="`pour la ${mcccStore.resourceCode}`"/>
+  <Sidebar />
+  <div class="page-container">
+    <AppHeader title="Gestion des compétences" />
+    <main class="main-content">
 
-  <main class="main-content">
-    <div class="content-wrapper">
-
-      <div class="selection-section" v-if="mcccStore.acsGrouped.length > 0">
-        <h2 class="section-title selected-title">Compétences sélectionnées :</h2>
-        <div class="grid-container">
-          <div v-for="(group, idx) in mcccStore.acsGrouped" :key="idx" class="admin-card is-selected-summary">
-            <button @click="removeGroup(idx)" class="btn-remove-absolute" title="Supprimer">✕</button>
-
-            <div class="icon-circle selected-icon">
-              {{ group.skillNum || '?' }}
+      <div class="form-card" v-if="editingIndex === null">
+        <div class="form-header">
+          <h4>Ajouter une nouvelle compétence</h4>
+        </div>
+        <div class="row-inputs">
+          <div class="input-group small">
+            <label class="field-label">N°</label>
+            <input type="number" v-model.number="currentSkill.skillNum" min="1" placeholder="1" class="card-input">
+          </div>
+          <div class="input-group large">
+            <label class="field-label">Intitulé de la Compétence</label>
+            <input type="text" v-model="currentSkill.skillName" placeholder="Réaliser" class="card-input">
+          </div>
+        </div>
+        <div v-for="(niveau, nIndex) in currentSkill.levels" :key="nIndex" class="niveau-container">
+          <div class="niveau-header">
+            <div class="header-with-remove">
+              <label class="group-label">Niveau {{ nIndex + 1 }}</label>
+              <button v-if="currentSkill.levels.length > 1" @click="removeNiveau(nIndex)" class="btn-remove-item">✕</button>
             </div>
-
-            <h3 class="card-title">{{ group.ue }}</h3>
-
-            <div v-for="(lvl, lIdx) in group.allLevels" :key="lIdx" class="level-entry">
-              <span class="rank-info-bold">Niveau {{ lIdx + 1 }} : {{ lvl.title }}</span>
-              <div class="ac-details-list">
-                <div v-for="ac in lvl.acs" :key="ac.learningNum" class="ac-detail-item">
-                  <strong>AC {{ ac.learningNum }} :</strong> {{ ac.learningTitle }}
-                </div>
-              </div>
+            <input type="text" v-model="niveau.title" placeholder="Intitulé du niveau..." class="card-input">
+          </div>
+          <div class="acs-container">
+            <div v-for="(ac, aIndex) in niveau.acs" :key="aIndex" class="ac-row">
+              <input type="number" v-model.number="ac.num" min="1" placeholder="N°" class="card-input ac-num">
+              <input type="text" v-model="ac.title" placeholder="Intitulé AC" class="card-input ac-name">
+              <button v-if="niveau.acs.length > 1" @click="removeAc(nIndex, aIndex)" class="btn-remove-item">✕</button>
+            </div>
+            <div class="add-ac-center-wrapper" v-if="niveau.acs.length < 4">
+              <button @click="handleAddAc(nIndex)" class="btn-framed-add mini">+ Ajouter un AC</button>
             </div>
           </div>
         </div>
+        <div class="add-level-center-wrapper" v-if="currentSkill.levels.length < 3">
+          <button @click="handleAddNiveau" class="btn-framed-add">+ Ajouter un Niveau</button>
+        </div>
+        <button class="save-btn big-save" @click="handleSaveNewCompetence">Valider et synchroniser</button>
       </div>
 
-      <div class="separator-line" v-if="mcccStore.acsGrouped.length > 0"></div>
+      <div class="separator-line"></div>
 
-      <div class="selection-section">
-        <h2 class="section-title">Compétences disponibles :</h2>
-        <div v-if="isLoading" class="loading">Chargement du référentiel...</div>
+      <div v-if="finalSkills.length > 0" class="grid-container">
+        <div v-for="(comp, index) in filteredSkills" :key="comp.id || index" class="skill-card" :class="{ 'is-editing': editingIndex === index }">
 
-        <div class="grid-container">
-          <div v-for="skill in filteredSkills"
-               :key="skill.id"
-               class="admin-card"
-               @click="addSkillDirectly(skill)">
-
-            <div class="icon-circle">
-              {{ skill.skillNum }}
+          <div v-if="editingIndex !== index" class="view-mode-container">
+            <div class="card-header-view">
+              <div class="icon-circle"><span>{{ comp.skillNum }}</span></div>
+              <h3>{{ comp.skillName }}</h3>
             </div>
-            <h3 class="card-title">{{ skill.skillName }}</h3>
-
-            <div v-if="skill.levels && skill.levels.length > 0">
-              <div v-for="(level, lIdx) in skill.levels" :key="lIdx" class="level-entry">
-                <span class="rank-info-bold">
-                  Niveau {{ lIdx + 1 }} : {{ level.title || level.name || level.label || level.levelTitle || "Sans titre" }}
-                </span>
-
-                <div class="ac-details-list">
-                  <div v-for="ac in level.acs" :key="ac.id || ac.num" class="ac-detail-item">
-                    <strong>AC {{ ac.num || ac.acNum || ac.learningNum }} :</strong>
-                    {{ ac.title || ac.name || ac.label || ac.learningTitle }}
-                  </div>
-                </div>
+            <div class="card-body-scroll">
+              <div v-for="(niv, nIdx) in comp.levels" :key="nIdx" class="level-block">
+                <p class="level-title">Niveau {{ niv.num }}: {{ niv.title }}</p>
+                <ul class="ac-list">
+                  <li v-for="(ac, aIdx) in niv.acs" :key="aIdx">AC {{ ac.num }}: {{ ac.title }}</li>
+                </ul>
               </div>
             </div>
-            <div v-else class="no-content-warning">
-              Aucun niveau associé
-            </div>
-
-            <div class="btn-add-footer">
-              + Ajouter
+            <div class="card-actions-overlay">
+              <button class="action-btn edit" @click="handleModif(comp, index)">
+                <svg width="18" height="18" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="action-btn delete" @click="handleDelete(index)">
+                <svg width="18" height="18" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" fill="none">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
             </div>
           </div>
-        </div>
 
-        <div v-if="!isLoading && filteredSkills.length === 0" class="no-result">
-          <span v-if="searchQuery">Aucune compétence ne correspond à "{{ searchQuery }}"</span>
-          <span v-else>Toutes les compétences sont sélectionnées.</span>
+          <div v-else class="edit-mode-container">
+            <div class="edit-header">
+              <h4>Édition</h4>
+              <button class="close-icon" @click="handleCancelEdit">✕</button>
+            </div>
+            <div class="edit-scroll-area">
+              <label class="field-label">N° & Nom</label>
+              <div class="ac-edit-row">
+                <input type="number" v-model.number="editedSkill.skillNum" min="1" class="card-input tiny">
+                <input type="text" v-model="editedSkill.skillName" class="card-input compact flex-1">
+              </div>
+              <div v-for="(lvl, lIdx) in editedSkill.levels" :key="lIdx" class="edit-level-group">
+                <div class="header-with-remove">
+                  <span class="field-label">Niveau {{ lIdx + 1 }}</span>
+                  <button v-if="editedSkill.levels.length > 1" @click="removeLevelToEdit(lIdx)" class="remove-ac">✕</button>
+                </div>
+                <input type="text" v-model="lvl.title" class="card-input compact" placeholder="Intitulé">
+                <div v-for="(ac, acIdx) in lvl.acs" :key="acIdx" class="ac-edit-row">
+                  <input type="number" v-model.number="ac.num" min="1" class="card-input tiny">
+                  <input type="text" v-model="ac.title" class="card-input compact flex-1">
+                  <span @click="removeAcFromEdit(lIdx, acIdx)" class="remove-ac">✕</span>
+                </div>
+                <div class="add-ac-center-wrapper" v-if="lvl.acs.length < 4">
+                  <div @click="addAcToEdit(lIdx)" class="add-mini-btn-framed">+ AC</div>
+                </div>
+              </div>
+              <div class="add-ac-center-wrapper" v-if="editedSkill.levels.length < 3" style="margin-top: 10px;">
+                <div @click="addLevelToEdit" class="add-mini-btn-framed" style="width: 100%; text-align: center;">+ Ajouter un Niveau</div>
+              </div>
+            </div>
+            <button class="save-btn" @click="saveModification(index)">Mettre à jour</button>
+          </div>
         </div>
       </div>
+    </main>
 
-    </div>
-
-    <footer class="sticky-footer">
-      <div class="footer-content">
-        <div class="search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Rechercher par nom, numéro ou AC..."
-              class="search-input"
-          />
-          <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
+    <footer class="sticky-bar">
+      <div class="sticky-wrapper">
+        <div class="search-container">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" v-model="searchQuery" placeholder="Chercher par nom, numéro ou AC..."
+                 class="search-input"/>
         </div>
-        <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
-        </div>
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 
-    <CancelModal
-        v-if="showModal"
-        @confirm="onConfirmCancel"
-        @close="showModal = false"
+    <DeleteSkillModal
+        v-if="showDeleteModal"
+        :skillName="skillToDelete?.skill?.skillName"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
     />
-
-    <ErrorSkillModal
-        v-if="showSkillErrorModal"
-        @close="showSkillErrorModal = false"
-    />
-  </main>
+  </div>
 </template>
 
 <style scoped>
-.main-content {
-  background-color: #fcfcfc;
+.page-container {
   min-height: 100vh;
-  padding: 180px 20px 120px;
+  background-color: #f8f9fa;
   font-family: 'Roboto', sans-serif;
+  padding-bottom: 120px;
+}
+
+.main-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 40px 20px;
+  margin-top: 150px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.content-wrapper {
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
   width: 100%;
-  max-width: 1200px;
-}
-
-.selection-section {
+  margin-top: 20px;
   margin-bottom: 40px;
 }
 
-.section-title {
-  color: #666;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  font-weight: 600;
-  text-transform: uppercase;
+.skill-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+  overflow: hidden;
 }
 
-.selected-title {
+.skill-card.is-editing {
+  border: 2px solid #B51621;
+  height: auto;
+  min-height: 400px;
+}
+
+.view-mode-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header-view {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.icon-circle {
+  width: 35px;
+  height: 35px;
+  background: rgba(181, 22, 33, 0.1);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #B51621;
+  font-weight: bold;
+}
+
+.card-body-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  margin-bottom: 15px;
+}
+
+.card-body-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.card-body-scroll::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.level-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #444;
+  margin: 8px 0 4px;
+}
+
+.ac-list {
+  padding-left: 15px;
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.card-actions-overlay {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.action-btn.edit {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.action-btn.delete {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+
+.form-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  margin-bottom: 30px;
+}
+
+.row-inputs {
+  display: flex;
+  gap: 15px; margin-bottom: 15px;
+  margin-top: 15px;
+}
+.input-group.small {
+  width: 80px;
+}
+.input-group.large {
+  flex: 1;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.card-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+
+.card-input:focus {
+  border-color: #B51621;
+  outline: none;
+}
+
+.niveau-container {
+  background: #fdfdfd;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.header-with-remove { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+
+.acs-container {
+  border-left: 2px solid #B51621;
+  padding-left: 15px;
+  margin-top: 10px;
+}
+
+.ac-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+.ac-num {
+  width: 65px;
+  flex-shrink: 0;
+}
+
+.btn-remove-item {
+  background: none;
+  border: none;
+  color: #ff4d4f;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.add-level-center-wrapper, .add-ac-center-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-framed-add {
+  background: rgba(181, 22, 33, 0.02);
+  border: 2px dashed #B51621;
+  color: #B51621;
+  padding: 10px 30px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.btn-framed-add.mini {
+  padding: 6px 15px;
+  font-size: 11px;
+}
+
+.add-mini-btn-framed {
+  font-size: 10px;
+  color: #B51621;
+  cursor: pointer;
+  font-weight: bold;
+  border: 1px dashed #B51621;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: white;
+  margin-top: 5px;
 }
 
 .separator-line {
   width: 100%;
   height: 1px;
-  background: #eee;
-  margin-bottom: 40px;
+  background: #ddd;
+  margin: 30px 0;
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.admin-card {
-  background: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border: 1px solid #e0e0e0;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.3s ease;
-  min-height: 220px;
-  position: relative;
-  justify-content: flex-start;
-}
-
-.admin-card:hover {
-  border-color: #B51621;
-  transform: translateY(-3px);
-  background-color: #fff5f5;
-}
-
-.is-selected-summary {
-  border-color: #B51621;
-  background-color: #fff5f5;
-  cursor: default;
-}
-
-.icon-circle {
-  width: 45px;
-  height: 45px;
-  background: #f0f0f0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #666;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.selected-icon, .admin-card:hover .icon-circle {
-  background: #B51621;
-  color: white;
-}
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  text-align: center;
-  margin: 0 0 15px 0;
-  color: #333;
-}
-
-.level-entry {
-  width: 100%;
-  padding: 10px 0;
-}
-
-.level-entry:not(:first-child) {
-  margin-top: 25px;
-  border-top: 1px dashed #ddd;
-  padding-top: 20px;
-}
-
-.rank-info-bold {
-  font-size: 0.95rem;
-  color: #B51621;
-  font-weight: 900;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.ac-details-list {
-  width: 100%;
-  margin-top: 5px;
-  padding-left: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ac-detail-item {
-  font-size: 0.75rem;
-  color: #444;
-  text-align: left;
-  line-height: 1.4;
-}
-
-.ac-detail-item strong {
-  color: #B51621;
-}
-
-.btn-remove-absolute {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.save-btn {
   background: #B51621;
   color: white;
   border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: bold;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  z-index: 10;
-}
-
-.btn-add-footer {
-  margin-top: 25px;
-  padding: 8px 20px;
-  background-color: transparent;
-  color: #B51621;
-  border: 1px solid #B51621;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
   width: 100%;
-  text-align: center;
-  max-width: 120px;
-}
-
-.admin-card:hover .btn-add-footer {
-  background-color: #B51621;
-  color: white;
-}
-
-.no-content-warning {
-  font-size: 0.8rem;
-  color: #999;
-  font-style: italic;
   margin-top: 10px;
 }
 
-.sticky-footer {
+/* Sticky Bar */
+.sticky-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   background: white;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  padding: 15px 0;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+  padding: 12px 0;
   z-index: 100;
 }
 
-.footer-content {
-  max-width: 1200px;
+.sticky-wrapper {
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  padding: 0 40px;
 }
 
-.search-wrapper {
+.search-container {
   position: relative;
-  flex: 1;
-  max-width: 500px;
+  width: 320px;
 }
-
 .search-icon {
   position: absolute;
-  left: 18px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.1rem;
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 2;
+  color: #999;
 }
-
 .search-input {
   width: 100%;
-  padding: 12px 45px;
+  padding: 10px 15px 10px 40px;
   border-radius: 50px;
-  border: 2px solid #e2e8f0;
-  font-size: 1rem;
-  background: #f8fafc;
-  transition: all 0.2s;
-  box-sizing: border-box;
+  border: 1px solid #ddd;
   outline: none;
-}
-
-.search-input:focus {
-  border-color: #B51621;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(181, 22, 33, 0.1);
-}
-
-.clear-input-btn {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #e2e8f0;
-  border: none;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  font-size: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.footer-buttons {
-  display: flex;
-  gap: 15px;
-}
-
-.btn-sys {
-  padding: 12px 30px;
-  border-radius: 50px;
-  border: none;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  font-size: 14px;
 }
 
 .btn-sys.primary {
-  background: linear-gradient(135deg, #B51621 0%, #d92533 100%);
-  color: white;
-}
-
-.btn-sys.secondary {
-  background-color: white;
-  color: #555;
-  border: 2px solid #e0e0e0;
-}
-
-.btn-sys:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.loading, .no-result {
-  text-align: center;
-  padding: 40px;
-  color: #999;
-  font-style: italic;
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    gap: 15px;
-  }
-  .search-wrapper, .footer-buttons {
-    width: 100%;
-  }
-  .footer-buttons {
-    justify-content: space-between;
-  }
-}
-
-:global(body.dark-mode) .main-content {
-  background-color: #252525;
-}
-:global(body.dark-mode) .section-title {
-  color: #ef5350;
-}
-:global(body.dark-mode) .separator-line {
-  background: #444;
-}
-:global(body.dark-mode) .admin-card {
-  background: #333;
-  border-color: #444;
-}
-:global(body.dark-mode) .admin-card:hover {
-  background-color: #383838;
-  border-color: #ef5350;
-}
-:global(body.dark-mode) .is-selected-summary {
-  background-color: rgba(239, 83, 80, 0.15);
-  border-color: #ef5350;
-}
-:global(body.dark-mode) .icon-circle {
-  background: rgba(255,255,255,0.05);
-  color: #ef5350;
-}
-:global(body.dark-mode) .selected-icon,
-:global(body.dark-mode) .admin-card:hover .icon-circle {
   background: #B51621;
   color: white;
+  padding: 10px 35px;
+  border-radius: 50px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  min-width: 160px;
 }
-:global(body.dark-mode) .card-title {
-  color: #ffffff;
+
+.edit-mode-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
-:global(body.dark-mode) .level-entry:not(:first-child) {
-  border-top-color: #444;
+.edit-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 5px;
 }
-:global(body.dark-mode) .rank-info-bold {
-  color: #ef5350;
+.edit-level-group {
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 5px;
+  margin-top: 8px;
+  background: #fafafa;
 }
-:global(body.dark-mode) .ac-detail-item {
-  color: #bbb;
+.ac-edit-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-top: 5px;
 }
-:global(body.dark-mode) .ac-detail-item strong {
-  color: #ef5350;
+.remove-ac {
+  color: #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 5px;
 }
-:global(body.dark-mode) .btn-add-footer {
-  color: #ef5350;
-  border-color: #ef5350;
+.flex-1 {
+  flex: 1;
 }
-:global(body.dark-mode) .admin-card:hover .btn-add-footer {
-  background-color: #B51621;
-  color: white;
+.tiny {
+  width: 55px;
+  flex-shrink: 0;
 }
-:global(body.dark-mode) .sticky-footer {
-  background: #333;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+.compact {
+  padding: 6px;
+  font-size: 13px;
 }
-:global(body.dark-mode) .search-input {
-  background: #444;
-  border-color: #555;
-  color: white;
-}
-:global(body.dark-mode) .search-input:focus {
-  border-color: #ef5350;
-  background: #333;
-}
-:global(body.dark-mode) .clear-input-btn {
-  background: #555;
-  color: #fff;
-}
-:global(body.dark-mode) .loading,
-:global(body.dark-mode) .no-result {
-  color: #777;
+.close-icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
 }
 </style>
