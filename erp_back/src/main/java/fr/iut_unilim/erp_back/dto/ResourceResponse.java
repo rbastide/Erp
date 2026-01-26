@@ -6,14 +6,14 @@ public class ResourceResponse {
     private Long resourceID;
     private String num;
     private String name;
-    private int semestre;
+    private int semester;
     private UniversityDepartment universityDepartment;
 
-    public ResourceResponse(Long resourceID, String num, String name, int semestre, UniversityDepartment universityDepartment) {
+    public ResourceResponse(Long resourceID, String num, String name, int semester, UniversityDepartment universityDepartment) {
         this.resourceID = resourceID;
         this.num = num;
         this.name = name;
-        this.semestre = semestre;
+        this.semester = semester;
         this.universityDepartment = universityDepartment;
     }
 
@@ -30,8 +30,8 @@ public class ResourceResponse {
         this.name = name;
     }
 
-    public void setSemestre(int semestre) {
-        this.semestre = semestre;
+    public void setSemester(int semester) {
+        this.semester = semester;
     }
 
     public void setUniversityDepartment(UniversityDepartment universityDepartment) {
@@ -50,8 +50,8 @@ public class ResourceResponse {
         return name;
     }
 
-    public int getSemestre() {
-        return semestre;
+    public int getSemester() {
+        return semester;
     }
 
     public UniversityDepartment getUniversityDepartment() {

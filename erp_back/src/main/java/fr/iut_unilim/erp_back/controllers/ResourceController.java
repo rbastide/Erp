@@ -49,7 +49,7 @@ public class ResourceController {
                     Resource resourceToUpdate = existingResource.get();
                     resourceToUpdate.setNum(res.getNum());
                     resourceToUpdate.setName(res.getName());
-                    resourceToUpdate.setSemester(res.getSemestre());
+                    resourceToUpdate.setSemester(res.getSemester());
                     resourceRepository.save(resourceToUpdate);
                     continue;
                 }
@@ -57,7 +57,7 @@ public class ResourceController {
             Resource newResource = new Resource();
             newResource.setNum(res.getNum());
             newResource.setName(res.getName());
-            newResource.setSemester(res.getSemestre());
+            newResource.setSemester(res.getSemester());
             handleDepartment(newResource, authentication);
             resourceRepository.save(newResource);
         }
