@@ -44,9 +44,26 @@ const filteredSkills = computed(() => {
     );
   }
 
-  return finalSkills.value.filter(c =>
-      c.skillName.toLowerCase().includes(query)
-  );
+  return finalSkills.value.filter(c => {
+    const matchSkill = (c.skillName && c.skillName.toLowerCase().includes(query)) ||
+        (c.skillNum && c.skillNum.toString().includes(query));
+
+    if (matchSkill) return true;
+
+    if (c.levels && Array.isArray(c.levels)) {
+      return c.levels.some(level => {
+        if (level.acs && Array.isArray(level.acs)) {
+          return level.acs.some(ac => {
+            const title = (ac.title || ac.learningTitle || ac.name || '').toLowerCase();
+            const num = (ac.num || ac.learningNum || ac.acNum || '').toString().toLowerCase();
+            return title.includes(query) || num.includes(query);
+          });
+        }
+        return false;
+      });
+    }
+    return false;
+  });
 });
 
 const syncWithBackend = async (skill) => {
@@ -278,7 +295,7 @@ const handleValider = () => router.back();
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" v-model="searchQuery" placeholder="Chercher par nom ou par numéro (ex : #3)"
+          <input type="text" v-model="searchQuery" placeholder="Chercher par nom, numéro ou AC..."
                  class="search-input"/>
         </div>
         <button @click="handleValider" class="btn-sys primary">Terminer</button>

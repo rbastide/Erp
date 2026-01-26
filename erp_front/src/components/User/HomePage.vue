@@ -15,6 +15,10 @@ const handleHistory = () => {
   router.push('/history');
 };
 
+const handleToValidate = () => {
+  router.push('/to-validate');
+};
+
 onMounted(() => {
   authStore.load();
 });
@@ -38,6 +42,13 @@ onMounted(() => {
           <svg width="48" height="48" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
         </div>
         <p>Afficher les fiches ressources</p>
+      </div>
+
+      <div class="card-action" @click="handleToValidate">
+        <div class="icon-circle">
+          <svg width="48" height="48" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+        </div>
+        <p>Fiches à valider</p>
       </div>
     </main>
   </div>
