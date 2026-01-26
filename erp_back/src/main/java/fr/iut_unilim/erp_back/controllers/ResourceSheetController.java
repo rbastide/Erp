@@ -55,16 +55,20 @@ public class ResourceSheetController {
 
         Connection connection = connectionService.getConnectionByIdentifier(authentication.getName());
 
+        Resource resource;
         ResourceSheet resourceSheet;
+        Long targetResourceId = resourceSheetRequest.getResourceID();
         Long resourceSheetId = resourceSheetRequest.getSheetsID();
 
-        if (resourceSheetId != null) {
-            resourceSheet = resourceSheetRepository.findById(resourceSheetId)
-                    .orElse(new ResourceSheet());
-            if (resourceSheet.getSheetsID() == null) {
+        if (targetResourceId != null && resourceSheetId != null) {
+            resource = resourceRepository.findById(targetResourceId).orElse(new Resource());
+                    resourceSheet = resourceSheetRepository.findById(resourceSheetId).orElse(new ResourceSheet());
+
+            if (resource.getResourceID() == null) {
                 resourceSheet.setCreationDate(new Date());
             }
         } else {
+            resource = new Resource();
             resourceSheet = new ResourceSheet();
             resourceSheet.setCreationDate(new Date());
         }
