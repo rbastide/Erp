@@ -36,7 +36,6 @@ const fetchLinkedSkills = async () => {
   }
 
   const targetId = String(mcccStore.resourceID);
-  console.log("Recherche des compétences pour resourceID :", targetId);
 
   try {
     const response = await api.get('/mccc/mcccs');
@@ -54,8 +53,6 @@ const fetchLinkedSkills = async () => {
       console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
       return;
     }
-
-    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
 
     const acsFromBdd = currentMccc.criticalLearningsId;
     const groupedResult = [];
@@ -95,7 +92,6 @@ const fetchLinkedSkills = async () => {
 
     mcccStore.acsGrouped = groupedResult;
     mcccStore.registerMcccStore();
-    console.log("Store ACs mis à jour depuis BDD :", mcccStore.acsGrouped);
 
   } catch (error) {
     console.error("Erreur chargement des compétences liées :", error);
@@ -112,10 +108,7 @@ onMounted(async () => {
   await fetchReferential();
 
   if (mcccStore.acsGrouped.length === 0) {
-    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedSkills();
-  } else {
-    console.log("Compétences chargées depuis le Store local");
   }
 
   mcccStore.saveBackup();
@@ -136,10 +129,31 @@ const filteredSkills = computed(() => {
       return s.skillNum?.toString().includes(numToSearch);
     }
 
-    return (
+    const matchSkill = (
         s.skillName.toLowerCase().includes(query) ||
         s.skillNum?.toString().includes(query)
     );
+
+    if (matchSkill) return true;
+
+    if (s.levels && Array.isArray(s.levels)) {
+      return s.levels.some(level => {
+        if (level.acs && Array.isArray(level.acs)) {
+          return level.acs.some(ac => {
+            const title = ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "";
+            const num = ac.num || ac.acNum || ac.learningNum || "";
+
+            return (
+                String(title).toLowerCase().includes(query) ||
+                String(num).toLowerCase().includes(query)
+            );
+          });
+        }
+        return false;
+      });
+    }
+
+    return false;
   });
 });
 
@@ -278,7 +292,7 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher par nom ou numéro (ex : #3)"
+              placeholder="Rechercher par nom, numéro ou AC..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
