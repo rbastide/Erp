@@ -161,8 +161,8 @@ const fetchResourceSheetData = async () => {
 
       if (resourceData) {
         const getContentByType = (type: string) => {
-          if (!resourceData.pedagologicalContentId) return [];
-          return resourceData.pedagologicalContentId
+          if (!resourceData.educationalContentId) return [];
+          return resourceData.educationalContentId
               .filter((item: any) => item.classTypeId?.classType === type)
               .map((item: any) => item.content || '');
         };
@@ -176,7 +176,7 @@ const fetchResourceSheetData = async () => {
         const ds = getContentByType('DS');
         dsContents.value = ds.length > 0 ? ds : [''];
 
-        const dstpRaw = resourceData.pedagologicalContentId?.filter((item: any) =>
+        const dstpRaw = resourceData.educationalContentId?.filter((item: any) =>
             ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
         ) || [];
         const dstp = dstpRaw.map((item: any) => item.content || '');
@@ -234,7 +234,7 @@ const handleValider = async () => {
         .filter((item): item is string => item !== null);
   };
 
-  const allPedagogicalContent = [
+  const allEducationalContent = [
     ...formatForBackend('CM', cmContents.value),
     ...formatForBackend('TD', tdContents.value),
     ...formatForBackend('TP', tpContents.value),
@@ -246,15 +246,15 @@ const handleValider = async () => {
 
   const payload = {
     resourceID: currentResourceId.value,
-    hourlyVolumeID: currentHourlyVolId.value,
+    hourlyVolume: hours.value,
     teachersFeedbackID: filterRich(edFBContents.value),
     studentFeedbackID: filterRich(stFBContents.value),
     improvementsIdeaID: filterRich(upgradesContents.value),
-    pedagologicalContent: allPedagogicalContent,
-    semester: 1,
-    year: new Date().getFullYear(),
+    educationalContent: allEducationalContent,
     mainGoal: "Objectif pédagogique principal"
   };
+  console.log(payload);
+  console.log(hours.value);
 
   try {
     await api.post('/resourceSheet/resource-sheet', payload);

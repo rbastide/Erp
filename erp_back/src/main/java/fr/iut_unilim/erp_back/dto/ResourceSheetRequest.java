@@ -8,7 +8,7 @@ public class ResourceSheetRequest {
 
     private Long sheetsID;
     private Long resourceID;
-    private HourlyVolumeDto hourlyVolumeDto;
+    private HourlyVolumeDto hourlyVolume;
     private List<String> teachersFeedbackID;
     private List<String> studentFeedbackID;
     private List<String> improvementsIdeaID;
@@ -40,8 +40,8 @@ public class ResourceSheetRequest {
     }
     public void setUniversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment; }
 
-    public HourlyVolumeDto getHourlyVolumeDto() {
-        return hourlyVolumeDto;
+    public HourlyVolumeDto getHourlyVolume() {
+        return hourlyVolume;
     }
 
 }

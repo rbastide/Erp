@@ -70,12 +70,12 @@ public class ResourceSheetController {
 
         HourlyVolume hourlyVolume = new HourlyVolume();
 
-        if (resourceSheetRequest.getHourlyVolumeDto() != null) {
-            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolumeDto().getTp());
-            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolumeDto().getDs_tp());
-            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolumeDto().getDs());
-            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolumeDto().getTd());
-            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolumeDto().getCm());
+        if (resourceSheetRequest.getHourlyVolume() != null) {
+            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolume().getTp());
+            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolume().getDs_tp());
+            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolume().getDs());
+            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolume().getTd());
+            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolume().getCm());
         } else {
             hourlyVolume.setNbHoursTP(0F);
             hourlyVolume.setNbHoursDSTP(0F);
