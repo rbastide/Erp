@@ -22,6 +22,41 @@ const currentSkill = ref({
 
 const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
+// --- FONCTIONS DE VALIDATION ---
+
+// Valide le numéro de compétence (Creation)
+const validateSkillNum = () => {
+  if (currentSkill.value.skillNum !== null && currentSkill.value.skillNum <= 0) {
+    currentSkill.value.skillNum = null;
+  }
+};
+
+// Valide le numéro de compétence (Edition)
+const validateEditedSkillNum = () => {
+  if (editedSkill.value.skillNum !== null && editedSkill.value.skillNum <= 0) {
+    editedSkill.value.skillNum = null;
+  }
+};
+
+const validateAcNum = (ac) => {
+  if (ac.num <= 0 || ac.num === '') {
+    ac.num = null;
+  }
+};
+
+const canAddAc = (acs) => {
+  if (!acs || acs.length === 0) return true;
+  const last = acs[acs.length - 1];
+  return last.num > 0 && last.title && last.title.trim().length > 0;
+};
+
+const canAddLevel = (levels) => {
+  if (levels.length >= 3) return false;
+  if (levels.length === 0) return true;
+  const last = levels[levels.length - 1];
+  return last.title && last.title.trim().length > 0 && canAddAc(last.acs);
+};
+
 const fetchSkills = async () => {
   try {
     const response = await api.get('/skill/skills');
@@ -115,8 +150,10 @@ const confirmDeletion = async () => {
   }
 };
 
+// --- HANDLERS ---
+
 const handleAddNiveau = () => {
-  if (currentSkill.value.levels.length < 3) {
+  if (canAddLevel(currentSkill.value.levels)) {
     currentSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
@@ -128,8 +165,9 @@ const removeNiveau = (i) => {
 };
 
 const handleAddAc = (nivIdx) => {
-  if (currentSkill.value.levels[nivIdx].acs.length < 4) {
-    currentSkill.value.levels[nivIdx].acs.push({ num: null, title: '' });
+  const targetLevel = currentSkill.value.levels[nivIdx];
+  if (canAddAc(targetLevel.acs)) {
+    targetLevel.acs.push({ num: null, title: '' });
   }
 };
 
@@ -149,7 +187,7 @@ const handleCancelEdit = () => {
 };
 
 const addLevelToEdit = () => {
-  if (editedSkill.value.levels.length < 3) {
+  if (canAddLevel(editedSkill.value.levels)) {
     editedSkill.value.levels.push({ title: '', acs: [{ num: null, title: '' }] });
   }
 };
@@ -161,8 +199,9 @@ const removeLevelToEdit = (i) => {
 };
 
 const addAcToEdit = (lvlI) => {
-  if (editedSkill.value.levels[lvlI].acs.length < 4) {
-    editedSkill.value.levels[lvlI].acs.push({ num: null, title: '' });
+  const targetLevel = editedSkill.value.levels[lvlI];
+  if (canAddAc(targetLevel.acs)) {
+    targetLevel.acs.push({ num: null, title: '' });
   }
 };
 
@@ -186,7 +225,14 @@ const handleValider = () => router.back();
         <div class="row-inputs">
           <div class="input-group small">
             <label class="field-label">N°</label>
-            <input type="number" v-model.number="currentSkill.skillNum" min="1" placeholder="1" class="card-input">
+            <input
+                type="number"
+                v-model.number="currentSkill.skillNum"
+                min="1"
+                placeholder="1"
+                class="card-input"
+                @input="validateSkillNum"
+            >
           </div>
           <div class="input-group large">
             <label class="field-label">Intitulé de la Compétence</label>
@@ -203,17 +249,38 @@ const handleValider = () => router.back();
           </div>
           <div class="acs-container">
             <div v-for="(ac, aIndex) in niveau.acs" :key="aIndex" class="ac-row">
-              <input type="number" v-model.number="ac.num" min="1" placeholder="N°" class="card-input ac-num">
+              <input
+                  type="number"
+                  v-model.number="ac.num"
+                  min="1"
+                  placeholder="N°"
+                  class="card-input ac-num"
+                  @input="validateAcNum(ac)"
+              >
               <input type="text" v-model="ac.title" placeholder="Intitulé AC" class="card-input ac-name">
               <button v-if="niveau.acs.length > 1" @click="removeAc(nIndex, aIndex)" class="btn-remove-item">✕</button>
             </div>
-            <div class="add-ac-center-wrapper" v-if="niveau.acs.length < 4">
-              <button @click="handleAddAc(nIndex)" class="btn-framed-add mini">+ Ajouter un AC</button>
+            <div class="add-ac-center-wrapper">
+              <button
+                  @click="handleAddAc(nIndex)"
+                  class="btn-framed-add mini"
+                  :disabled="!canAddAc(niveau.acs)"
+                  :class="{ 'disabled-btn': !canAddAc(niveau.acs) }"
+              >
+                + Ajouter un AC
+              </button>
             </div>
           </div>
         </div>
-        <div class="add-level-center-wrapper" v-if="currentSkill.levels.length < 3">
-          <button @click="handleAddNiveau" class="btn-framed-add">+ Ajouter un Niveau</button>
+        <div class="add-level-center-wrapper">
+          <button
+              @click="handleAddNiveau"
+              class="btn-framed-add"
+              :disabled="!canAddLevel(currentSkill.levels)"
+              :class="{ 'disabled-btn': !canAddLevel(currentSkill.levels) }"
+          >
+            + Ajouter un Niveau
+          </button>
         </div>
         <button class="save-btn big-save" @click="handleSaveNewCompetence">Valider et synchroniser</button>
       </div>
@@ -230,7 +297,7 @@ const handleValider = () => router.back();
             </div>
             <div class="card-body-scroll">
               <div v-for="(niv, nIdx) in comp.levels" :key="nIdx" class="level-block">
-                <p class="level-title">Niveau {{ niv.num }}: {{ niv.title }}</p>
+                <p class="level-title">Niveau {{ nIdx + 1 }}: {{ niv.title }}</p>
                 <ul class="ac-list">
                   <li v-for="(ac, aIdx) in niv.acs" :key="aIdx">AC {{ ac.num }}: {{ ac.title }}</li>
                 </ul>
@@ -260,7 +327,13 @@ const handleValider = () => router.back();
             <div class="edit-scroll-area">
               <label class="field-label">N° & Nom</label>
               <div class="ac-edit-row">
-                <input type="number" v-model.number="editedSkill.skillNum" min="1" class="card-input tiny">
+                <input
+                    type="number"
+                    v-model.number="editedSkill.skillNum"
+                    min="1"
+                    class="card-input tiny"
+                    @input="validateEditedSkillNum"
+                >
                 <input type="text" v-model="editedSkill.skillName" class="card-input compact flex-1">
               </div>
               <div v-for="(lvl, lIdx) in editedSkill.levels" :key="lIdx" class="edit-level-group">
@@ -270,16 +343,37 @@ const handleValider = () => router.back();
                 </div>
                 <input type="text" v-model="lvl.title" class="card-input compact" placeholder="Intitulé">
                 <div v-for="(ac, acIdx) in lvl.acs" :key="acIdx" class="ac-edit-row">
-                  <input type="number" v-model.number="ac.num" min="1" class="card-input tiny">
+                  <input
+                      type="number"
+                      v-model.number="ac.num"
+                      min="1"
+                      class="card-input tiny"
+                      @input="validateAcNum(ac)"
+                  >
                   <input type="text" v-model="ac.title" class="card-input compact flex-1">
                   <span @click="removeAcFromEdit(lIdx, acIdx)" class="remove-ac">✕</span>
                 </div>
-                <div class="add-ac-center-wrapper" v-if="lvl.acs.length < 4">
-                  <div @click="addAcToEdit(lIdx)" class="add-mini-btn-framed">+ AC</div>
+                <div class="add-ac-center-wrapper">
+                  <div
+                      @click="addAcToEdit(lIdx)"
+                      class="add-mini-btn-framed"
+                      :disabled="!canAddAc(lvl.acs)"
+                      :class="{ 'disabled-btn': !canAddAc(lvl.acs) }"
+                  >
+                    + AC
+                  </div>
                 </div>
               </div>
-              <div class="add-ac-center-wrapper" v-if="editedSkill.levels.length < 3" style="margin-top: 10px;">
-                <div @click="addLevelToEdit" class="add-mini-btn-framed" style="width: 100%; text-align: center;">+ Ajouter un Niveau</div>
+              <div class="add-ac-center-wrapper" style="margin-top: 10px;">
+                <div
+                    @click="addLevelToEdit"
+                    class="add-mini-btn-framed"
+                    style="width: 100%; text-align: center;"
+                    :disabled="!canAddLevel(editedSkill.levels)"
+                    :class="{ 'disabled-btn': !canAddLevel(editedSkill.levels) }"
+                >
+                  + Ajouter un Niveau
+                </div>
               </div>
             </div>
             <button class="save-btn" @click="saveModification(index)">Mettre à jour</button>
@@ -688,5 +782,14 @@ const handleValider = () => router.back();
   font-size: 18px;
   cursor: pointer;
   color: #999;
+}
+
+/* Style désactivé pour les boutons */
+.disabled-btn {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border-color: #ddd !important;
+  color: #ccc !important;
 }
 </style>

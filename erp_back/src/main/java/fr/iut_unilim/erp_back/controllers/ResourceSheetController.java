@@ -3,17 +3,21 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.HourlyVolumeService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,13 +30,17 @@ public class ResourceSheetController {
     private final ResourceRepository resourceRepository;
     private final ConnectionService connectionService;
     private final HourlyVolumeService hourlyVolumeService;
+    private final ClassTypeRepository classTypeRepository;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, HourlyVolumeService hourlyVolumeService) {
+    private static final Pattern EDUCATIONAL_CONTENT_PATTERN = Pattern.compile("^([A-Z/]+)\\s+(\\d+)\\s*:\\s*(.*)$");
+
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, HourlyVolumeService hourlyVolumeService, ClassTypeRepository classTypeRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.resourceRepository = resourceRepository;
         this.connectionService = connectionService;
         this.hourlyVolumeService = hourlyVolumeService;
+        this.classTypeRepository = classTypeRepository;
     }
 
     @GetMapping("/getResourceSheet")
@@ -68,21 +76,7 @@ public class ResourceSheetController {
             resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
         }
 
-        HourlyVolume hourlyVolume = new HourlyVolume();
-
-        if (resourceSheetRequest.getHourlyVolume() != null) {
-            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolume().getTp());
-            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolume().getDs_tp());
-            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolume().getDs());
-            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolume().getTd());
-            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolume().getCm());
-        } else {
-            hourlyVolume.setNbHoursTP(0F);
-            hourlyVolume.setNbHoursDSTP(0F);
-            hourlyVolume.setNbHoursDS(0F);
-            hourlyVolume.setNbHoursTD(0F);
-            hourlyVolume.setNbHoursCM(0F);
-        }
+        HourlyVolume hourlyVolume = getHourlyVolume(resourceSheetRequest);
 
         HourlyVolume savedVolume = hourlyVolumeService.save(hourlyVolume);
         resourceSheet.setHourlyVolumeID(savedVolume.getHourlyVolID());
@@ -143,9 +137,67 @@ public class ResourceSheetController {
             }
         }
 
+        List<String> educationalContentsStrings = resourceSheetRequest.getEducationalContent();
+        if (educationalContentsStrings != null) {
+            List<EducationalContent> educationalContentEntities = new ArrayList<>();
+
+            for (String rawContent : educationalContentsStrings) {
+                Matcher matcher = EDUCATIONAL_CONTENT_PATTERN.matcher(rawContent);
+
+                if (matcher.find()) {
+                    String typeStr = matcher.group(1);
+                    String numStr = matcher.group(2);
+                    String contentStr = matcher.group(3);
+
+                    Optional<ClassType> classTypeOpt = classTypeRepository.findByClassType(typeStr);
+
+                    if (classTypeOpt.isPresent()) {
+                        EducationalContent eduContent = new EducationalContent();
+                        eduContent.setClassTypeId(classTypeOpt.get());
+                        eduContent.setCourseNumber(Long.parseLong(numStr));
+                        eduContent.setContent(contentStr);
+
+                        eduContent.setRessourceSheetId(resourceSheet);
+
+                        educationalContentEntities.add(eduContent);
+                    } else {
+                        System.out.println("Attention: Type de cours inconnu en base de données : " + typeStr);
+                    }
+                }
+            }
+            if (resourceSheet.getEducationalContentID() != null) {
+                resourceSheet.getEducationalContentID().clear();
+                resourceSheet.getEducationalContentID().addAll(educationalContentEntities);
+            } else {
+                resourceSheet.setEducationalContentID(educationalContentEntities);
+            }
+        }
+
+        
+
         resourceSheetService.save(resourceSheet);
 
         return ResponseEntity.ok("L'ajout des fiches ressources a été effectué avec succès");
+    }
+
+    @NotNull
+    private static HourlyVolume getHourlyVolume(ResourceSheetRequest resourceSheetRequest) {
+        HourlyVolume hourlyVolume = new HourlyVolume();
+
+        if (resourceSheetRequest.getHourlyVolume() != null) {
+            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolume().getTp());
+            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolume().getDs_tp());
+            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolume().getDs());
+            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolume().getTd());
+            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolume().getCm());
+        } else {
+            hourlyVolume.setNbHoursTP(0F);
+            hourlyVolume.setNbHoursDSTP(0F);
+            hourlyVolume.setNbHoursDS(0F);
+            hourlyVolume.setNbHoursTD(0F);
+            hourlyVolume.setNbHoursCM(0F);
+        }
+        return hourlyVolume;
     }
 
     @DeleteMapping("/{id}")
