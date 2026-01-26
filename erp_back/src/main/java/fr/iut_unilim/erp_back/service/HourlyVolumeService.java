@@ -16,12 +16,13 @@ public class HourlyVolumeService {
         this.hourlyVolumeRepository = hourlyVolumeRepository;
     }
 
-    public List<HourlyVolume> getAllHourlyVolumesFromDatas(int hoursCM, int hoursTD, int hoursTP, int hoursDSTP) {
+    public List<HourlyVolume> getAllHourlyVolumesFromDatas(Float hoursCM, Float hoursTD, Float hoursTP, Float hoursDSTP) {
         return hourlyVolumeRepository.findByDatas(hoursCM, hoursTD, hoursTP, hoursDSTP);
     }
 
-    public void save(HourlyVolume hourlyVolume) {
+    public HourlyVolume save(HourlyVolume hourlyVolume) {
         hourlyVolumeRepository.save(hourlyVolume);
+        return hourlyVolume;
     }
 
     public List<HourlyVolume> getAllHourlyVolume() {

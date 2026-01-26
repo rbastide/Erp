@@ -3,20 +3,18 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
+import fr.iut_unilim.erp_back.service.HourlyVolumeService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/resourceSheet")
@@ -26,15 +24,15 @@ public class ResourceSheetController {
     private final ResourceSheetService resourceSheetService;
     private final ResourceSheetRepository resourceSheetRepository;
     private final ResourceRepository resourceRepository;
-    private final ClassTypeRepository classTypeRepository;
     private final ConnectionService connectionService;
+    private final HourlyVolumeService hourlyVolumeService;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ClassTypeRepository classTypeRepository, ConnectionService connectionService) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, HourlyVolumeService hourlyVolumeService) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.resourceRepository = resourceRepository;
-        this.classTypeRepository = classTypeRepository;
         this.connectionService = connectionService;
+        this.hourlyVolumeService = hourlyVolumeService;
     }
 
     @GetMapping("/getResourceSheet")
@@ -46,134 +44,108 @@ public class ResourceSheetController {
     @PostMapping("/resource-sheet")
     @PreAuthorize("hasAuthority('TEACHER')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
-        ResourceSheet resourceSheet;
-        Long resourceSheetID = resourceSheetRequest.getSheetsID();
 
-        if (resourceSheetID != null) {
-            Optional<ResourceSheet> canHaveResourceSheet = resourceSheetRepository.findById(resourceSheetID);
-            if (canHaveResourceSheet.isPresent()) {
-                resourceSheet = canHaveResourceSheet.get();
-                clearExistingContent(resourceSheet);
-            } else {
-                resourceSheet = new ResourceSheet();
-                initDefaultValues(resourceSheet);
+        Connection connection = connectionService.getConnectionByIdentifier(authentication.getName());
+
+        ResourceSheet resourceSheet;
+        Long resourceSheetId = resourceSheetRequest.getSheetsID();
+
+        if (resourceSheetId != null) {
+            resourceSheet = resourceSheetRepository.findById(resourceSheetId)
+                    .orElse(new ResourceSheet());
+            if (resourceSheet.getSheetsID() == null) {
+                resourceSheet.setCreationDate(new Date());
             }
         } else {
             resourceSheet = new ResourceSheet();
-            initDefaultValues(resourceSheet);
+            resourceSheet.setCreationDate(new Date());
         }
 
-        handleDepartment(resourceSheet, authentication);
-
-        if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
         resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
-
-        if (resourceSheetRequest.getHourlyVolumeID() == null)
-            return ResponseEntity.badRequest().body("HourlyVolumeID is null");
-        resourceSheet.setHourlyVolumeID(resourceSheetRequest.getHourlyVolumeID());
-
-        handleTeacherFeedbacks(resourceSheetRequest, resourceSheet);
-        handleStudentFeedbacks(resourceSheetRequest, resourceSheet);
-        handleImprovementIdeasFeedbacks(resourceSheetRequest, resourceSheet);
-
-        ResponseEntity<String> educationalContent = handleEducationalContent(resourceSheetRequest, resourceSheet);
-        if (educationalContent != null) return educationalContent;
-
         resourceSheet.setLastModificationDate(new Date());
+
+        if (connection != null) {
+            resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
+        }
+
+        HourlyVolume hourlyVolume = new HourlyVolume();
+
+        if (resourceSheetRequest.getHourlyVolumeDto() != null) {
+            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolumeDto().getTp());
+            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolumeDto().getDs_tp());
+            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolumeDto().getDs());
+            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolumeDto().getTd());
+            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolumeDto().getCm());
+        } else {
+            hourlyVolume.setNbHoursTP(0F);
+            hourlyVolume.setNbHoursDSTP(0F);
+            hourlyVolume.setNbHoursDS(0F);
+            hourlyVolume.setNbHoursTD(0F);
+            hourlyVolume.setNbHoursCM(0F);
+        }
+
+        HourlyVolume savedVolume = hourlyVolumeService.save(hourlyVolume);
+        resourceSheet.setHourlyVolumeID(savedVolume.getHourlyVolID());
+
+        List<String> studentContents = resourceSheetRequest.getStudentFeedbackID();
+        if (studentContents != null) {
+            List<StudentsFeedbacks> studentEntities = studentContents.stream()
+                    .filter(c -> c != null && !c.isBlank())
+                    .map(content -> {
+                        StudentsFeedbacks fb = new StudentsFeedbacks();
+                        fb.setContent(content);
+                        return fb;
+                    })
+                    .collect(Collectors.toList());
+
+            if (resourceSheet.getStudentsFeedbacks() != null) {
+                resourceSheet.getStudentsFeedbacks().clear();
+                resourceSheet.getStudentsFeedbacks().addAll(studentEntities);
+            } else {
+                resourceSheet.setStudentsFeedbacks(studentEntities);
+            }
+        }
+
+        List<String> teacherContents = resourceSheetRequest.getTeachersFeedbackID();
+        if (teacherContents != null) {
+            List<EducationalTeachersFeedbacks> teacherEntities = teacherContents.stream()
+                    .filter(c -> c != null && !c.isBlank())
+                    .map(content -> {
+                        EducationalTeachersFeedbacks fb = new EducationalTeachersFeedbacks();
+                        fb.setContent(content);
+                        return fb;
+                    })
+                    .collect(Collectors.toList());
+
+            if (resourceSheet.getTeachersFeedbacks() != null) {
+                resourceSheet.getTeachersFeedbacks().clear();
+                resourceSheet.getTeachersFeedbacks().addAll(teacherEntities);
+            } else {
+                resourceSheet.setTeachersFeedbacks(teacherEntities);
+            }
+        }
+        List<String> ideaContents = resourceSheetRequest.getImprovementsIdeaID();
+        if (ideaContents != null) {
+            List<ImprovementIdeas> ideaEntities = ideaContents.stream()
+                    .filter(c -> c != null && !c.isBlank())
+                    .map(content -> {
+                        ImprovementIdeas idea = new ImprovementIdeas();
+                        idea.setIdeaContent(content);
+                        return idea;
+                    })
+                    .collect(Collectors.toList());
+
+            if (resourceSheet.getImprovementIdeas() != null) {
+                resourceSheet.getImprovementIdeas().clear();
+                resourceSheet.getImprovementIdeas().addAll(ideaEntities);
+            } else {
+                resourceSheet.setImprovementIdeas(ideaEntities);
+            }
+        }
 
         resourceSheetService.save(resourceSheet);
 
-        return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
-    }
-
-    private void handleDepartment(ResourceSheet resourceSheet, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
-
-        if (connection == null) return;
-
-        resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
-    }
-
-    private static void handleImprovementIdeasFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> ideasReq = resourceSheetRequest.getImprovementsIdeaID();
-        if (ideasReq != null) {
-            for (String content : ideasReq) {
-                ImprovementIdeas item = new ImprovementIdeas();
-                item.setIdeaContent(content);
-                resourceSheet.getImprovementIdeas().add(item);
-            }
-        }
-    }
-
-    private static void handleStudentFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> studentFeedbacksReq = resourceSheetRequest.getStudentFeedbackID();
-        if (studentFeedbacksReq != null) {
-            for (String content : studentFeedbacksReq) {
-                StudentsFeedbacks item = new StudentsFeedbacks();
-                item.setContent(content);
-                resourceSheet.getStudentsFeedbacks().add(item);
-            }
-        }
-    }
-
-    private static void handleTeacherFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
-        if (teacherFeedbacksReq != null) {
-            for (String content : teacherFeedbacksReq) {
-                EducationalTeachersFeedbacks item = new EducationalTeachersFeedbacks();
-                item.setContent(content);
-                resourceSheet.getTeachersFeedbacks().add(item);
-            }
-        }
-    }
-
-    private static void initDefaultValues(ResourceSheet resourceSheet) {
-        resourceSheet.setCreationDate(new Date());
-
-        resourceSheet.setTeachersFeedbacks(new ArrayList<>());
-        resourceSheet.setStudentsFeedbacks(new ArrayList<>());
-        resourceSheet.setImprovementIdeas(new ArrayList<>());
-        resourceSheet.setEducationalContentID(new ArrayList<>());
-    }
-
-    private static void clearExistingContent(ResourceSheet resourceSheet) {
-        if (resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
-        if (resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
-        if (resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
-        if (resourceSheet.getEducationalContentID() != null) resourceSheet.getEducationalContentID().clear();
-    }
-
-    @Nullable
-    private ResponseEntity<String> handleEducationalContent(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        if (resourceSheetRequest.getEducationalContent() != null) {
-            String regex = "^(TP|CM|TD|DS|DS/TP)\\s*(\\d+)\\s*:\\s*(.*)$";
-            Pattern pattern = Pattern.compile(regex);
-
-            for (String educationalContent : resourceSheetRequest.getEducationalContent()) {
-                Matcher matcher = pattern.matcher(educationalContent);
-
-                if (!matcher.find()) {
-                    return ResponseEntity.badRequest().body("Contenu invalide : " + educationalContent);
-                }
-
-                String typeName = matcher.group(1);
-                String numero = matcher.group(2);
-                String description = matcher.group(3);
-
-                EducationalContent contentEntity = new EducationalContent();
-
-                ClassType existingType = classTypeRepository.findByClassType(typeName)
-                        .orElseThrow(() -> new RuntimeException("Type introuvable : " + typeName));
-                contentEntity.setClassTypeId(existingType);
-
-                contentEntity.setCourseNumber(Long.valueOf(numero));
-                contentEntity.setContent(description);
-                contentEntity.setRessourceSheetId(resourceSheet);
-
-                resourceSheet.getEducationalContentID().add(contentEntity);
-            }
-        }
-        return null;
+        return ResponseEntity.ok("L'ajout des fiches ressources a été effectué avec succès");
     }
 
     @DeleteMapping("/{id}")

@@ -95,4 +95,8 @@ public class ConnectionService {
                 firstname
         );
     }
+
+    public Connection getConnectionByIdentifier(String name) {
+        return connectionRepository.findByIdentifier(name);
+    }
 }

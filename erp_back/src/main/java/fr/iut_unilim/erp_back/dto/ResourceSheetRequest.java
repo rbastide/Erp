@@ -8,7 +8,7 @@ public class ResourceSheetRequest {
 
     private Long sheetsID;
     private Long resourceID;
-    private Long hourlyVolumeID;
+    private HourlyVolumeDto hourlyVolumeDto;
     private List<String> teachersFeedbackID;
     private List<String> studentFeedbackID;
     private List<String> improvementsIdeaID;
@@ -20,7 +20,6 @@ public class ResourceSheetRequest {
 
     public Long getSheetsID() { return sheetsID; }
     public Long getResourceID() { return resourceID; }
-    public Long getHourlyVolumeID() { return hourlyVolumeID; }
     public List<String> getTeachersFeedbackID() { return teachersFeedbackID; }
     public List<String> getStudentFeedbackID() { return studentFeedbackID; }
     public List<String> getImprovementsIdeaID() { return improvementsIdeaID; }
@@ -32,7 +31,6 @@ public class ResourceSheetRequest {
 
     public void setSheetsID(Long sheetsID) { this.sheetsID = sheetsID; }
     public void setResourceID(Long resourceID) { this.resourceID = resourceID; }
-    public void setHourlyVolumeID(Long hourlyVolumeID) { this.hourlyVolumeID = hourlyVolumeID; }
     public void setTeachersFeedbackID(List<String> teachersFeedbackID) { this.teachersFeedbackID = teachersFeedbackID; }
     public void setStudentFeedbackID(List<String> studentFeedbackID) { this.studentFeedbackID = studentFeedbackID; }
     public void setImprovementsIdeaID(List<String> improvementsIdeaID) { this.improvementsIdeaID = improvementsIdeaID; }
@@ -41,4 +39,9 @@ public class ResourceSheetRequest {
         this.educationalContent = educationalContent;
     }
     public void setUniversityDepartment(UniversityDepartment universityDepartment) { this.universityDepartment = universityDepartment; }
+
+    public HourlyVolumeDto getHourlyVolumeDto() {
+        return hourlyVolumeDto;
+    }
+
 }

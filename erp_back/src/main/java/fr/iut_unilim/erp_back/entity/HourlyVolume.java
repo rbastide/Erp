@@ -12,24 +12,24 @@ public class HourlyVolume {
     private Long hourlyVolID;
 
     @Column(name = "nbHoursCM")
-    private int nbHoursCM;
+    private Float nbHoursCM;
 
     @Column(name = "nbHoursDSTP")
-    private int nbHoursDSTP;
+    private Float nbHoursDSTP;
 
     @Column(name = "nbHoursDS")
-    private int nbHoursDS;
+    private Float nbHoursDS;
 
     @Column(name = "nbHoursTP")
-    private int nbHoursTP;
+    private Float nbHoursTP;
 
     @Column(name = "nbHoursTD")
-    private int nbHoursTD;
+    private Float nbHoursTD;
 
     public HourlyVolume() {
     }
 
-    public HourlyVolume(int nbHoursCM, int nbHoursDS, int nbHoursDSTP, int nbHoursTP, int nbHoursTD) {
+    public HourlyVolume(Float nbHoursCM, Float nbHoursDS, Float nbHoursDSTP, Float nbHoursTP, Float nbHoursTD) {
         this.nbHoursCM = nbHoursCM;
         this.nbHoursDSTP = nbHoursDSTP;
         this.nbHoursDS = nbHoursDS;
@@ -41,30 +41,30 @@ public class HourlyVolume {
         this.hourlyVolID = hourlyVolID;
     }
 
-    public void setNbHoursCM(int nbHoursCM) {
+    public void setNbHoursCM(Float nbHoursCM) {
         this.nbHoursCM = nbHoursCM;
     }
 
-    public void setNbHoursDSTP(int nbHoursDSTP) {
+    public void setNbHoursDSTP(Float nbHoursDSTP) {
         this.nbHoursDSTP = nbHoursDSTP;
     }
 
-    public void setNbHoursDS(int nbHoursDS) {
+    public void setNbHoursDS(Float nbHoursDS) {
         this.nbHoursDS = nbHoursDS;
     }
 
-    public void setNbHoursTP(int nbHoursTP) {
+    public void setNbHoursTP(Float nbHoursTP) {
         this.nbHoursTP = nbHoursTP;
     }
 
-    public void setNbHoursTD(int nbHoursTD) {
+    public void setNbHoursTD(Float nbHoursTD) {
         this.nbHoursTD = nbHoursTD;
     }
 
     public Long getHourlyVolID() { return hourlyVolID; }
-    public int getNbHoursCM() { return nbHoursCM; }
-    public int getNbHoursDSTP() { return nbHoursDSTP; }
-    public int getNbHoursDS() { return nbHoursDS; }
-    public int getNbHoursTP() { return nbHoursTP; }
-    public int getNbHoursTD() { return nbHoursTD; }
+    public Float getNbHoursCM() { return nbHoursCM; }
+    public Float getNbHoursDSTP() { return nbHoursDSTP; }
+    public Float getNbHoursDS() { return nbHoursDS; }
+    public Float getNbHoursTP() { return nbHoursTP; }
+    public Float getNbHoursTD() { return nbHoursTD; }
 }

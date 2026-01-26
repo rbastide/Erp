@@ -15,7 +15,7 @@ public interface HourlyVolumeRepository extends JpaRepository<HourlyVolume, Long
     List<HourlyVolume> findByHourlyVolID(Long hourlyVolumeID);
 
     @Query("SELECT h FROM HourlyVolume h WHERE h.nbHoursCM = :hoursCM AND h.nbHoursTD = :hoursTD AND h.nbHoursTP = :hoursTP AND h.nbHoursDSTP = :hoursDSTP")
-    List<HourlyVolume> findByDatas(@Param("hoursCM") int hoursCM, @Param("hoursTD") int hoursTD, @Param("hoursTP") int hoursTP, @Param("hoursDSTP") int hoursDSTP);
+    List<HourlyVolume> findByDatas(@Param("hoursCM") Float hoursCM, @Param("hoursTD") Float hoursTD, @Param("hoursTP") Float hoursTP, @Param("hoursDSTP") Float hoursDSTP);
 
     @NotNull Optional<HourlyVolume> findById(@NotNull Long hourlyVolumeId);
 }
