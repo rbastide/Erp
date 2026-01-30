@@ -31,6 +31,14 @@ const contents = ref({
   upgrades: [] as string[]
 })
 
+const formatHour = (decimal: number) => {
+  const val = decimal || 0;
+  const h = Math.floor(val);
+  const m = Math.round((val - h) * 60);
+
+  return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
+};
+
 const fetchSheetData = async () => {
   const sheetIdFromUrl = route.query.id
   resourceCode.value = (route.query.code as string) || 'Inconnu'
@@ -145,17 +153,17 @@ const hourConfig = {
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }} h</div>
+              <div class="box-static">{{ formatHour(hours[key]) }}</div>
             </div>
           </div>
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }} h</div>
+              <div class="box-static">{{ formatHour(hours[key]) }}</div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
-              <div class="box-static total-highlight">{{ totalGlobal }} h</div>
+              <div class="box-static total-highlight">{{ formatHour(totalGlobal) }}</div>
             </div>
           </div>
         </div>

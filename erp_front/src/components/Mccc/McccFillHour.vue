@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, reactive} from 'vue';
 import {useRouter} from 'vue-router';
 import {mcccStore} from '@/services/mcccStore';
 import api from '@/services/api';
@@ -20,6 +20,14 @@ const initialState = ref({
   hoursDSTP: 0
 });
 
+const splitHours = reactive({
+  hoursCM: { h: '', m: '00' },
+  hoursTD: { h: '', m: '00' },
+  hoursTP: { h: '', m: '00' },
+  hoursDS: { h: '', m: '00' },
+  hoursDSTP: { h: '', m: '00' }
+});
+
 const hourTypes = [
   { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
   { key: 'hoursTD', label: 'TD', color: '#7986CB' },
@@ -28,23 +36,80 @@ const hourTypes = [
   { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
+const convertDecimalToSplit = (decimal: number) => {
+  const val = decimal || 0;
+  const h = Math.floor(val);
+  const m = Math.round((val - h) * 60);
+  return {
+    h: h === 0 ? '' : h.toString(),
+    m: m.toString().padStart(2, '0')
+  };
+};
+
+const convertSplitToDecimal = (time: { h: string, m: string }) => {
+  const h = parseInt(time.h || '0');
+  const m = parseInt(time.m || '0');
+  return h + (m / 60);
+};
+
+
+const validateInput = (key: string, subType: 'h' | 'm', event: Event) => {
+  const input = event.target as HTMLInputElement;
+  let val = input.value.replace(/[^0-9]/g, '');
+
+  if (subType === 'h') {
+    if (val.length > 3) val = val.substring(0, 3);
+    if (val.length > 1 && val.startsWith('0')) {
+      val = val.replace(/^0+/, '');
+    }
+    if (val !== '' && parseInt(val) > 999) val = '999';
+  } else {
+    if (val.length > 2) val = val.substring(0, 2);
+    if (val !== '' && parseInt(val) > 59) val = '59';
+  }
+
+  (splitHours as any)[key][subType] = val;
+  input.value = val;
+
+  const decimalValue = convertSplitToDecimal((splitHours as any)[key]);
+  (mcccStore as any)[key] = decimalValue;
+  mcccStore.registerMcccStore();
+};
+
+const formatMinutesOnBlur = (key: string) => {
+  let val = (splitHours as any)[key].m;
+  if (!val) {
+    (splitHours as any)[key].m = '00';
+  } else if (val.length === 1) {
+    (splitHours as any)[key].m = '0' + val;
+  }
+};
+
+const formatHoursOnBlur = (key: string) => {
+};
+
+
+const syncSplitFromStore = () => {
+  splitHours.hoursCM = convertDecimalToSplit(mcccStore.hoursCM);
+  splitHours.hoursTD = convertDecimalToSplit(mcccStore.hoursTD);
+  splitHours.hoursTP = convertDecimalToSplit(mcccStore.hoursTP);
+  splitHours.hoursDS = convertDecimalToSplit(mcccStore.hoursDS);
+  splitHours.hoursDSTP = convertDecimalToSplit(mcccStore.hoursDSTP);
+};
+
 const fetchHourlyVolumes = async () => {
   if (!mcccStore.resourceID) return;
 
   const targetId = String(mcccStore.resourceID);
-  console.log("Récupération des heures pour resourceID:", targetId);
 
   try {
     const response = await api.get('/mccc/mcccs');
-
     const currentMccc = response.data.find((m: any) =>
         m.resourceId && String(m.resourceId.resourceID) === targetId
     );
 
     if (currentMccc && currentMccc.hourlyVolId) {
-      console.log("Heures trouvées en BDD :", currentMccc.hourlyVolId);
       const bddData = currentMccc.hourlyVolId;
-
       currentHourlyVolID.value = bddData.hourlyVolID;
 
       mcccStore.hoursCM = bddData.nbHoursCM || 0;
@@ -53,14 +118,14 @@ const fetchHourlyVolumes = async () => {
       mcccStore.hoursDS = bddData.nbHoursDS || 0;
       mcccStore.hoursDSTP = bddData.nbHoursDSTP || 0;
     } else {
-      console.log("Pas d'heures trouvées, mise à zéro.");
       mcccStore.hoursCM = 0;
       mcccStore.hoursTD = 0;
       mcccStore.hoursTP = 0;
       mcccStore.hoursDS = 0;
       mcccStore.hoursDSTP = 0;
     }
-    mcccStore.saveBackup();
+    mcccStore.registerMcccStore();
+    syncSplitFromStore();
   } catch (error) {
     console.error("Erreur chargement volumes horaires :", error);
   }
@@ -78,7 +143,7 @@ onMounted(async () => {
   ) > 0;
 
   if (hasLocalData) {
-    console.log("Utilisation des heures du store local");
+    syncSplitFromStore();
   } else {
     await fetchHourlyVolumes();
   }
@@ -93,27 +158,17 @@ onMounted(async () => {
 });
 
 const totalHeures = computed(() => {
-  return (mcccStore.hoursCM || 0) +
-      (mcccStore.hoursTD || 0) +
-      (mcccStore.hoursDS || 0) +
-      (mcccStore.hoursTP || 0) +
-      (mcccStore.hoursDSTP || 0);
+  let totalMinutes = 0;
+  Object.values(splitHours).forEach(time => {
+    const h = parseInt(time.h || '0');
+    const m = parseInt(time.m || '0');
+    totalMinutes += (h * 60) + m;
+  });
+
+  const h = Math.floor(totalMinutes / 60);
+  const m = Math.round(totalMinutes % 60);
+  return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
 });
-
-const updateHours = (key: string, delta: number) => {
-  const current = (mcccStore as any)[key] || 0;
-  (mcccStore as any)[key] = Math.max(0, current + delta);
-  mcccStore.registerMcccStore();
-};
-
-const validateInput = (key: string) => {
-  const value = (mcccStore as any)[key];
-  if (value === "" || value === null || value === undefined) {
-    (mcccStore as any)[key] = 0;
-  } else if (value < 0) {
-    (mcccStore as any)[key] = 0;
-  }
-};
 
 const handleValider = async () => {
   mcccStore.registerMcccStore();
@@ -130,9 +185,7 @@ const onConfirmCancel = () => {
   mcccStore.hoursTP = initialState.value.hoursTP;
   mcccStore.hoursDS = initialState.value.hoursDS;
   mcccStore.hoursDSTP = initialState.value.hoursDSTP;
-
   mcccStore.registerMcccStore();
-
   router.push('/mccc-menu');
 };
 </script>
@@ -148,24 +201,32 @@ const onConfirmCancel = () => {
         <div v-for="type in hourTypes" :key="type.key" class="hour-card">
           <span class="card-label" :style="{ color: type.color }">{{ type.label }}</span>
 
-          <div class="input-container">
-            <button type="button" class="step-btn" @click="updateHours(type.key, -1)">−</button>
-
+          <div class="time-input-container">
             <input
-                class="hour-input"
-                type="number"
-                v-model.number="(mcccStore as any)[type.key]"
-                min="0"
-                @input="() => { validateInput(type.key); mcccStore.registerMcccStore(); }"
+                type="text"
+                v-model="(splitHours as any)[type.key].h"
+                @input="validateInput(type.key, 'h', $event)"
+                @blur="formatHoursOnBlur(type.key)"
+                placeholder="0"
+                maxlength="3"
+                class="time-input"
             >
-
-            <button type="button" class="step-btn" @click="updateHours(type.key, 1)">+</button>
+            <span class="time-separator">h</span>
+            <input
+                type="text"
+                v-model="(splitHours as any)[type.key].m"
+                @input="validateInput(type.key, 'm', $event)"
+                @blur="formatMinutesOnBlur(type.key)"
+                placeholder="00"
+                maxlength="2"
+                class="time-input"
+            >
           </div>
         </div>
       </div>
 
       <div class="total-section">
-        <p>Total : <span class="total-number">{{ totalHeures }}</span> h</p>
+        <p>Total : <span class="total-number">{{ totalHeures }}</span></p>
       </div>
 
       <div class="actions-container">
@@ -235,50 +296,48 @@ const onConfirmCancel = () => {
   text-transform: uppercase;
 }
 
-.input-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f1f3f5;
-  border-radius: 12px;
-  padding: 8px 12px;
-}
-
-.hour-input {
-  width: 70px;
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #2d3436;
-}
-
-.hour-input::-webkit-outer-spin-button,
-.hour-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.step-btn {
-  background: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  font-size: 1.5rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.time-input-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #B51621;
-  transition: all 0.2s;
+  gap: 5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 140px;
+  height: 50px;
+  box-sizing: border-box;
 }
 
-.step-btn:hover {
-  background: #B51621;
-  color: white;
+.time-input {
+  width: 40px;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: #2d3436;
+  outline: none;
+  padding: 0;
+}
+
+.time-input::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.time-separator {
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-top: -3px;
+}
+
+.time-input-container:focus-within {
+  border-color: #B51621;
+  box-shadow: 0 0 0 3px rgba(181, 22, 33, 0.1);
+  background: #fff;
 }
 
 .total-section {

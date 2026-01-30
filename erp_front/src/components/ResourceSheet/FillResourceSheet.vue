@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, computed, onMounted } from 'vue'
+import { ref, reactive, nextTick, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -19,7 +19,13 @@ const resourceCode = ref('');
 const currentHourlyVolId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
-const hours = ref({ cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0 })
+const splitHours = reactive({
+  cm: { h: '', m: '00' },
+  td: { h: '', m: '00' },
+  tp: { h: '', m: '00' },
+  ds: { h: '', m: '00' },
+  ds_tp: { h: '', m: '00' }
+});
 
 const cmContents = ref([''])
 const tdContents = ref([''])
@@ -50,6 +56,73 @@ const activeFormats = ref({
   unordered: false,
   ordered: false
 });
+
+
+const validateInput = (type: keyof typeof splitHours, subType: 'h' | 'm', event: Event) => {
+  const input = event.target as HTMLInputElement;
+  let val = input.value.replace(/[^0-9]/g, '');
+
+  if (subType === 'h') {
+    if (val.length > 1 && val.startsWith('0')) {
+      val = val.replace(/^0+/, '');
+    }
+
+    if (val !== '' && parseInt(val) > 999) {
+      val = '999';
+    }
+  } else {
+    if (val !== '' && parseInt(val) > 59) {
+      val = '59';
+    }
+  }
+
+  splitHours[type][subType] = val;
+  input.value = val;
+};
+
+const formatMinutesOnBlur = (type: keyof typeof splitHours) => {
+  let val = splitHours[type].m;
+  if (!val) {
+    splitHours[type].m = '00';
+  } else if (val.length === 1) {
+    splitHours[type].m = '0' + val;
+  }
+};
+
+const formatHoursOnBlur = (type: keyof typeof splitHours) => {
+  if (!splitHours[type].h) {
+    splitHours[type].h = '0';
+  }
+};
+
+const totalGlobal = computed(() => {
+  let totalMinutes = 0;
+  Object.values(splitHours).forEach(time => {
+    const h = parseInt(time.h || '0');
+    const m = parseInt(time.m || '0');
+    totalMinutes += (h * 60) + m;
+  });
+
+  const h = Math.floor(totalMinutes / 60);
+  const m = Math.round(totalMinutes % 60);
+
+  return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
+});
+
+const convertDecimalToSplit = (decimal: number) => {
+  const h = Math.floor(decimal || 0);
+  const m = Math.round(((decimal || 0) - h) * 60);
+  return {
+    h: h.toString(),
+    m: m.toString().padStart(2, '0')
+  };
+};
+
+const convertSplitToDecimal = (time: { h: string, m: string }) => {
+  const h = parseInt(time.h || '0');
+  const m = parseInt(time.m || '0');
+  return h + (m / 60);
+};
 
 const canAdd = (list: string[]) => {
   if (!list || list.length === 0) return true;
@@ -128,14 +201,13 @@ const fetchHoursData = async () => {
 
       if (mcccFound && mcccFound.hourlyVolId) {
         const vol = mcccFound.hourlyVolId;
-        hours.value = {
-          cm: vol.nbHoursCM,
-          td: vol.nbHoursTD,
-          tp: vol.nbHoursTP,
-          ds: vol.nbHoursDS,
-          ds_tp: vol.nbHoursDSTP,
-          student: vol.nbHoursDSTP + vol.nbHoursDS + vol.nbHoursTP + vol.nbHoursTD + vol.nbHoursCM
-        };
+
+        splitHours.cm = convertDecimalToSplit(vol.nbHoursCM);
+        splitHours.td = convertDecimalToSplit(vol.nbHoursTD);
+        splitHours.tp = convertDecimalToSplit(vol.nbHoursTP);
+        splitHours.ds = convertDecimalToSplit(vol.nbHoursDS);
+        splitHours.ds_tp = convertDecimalToSplit(vol.nbHoursDSTP);
+
         currentHourlyVolId.value = vol.hourlyVolID;
       }
     }
@@ -167,32 +239,24 @@ const fetchResourceSheetData = async () => {
               .map((item: any) => item.content || '');
         };
 
-        const cm = getContentByType('CM');
-        cmContents.value = cm.length > 0 ? cm : [''];
-        const td = getContentByType('TD');
-        tdContents.value = td.length > 0 ? td : [''];
-        const tp = getContentByType('TP');
-        tpContents.value = tp.length > 0 ? tp : [''];
-        const ds = getContentByType('DS');
-        dsContents.value = ds.length > 0 ? ds : [''];
+        cmContents.value = getContentByType('CM').length ? getContentByType('CM') : [''];
+        tdContents.value = getContentByType('TD').length ? getContentByType('TD') : [''];
+        tpContents.value = getContentByType('TP').length ? getContentByType('TP') : [''];
+        dsContents.value = getContentByType('DS').length ? getContentByType('DS') : [''];
 
-        const dstpRaw = resourceData.educationalContentId?.filter((item: any) =>
+        const dstp = resourceData.educationalContentId?.filter((item: any) =>
             ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
-        ) || [];
-        const dstp = dstpRaw.map((item: any) => item.content || '');
-        dstpContents.value = dstp.length > 0 ? dstp : [''];
+        ).map((item: any) => item.content || '') || [];
+        dstpContents.value = dstp.length ? dstp : [''];
 
-        if (resourceData.teachersFeedbacks && resourceData.teachersFeedbacks.length > 0) {
-          const content = resourceData.teachersFeedbacks.map((f: any) => f.content).join('<br>');
-          edFBContents.value = [content];
+        if (resourceData.teachersFeedbacks?.length) {
+          edFBContents.value = [resourceData.teachersFeedbacks.map((f: any) => f.content).join('<br>')];
         }
-        if (resourceData.studentsFeedbacks && resourceData.studentsFeedbacks.length > 0) {
-          const content = resourceData.studentsFeedbacks.map((f: any) => f.content).join('<br>');
-          stFBContents.value = [content];
+        if (resourceData.studentsFeedbacks?.length) {
+          stFBContents.value = [resourceData.studentsFeedbacks.map((f: any) => f.content).join('<br>')];
         }
-        if (resourceData.improvementIdeas && resourceData.improvementIdeas.length > 0) {
-          const content = resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content).join('<br>');
-          upgradesContents.value = [content];
+        if (resourceData.improvementIdeas?.length) {
+          upgradesContents.value = [resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content).join('<br>')];
         }
 
         await populateRichEditors();
@@ -244,17 +308,25 @@ const handleValider = async () => {
 
   const filterRich = (list: string[]) => list.filter(t => t && t.replace(/<[^>]*>?/gm, '').trim().length > 0);
 
+  const hoursPayload = {
+    cm: convertSplitToDecimal(splitHours.cm),
+    td: convertSplitToDecimal(splitHours.td),
+    tp: convertSplitToDecimal(splitHours.tp),
+    ds: convertSplitToDecimal(splitHours.ds),
+    ds_tp: convertSplitToDecimal(splitHours.ds_tp),
+    student: 0
+  };
+  hoursPayload.student = hoursPayload.cm + hoursPayload.td + hoursPayload.tp + hoursPayload.ds + hoursPayload.ds_tp;
+
   const payload = {
     resourceID: currentResourceId.value,
-    hourlyVolume: hours.value,
+    hourlyVolume: hoursPayload,
     teachersFeedbackID: filterRich(edFBContents.value),
     studentFeedbackID: filterRich(stFBContents.value),
     improvementsIdeaID: filterRich(upgradesContents.value),
     educationalContent: allEducationalContent,
     mainGoal: "Objectif pédagogique principal"
   };
-  console.log(payload);
-  console.log(hours.value);
 
   try {
     await api.post('/resourceSheet/resource-sheet', payload);
@@ -272,14 +344,6 @@ const handleRetour = () => {
 const onConfirmCancel = () => {
   router.back();
 };
-
-const totalGlobal = computed(() => {
-  return (hours.value.cm || 0) + (hours.value.td || 0) + (hours.value.ds || 0) + (hours.value.tp || 0) + (hours.value.ds_tp || 0);
-})
-
-const validatePositive = (key: keyof typeof hours.value) => {
-  if (hours.value[key] < 0 || hours.value[key] === null) hours.value[key] = 0;
-}
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -312,17 +376,57 @@ const pedagogicalSections = computed(() => [
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <input type="number" v-model.number="hours[key]" class="box-input" min="0" @input="validatePositive(key)">
+              <div class="time-input-container">
+                <input
+                    type="text"
+                    v-model="splitHours[key].h"
+                    @input="validateInput(key, 'h', $event)"
+                    @blur="formatHoursOnBlur(key)"
+                    placeholder="0"
+                    maxlength="3"
+                    class="time-input"
+                >
+                <span class="time-separator">h</span>
+                <input
+                    type="text"
+                    v-model="splitHours[key].m"
+                    @input="validateInput(key, 'm', $event)"
+                    @blur="formatMinutesOnBlur(key)"
+                    placeholder="00"
+                    maxlength="2"
+                    class="time-input"
+                >
+              </div>
             </div>
           </div>
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <input type="number" v-model.number="hours[key]" class="box-input" min="0" @input="validatePositive(key)">
+              <div class="time-input-container">
+                <input
+                    type="text"
+                    v-model="splitHours[key].h"
+                    @input="validateInput(key, 'h', $event)"
+                    @blur="formatHoursOnBlur(key)"
+                    placeholder="0"
+                    maxlength="3"
+                    class="time-input"
+                >
+                <span class="time-separator">h</span>
+                <input
+                    type="text"
+                    v-model="splitHours[key].m"
+                    @input="validateInput(key, 'm', $event)"
+                    @blur="formatMinutesOnBlur(key)"
+                    placeholder="00"
+                    maxlength="2"
+                    class="time-input"
+                >
+              </div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
-              <div class="box-static total-highlight">{{ totalGlobal }} h</div>
+              <div class="box-static total-highlight">{{ totalGlobal }}</div>
             </div>
           </div>
         </div>
@@ -539,6 +643,9 @@ const pedagogicalSections = computed(() => [
 .hour-block {
   flex: 1;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .hour-block label {
   display: block;
@@ -547,18 +654,55 @@ const pedagogicalSections = computed(() => [
   margin-bottom: 8px;
   text-transform: uppercase;
 }
-.box-input {
-  width: 100%;
+
+.time-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
+  padding: 5px 10px;
+  width: 120px;
   height: 45px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  text-align: center;
+  box-sizing: border-box;
 }
+
+.time-input {
+  width: 35px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #333;
+  outline: none;
+  padding: 0;
+}
+
+.time-input::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.time-separator {
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: -2px;
+}
+
+.time-input-container:focus-within {
+  border-color: #E92533;
+  box-shadow: 0 0 0 3px rgba(233, 37, 51, 0.1);
+  background: #fff;
+}
+
 .box-static {
   height: 45px;
+  width: 100%;
+  min-width: 140px;
   display: flex;
   align-items: center;
   justify-content: center;

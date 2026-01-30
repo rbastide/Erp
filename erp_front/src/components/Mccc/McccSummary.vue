@@ -9,304 +9,173 @@ import ErrorSaveModal from '../Information/ErrorSaveModal.vue';
 import ModifSavedModal from '../Information/ModifSavedModal.vue';
 
 const router = useRouter();
-const allSaes = ref([]);
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 
-const hoursTotal = computed(() => {
-  return (mcccStore.hoursCM || 0) +
+// Initialisation au montage pour éviter les erreurs d'accès aux propriétés undefined
+onMounted(() => {
+  mcccStore.loadMcccStore();
+});
+
+// Fonction utilitaire pour formater les heures décimales en HhMM (ex: 1.5 -> 1h30)
+const formatHour = (decimalVal) => {
+  const val = decimalVal || 0;
+  const h = Math.floor(val);
+  const m = Math.round((val - h) * 60);
+
+  if (m === 0) return `${h} h`; // Affiche "12 h" si pile
+  return `${h}h${m.toString().padStart(2, '0')}`; // Affiche "12h30"
+};
+
+// Calcul du total formaté
+const formattedTotalHours = computed(() => {
+  const decimalTotal = (mcccStore.hoursCM || 0) +
       (mcccStore.hoursDS || 0) +
       (mcccStore.hoursTP || 0) +
       (mcccStore.hoursTD || 0) +
       (mcccStore.hoursDSTP || 0);
+
+  return formatHour(decimalTotal);
 });
 
 const handleBack = () => router.back();
 
 const handleValider = async () => {
   try {
-    const formattedAcs = mcccStore.acsGrouped.flatMap(skill =>
-        skill.allLevels.map((lvl, lvlIdx) => ({
-          resourceCode: mcccStore.resourceCode,
-          ue: `UE ${skill.skillNum} : ${skill.ue}`,
-          levels: `Niveau ${lvlIdx + 1} : ${lvl.title}`,
-          acs: lvl.acs.map(ac => ({
-            learningNum: ac.learningNum,
-            learningTitle: ac.learningTitle
-          }))
-        }))
-    );
+    // Utilisation de tableaux vides par défaut pour éviter le crash
+    const safeAcsGrouped = mcccStore.acsGrouped || [];
 
     const payload = {
-      resourceID: String(mcccStore.resourceID),
-      creationDate: mcccStore.creationDate,
-      editDate: mcccStore.editDate,
-      hoursCM: mcccStore.hoursCM,
-      hoursTD: mcccStore.hoursTD,
-      hoursTP: mcccStore.hoursTP,
-      hoursDS: mcccStore.hoursDS,
-      hoursDSTP: mcccStore.hoursDSTP,
-      saeCodes: mcccStore.saeCodes,
-      acsGrouped: formattedAcs,
-      referents: mcccStore.referents
+      resourceID: mcccStore.resourceID,
+      hourlyVolID: {
+        nbHoursCM: mcccStore.hoursCM,
+        nbHoursTD: mcccStore.hoursTD,
+        nbHoursTP: mcccStore.hoursTP,
+        nbHoursDS: mcccStore.hoursDS,
+        nbHoursDSTP: mcccStore.hoursDSTP,
+      },
+      criticalLearningsID: safeAcsGrouped.flatMap(skill =>
+          skill.allLevels.flatMap((lvl, lvlIdx) =>
+              lvl.acs.map(ac => ({
+                learningNum: ac.learningNum,
+                learningTitle: ac.learningTitle,
+                rankID: {
+                  rankNum: lvlIdx + 1,
+                  rankTitle: lvl.title,
+                  skillID: {
+                    skillNum: skill.skillNum,
+                    skillName: skill.ue
+                  }
+                }
+              }))
+          )
+      ),
+      saesID: (mcccStore.saes || []).map(s => ({
+        saeNum: s.saeNum,
+        saeName: s.saeName
+      }))
     };
 
-    const response = await api.post('/mccc/save', payload);
-
-    if (response.status === 200 || response.status === 201) {
-      mcccStore.clearMcccStore();
-      showSuccessModal.value = true;
-    }
+    console.log("Payload envoyé:", payload);
+    await api.post('/mccc/createMccc', payload);
+    showSuccessModal.value = true;
 
   } catch (error) {
-    console.error(error);
+    console.error("Erreur sauvegarde:", error);
     showErrorModal.value = true;
   }
 };
 
-const fetchSaes = async () => {
-  try {
-    const response = await api.get('/sae/saes');
-    if (response.data) {
-      allSaes.value = response.data;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const getSaeDisplay = (saeItem) => {
-  if (typeof saeItem === 'object' && saeItem !== null) {
-    const code = saeItem.saeCode || saeItem.code || saeItem.num;
-    const name = saeItem.saeName || saeItem.title || saeItem.name || '';
-    if (code) return `${code} - ${name}`;
-  }
-
-  const found = allSaes.value.find((s) => s.num === saeItem || s.code === saeItem);
-  if (found) {
-    const title = found.title || found.name || '';
-    return `${found.num || found.code} - ${title}`;
-  }
-  return String(saeItem);
-};
-
-const loadDataFromBddIfEmpty = async () => {
-  if (!mcccStore.resourceID) return;
-  const targetId = String(mcccStore.resourceID);
-
-  try {
-    const response = await api.get('/mccc/mcccs');
-    const currentMccc = response.data.find(m =>
-        m.resourceId && String(m.resourceId.resourceID) === targetId
-    );
-
-    if (!currentMccc) {
-      mcccStore.creationDate = new Date().toLocaleString('fr-FR');
-      return;
-    }
-
-    mcccStore.creationDate = new Date(currentMccc.creationDate).toLocaleString('fr-FR');
-
-    const localHoursEmpty = (mcccStore.hoursCM + mcccStore.hoursTD + mcccStore.hoursTP + mcccStore.hoursDS + mcccStore.hoursDSTP) === 0;
-    if (localHoursEmpty && currentMccc.hourlyVolId) {
-      mcccStore.hoursCM = currentMccc.hourlyVolId.nbHoursCM || 0;
-      mcccStore.hoursTD = currentMccc.hourlyVolId.nbHoursTD || 0;
-      mcccStore.hoursTP = currentMccc.hourlyVolId.nbHoursTP || 0;
-      mcccStore.hoursDS = currentMccc.hourlyVolId.nbHoursDS || 0;
-      mcccStore.hoursDSTP = currentMccc.hourlyVolId.nbHoursDSTP || 0;
-    }
-
-    if ((!mcccStore.saeCodes || mcccStore.saeCodes.length === 0) && currentMccc.saesId) {
-      mcccStore.saeCodes = currentMccc.saesId.map(s => ({
-        saeCode: s.num,
-        saeName: s.title
-      }));
-    }
-
-    if ((!mcccStore.referents || mcccStore.referents.length === 0) && currentMccc.referencialTeacherId) {
-      mcccStore.referents = currentMccc.referencialTeacherId.map(t => ({
-        firstname: t.firstname,
-        lastname: t.lastname
-      }));
-    }
-
-    if ((!mcccStore.acsGrouped || mcccStore.acsGrouped.length === 0) && currentMccc.criticalLearningsId) {
-      const groupedResult = [];
-
-      currentMccc.criticalLearningsId.forEach(acItem => {
-        if (!acItem.rankID || !acItem.rankID.skillID) return;
-
-        const skillName = acItem.rankID.skillID.skillName;
-        const skillNum = acItem.rankID.skillID.skillNum;
-        const rankTitle = acItem.rankID.rankTitle || `Niveau ${acItem.rankID.rankNum}`;
-
-        let existingSkill = groupedResult.find(g => g.ue === skillName);
-        if (!existingSkill) {
-          existingSkill = {
-            resourceCode: mcccStore.resourceCode,
-            ue: skillName,
-            skillNum: skillNum,
-            allLevels: []
-          };
-          groupedResult.push(existingSkill);
-        }
-
-        let existingLevel = existingSkill.allLevels.find(l => l.title === rankTitle);
-        if (!existingLevel) {
-          existingLevel = { title: rankTitle, acs: [] };
-          existingSkill.allLevels.push(existingLevel);
-        }
-
-        existingLevel.acs.push({
-          learningNum: acItem.learningNum,
-          learningTitle: acItem.learningTitle || "Sans titre"
-        });
-      });
-
-      mcccStore.acsGrouped = groupedResult;
-    }
-  } catch (error) {
-    console.error("Erreur chargement données BDD :", error);
-  }
-};
-
-onMounted(async () => {
-  mcccStore.loadMcccStore();
-
-  if (!mcccStore.saeCodes) mcccStore.saeCodes = [];
-  if (!mcccStore.referents) mcccStore.referents = [];
-  if (!mcccStore.acsGrouped) mcccStore.acsGrouped = [];
-
-  await fetchSaes();
-
-  await loadDataFromBddIfEmpty();
-
-  mcccStore.editDate = new Date().toLocaleString('fr-FR');
-
-  mcccStore.registerMcccStore();
-});
-
-const getGroupsForUE = (ueName) => {
-  if (!mcccStore.acsGrouped) return [];
-  return mcccStore.acsGrouped.filter(group => group.ue === ueName);
+const handleCloseSuccess = () => {
+  showSuccessModal.value = false;
+  router.push('/home-admin');
 };
 </script>
 
 <template>
   <Sidebar/>
-  <AppHeader title="Récapitulatif"/>
+  <AppHeader title="Récapitulatif MCCC" :inline="mcccStore.resourceCode"/>
 
   <main class="main-content">
-    <div class="summary">
-      <span class="summary-label">Ressource :</span>
-      <span class="summary-code">{{ mcccStore.resourceCode }}</span>
-    </div>
+    <div class="content-wrapper">
 
-    <div class="grid">
-      <div class="card hour-summary">
-        <div class="section-header">Volume Horaire</div>
-        <div class="listing-hours">
-          <div class="type-of-hour" id="cm">
-            <p class="title-hour">CM</p>
-            <div class="hour-badge">{{ mcccStore.hoursCM }}h</div>
-          </div>
-          <div class="type-of-hour">
-            <p class="title-hour">TD</p>
-            <div class="hour-badge">{{ mcccStore.hoursTD }}h</div>
-          </div>
-          <div class="type-of-hour">
-            <p class="title-hour">TP</p>
-            <div class="hour-badge">{{ mcccStore.hoursTP }}h</div>
-          </div>
-          <div class="type-of-hour">
-            <p class="title-hour">DS</p>
-            <div class="hour-badge">{{ mcccStore.hoursDS }}h</div>
-          </div>
-          <div class="type-of-hour" id="ds_tp">
-            <p class="title-hour">DS/TP</p>
-            <div class="hour-badge">{{ mcccStore.hoursDSTP }}h</div>
-          </div>
-          <div class="total-separator"></div>
-          <div class="total">
-            <p>Total estimé</p>
-            <span id="tot" class="total-number">{{ hoursTotal }}h</span>
-          </div>
+      <div class="summary-card">
+        <h2 class="card-title">Compétences & ACs sélectionnés</h2>
+        <div class="table-responsive">
+          <table class="summary-table">
+            <thead>
+            <tr>
+              <th>UE</th>
+              <th>Niveau</th>
+              <th>Apprentissages Critiques</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template v-for="(skill, sIdx) in (mcccStore.acsGrouped || [])" :key="sIdx">
+              <template v-for="(lvl, lIdx) in skill.allLevels" :key="lIdx">
+                <tr>
+                  <td class="ue-cell">UE {{ skill.skillNum }} : {{ skill.ue }}</td>
+                  <td class="level-cell">Niveau {{ lIdx + 1 }} : {{ lvl.title }}</td>
+                  <td class="acs-cell">
+                    <ul>
+                      <li v-for="ac in lvl.acs" :key="ac.learningNum">
+                        AC {{ ac.learningNum }} : {{ ac.learningTitle }}
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </template>
+            </template>
+            <tr v-if="!mcccStore.acsGrouped || mcccStore.acsGrouped.length === 0">
+              <td colspan="3" class="empty-table">Aucune compétence sélectionnée.</td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="card sae-summary">
-        <p class="section-header">SAE(s) concernées</p>
-        <div class="sae-list">
-          <div class="sae-chip" v-for="saeCode in mcccStore.saeCodes" :key="saeCode">
-            {{ getSaeDisplay(saeCode) }}
-          </div>
-          <div v-if="!mcccStore.saeCodes || mcccStore.saeCodes.length === 0" class="empty-msg">
-            Aucune SAE liée
+      <div class="summary-card">
+        <h2 class="card-title">SAÉs Associées</h2>
+        <div v-if="mcccStore.saes && mcccStore.saes.length > 0" class="sae-list">
+          <div v-for="sae in mcccStore.saes" :key="sae.saeNum" class="sae-tag">
+            {{ sae.saeNum }} - {{ sae.saeName }}
           </div>
         </div>
-      </div>
-    </div>
-
-    <p class="section-main-title" id="comp">Compétences & Objectifs</p>
-
-    <div class="big-square" v-for="(skill, sIdx) in mcccStore.acsGrouped" :key="sIdx">
-
-      <div class="ue-header">
-        <span class="ue-prefix">Compétence {{ skill.skillNum }}</span>
-        <h3 class="ue-title">{{ skill.ue }}</h3>
+        <div v-else class="empty-table">Aucune SAÉ associée.</div>
       </div>
 
-      <div class="table-container">
-        <table class="competence-table">
-          <thead>
-          <tr>
-            <th class="col-lvl">Niv.</th>
-            <th class="col-content">Détails des Apprentissages Critiques</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(lvl, lIdx) in skill.allLevels" :key="lIdx">
-            <td class="lvl-number">
-              <span class="circle-number">{{ lIdx + 1 }}</span>
-            </td>
-
-            <td class="lvl-data">
-              <div class="lvl-block">
-                <p class="lvl-label">Intitulé du niveau</p>
-                <p class="lvl-desc">{{ lvl.title }}</p>
-              </div>
-
-              <div v-if="lvl.acs && lvl.acs.length > 0" class="acs-block">
-                <p class="lvl-label">Apprentissages critiques</p>
-                <ul class="ac-list">
-                  <li v-for="(ac, acIdx) in lvl.acs" :key="acIdx">
-                    <span class="ac-tag">AC {{ ac.learningNum }}</span>
-                    {{ ac.learningTitle }}
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+      <div class="info-footer">
+        <div class="footer-item">
+          <span class="footer-label">Heures CM</span>
+          <span class="footer-value">{{ formatHour(mcccStore.hoursCM) }}</span>
+        </div>
+        <div class="footer-item">
+          <span class="footer-label">Heures TD</span>
+          <span class="footer-value">{{ formatHour(mcccStore.hoursTD) }}</span>
+        </div>
+        <div class="footer-item">
+          <span class="footer-label">Heures TP</span>
+          <span class="footer-value">{{ formatHour(mcccStore.hoursTP) }}</span>
+        </div>
+        <div class="footer-item">
+          <span class="footer-label">Heures DS</span>
+          <span class="footer-value">{{ formatHour(mcccStore.hoursDS) }}</span>
+        </div>
+        <div class="footer-item">
+          <span class="footer-label">Heures DS TP</span>
+          <span class="footer-value">{{ formatHour(mcccStore.hoursDSTP) }}</span>
+        </div>
+        <div class="footer-item total-item">
+          <span class="footer-label">Total Étudiant</span>
+          <span class="footer-value total-value">{{ formattedTotalHours }}</span>
+        </div>
       </div>
-    </div>
 
-    <div class="info-footer card">
-      <div class="footer-item">
-        <span class="footer-label">Professeur(s) référent(s) :</span>
-        <span class="footer-value" v-for="(referent, index) in mcccStore.referents" :key="referent">
-          {{ referent.firstname + " " + referent.lastname + (mcccStore.referents && mcccStore.referents.length == index + 1 ? "" : ", ") }}
-        </span>
+      <div class="container-btn">
+        <button @click="handleValider" class="btn-sys primary">Valider et Sauvegarder</button>
+        <button @click="handleBack" class="btn-sys secondary">Retour</button>
       </div>
-      <div class="footer-item"><span class="footer-label">Version :</span> <span class="footer-value">1.0</span></div>
-      <div class="footer-item"><span class="footer-label">Création :</span> <span class="footer-value">{{mcccStore.creationDate}}</span></div>
-      <div class="footer-item"><span class="footer-label"> Dernière Modification :</span> <span class="footer-value">{{mcccStore.editDate}}</span></div>
-    </div>
 
-    <div class="container-btn">
-      <button @click="handleValider" class="btn-sys btn-validate">Valider</button>
-      <button @click="handleBack" class="btn-sys btn-cancel">Retour</button>
     </div>
 
     <ErrorSaveModal
@@ -316,280 +185,100 @@ const getGroupsForUE = (ueName) => {
 
     <ModifSavedModal
         v-if="showSuccessModal"
+        @close="handleCloseSuccess"
     />
   </main>
 </template>
 
 <style scoped>
-
 .main-content {
-  width: 90%;
-  max-width: 1200px;
-  margin: 180px auto 80px;
+  padding-top: 10%;
+  min-height: 100vh;
+  background-color: #f8f9fa;
   font-family: 'Roboto', sans-serif;
-  color: #333;
+  padding-bottom: 80px;
 }
 
-.section-header {
-  font-size: 1.4rem;
-  font-weight: 700;
+.content-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+  border: 1px solid #eee;
+}
+
+.card-title {
+  font-size: 1.2rem;
   color: #B51621;
   margin-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 10px;
-}
-
-.section-main-title {
-  font-size: 2rem;
+  border-left: 4px solid #B51621;
+  padding-left: 10px;
   font-weight: 700;
-  text-align: center;
-  color: #333;
-  margin: 60px 0 30px;
-  position: relative;
-  display: inline-block;
-  width: 100%;
 }
 
-.summary {
-  text-align: center;
-  margin-top: 250px;
-  margin-bottom: 40px;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-}
-.summary-label {
-  font-size: 1.5rem;
-  color: #666;
-}
-.summary-code {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #B51621;
+.table-responsive {
+  overflow-x: auto;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
-}
-
-.card {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.02);
-}
-
-
-.listing-hours {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.type-of-hour {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-}
-
-.title-hour {
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin: 0;
-  color: #555;
-}
-
-.hour-badge {
-  background: #f4f6f8;
-  color: #333;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  min-width: 60px;
-  text-align: center;
-}
-
-.total-separator {
-  height: 1px;
-  background: #e0e0e0;
-  margin: 10px 0;
-}
-
-.total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #B51621;
-}
-
-.total p { margin: 0; }
-.total-number { font-size: 1.8rem; }
-
-
-.sae-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: flex-start;
-}
-
-.sae-chip {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 10px 20px;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1rem;
-  border: 1px solid #ffcdd2;
-  transition: transform 0.2s;
-  white-space: normal;
-  text-align: center;
-  max-width: 100%;
-}
-
-.sae-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(181, 22, 33, 0.15);
-}
-
-.empty-msg {
-  color: #999;
-  font-style: italic;
-}
-
-.big-square {
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  margin-bottom: 50px;
-  overflow: hidden;
-  border: none;
-}
-
-.ue-header {
-  background: linear-gradient(135deg, #B51621 0%, #E92533 100%);
-  padding: 20px 30px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  color: white;
-}
-
-.ue-prefix {
-  background: rgba(255,255,255,0.2);
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
-.ue-title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.table-container {
-  padding: 0;
-}
-
-.competence-table {
+.summary-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.competence-table th {
-  background-color: #f9fafb;
-  color: #444;
-  padding: 18px 25px;
+.summary-table th, .summary-table td {
+  padding: 12px 15px;
   text-align: left;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.col-lvl { width: 80px; text-align: center; }
-
-.competence-table td {
-  padding: 25px;
-  border-bottom: 1px solid #e5e7eb;
-  vertical-align: top;
-}
-
-.competence-table tr:last-child td {
-  border-bottom: none;
-}
-
-.lvl-number {
+.summary-table th {
   background-color: #fafafa;
-  border-right: 1px solid #f0f0f0;
-  text-align: center;
-  vertical-align: middle !important;
-}
-
-.circle-number {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  background: #333;
-  color: white;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.lvl-block, .acs-block {
-  margin-bottom: 20px;
-}
-
-.lvl-label {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #999;
+  color: #666;
   font-weight: 700;
-  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  font-size: 0.85rem;
 }
 
-.lvl-desc {
-  font-size: 1.1rem;
-  color: #222;
+.ue-cell {
+  font-weight: 700;
+  color: #333;
+  width: 20%;
+}
+
+.level-cell {
+  color: #555;
+  width: 25%;
+}
+
+.acs-cell ul {
+  padding-left: 20px;
   margin: 0;
-  line-height: 1.5;
 }
 
-.ac-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.acs-cell li {
+  margin-bottom: 4px;
+  color: #444;
+  font-size: 0.9rem;
 }
 
-.ac-list li {
-  margin-bottom: 8px;
+.sae-list {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
   gap: 10px;
-  line-height: 1.5;
 }
 
-.ac-tag {
+.sae-tag {
+  background: #fff5f5;
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ffccd0;
   color: #B51621;
   font-weight: bold;
   font-size: 0.95rem;
@@ -609,26 +298,40 @@ const getGroupsForUE = (ueName) => {
   justify-content: space-between;
   gap: 20px;
   margin-top: 40px;
-  background: #fdfdfd;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
 }
 
 .footer-item {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 100px;
 }
 
 .footer-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #888;
   text-transform: uppercase;
   font-weight: 700;
 }
 
 .footer-value {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: 1.2rem;
+  font-weight: 700;
   color: #333;
+}
+
+.total-item .footer-label {
+  color: #B51621;
+}
+
+.total-value {
+  color: #B51621;
+  font-size: 1.4rem;
 }
 
 .container-btn {
@@ -640,38 +343,34 @@ const getGroupsForUE = (ueName) => {
 }
 
 .btn-sys {
-  padding: 16px 40px;
+  padding: 14px 40px;
   border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
   border: none;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: all 0.2s;
 }
 
-.btn-validate {
-  background: linear-gradient(135deg, #B51621 0%, #D32F2F 100%);
+.btn-sys.primary {
+  background: #B51621;
   color: white;
 }
-.btn-validate:hover {
+
+.btn-sys.primary:hover {
+  background: #96121b;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(181, 22, 33, 0.4);
+  box-shadow: 0 4px 10px rgba(181, 22, 33, 0.3);
 }
 
-.btn-cancel {
-  background-color: white;
+.btn-sys.secondary {
+  background: white;
   color: #555;
-  border: 1px solid #ddd;
-}
-.btn-cancel:hover {
-  background-color: #f5f5f5;
-  color: #333;
-  transform: translateY(-2px);
+  border: 2px solid #e0e0e0;
 }
 
-@media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
-  .main-content { margin-top: 150px; width: 95%; }
+.btn-sys.secondary:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
 }
 </style>

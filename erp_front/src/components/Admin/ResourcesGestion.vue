@@ -22,10 +22,17 @@ const editedResource = reactive({
   semester: null
 });
 
+const validateSemester = () => {
+  if (editedResource.semester !== null && (editedResource.semester <= 0 || editedResource.semester === '')) {
+    editedResource.semester = null;
+  }
+};
+
 const fetchResources = async () => {
   try {
     const response = await api.get('resources/resources');
     resources.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
+    console.log(response.data);
   } catch (error) {
     console.error(error);
   }
@@ -49,7 +56,8 @@ const filteredResources = computed(() => {
   return resources.value.filter(res => {
     const num = res.num ? res.num.toLowerCase() : '';
     const name = res.name ? res.name.toLowerCase() : '';
-    return num.includes(query) || name.includes(query);
+    const sem = res.semestre ? res.semestre.toString() : '';
+    return num.includes(query) || name.includes(query) || sem.includes(query);
   });
 });
 
@@ -74,18 +82,13 @@ const confirmDeletion = async () => {
 };
 
 const saveResource = async () => {
-  if (!editedResource.num || !editedResource.name || editedResource.semester === null) {
-    alert("Veuillez remplir tous les champs.");
+  if (!editedResource.num || !editedResource.name || !editedResource.semester) {
+    alert("Veuillez remplir tous les champs (Semestre > 0).");
     return;
   }
 
   if (editedResource.num.length > 5) {
     alert("Le code ne doit pas dépasser 5 caractères.");
-    return;
-  }
-
-  if (editedResource.semester < 1) {
-    alert("Le semestre doit être au minimum 1.");
     return;
   }
 
@@ -115,7 +118,7 @@ const handleModif = (resource, index) => {
     resourceID: resource.resourceID,
     num: resource.num,
     name: resource.name,
-    semester: resource.semester || resource.semester
+    semester: resource.semestre
   });
 };
 
@@ -188,6 +191,7 @@ const handleValider = () => router.push('/home-admin');
                   class="card-input-compact"
                   min="1"
                   placeholder="Saisir 1, 2..."
+                  @input="validateSemester"
               >
             </div>
             <button class="save-btn-compact" @click="saveResource">
@@ -207,7 +211,9 @@ const handleValider = () => router.push('/home-admin');
               </div>
               <h3 class="res-num">{{ resource.num }}</h3>
               <p class="res-name">{{ resource.name }}</p>
-              <span class="role-badge">Semestre {{ resource.semester || resource.semester }}</span>
+
+              <span class="role-badge">Semestre {{ resource.semester }}</span>
+
               <div class="card-actions">
                 <button class="action-btn-mini edit" @click="handleModif(resource, index)">
                   <svg width="16" height="16" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2.5" fill="none">

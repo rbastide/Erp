@@ -22,16 +22,12 @@ const currentSkill = ref({
 
 const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
-// --- FONCTIONS DE VALIDATION ---
-
-// Valide le numéro de compétence (Creation)
 const validateSkillNum = () => {
   if (currentSkill.value.skillNum !== null && currentSkill.value.skillNum <= 0) {
     currentSkill.value.skillNum = null;
   }
 };
 
-// Valide le numéro de compétence (Edition)
 const validateEditedSkillNum = () => {
   if (editedSkill.value.skillNum !== null && editedSkill.value.skillNum <= 0) {
     editedSkill.value.skillNum = null;
@@ -149,8 +145,6 @@ const confirmDeletion = async () => {
     alert("Erreur lors de la suppression.");
   }
 };
-
-// --- HANDLERS ---
 
 const handleAddNiveau = () => {
   if (canAddLevel(currentSkill.value.levels)) {
@@ -683,7 +677,6 @@ const handleValider = () => router.back();
   margin-top: 10px;
 }
 
-/* Sticky Bar */
 .sticky-bar {
   position: fixed;
   bottom: 0;
@@ -784,7 +777,6 @@ const handleValider = () => router.back();
   color: #999;
 }
 
-/* Style désactivé pour les boutons */
 .disabled-btn {
   opacity: 0.5;
   cursor: not-allowed !important;
