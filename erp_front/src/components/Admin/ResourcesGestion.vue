@@ -117,6 +117,11 @@ const saveResource = async () => {
     resourceData.resourceID = editedResource.resourceID;
   }
 
+  if(resources.value.some(resource => resource.num === editedResource.num && resource.name === editedResource.name && resource.semester === editedResource.semester)){
+    alert("La ressource existe déjà")
+    return;
+  }
+
   try {
     await api.post('resources/editResource', [resourceData]);
     await fetchResources();
