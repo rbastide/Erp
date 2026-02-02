@@ -168,11 +168,11 @@ const saveSae = async (isNew = false) => {
             </div>
             <div class="input-group">
               <label class="input-label">Numéro SAE</label>
-              <input type="text" v-model="newSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="5">
+              <input type="text" v-model="newSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="7">
             </div>
             <div class="input-group">
-              <label class="input-label">Intitulé</label>
-              <input type="text" v-model="newSae.title" placeholder="Ex: Découverte..." class="card-input">
+              <label class="input-label">Intitulé max(25)</label>
+              <input type="text" v-model="newSae.title" placeholder="Ex: Découverte..." class="card-input" maxlength="25">
             </div>
             <button class="save-btn" @click="saveSae(true)">
               <svg width="20" height="20" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -207,11 +207,11 @@ const saveSae = async (isNew = false) => {
             </div>
             <div class="input-group">
               <label class="input-label">Numéro SAE</label>
-              <input type="text" v-model="editedSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="5">
+              <input type="text" v-model="editedSae.num" placeholder="Ex: S2.01" class="card-input" maxlength="7">
             </div>
             <div class="input-group">
-              <label class="input-label">Intitulé</label>
-              <input type="text" v-model="editedSae.title" placeholder="Ex: Implémenter..." class="card-input">
+              <label class="input-label">Intitulé max(25)</label>
+              <input type="text" v-model="editedSae.title" placeholder="Ex: Implémenter..." class="card-input" maxlength="25">
             </div>
             <button class="save-btn" @click="saveSae(false)">
               <svg width="20" height="20" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>

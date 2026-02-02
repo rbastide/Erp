@@ -185,7 +185,7 @@ const handleValider = () => router.push('/home-admin');
               <button class="close-icon" @click="handleCancel">✕</button>
             </div>
             <div class="input-group-compact">
-              <label class="compact-label">Code (max 7)</label>
+              <label class="compact-label">Code</label>
               <input
                   type="text"
                   v-model="editedResource.num"
