@@ -22,12 +22,6 @@ const editedResource = reactive({
   semester: null
 });
 
-const validateSemester = () => {
-  if (editedResource.semester !== null && (editedResource.semester <= 0 || editedResource.semester === '')) {
-    editedResource.semester = null;
-  }
-};
-
 const fetchResources = async () => {
   try {
     const response = await api.get('resources/resources');
@@ -78,6 +72,27 @@ const confirmDeletion = async () => {
     resourceToDelete.value = null;
   } catch (error) {
     alert("Erreur lors de la suppression.");
+  }
+};
+
+const blockInvalidChars = (e) => {
+  if (['e', 'E', '+', '-'].includes(e.key)) {
+    e.preventDefault();
+  }
+};
+
+const validateSemesterInput = () => {
+  let val = editedResource.semester;
+  if (val === '' || val === null)
+    return;
+  if (val > 10) {
+    editedResource.semester = 10;
+  }
+  else if (val < 1) {
+    editedResource.semester = 1;
+  }
+  else {
+    editedResource.semester = Math.floor(val);
   }
 };
 
@@ -170,28 +185,29 @@ const handleValider = () => router.push('/home-admin');
               <button class="close-icon" @click="handleCancel">✕</button>
             </div>
             <div class="input-group-compact">
-              <label class="compact-label">Code (max 5)</label>
+              <label class="compact-label">Code (max 7)</label>
               <input
                   type="text"
                   v-model="editedResource.num"
                   class="card-input-compact"
-                  maxlength="5"
+                  maxlength="7"
                   placeholder="ex: R1.01"
               >
             </div>
             <div class="input-group-compact">
-              <label class="compact-label">Nom</label>
-              <input type="text" v-model="editedResource.name" class="card-input-compact">
+              <label class="compact-label">Nom max(25)</label>
+              <input type="text" v-model="editedResource.name" class="card-input-compact" maxlength="25">
             </div>
             <div class="input-group-compact">
-              <label class="compact-label">Semestre</label>
+              <label class="compact-label">Semestre (max 10)</label>
               <input
                   type="number"
                   v-model.number="editedResource.semester"
                   class="card-input-compact"
                   min="1"
                   placeholder="Saisir 1, 2..."
-                  @input="validateSemester"
+                  @keydown="blockInvalidChars"
+                  @input="validateSemesterInput"
               >
             </div>
             <button class="save-btn-compact" @click="saveResource">
