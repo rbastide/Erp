@@ -117,6 +117,11 @@ const saveSae = async (isNew = false) => {
     return;
   }
 
+  if(saes.value.some(sae => sae.num === saeObject.num || sae.title === saeObject.title)){ // Remplacer par && si on pense que la SAE ne doit pas être unique en tout point
+    alert("la SAE existe déjà")
+    return;
+  }
+
   try {
     await api.post('/sae/addSae', [ saeObject ]);
     await fetchSaes();
