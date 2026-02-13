@@ -25,6 +25,7 @@ import LogoutModal from "./components/Information/LogoutModal.vue";
 import RoleGestion from "@/components/Admin/RoleGestion.vue";
 import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
 import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
+import RecallGestion from "@/components/Admin/RecallGestion.vue";
 
 
 const routes = [
@@ -162,6 +163,11 @@ const routes = [
         path:'/resource-sheet-to-validate',
         name: ResourceSheetToValidate,
         component: ResourceSheetToValidate
+    },
+    {
+        path:'/recall-gestion',
+        name: RecallGestion,
+        component: RecallGestion
     }
 ];
 
