@@ -15,17 +15,17 @@ import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
 import McccSkills from "./components/Mccc/McccSkills.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
-import SkillsGestion from "./components/Admin/SkillsGestion.vue";
+import SkillsManagement from "./components/Admin/SkillsManagement.vue";
 import ResourceSheetHistory from "@/components/ResourceSheet/ResourceSheetHistory.vue";
-import ResourcesGestion from "./components/Admin/ResourcesGestion.vue";
-import UsersGestion from "./components/Admin/UsersGestion.vue";
-import SaeGestion from "./components/Admin/SaeGestion.vue";
+import ResourcesManagement from "./components/Admin/ResourcesManagement.vue";
+import UsersManagement from "./components/Admin/UsersManagement.vue";
+import SaeManagement from "./components/Admin/SaeManagement.vue";
 import Settings from "./components/App/Settings.vue";
 import LogoutModal from "./components/Information/LogoutModal.vue";
-import RoleGestion from "@/components/Admin/RoleGestion.vue";
+import RoleManagement from "@/components/Admin/RoleManagement.vue";
 import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
 import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
-import RecallGestion from "@/components/Admin/RecallGestion.vue";
+import RecallManagement from "@/components/Admin/RecallManagement.vue";
 
 
 const routes = [
@@ -117,7 +117,7 @@ const routes = [
     {
         path: '/skill-creating',
         name: 'SkillsGestionPage',
-        component: SkillsGestion
+        component: SkillsManagement
     },
     {
         path: '/resource-sheet-history',
@@ -125,19 +125,19 @@ const routes = [
         component: ResourceSheetHistory
     },
     {
-        path: '/resources-gestion',
+        path: '/resources-management',
         name: 'ResourcesGestion',
-        component: ResourcesGestion
+        component: ResourcesManagement
     },
     {
-        path: '/users-gestion',
+        path: '/users-management',
         name: 'UsersGestion',
-        component: UsersGestion
+        component: UsersManagement
     },
     {
-        path: '/sae-gestion',
+        path: '/sae-management',
         name: 'SaeGestion',
-        component: SaeGestion
+        component: SaeManagement
     },
     {
         path: '/settings',
@@ -150,9 +150,9 @@ const routes = [
         component: LogoutModal
     },
     {
-        path:'/role-gestion',
-        name: RoleGestion,
-        component: RoleGestion
+        path:'/role-management',
+        name: RoleManagement,
+        component: RoleManagement
     },
     {
         path:'/to-validate',
@@ -165,9 +165,9 @@ const routes = [
         component: ResourceSheetToValidate
     },
     {
-        path:'/recall-gestion',
-        name: RecallGestion,
-        component: RecallGestion
+        path:'/recall-management',
+        name: RecallManagement,
+        component: RecallManagement
     }
 ];
 

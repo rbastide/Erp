@@ -49,7 +49,7 @@ const handleRegister = async () => {
   try {
     console.log(userPayload);
     await AuthService.register(userPayload);
-    await router.push('/users-gestion');
+    await router.push('/users-management');
   } catch (error) {
     console.error("Erreur Inscription:", error);
     if (error.response && error.response.data) {

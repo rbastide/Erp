@@ -14,7 +14,7 @@ const handleHistory = () => {
 };
 
 const handleSignIn = () => {
-  router.push('/users-gestion');
+  router.push('/users-management');
 };
 
 const handleCompetenceCreating = () => {
@@ -22,19 +22,19 @@ const handleCompetenceCreating = () => {
 };
 
 const handleResources = () => {
-  router.push('/resources-gestion');
+  router.push('/resources-management');
 };
 
 const handleAddSae = () => {
-  router.push('/sae-gestion');
+  router.push('/sae-management');
 };
 
 const handleRole = () => {
-  router.push('/role-gestion')
+  router.push('/role-management')
 };
 
 const handleRecall = () => {
-  router.push('/recall-gestion')
+  router.push('/recall-management')
 };
 </script>
 
