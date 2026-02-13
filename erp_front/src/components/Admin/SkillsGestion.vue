@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, reactive, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -14,7 +14,7 @@ const searchQuery = ref('');
 const showDeleteModal = ref(false);
 const skillToDelete = ref(null);
 
-const currentSkill = ref({
+const currentSkill = reactive({
   skillNum: null,
   skillName: '',
   levels: [{ title: '', acs: [{ num: null, title: '' }] }],
@@ -22,9 +22,25 @@ const currentSkill = ref({
 
 const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
-const validateSkillNum = () => {
-  if (currentSkill.value.skillNum !== null && currentSkill.value.skillNum <= 0) {
-    currentSkill.value.skillNum = null;
+
+const validateNumInput = () => {
+  let val = currentSkill.skillNum;
+  if (val === '' || val === null)
+    return;
+  if (val > 30) {
+    currentSkill.skillNum = 30;
+  }
+  else if (val < 1) {
+    currentSkill.skillNum = 1;
+  }
+  else {
+    currentSkill.skillNum = Math.floor(val);
+  }
+};
+
+const blockInvalidChars = (e) => {
+  if (['e', 'E', '+', '-'].includes(e.key)) {
+    e.preventDefault();
   }
 };
 
@@ -225,12 +241,13 @@ const handleValider = () => router.back();
                 min="1"
                 placeholder="1"
                 class="card-input"
-                @input="validateSkillNum"
+                @keydown="blockInvalidChars"
+                @input="validateNumInput"
             >
           </div>
           <div class="input-group large">
             <label class="field-label">Intitulé de la Compétence</label>
-            <input type="text" v-model="currentSkill.skillName" placeholder="Réaliser" class="card-input">
+            <input type="text" v-model="currentSkill.skillName" placeholder="Réaliser" class="card-input" maxlength="25">
           </div>
         </div>
         <div v-for="(niveau, nIndex) in currentSkill.levels" :key="nIndex" class="niveau-container">
@@ -239,7 +256,7 @@ const handleValider = () => router.back();
               <label class="group-label">Niveau {{ nIndex + 1 }}</label>
               <button v-if="currentSkill.levels.length > 1" @click="removeNiveau(nIndex)" class="btn-remove-item">✕</button>
             </div>
-            <input type="text" v-model="niveau.title" placeholder="Intitulé du niveau..." class="card-input">
+            <input type="text" v-model="niveau.title" placeholder="Intitulé du niveau..." class="card-input" maxlength="25">
           </div>
           <div class="acs-container">
             <div v-for="(ac, aIndex) in niveau.acs" :key="aIndex" class="ac-row">
@@ -247,9 +264,11 @@ const handleValider = () => router.back();
                   type="number"
                   v-model.number="ac.num"
                   min="1"
+                  max="50"
                   placeholder="N°"
                   class="card-input ac-num"
-                  @input="validateAcNum(ac)"
+                  @keydown="blockInvalidChars"
+                  @input="validateSemesterInput"
               >
               <input type="text" v-model="ac.title" placeholder="Intitulé AC" class="card-input ac-name">
               <button v-if="niveau.acs.length > 1" @click="removeAc(nIndex, aIndex)" class="btn-remove-item">✕</button>
