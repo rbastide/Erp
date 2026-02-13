@@ -191,7 +191,7 @@ const clearSearch = () => searchQuery.value = '';
             Aucun autre enseignant trouvé pour "{{ searchQuery }}"
           </div>
           <div v-if="availableTeachersList.length === 0 && !searchQuery && selectedTeachersList.length === allTeachers.length" class="no-result">
-            Tous les enseignants sont sélectionnés.
+            Tous les enseignants sont sélectionnés ou aucun enseignant trouvé.
           </div>
         </div>
       </div>

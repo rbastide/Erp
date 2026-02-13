@@ -279,7 +279,7 @@ const clearSearch = () => searchQuery.value = '';
 
         <div v-if="!isLoading && filteredSkills.length === 0" class="no-result">
           <span v-if="searchQuery">Aucune compétence ne correspond à "{{ searchQuery }}"</span>
-          <span v-else>Toutes les compétences sont sélectionnées.</span>
+          <span v-else>Toutes les compétences sont sélectionnées ou aucune compétence trouvé.</span>
         </div>
       </div>
 
