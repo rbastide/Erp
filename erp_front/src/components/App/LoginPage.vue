@@ -11,7 +11,7 @@ const password = ref('');
 const errorMessage = ref('');
 
 const handleLogin = async () => {
-  AuthService.logout();
+  await AuthService.logout();
   errorMessage.value = '';
 
   const credentials = {
