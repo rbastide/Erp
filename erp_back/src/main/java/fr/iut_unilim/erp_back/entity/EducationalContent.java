@@ -15,7 +15,7 @@ public class EducationalContent {
     private Long educationalContentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ressourceSheetId")
+    @JoinColumn(name = "resourceSheetId")
     @JsonBackReference
     private ResourceSheet ressourceSheetId;
 
@@ -24,10 +24,10 @@ public class EducationalContent {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private ClassType classTypeId;
 
-    @Column(name = "courseNumber")
+    @Column(name = "courseNum")
     private Long courseNumber;
 
-    @Column(name = "Content")
+    @Column(name = "content")
     private String content;
 
     public Long getEducationalContentId() {
