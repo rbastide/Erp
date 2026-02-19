@@ -153,7 +153,7 @@ public class ResourceSheetController {
                     String numStr = matcher.group(2);
                     String contentStr = matcher.group(3);
 
-                    Optional<ClassType> classTypeOpt = classTypeRepository.findByClassType(typeStr);
+                    Optional<ClassType> classTypeOpt = classTypeRepository.findByClassTypeName(typeStr);
 
                     if (classTypeOpt.isPresent()) {
                         EducationalContent eduContent = new EducationalContent();
