@@ -44,7 +44,7 @@ public class ResourceSheet {
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
     @JsonManagedReference
-    private List<ImprovementIdeas> improvementIdeas;
+    private List<ImprovementIdea> improvementIdeas;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheetId")
     @JsonManagedReference
@@ -57,7 +57,7 @@ public class ResourceSheet {
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, CourseHours courseHoursID, List<TeachersEducationalFeedback> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
+    public ResourceSheet(Long sheetsID, Long resourceID, CourseHours courseHoursID, List<TeachersEducationalFeedback> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdea> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.courseHoursID = courseHoursID;
@@ -90,7 +90,7 @@ public class ResourceSheet {
         this.studentsFeedbacks = studentsFeedbacks;
     }
 
-    public void setImprovementIdeas(List<ImprovementIdeas> improvementIdeas) {
+    public void setImprovementIdeas(List<ImprovementIdea> improvementIdeas) {
         this.improvementIdeas = improvementIdeas;
     }
 
@@ -126,7 +126,7 @@ public class ResourceSheet {
         return teachersFeedbacks;
     }
 
-    public List<ImprovementIdeas> getImprovementIdeas() {
+    public List<ImprovementIdea> getImprovementIdeas() {
         return improvementIdeas;
     }
 

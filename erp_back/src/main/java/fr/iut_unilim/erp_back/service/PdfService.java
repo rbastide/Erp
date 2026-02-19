@@ -86,13 +86,13 @@ public class PdfService {
     private static ResourceSheetFeedbacks handleResourceSheetFeedbacks(@NotNull ResourceSheet resourceSheet) {
         List<TeachersEducationalFeedback> educationalTeachersFeedbacks = resourceSheet.getTeachersFeedbacks();
         List<StudentsFeedbacks> studentsFeedbacks = resourceSheet.getStudentsFeedbacks();
-        List<ImprovementIdeas> improvementIdeas = resourceSheet.getImprovementIdeas();
+        List<ImprovementIdea> improvementIdeas = resourceSheet.getImprovementIdeas();
         return new ResourceSheetFeedbacks(educationalTeachersFeedbacks, studentsFeedbacks, improvementIdeas);
     }
 
     private record ResourceSheetFeedbacks(List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
                                           List<StudentsFeedbacks> studentsFeedbacks,
-                                          List<ImprovementIdeas> improvementIdeas) {
+                                          List<ImprovementIdea> improvementIdeas) {
     }
 
     private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<Teacher> teachers,

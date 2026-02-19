@@ -11,7 +11,7 @@ public record ResourceSheetViewModel(
         CourseHours courseHours,
         List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
         List<StudentsFeedbacks> studentsFeedbacks,
-        List<ImprovementIdeas> improvementIdeas,
+        List<ImprovementIdea> improvementIdeas,
         int semester,
         Set<Sae> saes,
         Date creationDate,

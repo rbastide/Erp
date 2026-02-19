@@ -3,19 +3,19 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ImprovementIdeas")
-public class ImprovementIdeas {
+@Table(name = "ImprovementIdea")
+public class ImprovementIdea {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    @Column(name = "improvementsIdeaID")
+    @Column(name = "improvementIdeaID")
     private Long improvementsIdeaID;
 
     @Column(name = "ideaContent")
     private String ideaContent;
 
-    public ImprovementIdeas() {
+    public ImprovementIdea() {
     }
 
     public Long getImprovementsIdeaID(){ return this.improvementsIdeaID; }

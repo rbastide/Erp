@@ -124,10 +124,10 @@ public class ResourceSheetController {
         }
         List<String> ideaContents = resourceSheetRequest.getImprovementsIdeaID();
         if (ideaContents != null) {
-            List<ImprovementIdeas> ideaEntities = ideaContents.stream()
+            List<ImprovementIdea> ideaEntities = ideaContents.stream()
                     .filter(c -> c != null && !c.isBlank())
                     .map(content -> {
-                        ImprovementIdeas idea = new ImprovementIdeas();
+                        ImprovementIdea idea = new ImprovementIdea();
                         idea.setIdeaContent(content);
                         return idea;
                     })

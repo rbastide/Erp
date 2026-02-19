@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.entity.ImprovementIdeas;
+import fr.iut_unilim.erp_back.entity.ImprovementIdea;
 import fr.iut_unilim.erp_back.repository.ImprovementIdeasRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class ImprovementIdeasService {
         this.improvementIdeasRepository = improvementIdeasRepository1;
     }
 
-    public Optional<ImprovementIdeas> findById(Long id) {
+    public Optional<ImprovementIdea> findById(Long id) {
         return improvementIdeasRepository.findById(id);
     }
 }
