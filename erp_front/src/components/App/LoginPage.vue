@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
 import api from "@/services/api.js";
@@ -14,6 +14,7 @@ const handleLogin = async () => {
   await AuthService.logout();
   errorMessage.value = '';
 
+  /** @type {LoginRequest} */
   const credentials = {
     identifier: username.value,
     password: password.value
