@@ -49,12 +49,12 @@ const fetchLinkedSkills = async () => {
       return;
     }
 
-    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
-      console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
+    if (!currentMccc.criticalConceptsId || currentMccc.criticalConceptsId.length === 0) {
+      console.warn("MCCC trouvé, mais liste criticalConceptsId vide.");
       return;
     }
 
-    const acsFromBdd = currentMccc.criticalLearningsId;
+    const acsFromBdd = currentMccc.criticalConceptsId;
     const groupedResult = [];
 
     acsFromBdd.forEach(acItem => {

@@ -54,7 +54,7 @@ const handleValider = async () => {
         nbHoursDS: mcccStore.hoursDS,
         nbHoursDSTP: mcccStore.hoursDSTP,
       },
-      criticalLearningsID: safeAcsGrouped.flatMap(skill =>
+      criticalConceptsID: safeAcsGrouped.flatMap(skill =>
           skill.allLevels.flatMap((lvl, lvlIdx) =>
               lvl.acs.map(ac => ({
                 learningNum: ac.learningNum,

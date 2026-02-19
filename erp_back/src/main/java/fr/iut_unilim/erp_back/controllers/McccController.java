@@ -2,7 +2,7 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.model.CriticalLearningModel;
+import fr.iut_unilim.erp_back.model.CriticalConceptModel;
 import fr.iut_unilim.erp_back.model.LearningRankModel;
 import fr.iut_unilim.erp_back.model.SaeModel;
 import fr.iut_unilim.erp_back.model.TeacherModel;
@@ -32,10 +32,10 @@ public class McccController {
     private final SaeService saeService;
     private final SkillService skillService;
     private final RankService rankService;
-    private final CriticalLearningService criticalLearningService;
+    private final CriticalConceptService criticalConceptService;
     private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService, ConnectionService connectionService) {
+    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalConceptService criticalConceptService, ConnectionService connectionService) {
         this.mcccService = mcccService;
         this.hourlyVolumeService = hourlyVolumeService;
         this.resourceService = resourceService;
@@ -43,7 +43,7 @@ public class McccController {
         this.saeService = saeService;
         this.skillService = skillService;
         this.rankService = rankService;
-        this.criticalLearningService = criticalLearningService;
+        this.criticalConceptService = criticalConceptService;
         this.connectionService = connectionService;
     }
 
@@ -108,11 +108,11 @@ public class McccController {
             return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
         }
 
-        Set<CriticalLearning> setCriticalLearnings = new HashSet<>();
-        ResponseEntity<Object> doCriticalLearningHasCrashed = fillCriticalLearnings(dto, setCriticalLearnings);
-        if (doCriticalLearningHasCrashed != null) return doCriticalLearningHasCrashed;
+        Set<CriticalConcept> setCriticalConcepts = new HashSet<>();
+        ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
+        if (doCriticalConceptsHasCrashed != null) return doCriticalConceptsHasCrashed;
 
-        mccc.setCriticalLearningsId(setCriticalLearnings);
+        mccc.setCriticalConceptsId(setCriticalConcepts);
 
         mcccService.save(mccc);
 
@@ -146,7 +146,7 @@ public class McccController {
 
 
     @Nullable
-    private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
+    private ResponseEntity<Object> fillCriticalConcepts(@NotNull McccRequest dto, @NotNull Set<CriticalConcept> setCriticalConcepts) {
         List<LearningRankModel> acs = dto.getAcsGrouped();
         for (LearningRankModel learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
@@ -155,7 +155,7 @@ public class McccController {
             Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels());
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le levels n'existe pas !");
 
-            fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
+            fillNewCriticalConcepts(setCriticalConcepts, learningRank, correspondedRank);
         }
         return null;
     }
@@ -183,22 +183,22 @@ public class McccController {
         return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
     }
 
-    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
-        List<CriticalLearningModel> criticalLearnings = learningRank.acs();
-        for (CriticalLearningModel criticalLearning : criticalLearnings) {
-            CriticalLearning newCriticalLearning = verifyPresenceOfCriticalLearning(criticalLearning, correspondedRank);
-            setAcs.add(newCriticalLearning);
+    private void fillNewCriticalConcepts(Set<CriticalConcept> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
+        List<CriticalConceptModel> criticalConcepts = learningRank.acs();
+        for (CriticalConceptModel criticalConcept : criticalConcepts) {
+            CriticalConcept newCriticalConcept = verifyPresenceOfCriticalConcept(criticalConcept, correspondedRank);
+            setAcs.add(newCriticalConcept);
         }
     }
 
 
     @NotNull
-    private CriticalLearning verifyPresenceOfCriticalLearning(CriticalLearningModel criticalLearning, Rank rank) {
-        List<CriticalLearning> criticalLearnings = criticalLearningService.getCriticalLearningsWithNumAndTitleAndRank(criticalLearning.learningNum(), criticalLearning.learningTitle(), rank);
-        if (criticalLearnings.isEmpty()) {
-            return new CriticalLearning(criticalLearning, rank);
+    private CriticalConcept verifyPresenceOfCriticalConcept(CriticalConceptModel criticalConcept, Rank rank) {
+        List<CriticalConcept> criticalConcepts = criticalConceptService.getCriticalConceptWithNumAndTitleAndRank(criticalConcept.conceptNum(), criticalConcept.conceptTitle(), rank);
+        if (criticalConcepts.isEmpty()) {
+            return new CriticalConcept(criticalConcept, rank);
         } else {
-            return criticalLearnings.get(0);
+            return criticalConcepts.get(0);
         }
     }
 

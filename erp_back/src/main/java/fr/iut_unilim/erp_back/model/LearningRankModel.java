@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record LearningRankModel(String resourceCode, String ue, String levels, List<CriticalLearningModel> acs) {
+public record LearningRankModel(String resourceCode, String ue, String levels, List<CriticalConceptModel> acs) {
     @NotNull
     @Override
     public String toString() {

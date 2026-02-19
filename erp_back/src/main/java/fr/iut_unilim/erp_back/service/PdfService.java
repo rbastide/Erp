@@ -65,7 +65,7 @@ public class PdfService {
 
         List<EducationalContent> educationallContents = resourceSheet.getEducationalContentID();
 
-        return new ResourceSheetViewModel(resource, hourlyVolume.get(), resourceSheetFeedbacks.educationalTeachersFeedbacks(), resourceSheetFeedbacks.studentsFeedbacks(), resourceSheetFeedbacks.improvementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalLearnings(), educationallContents, fromMccc.skills());
+        return new ResourceSheetViewModel(resource, hourlyVolume.get(), resourceSheetFeedbacks.educationalTeachersFeedbacks(), resourceSheetFeedbacks.studentsFeedbacks(), resourceSheetFeedbacks.improvementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
     }
 
     @NotNull
@@ -77,9 +77,9 @@ public class PdfService {
 
         Set<Teacher> teachers = mccc.getReferencialTeacherId();
 
-        Set<CriticalLearning> criticalLearnings = mccc.getCriticalLearningsId();
+        Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
         Set<Skill> skills = mcccService.getSkillsByResource(resource);
-        return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalLearnings, skills);
+        return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalConcepts, skills);
     }
 
     @NotNull
@@ -93,6 +93,7 @@ public class PdfService {
     private record ResourceSheetFeedbacks(List<EducationalTeachersFeedbacks> educationalTeachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas) {
     }
 
-    private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<Teacher> teachers, Set<CriticalLearning> criticalLearnings, Set<Skill> skills) {
+    private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<Teacher> teachers,
+                             Set<CriticalConcept> criticalConcepts, Set<Skill> skills) {
     }
 }

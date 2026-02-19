@@ -32,11 +32,11 @@ public class Mccc {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "McccCriticalLearning",
+            name = "L_McccCriticalConcept",
             joinColumns = @JoinColumn(name = "mcccID"),
-            inverseJoinColumns = @JoinColumn(name = "criticalLearningID")
+            inverseJoinColumns = @JoinColumn(name = "criticalConceptID")
     )
-    private Set<CriticalLearning> criticalLearningsId;
+    private Set<CriticalConcept> criticalConceptsId;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -53,11 +53,11 @@ public class Mccc {
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
+    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
         this.hourlyVolId = hourlyVolId;
         this.resourceId = resourceId;
         this.saesId = saesId;
-        this.criticalLearningsId = criticalLearningsId;
+        this.criticalConceptsId = criticalConceptsId;
         this.referencialTeacherId = referencialTeacherId;
         this.universityDepartment = universityDepartment;
     }
@@ -97,12 +97,12 @@ public class Mccc {
         this.saesId = saeId;
     }
 
-    public Set<CriticalLearning> getCriticalLearningsId() {
-        return criticalLearningsId;
+    public Set<CriticalConcept> getCriticalConceptsId() {
+        return criticalConceptsId;
     }
 
-    public void setCriticalLearningsId(Set<CriticalLearning> skillId) {
-        this.criticalLearningsId = skillId;
+    public void setCriticalConceptsId(Set<CriticalConcept> skillId) {
+        this.criticalConceptsId = skillId;
     }
 
     public Set<Teacher> getReferencialTeacherId() {
