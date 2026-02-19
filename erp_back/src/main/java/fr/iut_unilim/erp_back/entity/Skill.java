@@ -2,8 +2,6 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "Skill")
 public class Skill {

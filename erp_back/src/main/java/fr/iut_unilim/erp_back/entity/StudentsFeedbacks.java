@@ -3,17 +3,21 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "StudentFeedbacks")
+@Table(name = "StudentsFeedback")
 public class StudentsFeedbacks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    @Column(name = "studentFeedbackID")
+    @Column(name = "studentsFeedbackID")
     private Long studentFeedbackID;
 
-    @Column(name = "content")
+    @Column(name = "studentsFeedbackContent")
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "resourceSheetID")
+    private ResourceSheet resourceSheet;
 
     public StudentsFeedbacks() {
     }
