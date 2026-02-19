@@ -12,7 +12,7 @@ public class PdfPedalogicalContent {
         pedalogicalContent.useAllAvailableWidth();
 
         for (EducationalContent educationalContent : educationalContents) {
-            String contentType = educationalContent.getClassTypeId().getClassType() + " " + educationalContent.getCourseNumber();
+            String contentType = educationalContent.getClassTypeId().getClassTypeName() + " " + educationalContent.getCourseNumber();
             Paragraph paragraph = new Paragraph(contentType + " : " + educationalContent.getContent());
             pedalogicalContent.addCell(paragraph);
         }

@@ -12,33 +12,33 @@ public class ClassType {
     @Column(name="classTypeId")
     private Long classTypeId;
 
-    @Column(name = "classType")
-    private String classType;
+    @Column(name = "classTypeName")
+    private String classTypeName;
 
     public ClassType() {}
 
-    public ClassType(Long classTypeId, String classType) {
+    public ClassType(Long classTypeId, String classTypeName) {
         this.classTypeId = classTypeId;
-        this.classType = classType;
+        this.classTypeName = classTypeName;
     }
 
-    public ClassType(String classType) {
-        this.classType = classType;
+    public ClassType(String classTypeName) {
+        this.classTypeName = classTypeName;
     }
 
     public Long getClassTypeId() {
         return classTypeId;
     }
 
-    public String getClassType() {
-        return classType;
+    public String getClassTypeName() {
+        return classTypeName;
     }
 
     public void setClassTypeId(Long classTypeId) {
         this.classTypeId = classTypeId;
     }
 
-    public void setClassType(String classType) {
-        this.classType = classType;
+    public void setClassTypeName(String classType) {
+        this.classTypeName = classType;
     }
 }
