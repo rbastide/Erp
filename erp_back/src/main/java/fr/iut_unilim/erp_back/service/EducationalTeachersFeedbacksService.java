@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.entity.EducationalTeachersFeedbacks;
+import fr.iut_unilim.erp_back.entity.TeachersEducationalFeedback;
 import fr.iut_unilim.erp_back.repository.EducationalTeachersFeedbacksRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class EducationalTeachersFeedbacksService {
         this.educationalTeachersFeedbacksRepository = educationalTeachersFeedbacksRepository;
     }
 
-    public Optional<EducationalTeachersFeedbacks> findById(@NotNull Long id) {
+    public Optional<TeachersEducationalFeedback> findById(@NotNull Long id) {
         return educationalTeachersFeedbacksRepository.findById(id);
     }
 }

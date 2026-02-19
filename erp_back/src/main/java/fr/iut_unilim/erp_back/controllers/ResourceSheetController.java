@@ -106,10 +106,10 @@ public class ResourceSheetController {
 
         List<String> teacherContents = resourceSheetRequest.getTeachersFeedbackID();
         if (teacherContents != null) {
-            List<EducationalTeachersFeedbacks> teacherEntities = teacherContents.stream()
+            List<TeachersEducationalFeedback> teacherEntities = teacherContents.stream()
                     .filter(c -> c != null && !c.isBlank())
                     .map(content -> {
-                        EducationalTeachersFeedbacks fb = new EducationalTeachersFeedbacks();
+                        TeachersEducationalFeedback fb = new TeachersEducationalFeedback();
                         fb.setContent(content);
                         return fb;
                     })

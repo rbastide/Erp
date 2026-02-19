@@ -9,7 +9,7 @@ import java.util.Set;
 public record ResourceSheetViewModel(
         Resource resource,
         HourlyVolume hourlyVolume,
-        List<EducationalTeachersFeedbacks> educationalTeachersFeedbacks,
+        List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
         List<StudentsFeedbacks> studentsFeedbacks,
         List<ImprovementIdeas> improvementIdeas,
         int semester,

@@ -33,7 +33,7 @@ public class ResourceSheet {
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
     @JsonManagedReference
-    private List<EducationalTeachersFeedbacks> teachersFeedbacks;
+    private List<TeachersEducationalFeedback> teachersFeedbacks;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "sheetID")
@@ -56,7 +56,7 @@ public class ResourceSheet {
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<EducationalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
+    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<TeachersEducationalFeedback> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
         this.hourlyVolumeID = hourlyVolumeID;
@@ -81,7 +81,7 @@ public class ResourceSheet {
         this.hourlyVolumeID = hourlyVolumeID;
     }
 
-    public void setTeachersFeedbacks(List<EducationalTeachersFeedbacks> teachersFeedbacks) {
+    public void setTeachersFeedbacks(List<TeachersEducationalFeedback> teachersFeedbacks) {
         this.teachersFeedbacks = teachersFeedbacks;
     }
 
@@ -121,7 +121,7 @@ public class ResourceSheet {
         return studentsFeedbacks;
     }
 
-    public List<EducationalTeachersFeedbacks> getTeachersFeedbacks() {
+    public List<TeachersEducationalFeedback> getTeachersFeedbacks() {
         return teachersFeedbacks;
     }
 
