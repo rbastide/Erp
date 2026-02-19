@@ -17,7 +17,7 @@ public class EducationalContent {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resourceSheetId")
     @JsonBackReference
-    private ResourceSheet ressourceSheetId;
+    private ResourceSheet resourceSheetId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classTypeId")
@@ -34,8 +34,8 @@ public class EducationalContent {
         return educationalContentId;
     }
 
-    public ResourceSheet getRessourceSheetId() {
-        return ressourceSheetId;
+    public ResourceSheet getResourceSheetId() {
+        return resourceSheetId;
     }
 
     public ClassType getClassTypeId() {
@@ -54,8 +54,8 @@ public class EducationalContent {
         this.educationalContentId = educationalContentId;
     }
 
-    public void setRessourceSheetId(ResourceSheet ressourceSheetId) {
-        this.ressourceSheetId = ressourceSheetId;
+    public void setResourceSheetId(ResourceSheet ressourceSheetId) {
+        this.resourceSheetId = ressourceSheetId;
     }
 
     public void setClassTypeId(ClassType classTypeId) {

@@ -45,7 +45,7 @@ public class ResourceSheet {
     @JsonManagedReference
     private List<ImprovementIdeas> improvementIdeas;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "ressourceSheetId")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheetId")
     @JsonManagedReference
     private List<EducationalContent> educationalContentID;
 

@@ -161,7 +161,7 @@ public class ResourceSheetController {
                         eduContent.setCourseNumber(Long.parseLong(numStr));
                         eduContent.setContent(contentStr);
 
-                        eduContent.setRessourceSheetId(resourceSheet);
+                        eduContent.setResourceSheetId(resourceSheet);
 
                         educationalContentEntities.add(eduContent);
                     } else {
