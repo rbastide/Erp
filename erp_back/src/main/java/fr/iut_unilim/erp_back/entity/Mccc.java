@@ -24,7 +24,7 @@ public class Mccc {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "McccSaes",
+            name = "L_McccSae",
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "saeID")
     )
@@ -40,7 +40,7 @@ public class Mccc {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "MCCCTeachers",
+            name = "L_McccTeacher",
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
