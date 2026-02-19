@@ -68,12 +68,12 @@ const fetchSheetData = async () => {
         contents.value.ds_tp = getBlocks('DS/TP')
       }
 
-      if (sheet.hourlyVolumeID) {
+      if (sheet.courseHoursID) {
         const responseMccc = await api.get('/mccc/mcccs')
-        const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
+        const mcccMatch = responseMccc.data.find((m: any) => m.courseHoursId?.courseHoursID == sheet.courseHoursID)
 
-        if (mcccMatch && mcccMatch.hourlyVolId) {
-          const v = mcccMatch.hourlyVolId
+        if (mcccMatch && mcccMatch.courseHoursId) {
+          const v = mcccMatch.courseHoursId
           hours.value = {
             cm: v.nbHoursCM || 0,
             td: v.nbHoursTD || 0,

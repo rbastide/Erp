@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.dto;
 
-public class HourlyVolumeDto {
+public class CourseHoursDto {
     private Float cm;
     private Float td;
     private Float tp;

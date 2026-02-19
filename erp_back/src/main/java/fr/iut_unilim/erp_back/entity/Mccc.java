@@ -14,8 +14,8 @@ public class Mccc {
     private Long mcccId;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "hourlyVolID")
-    private HourlyVolume hourlyVolId;
+    @JoinColumn(name = "courseHoursID")
+    private CourseHours courseHoursId;
 
     @ManyToOne
     @JoinColumn(name = "resourceID")
@@ -53,8 +53,8 @@ public class Mccc {
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
-        this.hourlyVolId = hourlyVolId;
+    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
+        this.courseHoursId = courseHoursId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalConceptsId = criticalConceptsId;
@@ -73,12 +73,12 @@ public class Mccc {
         this.mcccId = mcccId;
     }
 
-    public HourlyVolume getHourlyVolId() {
-        return hourlyVolId;
+    public CourseHours getCourseHoursId() {
+        return courseHoursId;
     }
 
-    public void setHourlyVolId(HourlyVolume hourlyVolId) {
-        this.hourlyVolId = hourlyVolId;
+    public void setCourseHoursId(CourseHours courseHours) {
+        this.courseHoursId = courseHours;
     }
 
     public Resource getResourceId() {

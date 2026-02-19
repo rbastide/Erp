@@ -8,19 +8,20 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ResourceSheets")
+@Table(name = "ResourceSheet")
 public class ResourceSheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sheetsID")
+    @Column(name = "resourceSheetID")
     private Long sheetsID;
 
     @Column(name = "resourceID")
     private Long resourceID;
 
-    @Column(name = "hourlyVolumeID")
-    private Long hourlyVolumeID;
+    @ManyToOne
+    @JoinColumn(name = "courseHoursID")
+    private CourseHours courseHoursID;
 
     @Column(name = "creationDate")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
@@ -56,10 +57,10 @@ public class ResourceSheet {
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<TeachersEducationalFeedback> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
+    public ResourceSheet(Long sheetsID, Long resourceID, CourseHours courseHoursID, List<TeachersEducationalFeedback> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
         this.sheetsID = sheetsID;
         this.resourceID = resourceID;
-        this.hourlyVolumeID = hourlyVolumeID;
+        this.courseHoursID = courseHoursID;
         this.teachersFeedbacks = teachersFeedbacks;
         this.studentsFeedbacks = studentsFeedbacks;
         this.improvementIdeas = improvementIdeas;
@@ -77,8 +78,8 @@ public class ResourceSheet {
         this.resourceID = resourceID;
     }
 
-    public void setHourlyVolumeID(Long hourlyVolumeID) {
-        this.hourlyVolumeID = hourlyVolumeID;
+    public void setCourseHoursID(CourseHours courseHours) {
+        this.courseHoursID = courseHours;
     }
 
     public void setTeachersFeedbacks(List<TeachersEducationalFeedback> teachersFeedbacks) {
@@ -113,8 +114,8 @@ public class ResourceSheet {
         return resourceID;
     }
 
-    public Long getHourlyVolumeID() {
-        return hourlyVolumeID;
+    public CourseHours getCourseHoursID() {
+        return courseHoursID;
     }
 
     public List<StudentsFeedbacks> getStudentsFeedbacks() {

@@ -4,7 +4,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
-import fr.iut_unilim.erp_back.entity.HourlyVolume;
+import fr.iut_unilim.erp_back.entity.CourseHours;
 import fr.iut_unilim.erp_back.entity.Resource;
 import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
@@ -20,7 +20,7 @@ import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createCenteredPara
 public class PdfFormationInfo {
     private static final String[] HOURS_CLASS_CORRESPONDANCE = new String[]{"CM", "TD", "TP"};
 
-    public static Table create(@NotNull Resource resource, @NotNull HourlyVolume hourlyVolume, @NotNull String referencialTeachersString, Set<Skill> skills) {
+    public static Table create(@NotNull Resource resource, @NotNull CourseHours courseHours, @NotNull String referencialTeachersString, Set<Skill> skills) {
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{33, 33, 11, 11, 11}));
         infoTable.useAllAvailableWidth();
 
@@ -30,7 +30,7 @@ public class PdfFormationInfo {
 
         infoTable.addCell(CellUtils.createCenteredCell(resource.getName()));
 
-        double[] hours = new double[]{hourlyVolume.getNbHoursCM(), hourlyVolume.getNbHoursTD(), hourlyVolume.getNbHoursTP()};
+        double[] hours = new double[]{courseHours.getNbHoursCM(), courseHours.getNbHoursTD(), courseHours.getNbHoursTP()};
         for (int i = 0; i < hours.length; i++) {
             infoTable.addCell(CellUtils.createCenteredCell(decimalFormat.format(hours[i]) + "h " + HOURS_CLASS_CORRESPONDANCE[i]));
         }

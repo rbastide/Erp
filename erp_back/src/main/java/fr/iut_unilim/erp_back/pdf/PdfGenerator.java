@@ -79,7 +79,7 @@ public class PdfGenerator {
 
         document.add(header);
 
-        Table formationInfo = PdfFormationInfo.create(resourceSheet.resource(), resourceSheet.hourlyVolume(), referencialTeachersString, resourceSheet.skills());
+        Table formationInfo = PdfFormationInfo.create(resourceSheet.resource(), resourceSheet.courseHours(), referencialTeachersString, resourceSheet.skills());
         formationInfo.setMarginBottom(10);
         document.add(formationInfo);
 
@@ -97,7 +97,7 @@ public class PdfGenerator {
         document.add(header);
 
         document.add(createTitle("Heures :"));
-        document.add(PdfHours.create(resourceSheet.resource().getNum(), resourceSheet.hourlyVolume()));
+        document.add(PdfHours.create(resourceSheet.resource().getNum(), resourceSheet.courseHours()));
 
         document.add(createTitle("Contenu pédagogique :"));
         document.add(PdfPedalogicalContent.create(resourceSheet.educationalContent()));

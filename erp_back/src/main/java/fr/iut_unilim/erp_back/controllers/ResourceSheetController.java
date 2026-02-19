@@ -7,7 +7,7 @@ import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
-import fr.iut_unilim.erp_back.service.HourlyVolumeService;
+import fr.iut_unilim.erp_back.service.CourseHoursService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +29,17 @@ public class ResourceSheetController {
     private final ResourceSheetRepository resourceSheetRepository;
     private final ResourceRepository resourceRepository;
     private final ConnectionService connectionService;
-    private final HourlyVolumeService hourlyVolumeService;
+    private final CourseHoursService courseHoursService;
     private final ClassTypeRepository classTypeRepository;
 
     private static final Pattern EDUCATIONAL_CONTENT_PATTERN = Pattern.compile("^([A-Z/]+)\\s+(\\d+)\\s*:\\s*(.*)$");
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, HourlyVolumeService hourlyVolumeService, ClassTypeRepository classTypeRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, CourseHoursService courseHoursService, ClassTypeRepository classTypeRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.resourceRepository = resourceRepository;
         this.connectionService = connectionService;
-        this.hourlyVolumeService = hourlyVolumeService;
+        this.courseHoursService = courseHoursService;
         this.classTypeRepository = classTypeRepository;
     }
 
@@ -80,10 +80,10 @@ public class ResourceSheetController {
             resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
         }
 
-        HourlyVolume hourlyVolume = getHourlyVolume(resourceSheetRequest);
+        CourseHours courseHours = getCourseHours(resourceSheetRequest);
 
-        HourlyVolume savedVolume = hourlyVolumeService.save(hourlyVolume);
-        resourceSheet.setHourlyVolumeID(savedVolume.getHourlyVolID());
+        CourseHours savedVolume = courseHoursService.save(courseHours);
+        resourceSheet.setCourseHoursID(savedVolume);
 
         List<String> studentContents = resourceSheetRequest.getStudentFeedbackID();
         if (studentContents != null) {
@@ -185,23 +185,23 @@ public class ResourceSheetController {
     }
 
     @NotNull
-    private static HourlyVolume getHourlyVolume(ResourceSheetRequest resourceSheetRequest) {
-        HourlyVolume hourlyVolume = new HourlyVolume();
+    private static CourseHours getCourseHours(ResourceSheetRequest resourceSheetRequest) {
+        CourseHours courseHours = new CourseHours();
 
-        if (resourceSheetRequest.getHourlyVolume() != null) {
-            hourlyVolume.setNbHoursTP(resourceSheetRequest.getHourlyVolume().getTp());
-            hourlyVolume.setNbHoursDSTP(resourceSheetRequest.getHourlyVolume().getDs_tp());
-            hourlyVolume.setNbHoursDS(resourceSheetRequest.getHourlyVolume().getDs());
-            hourlyVolume.setNbHoursTD(resourceSheetRequest.getHourlyVolume().getTd());
-            hourlyVolume.setNbHoursCM(resourceSheetRequest.getHourlyVolume().getCm());
+        if (resourceSheetRequest.getCourseHours() != null) {
+            courseHours.setNbHoursTP(resourceSheetRequest.getCourseHours().getTp());
+            courseHours.setNbHoursDSTP(resourceSheetRequest.getCourseHours().getDs_tp());
+            courseHours.setNbHoursDS(resourceSheetRequest.getCourseHours().getDs());
+            courseHours.setNbHoursTD(resourceSheetRequest.getCourseHours().getTd());
+            courseHours.setNbHoursCM(resourceSheetRequest.getCourseHours().getCm());
         } else {
-            hourlyVolume.setNbHoursTP(0F);
-            hourlyVolume.setNbHoursDSTP(0F);
-            hourlyVolume.setNbHoursDS(0F);
-            hourlyVolume.setNbHoursTD(0F);
-            hourlyVolume.setNbHoursCM(0F);
+            courseHours.setNbHoursTP(0F);
+            courseHours.setNbHoursDSTP(0F);
+            courseHours.setNbHoursDS(0F);
+            courseHours.setNbHoursTD(0F);
+            courseHours.setNbHoursCM(0F);
         }
-        return hourlyVolume;
+        return courseHours;
     }
 
     @DeleteMapping("/{id}")

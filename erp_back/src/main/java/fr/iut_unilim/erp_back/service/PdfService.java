@@ -14,12 +14,12 @@ import java.util.Set;
 
 @Service
 public class PdfService {
-    private final HourlyVolumeService hourlyVolumeService;
+    private final CourseHoursService courseHoursService;
     private final ResourceService resourceService;
     private final McccService mcccService;
 
-    public PdfService(HourlyVolumeService hourlyVolumeService, ResourceService resourceService, McccService mcccService) {
-        this.hourlyVolumeService = hourlyVolumeService;
+    public PdfService(CourseHoursService courseHoursService, ResourceService resourceService, McccService mcccService) {
+        this.courseHoursService = courseHoursService;
         this.resourceService = resourceService;
         this.mcccService = mcccService;
     }
@@ -42,8 +42,8 @@ public class PdfService {
         }
         Resource resource = canHaveResource.get();
 
-        Optional<HourlyVolume> hourlyVolume = hourlyVolumeService.findById(resourceSheet.getResourceID());
-        if (hourlyVolume.isEmpty()) {
+        Optional<CourseHours> courseHours = courseHoursService.findById(resourceSheet.getResourceID());
+        if (courseHours.isEmpty()) {
             return null;
         }
 
@@ -65,7 +65,7 @@ public class PdfService {
 
         List<EducationalContent> educationallContents = resourceSheet.getEducationalContentID();
 
-        return new ResourceSheetViewModel(resource, hourlyVolume.get(), resourceSheetFeedbacks.educationalTeachersFeedbacks(), resourceSheetFeedbacks.studentsFeedbacks(), resourceSheetFeedbacks.improvementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
+        return new ResourceSheetViewModel(resource, courseHours.get(), resourceSheetFeedbacks.educationalTeachersFeedbacks(), resourceSheetFeedbacks.studentsFeedbacks(), resourceSheetFeedbacks.improvementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
     }
 
     @NotNull

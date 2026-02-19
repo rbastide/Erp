@@ -26,7 +26,7 @@ import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegex
 public class McccController {
 
     private final McccService mcccService;
-    private final HourlyVolumeService hourlyVolumeService;
+    private final CourseHoursService courseHoursService;
     private final ResourceService resourceService;
     private final TeacherService teacherService;
     private final SaeService saeService;
@@ -35,9 +35,9 @@ public class McccController {
     private final CriticalConceptService criticalConceptService;
     private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalConceptService criticalConceptService, ConnectionService connectionService) {
+    public McccController(McccService mcccService, CourseHoursService courseHoursService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalConceptService criticalConceptService, ConnectionService connectionService) {
         this.mcccService = mcccService;
-        this.hourlyVolumeService = hourlyVolumeService;
+        this.courseHoursService = courseHoursService;
         this.resourceService = resourceService;
         this.teacherService = teacherService;
         this.saeService = saeService;
@@ -86,8 +86,8 @@ public class McccController {
         Set<Sae> setSae = getSAEFromDto(dto);
         mccc.setSaesId(setSae);
 
-        HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
-        mccc.setHourlyVolId(hourlyVolume);
+        CourseHours courseHours = getCourseHoursFromDto(dto);
+        mccc.setCourseHoursId(courseHours);
 
         try {
             if (dto.getEditDate() != null) {
@@ -235,18 +235,18 @@ public class McccController {
     }
 
     @NotNull
-    private HourlyVolume getHourlyVolumeFromDto(McccRequest dto) {
-        List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
-        if (hourlyVolumes.isEmpty()) {
-            return new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
+    private CourseHours getCourseHoursFromDto(McccRequest dto) {
+        List<CourseHours> allCourseHours = courseHoursService.getAllCourseHoursFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
+        if (allCourseHours.isEmpty()) {
+            return new CourseHours(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
         }
-        HourlyVolume hourlyVolume = hourlyVolumes.get(0);
-        hourlyVolume.setNbHoursCM(dto.getHoursCM());
-        hourlyVolume.setNbHoursTD(dto.getHoursTD());
-        hourlyVolume.setNbHoursTP(dto.getHoursTP());
-        hourlyVolume.setNbHoursDS(dto.getHoursDS());
-        hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
-        return hourlyVolume;
+        CourseHours courseHours = allCourseHours.get(0);
+        courseHours.setNbHoursCM(dto.getHoursCM());
+        courseHours.setNbHoursTD(dto.getHoursTD());
+        courseHours.setNbHoursTP(dto.getHoursTP());
+        courseHours.setNbHoursDS(dto.getHoursDS());
+        courseHours.setNbHoursDSTP(dto.getHoursDSTP());
+        return courseHours;
     }
 
     @GetMapping("/getTeachers")
@@ -260,22 +260,22 @@ public class McccController {
     }
 
     @GetMapping("/getHourlyVolumes")
-    public ResponseEntity<?> getHourlyVolumes() {
-        return ResponseEntity.ok(hourlyVolumeService.getAllHourlyVolume());
+    public ResponseEntity<?> getCourseHours() {
+        return ResponseEntity.ok(courseHoursService.getAllCourseHours());
     }
 
     @PostMapping("/saveHourlyVolume")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveHourlyVolume(@RequestBody HourlyVolume hourlyVolume) {
-        hourlyVolumeService.save(hourlyVolume);
+    public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
+        courseHoursService.save(courseHours);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
     }
 
     @GetMapping("/getHourlyVolumesID/{id}")
-    public ResponseEntity<?> getHourlyVolumesID(@PathVariable Long id) {
-        Optional<HourlyVolume> hourlyVolume = hourlyVolumeService.findById(id);
-        if (hourlyVolume.isPresent()) {
-            return ResponseEntity.ok(hourlyVolume.get());
+    public ResponseEntity<?> getCourseHoursID(@PathVariable Long id) {
+        Optional<CourseHours> courseHours = courseHoursService.findById(id);
+        if (courseHours.isPresent()) {
+            return ResponseEntity.ok(courseHours.get());
         }
         return ResponseEntity.notFound().build();
     }

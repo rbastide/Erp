@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, reactive} from 'vue';
+import {computed, onMounted, reactive, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {mcccStore} from '@/services/mcccStore';
 import api from '@/services/api';
@@ -9,7 +9,7 @@ import CancelModal from '../Information/CancelModal.vue';
 
 mcccStore.loadMcccStore();
 const router = useRouter();
-const currentHourlyVolID = ref(null);
+const currentCourseHoursID = ref(null);
 const showModal = ref(false);
 
 const initialState = ref({
@@ -97,7 +97,7 @@ const syncSplitFromStore = () => {
   splitHours.hoursDSTP = convertDecimalToSplit(mcccStore.hoursDSTP);
 };
 
-const fetchHourlyVolumes = async () => {
+const fetchCourseHours = async () => {
   if (!mcccStore.resourceID) return;
 
   const targetId = String(mcccStore.resourceID);
@@ -108,9 +108,9 @@ const fetchHourlyVolumes = async () => {
         m.resourceId && String(m.resourceId.resourceID) === targetId
     );
 
-    if (currentMccc && currentMccc.hourlyVolId) {
-      const bddData = currentMccc.hourlyVolId;
-      currentHourlyVolID.value = bddData.hourlyVolID;
+    if (currentMccc && currentMccc.courseHoursId) {
+      const bddData = currentMccc.courseHoursId;
+      currentCourseHoursID.value = bddData.courseHoursID;
 
       mcccStore.hoursCM = bddData.nbHoursCM || 0;
       mcccStore.hoursTD = bddData.nbHoursTD || 0;
@@ -145,7 +145,7 @@ onMounted(async () => {
   if (hasLocalData) {
     syncSplitFromStore();
   } else {
-    await fetchHourlyVolumes();
+    await fetchCourseHours();
   }
 
   initialState.value = {

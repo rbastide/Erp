@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive, nextTick, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import {computed, nextTick, onMounted, reactive, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -16,7 +16,7 @@ const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 
 const resourceCode = ref('');
-const currentHourlyVolId = ref<number | null>(null);
+const currentCourseHoursId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
 const splitHours = reactive({
@@ -199,8 +199,8 @@ const fetchHoursData = async () => {
           m.resourceId && m.resourceId.num === resourceCode.value
       );
 
-      if (mcccFound && mcccFound.hourlyVolId) {
-        const vol = mcccFound.hourlyVolId;
+      if (mcccFound && mcccFound.courseHoursId) {
+        const vol = mcccFound.courseHoursId;
 
         splitHours.cm = convertDecimalToSplit(vol.nbHoursCM);
         splitHours.td = convertDecimalToSplit(vol.nbHoursTD);
@@ -208,7 +208,7 @@ const fetchHoursData = async () => {
         splitHours.ds = convertDecimalToSplit(vol.nbHoursDS);
         splitHours.ds_tp = convertDecimalToSplit(vol.nbHoursDSTP);
 
-        currentHourlyVolId.value = vol.hourlyVolID;
+        currentCourseHoursId.value = vol.courseHoursID;
       }
     }
   } catch (error) {
@@ -320,7 +320,7 @@ const handleValider = async () => {
 
   const payload = {
     resourceID: currentResourceId.value,
-    hourlyVolume: hoursPayload,
+    courseHours: hoursPayload,
     teachersFeedbackID: filterRich(edFBContents.value),
     studentFeedbackID: filterRich(stFBContents.value),
     improvementsIdeaID: filterRich(upgradesContents.value),

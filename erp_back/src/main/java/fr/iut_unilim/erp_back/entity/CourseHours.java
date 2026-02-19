@@ -3,13 +3,13 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "HourlyVolume")
-public class HourlyVolume {
+@Table(name = "CourseHours")
+public class CourseHours {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "hourlyVolID")
-    private Long hourlyVolID;
+    @Column(name = "courseHoursID")
+    private Long courseHoursID;
 
     @Column(name = "nbHoursCM")
     private Float nbHoursCM;
@@ -26,10 +26,10 @@ public class HourlyVolume {
     @Column(name = "nbHoursTD")
     private Float nbHoursTD;
 
-    public HourlyVolume() {
+    public CourseHours() {
     }
 
-    public HourlyVolume(Float nbHoursCM, Float nbHoursDS, Float nbHoursDSTP, Float nbHoursTP, Float nbHoursTD) {
+    public CourseHours(Float nbHoursCM, Float nbHoursDS, Float nbHoursDSTP, Float nbHoursTP, Float nbHoursTD) {
         this.nbHoursCM = nbHoursCM;
         this.nbHoursDSTP = nbHoursDSTP;
         this.nbHoursDS = nbHoursDS;
@@ -37,8 +37,8 @@ public class HourlyVolume {
         this.nbHoursTD = nbHoursTD;
     }
 
-    public void setHourlyVolID(Long hourlyVolID) {
-        this.hourlyVolID = hourlyVolID;
+    public void setCourseHoursID(Long courseHoursID) {
+        this.courseHoursID = courseHoursID;
     }
 
     public void setNbHoursCM(Float nbHoursCM) {
@@ -61,7 +61,9 @@ public class HourlyVolume {
         this.nbHoursTD = nbHoursTD;
     }
 
-    public Long getHourlyVolID() { return hourlyVolID; }
+    public Long getCourseHoursID() {
+        return courseHoursID;
+    }
     public Float getNbHoursCM() { return nbHoursCM; }
     public Float getNbHoursDSTP() { return nbHoursDSTP; }
     public Float getNbHoursDS() { return nbHoursDS; }

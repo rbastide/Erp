@@ -8,7 +8,7 @@ import java.util.Set;
 
 public record ResourceSheetViewModel(
         Resource resource,
-        HourlyVolume hourlyVolume,
+        CourseHours courseHours,
         List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
         List<StudentsFeedbacks> studentsFeedbacks,
         List<ImprovementIdeas> improvementIdeas,

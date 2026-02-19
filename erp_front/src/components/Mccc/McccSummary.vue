@@ -47,7 +47,7 @@ const handleValider = async () => {
 
     const payload = {
       resourceID: mcccStore.resourceID,
-      hourlyVolID: {
+      courseHoursID: {
         nbHoursCM: mcccStore.hoursCM,
         nbHoursTD: mcccStore.hoursTD,
         nbHoursTP: mcccStore.hoursTP,
