@@ -12,10 +12,10 @@ public class Resource {
     @Column(name = "resourceID")
     private Long resourceID;
 
-    @Column(name = "num")
+    @Column(name = "resourceNum")
     private String num;
 
-    @Column(name = "name")
+    @Column(name = "resourceName")
     private String name;
 
     @Column(name="semester")

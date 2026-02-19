@@ -3,7 +3,7 @@ package fr.iut_unilim.erp_back.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "SkillRanks")
+@Table(name = "SkillRank")
 public class Rank {
 
     @Id
