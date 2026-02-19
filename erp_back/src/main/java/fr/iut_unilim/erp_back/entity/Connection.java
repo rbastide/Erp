@@ -17,8 +17,9 @@ public class Connection {
     @Column(name = "hashedPassword")
     private String hashedPassword;
 
-    @Column(name = "role")
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "roleID")
+    private Role role;
 
     @Column(name = "email")
     private String email;
@@ -30,7 +31,7 @@ public class Connection {
     public Connection() {
     }
 
-    public Connection(String identifier, String hashedPassword, String role, String email, UniversityDepartment universityDepartment) {
+    public Connection(String identifier, String hashedPassword, Role role, String email, UniversityDepartment universityDepartment) {
         this.identifier = identifier;
         this.hashedPassword = hashedPassword;
         this.role = role;
@@ -50,7 +51,7 @@ public class Connection {
         return hashedPassword;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
@@ -66,7 +67,7 @@ public class Connection {
         this.identifier = identifier;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

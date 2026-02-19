@@ -39,7 +39,7 @@ public class ConnectionService {
             userResponses.add(new UserResponse(
                     connection.getId(),
                     connection.getIdentifier(),
-                    connection.getRole(),
+                    connection.getRole().getRoleName(),
                     connection.getEmail(),
                     lastname,
                     firstname
@@ -89,7 +89,7 @@ public class ConnectionService {
         return new UserResponse(
                 connection.getId(),
                 connection.getIdentifier(),
-                connection.getRole(),
+                connection.getRole().getRoleName(),
                 connection.getEmail(),
                 lastname,
                 firstname
