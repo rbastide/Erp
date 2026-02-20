@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "MCCC")
+@Table(name = "Mccc")
 public class Mccc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

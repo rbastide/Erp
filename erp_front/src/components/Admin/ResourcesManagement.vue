@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -123,7 +123,7 @@ const saveResource = async () => {
   }
 
   try {
-    await api.post('resources/editResource', [resourceData]);
+    await api.post('resources/editResource', resourceData);
     await fetchResources();
     handleCancel();
   } catch (error) {

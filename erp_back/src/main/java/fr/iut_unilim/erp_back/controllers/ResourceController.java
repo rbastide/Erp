@@ -40,28 +40,26 @@ public class ResourceController {
 
     @PostMapping("/editResource")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> editResources(@RequestBody List<ResourceResponse> resList, Authentication authentication) {
-        for (ResourceResponse res : resList) {
-            if (res.getResourceID() != null) {
-                Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
+    public ResponseEntity<?> editResources(@RequestBody ResourceResponse res, Authentication authentication) {
+        if (res.getResourceID() != null) {
+            Optional<Resource> existingResource = resourceRepository.findById(res.getResourceID());
 
-                if (existingResource.isPresent()) {
-                    Resource resourceToUpdate = existingResource.get();
-                    resourceToUpdate.setNum(res.getNum());
-                    resourceToUpdate.setName(res.getName());
-                    resourceToUpdate.setSemester(res.getSemester());
-                    resourceRepository.save(resourceToUpdate);
-                    continue;
-                }
+            if (existingResource.isPresent()) {
+                Resource resourceToUpdate = existingResource.get();
+                resourceToUpdate.setNum(res.getNum());
+                resourceToUpdate.setName(res.getName());
+                resourceToUpdate.setSemester(res.getSemester());
+                resourceRepository.save(resourceToUpdate);
+                return ResponseEntity.ok().body("Ressource traitée avec succès");
             }
-            Resource newResource = new Resource();
-            newResource.setNum(res.getNum());
-            newResource.setName(res.getName());
-            newResource.setSemester(res.getSemester());
-            handleDepartment(newResource, authentication);
-            resourceRepository.save(newResource);
         }
-        return ResponseEntity.ok().body("Ressources traitées avec succès");
+        Resource newResource = new Resource();
+        newResource.setNum(res.getNum());
+        newResource.setName(res.getName());
+        newResource.setSemester(res.getSemester());
+        handleDepartment(newResource, authentication);
+        resourceRepository.save(newResource);
+        return ResponseEntity.ok().body("Ressource traitée avec succès");
     }
 
     private void handleDepartment(Resource resource, Authentication authentication) {
