@@ -7,6 +7,7 @@ import api from '@/services/api';
 import DeleteResourceModal from '../Information/DeleteResourceModal.vue';
 
 const router = useRouter();
+/** @type {import('vue').Ref<ResourceDto[]>} */
 const resources = ref([]);
 const editingIndex = ref(null);
 const isAdding = ref(false);
@@ -15,6 +16,7 @@ const searchQuery = ref('');
 const showDeleteModal = ref(false);
 const resourceToDelete = ref(null);
 
+/** @type {import('vue').Reactive<ResourceDto>} */
 const editedResource = reactive({
   resourceID: null,
   num: '',
@@ -50,7 +52,7 @@ const filteredResources = computed(() => {
   return resources.value.filter(res => {
     const num = res.num ? res.num.toLowerCase() : '';
     const name = res.name ? res.name.toLowerCase() : '';
-    const sem = res.semestre ? res.semestre.toString() : '';
+    const sem = res.semester ? res.semester.toString() : '';
     return num.includes(query) || name.includes(query) || sem.includes(query);
   });
 });
@@ -123,7 +125,7 @@ const saveResource = async () => {
   }
 
   try {
-    await api.post('resources/editResource', resourceData);
+    await api.post('resources/edit-resource', resourceData);
     await fetchResources();
     handleCancel();
   } catch (error) {
@@ -138,7 +140,7 @@ const handleModif = (resource, index) => {
     resourceID: resource.resourceID,
     num: resource.num,
     name: resource.name,
-    semester: resource.semestre
+    semester: resource.semester
   });
 };
 

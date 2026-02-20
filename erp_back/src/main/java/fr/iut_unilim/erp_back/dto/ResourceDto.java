@@ -2,14 +2,14 @@ package fr.iut_unilim.erp_back.dto;
 
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 
-public class ResourceResponse {
+public class ResourceDto {
     private Long resourceID;
     private String num;
     private String name;
     private int semester;
     private UniversityDepartment universityDepartment;
 
-    public ResourceResponse(Long resourceID, String num, String name, int semester, UniversityDepartment universityDepartment) {
+    public ResourceDto(Long resourceID, String num, String name, int semester, UniversityDepartment universityDepartment) {
         this.resourceID = resourceID;
         this.num = num;
         this.name = name;
