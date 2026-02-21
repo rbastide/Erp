@@ -109,7 +109,7 @@ const confirmDeletion = async () => {
 
 const saveSae = async (isNew = false) => {
   const saeObject = isNew
-      ? { saeID: 0, num: newSae.num, title: newSae.title }
+      ? {num: newSae.num, title: newSae.title}
       : { saeID: editedSae.saeID, num: editedSae.num, title: editedSae.title };
 
   if (!saeObject.num.trim() || !saeObject.title.trim()) {
@@ -123,7 +123,7 @@ const saveSae = async (isNew = false) => {
   }
 
   try {
-    await api.post('/sae/addSae', [ saeObject ]);
+    await api.post('/sae/addSae', saeObject);
     await fetchSaes();
 
     if (isNew) {

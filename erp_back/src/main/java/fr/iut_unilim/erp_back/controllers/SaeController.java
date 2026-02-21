@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,22 +35,20 @@ public class SaeController {
 
     @PostMapping("/addSae")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> addSae(@RequestBody List<SaeRequest> saeRequest, Authentication authentication) {
-        for (SaeRequest sae : saeRequest) {
-            Optional<Sae> existingSaes = saeRepository.findById(sae.getSaeID());
+    public ResponseEntity<?> addSae(@RequestBody SaeRequest saeRequest, Authentication authentication) {
+        Optional<Sae> existingSaes = saeRepository.findById(saeRequest.getSaeID());
 
-            if (existingSaes.isPresent()) {
-                Sae saeToUpdate = existingSaes.get();
-                saeToUpdate.setNum(sae.getNum());
-                saeToUpdate.setTitle(sae.getTitle());
-                saeRepository.save(saeToUpdate);
-            } else {
-                Sae newSae = new Sae();
-                newSae.setNum(sae.getNum());
-                newSae.setTitle(sae.getTitle());
-                handleDepartment(newSae, authentication);
-                saeRepository.save(newSae);
-            }
+        if (existingSaes.isPresent()) {
+            Sae saeToUpdate = existingSaes.get();
+            saeToUpdate.setNum(saeRequest.getNum());
+            saeToUpdate.setTitle(saeRequest.getTitle());
+            saeRepository.save(saeToUpdate);
+        } else {
+            Sae newSae = new Sae();
+            newSae.setNum(saeRequest.getNum());
+            newSae.setTitle(saeRequest.getTitle());
+            handleDepartment(newSae, authentication);
+            saeRepository.save(newSae);
         }
 
         return ResponseEntity.ok().body("SAE bien ajoutée");
