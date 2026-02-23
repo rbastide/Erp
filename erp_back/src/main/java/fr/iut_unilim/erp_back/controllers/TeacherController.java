@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.dto.TeacherRequest;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,13 +25,28 @@ public class TeacherController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public List<Teacher> getAllTeachers(Authentication authentication) {
-        return teacherService.getAllTeachersFromDepartment(authentication.getName());
+    public List<TeacherRequest> getAllTeachers(Authentication authentication) {
+        List<Teacher> teachers = teacherService.getAllTeachersFromDepartment(authentication.getName());
+        return convertTeachersEntityToDto(teachers);
     }
 
-    @GetMapping("/search")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public List<Teacher> search(@RequestParam String name) {
-        return teacherService.findByLastname(name);
+
+    private List<TeacherRequest> convertTeachersEntityToDto(List<Teacher> teachers) {
+        List<TeacherRequest> teacherRequests =new ArrayList<>();
+
+        for(Teacher teacher : teachers){
+            TeacherRequest teacherDto = new TeacherRequest();
+
+            teacherDto.setTeacherID(teacher.getTeacherID());
+            teacherDto.setFirstName(teacher.getFirstname());
+            teacherDto.setLastName(teacher.getLastname());
+            teacherDto.setUserID(teacher.getuserID());
+
+            teacherRequests.add(teacherDto);
+        }
+
+        return teacherRequests;
+
     }
+
 }
