@@ -1,17 +1,12 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.dto.SaeRequest;
-import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Sae;
+import fr.iut_unilim.erp_back.dto.SaeDto;
 import fr.iut_unilim.erp_back.repository.SaeRepository;
-import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sae")
@@ -33,8 +28,8 @@ public class SaeController {
 
     @PostMapping("/addSae")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> addSae(@RequestBody SaeRequest saeRequest, Authentication authentication) {
-        boolean hasBeenSaved = saeService.saveFromDto(saeRequest, authentication);
+    public ResponseEntity<?> addSae(@RequestBody SaeDto saeDto, Authentication authentication) {
+        boolean hasBeenSaved = saeService.saveFromDto(saeDto, authentication);
 
         if (!hasBeenSaved) {
             return ResponseEntity.badRequest().body("Une erreur est survenue lors de l'ajout de la SAE");
