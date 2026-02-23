@@ -41,7 +41,7 @@ const filteredVersions = computed(() => {
   );
 });
 
-const handleRetour = () => router.back();
+const handleBack = () => router.back();
 
 const handleShow = (item: any) => {
   router.push({
@@ -137,7 +137,7 @@ const clearSearch = () => searchQuery.value = '';
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
         </div>
-        <button @click="handleRetour" class="quit-btn">Retour</button>
+        <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </footer>
   </main>

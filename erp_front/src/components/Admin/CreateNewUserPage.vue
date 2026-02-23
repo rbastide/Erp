@@ -19,7 +19,7 @@ const role = ref('');
 const errorMessage = ref('');
 const universityDepartments = ref([]);
 
-const handleRetour = () => {
+const handleBack = () => {
   router.back();
 };
 
@@ -168,7 +168,7 @@ onMounted(async () => {
   </main>
 
   <footer>
-    <div @click="handleRetour" class="quit-btn">Retour</div>
+    <div @click="handleBack" class="quit-btn">Retour</div>
   </footer>
 </template>
 

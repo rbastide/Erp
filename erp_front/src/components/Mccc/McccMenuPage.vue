@@ -32,7 +32,7 @@ const handleTeachers = () => {
   router.push('/mccc-teachers');
 }
 
-const handleValider = () => {
+const handleValidate = () => {
   mcccStore.backup = null;
   mcccStore.registerMcccStore();
   router.push('/mccc-summary');
@@ -92,7 +92,7 @@ onMounted(() => {
       </div>
 
       <div class="container-btn">
-        <button @click="handleValider" class="btn-sys primary">Valider</button>
+        <button @click="handleValidate" class="btn-sys primary">Valider</button>
         <button @click="handleBack" class="btn-sys secondary">Annuler</button>
       </div>
 

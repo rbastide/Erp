@@ -107,7 +107,7 @@ const toggleSae = (saeId) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   if (selectedSaeIds.value.length === 0) {
     errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
     return;
@@ -123,7 +123,7 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -176,8 +176,8 @@ const onConfirmCancel = () => {
       </div>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <div class="footer-actions">
-        <button @click="handleValider" class="btn-main">Valider</button>
-        <button @click="handleRetour" class="btn-sub">Annuler</button>
+        <button @click="handleValidate" class="btn-main">Valider</button>
+        <button @click="handleBack" class="btn-sub">Annuler</button>
       </div>
     </div>
 

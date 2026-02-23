@@ -291,7 +291,7 @@ const addTP = createFieldManager(tpContents, tpRefs)
 const addDS = createFieldManager(dsContents, dsRefs)
 const addDSTP = createFieldManager(dstpContents, dstpRefs)
 
-const handleValider = async () => {
+const handleValidate = async () => {
   const formatForBackend = (type: string, list: string[]) => {
     return list
         .map((content, index) => (content || '').trim() ? `${type} ${index + 1} : ${(content || '').trim()}` : null)
@@ -337,7 +337,7 @@ const handleValider = async () => {
   }
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -572,8 +572,8 @@ const pedagogicalSections = computed(() => [
       </section>
 
       <div class="actions-footer">
-        <button @click="handleValider" class="btn btn-primary">Valider la saisie</button>
-        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
+        <button @click="handleValidate" class="btn btn-primary">Valider la saisie</button>
+        <button @click="handleBack" class="btn btn-outline">Annuler</button>
       </div>
     </div>
 

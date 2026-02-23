@@ -51,7 +51,7 @@ const filteredSaes = computed(() => {
   );
 });
 
-const handleValider = () => router.back();
+const handleValidate = () => router.back();
 
 const handleAddSae = () => {
   showAddForm.value = true;
@@ -232,7 +232,7 @@ const saveSae = async (isNew = false) => {
           </svg>
           <input type="text" v-model="searchQuery" placeholder="Rechercher une SAE..." class="search-input" />
         </div>
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 

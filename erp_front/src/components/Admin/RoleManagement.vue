@@ -190,7 +190,7 @@ const handleCancel = () => {
   Object.assign(editedRole, { id: null, name: '', label: '', permissions: [] });
 };
 
-const handleValider = () => router.push('/home-admin');
+const handleValidate = () => router.push('/home-admin');
 </script>
 
 <template>
@@ -290,7 +290,7 @@ const handleValider = () => router.push('/home-admin');
           <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" v-model="searchQuery" placeholder="Rechercher un rôle..." class="search-input" />
         </div>
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
   </div>
@@ -368,7 +368,9 @@ const handleValider = () => router.push('/home-admin');
   color: #B51621;
 }
 
-.user-id { margin: 0; color: #333; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.user-id {
+  color: #333; font-size: 18px; font-weight: 700; margin: 0 0 10px;
+}
 
 .permissions-list-view {
   width: 100%;
