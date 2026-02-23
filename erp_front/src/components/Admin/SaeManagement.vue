@@ -123,7 +123,7 @@ const saveSae = async (isNew = false) => {
   }
 
   try {
-    await api.post('/sae/addSae', saeObject);
+    await api.post('/sae/edit-sae', saeObject);
     await fetchSaes();
 
     if (isNew) {

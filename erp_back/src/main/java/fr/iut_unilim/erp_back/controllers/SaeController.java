@@ -26,9 +26,9 @@ public class SaeController {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
-    @PostMapping("/addSae")
+    @PostMapping("/edit-sae")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> addSae(@RequestBody SaeDto saeDto, Authentication authentication) {
+    public ResponseEntity<?> createAndEditSae(@RequestBody SaeDto saeDto, Authentication authentication) {
         boolean hasBeenSaved = saeService.saveFromDto(saeDto, authentication);
 
         if (!hasBeenSaved) {
