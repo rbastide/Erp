@@ -10,7 +10,7 @@ onMounted(() => {
   userRole.value = role ? role.toUpperCase() : 'USER';
 });
 
-const handleRetour = () => {
+const handleBack = () => {
   if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
     router.push('/home-admin');
   }
@@ -34,7 +34,7 @@ const handleRetour = () => {
       <p class="sub-text">Vos modifications ont bien été enregistrées dans le système.</p>
 
       <div class="modal-actions">
-        <button @click="handleRetour" class="btn-modal primary">
+        <button @click="handleBack" class="btn-modal primary">
           Retour au menu
         </button>
       </div>

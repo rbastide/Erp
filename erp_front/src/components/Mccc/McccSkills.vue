@@ -185,12 +185,12 @@ const removeGroup = (index) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -298,8 +298,8 @@ const clearSearch = () => searchQuery.value = '';
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
         </div>
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
+          <button @click="handleValidate" class="btn-sys primary">Valider</button>
+          <button @click="handleBack" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>

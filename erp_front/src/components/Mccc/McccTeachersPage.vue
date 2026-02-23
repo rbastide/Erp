@@ -114,7 +114,7 @@ const toggleTeacher = (id) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   if (selectedTeacherIds.value.length === 0) {
     errorMessage.value = "Veuillez sélectionner au moins un référent.";
     return;
@@ -124,7 +124,7 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -211,8 +211,8 @@ const clearSearch = () => searchQuery.value = '';
         </div>
 
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
+          <button @click="handleValidate" class="btn-sys primary">Valider</button>
+          <button @click="handleBack" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>

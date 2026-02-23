@@ -166,7 +166,7 @@ const handleCancel = () => {
   });
 };
 
-const handleValider = () => router.push('/home-admin');
+const handleValidate = () => router.push('/home-admin');
 </script>
 
 <template>
@@ -271,7 +271,7 @@ const handleValider = () => router.push('/home-admin');
               class="search-input"
           />
         </div>
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 

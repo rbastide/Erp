@@ -33,7 +33,7 @@ onMounted(() => {
   fetchResources();
 });
 
-const handleRetour = () => {
+const handleBack = () => {
   router.back();
 };
 
@@ -77,7 +77,7 @@ const handleFill = (code: string) => {
       </div>
 
       <div class="footer-actions">
-        <button @click="handleRetour" class="quit-btn">Retour</button>
+        <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </main>
   </div>

@@ -170,12 +170,12 @@ const totalHeures = computed(() => {
   return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
 });
 
-const handleValider = async () => {
+const handleValidate = async () => {
   mcccStore.registerMcccStore();
   await router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -230,8 +230,8 @@ const onConfirmCancel = () => {
       </div>
 
       <div class="actions-container">
-        <button @click="handleValider" class="btn btn-primary">Valider</button>
-        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
+        <button @click="handleValidate" class="btn btn-primary">Valider</button>
+        <button @click="handleBack" class="btn btn-outline">Annuler</button>
       </div>
 
     </div>

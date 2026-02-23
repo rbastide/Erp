@@ -219,7 +219,7 @@ const removeAcFromEdit = (lvlI, acI) => {
   editedSkill.value.levels[lvlI].acs.splice(acI, 1);
 };
 
-const handleValider = () => router.back();
+const handleValidate = () => router.back();
 </script>
 
 <template>
@@ -405,7 +405,7 @@ const handleValider = () => router.back();
           <input type="text" v-model="searchQuery" placeholder="Chercher par nom, numéro ou AC..."
                  class="search-input"/>
         </div>
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 

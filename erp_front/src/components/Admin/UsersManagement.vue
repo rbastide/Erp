@@ -139,7 +139,7 @@ const handleCancel = () => {
   });
 };
 
-const handleValider = () => router.push('/home-admin');
+const handleValidate = () => router.push('/home-admin');
 const handleAddUser = () => router.push('/new-user');
 </script>
 
@@ -242,7 +242,7 @@ const handleAddUser = () => router.push('/new-user');
           </svg>
           <input type="text" v-model="searchQuery" placeholder="Rechercher par nom ou rôle..." class="search-input" />
         </div>
-        <button @click="handleValider" class="btn-sys primary">Terminer</button>
+        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 

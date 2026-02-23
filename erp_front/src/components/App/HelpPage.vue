@@ -5,7 +5,7 @@ import Sidebar from './Sidebar.vue';
 
 const router = useRouter();
 
-const handleRetour = () => {
+const handleBack = () => {
     router.back();
 };
 </script>
@@ -46,7 +46,7 @@ const handleRetour = () => {
       </div>
 
       <div class="footer-actions">
-        <button @click="handleRetour" class="btn-sys secondary">Retour</button>
+        <button @click="handleBack" class="btn-sys secondary">Retour</button>
       </div>
     </main>
   </div>

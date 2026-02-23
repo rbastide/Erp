@@ -40,7 +40,7 @@ const formattedTotalHours = computed(() => {
 
 const handleBack = () => router.back();
 
-const handleValider = async () => {
+const handleValidate = async () => {
   try {
     // Utilisation de tableaux vides par défaut pour éviter le crash
     const safeAcsGrouped = mcccStore.acsGrouped || [];
@@ -172,7 +172,7 @@ const handleCloseSuccess = () => {
       </div>
 
       <div class="container-btn">
-        <button @click="handleValider" class="btn-sys primary">Valider et Sauvegarder</button>
+        <button @click="handleValidate" class="btn-sys primary">Valider et Sauvegarder</button>
         <button @click="handleBack" class="btn-sys secondary">Retour</button>
       </div>
 
