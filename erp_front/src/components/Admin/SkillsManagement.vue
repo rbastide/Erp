@@ -1,6 +1,6 @@
 <script setup>
-import {computed, onMounted, reactive, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -14,7 +14,8 @@ const searchQuery = ref('');
 const showDeleteModal = ref(false);
 const skillToDelete = ref(null);
 
-const currentSkill = reactive({
+// CORRECTION 1 : Remplacé reactive par ref
+const currentSkill = ref({
   skillNum: null,
   skillName: '',
   levels: [{ title: '', acs: [{ num: null, title: '' }] }],
@@ -22,19 +23,19 @@ const currentSkill = reactive({
 
 const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
-
+// CORRECTION 2 : Ajout de .value car currentSkill est maintenant une ref
 const validateNumInput = () => {
-  let val = currentSkill.skillNum;
-  if (val === '' || val === null)
-    return;
+  let val = currentSkill.value.skillNum;
+  if (val === '' || val === null) return;
+
   if (val > 30) {
-    currentSkill.skillNum = 30;
+    currentSkill.value.skillNum = 30;
   }
   else if (val < 1) {
-    currentSkill.skillNum = 1;
+    currentSkill.value.skillNum = 1;
   }
   else {
-    currentSkill.skillNum = Math.floor(val);
+    currentSkill.value.skillNum = Math.floor(val);
   }
 };
 
@@ -126,13 +127,17 @@ const syncWithBackend = async (skill) => {
 
 const handleSaveNewCompetence = async () => {
   if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
-  const currentSkillToAdd = currentSkill.value;
-  finalSkills.value.unshift(JSON.parse(JSON.stringify(currentSkill.value)));
+
+  const currentSkillToAdd = JSON.parse(JSON.stringify(currentSkill.value));
+  finalSkills.value.unshift(currentSkillToAdd);
+
+  // Reset clean
   currentSkill.value = {
     skillNum: null,
     skillName: '',
     levels: [{ title: '', acs: [{ num: null, title: '' }] }]
   };
+
   await syncWithBackend(currentSkillToAdd);
 };
 
@@ -219,7 +224,7 @@ const removeAcFromEdit = (lvlI, acI) => {
   editedSkill.value.levels[lvlI].acs.splice(acI, 1);
 };
 
-const handleValidate = () => router.back();
+const handleValider = () => router.back();
 </script>
 
 <template>
@@ -268,7 +273,7 @@ const handleValidate = () => router.back();
                   placeholder="N°"
                   class="card-input ac-num"
                   @keydown="blockInvalidChars"
-                  @input="validateSemesterInput"
+                  @input="validateAcNum(ac)"
               >
               <input type="text" v-model="ac.title" placeholder="Intitulé AC" class="card-input ac-name">
               <button v-if="niveau.acs.length > 1" @click="removeAc(nIndex, aIndex)" class="btn-remove-item">✕</button>
@@ -368,9 +373,8 @@ const handleValidate = () => router.back();
                 </div>
                 <div class="add-ac-center-wrapper">
                   <div
-                      @click="addAcToEdit(lIdx)"
+                      @click="canAddAc(lvl.acs) ? addAcToEdit(lIdx) : null"
                       class="add-mini-btn-framed"
-                      :disabled="!canAddAc(lvl.acs)"
                       :class="{ 'disabled-btn': !canAddAc(lvl.acs) }"
                   >
                     + AC
@@ -378,15 +382,15 @@ const handleValidate = () => router.back();
                 </div>
               </div>
               <div class="add-ac-center-wrapper" style="margin-top: 10px;">
-                <div
+                <button
                     @click="addLevelToEdit"
                     class="add-mini-btn-framed"
-                    style="width: 100%; text-align: center;"
+                    style="width: 100%; text-align: center; border: none; background: transparent;"
                     :disabled="!canAddLevel(editedSkill.levels)"
                     :class="{ 'disabled-btn': !canAddLevel(editedSkill.levels) }"
                 >
                   + Ajouter un Niveau
-                </div>
+                </button>
               </div>
             </div>
             <button class="save-btn" @click="saveModification(index)">Mettre à jour</button>
@@ -405,7 +409,7 @@ const handleValidate = () => router.back();
           <input type="text" v-model="searchQuery" placeholder="Chercher par nom, numéro ou AC..."
                  class="search-input"/>
         </div>
-        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
+        <button @click="handleValider" class="btn-sys primary">Terminer</button>
       </div>
     </footer>
 
