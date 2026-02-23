@@ -368,7 +368,9 @@ const handleValidate = () => router.push('/home-admin');
   color: #B51621;
 }
 
-.user-id { margin: 0; color: #333; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.user-id {
+  color: #333; font-size: 18px; font-weight: 700; margin: 0 0 10px;
+}
 
 .permissions-list-view {
   width: 100%;
