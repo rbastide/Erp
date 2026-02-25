@@ -14,7 +14,7 @@ public class Permission {
 
     @ManyToOne
     @JoinColumn(name = "roleID")
-    private Role resource;
+    private Role role;
 
     @Column(name = "routePermission")
     private byte[] routePermission;
@@ -27,12 +27,12 @@ public class Permission {
         this.permissionID = permissionID;
     }
 
-    public Role getResource() {
-        return resource;
+    public Role getRole() {
+        return role;
     }
 
-    public void setResource(Role resource) {
-        this.resource = resource;
+    public void setRole(Role resource) {
+        this.role = resource;
     }
 
     public BitSet getBitSet() {

@@ -1,3 +1,5 @@
 package fr.iut_unilim.erp_back.dto;
 
-public record PermissionResponse(int id, RoleResponse role) {}
+import java.util.Map;
+
+public record PermissionResponse(long id, RoleResponse role, Map<Long, Boolean> permissions) {}

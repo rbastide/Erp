@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.dto.RoleResponse;
 import fr.iut_unilim.erp_back.entity.Role;
 import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,9 @@ public class RoleService {
                     return roleRepository.save(role);
                 }
         );
+    }
+
+    public RoleResponse convertEntityToResponse(Role role) {
+        return new RoleResponse(role.getId(), role.getRoleName());
     }
 }
