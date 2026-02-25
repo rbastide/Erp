@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionResponse;
 import fr.iut_unilim.erp_back.entity.Permission;
 import fr.iut_unilim.erp_back.entity.PermissionDefinition;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PermissionService {
@@ -29,6 +31,27 @@ public class PermissionService {
         return permissions.stream()
                 .map(this::convertEntityToResponse)
                 .toList();
+    }
+
+    public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
+        Optional<Permission> permissionOptional = permissionRepository.findById(editRolePermissionRequest.permissionRoleId());
+        Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(editRolePermissionRequest.permissionId());
+
+        if (permissionOptional.isEmpty() || permissionDefinitionOptional.isEmpty()) return false;
+
+        Permission permission = permissionOptional.get();
+        PermissionDefinition permissionDefinition = permissionDefinitionOptional.get();
+
+        BitSet bitSet = permission.getBitSet();
+        int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();
+        boolean newState = editRolePermissionRequest.permissionState();
+
+        bitSet.set(permIndex, newState);
+
+        permission.setBitSet(bitSet);
+        permissionRepository.save(permission);
+
+        return true;
     }
 
     private PermissionResponse convertEntityToResponse(Permission permission) {

@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
+import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionDefinitionResponse;
 import fr.iut_unilim.erp_back.dto.PermissionResponse;
 import fr.iut_unilim.erp_back.service.PermissionDefinitionService;
@@ -28,10 +28,24 @@ public class PermissionController {
         return ResponseEntity.ok(permissions);
     }
 
-    @GetMapping("/perms/role")
+    @GetMapping("/perms/roles")
     public ResponseEntity<?> getAllRolesPerms() {
         List<PermissionResponse> permissionResponses = permissionService.getAllRolePermissions();
 
         return ResponseEntity.ok(permissionResponses);
+    }
+
+    @PostMapping("/perms/role")
+    public ResponseEntity<?> editRolePermissions(@RequestBody List<EditRolePermissionRequest> editRolePermissionRequests) {
+        boolean doErrorOccured = false;
+        for (EditRolePermissionRequest editRolePermissionRequest : editRolePermissionRequests) {
+            doErrorOccured |= permissionService.editRolePermission(editRolePermissionRequest);
+        }
+
+        if (doErrorOccured) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
