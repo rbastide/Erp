@@ -19,7 +19,8 @@ public class PermissionDefinition {
     @Column(name = "permissionKey")
     private String permissionKey;
 
-    public PermissionDefinition() {}
+    public PermissionDefinition() {
+    }
 
     public Long getPermissionDefinitionID() {
         return permissionDefinitionID;
