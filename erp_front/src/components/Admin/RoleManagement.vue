@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, computed, nextTick } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -65,7 +65,7 @@ const fetchPermissions = async () => {
 
 const fetchRoles = async () => {
   try {
-    const response = await api.get('/perm/perms/roles');
+    const response = await api.get('perm/perms/roles');
     roles.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
   } catch (error) {
     console.error(error);
@@ -97,7 +97,7 @@ const filteredRoles = computed(() => {
 const handleDelete = async (id) => {
   if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
     try {
-      await api.delete(`/perm/perms/roles/${id}`);
+      await api.delete(`role/roles/${id}`);
       roles.value = roles.value.filter(r => r.id !== id);
       if (editedRole.id === id) handleCancel();
     } catch (error) {
@@ -144,8 +144,8 @@ const saveModification = async () => {
   if (!editedRole.name) {
     editedRole.name = editedRole.label
         .toUpperCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^A-Z0-9]/g, '_');
+        .normalize("NFD").replaceAll(/[\u0300-\u036f]/g, "")
+        .replaceAll(/[^A-Z0-9]/g, '_');
   }
 
   const permsObject = {};
@@ -163,7 +163,7 @@ const saveModification = async () => {
   };
 
   try {
-    await api.post('/perm/perms/roles', payload);
+    await api.post('perm/perms/role', [payload]);
     await fetchRoles();
     handleCancel();
   } catch (error) {
@@ -218,12 +218,12 @@ const handleValidate = () => router.push('/home-admin');
             </div>
 
             <div class="input-group">
-              <label class="input-label">Nom du Rôle</label>
+              <label class="input-label" for="role">Nom du Rôle</label>
               <input type="text" v-model="editedRole.label" class="card-input" placeholder="Ex: Administrateur">
             </div>
 
             <div class="scrollable-group">
-              <label class="input-label" style="margin-bottom: 8px;">Gestion des Permissions</label>
+              <label class="input-label" style="margin-bottom: 8px;" for="perm">Gestion des Permissions</label>
               <div class="permissions-edit-list">
                 <div v-for="perm in perms" :key="perm.id" class="perm-toggle-row">
                   <span class="perm-label">{{ perm.label }}</span>
@@ -296,12 +296,12 @@ const handleValidate = () => router.push('/home-admin');
             </div>
 
             <div class="input-group">
-              <label class="input-label">Nom du Rôle</label>
+              <label class="input-label" for="role">Nom du Rôle</label>
               <input type="text" v-model="editedRole.label" class="card-input" placeholder="Ex: Administrateur">
             </div>
 
             <div class="scrollable-group">
-              <label class="input-label" style="margin-bottom: 8px;">Gestion des Permissions</label>
+              <label class="input-label" style="margin-bottom: 8px;" for="perm">Gestion des Permissions</label>
 
               <div class="permissions-edit-list">
                 <div v-for="perm in perms" :key="perm.id" class="perm-toggle-row">
@@ -429,7 +429,7 @@ const handleValidate = () => router.push('/home-admin');
 .icon-circle.big-icon {
   width: 90px;
   height: 90px;
-  background: rgba(181, 22, 33, 0.05);
+  background: rgba(243, 221, 221, 0.64);
   color: #B51621;
   margin-bottom: 15px;
 }
@@ -482,7 +482,7 @@ const handleValidate = () => router.push('/home-admin');
 }
 
 .perm-tag {
-  background: #fdfdfd;
+  background: #e4e4e4;
   color: #444;
   font-size: 12px;
   padding: 6px 12px;
@@ -515,7 +515,7 @@ const handleValidate = () => router.push('/home-admin');
   color: #555;
 }
 
-.action-btn.edit:hover { background: #e3f2fd; color: #1976d2; transform: scale(1.1); }
+.action-btn.edit:hover { background: #e3f2fd; color: #1551ae; transform: scale(1.1); }
 .action-btn.delete:hover { background: #ffebee; color: #c62828; transform: scale(1.1); }
 .action-btn.duplicate:hover { background: #e8f5e9; color: #2e7d32; transform: scale(1.1); }
 
@@ -661,7 +661,7 @@ const handleValidate = () => router.push('/home-admin');
 .icon-circle.plus {
   width: 80px;
   height: 80px;
-  color: #888;
+  color: #515151;
   background: #e0e0e0;
   margin-bottom: 15px;
 }
