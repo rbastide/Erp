@@ -3,6 +3,7 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.StudentFeedbackResponse;
 import fr.iut_unilim.erp_back.entity.StudentsFeedbacks;
 import fr.iut_unilim.erp_back.repository.StudentsFeedbacksRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ public class StudentFeedbacksController {
     }
 
     @GetMapping("/getAllStudentFeedbacks")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public List<StudentFeedbackResponse> getAll() {
         List<StudentsFeedbacks> studentsFeedbacks = studentsFeedbacksRepository.findAll();
         return convertStudentFeedbacksEntitiesToDtos(studentsFeedbacks);
