@@ -22,13 +22,13 @@ public class ResourceController {
     }
 
     @GetMapping("/resources")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_MANAGEMENT')")
     public ResponseEntity<?> getResource(Authentication authentication) {
         return ResponseEntity.ok(resourceService.getAllResourceFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/edit-resource")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_MANAGEMENT')")
     public ResponseEntity<?> createAndEditResource(@RequestBody ResourceDto res, Authentication authentication) {
         Connection connection = connectionService.findByIdentifier(authentication.getName());
 
@@ -44,7 +44,7 @@ public class ResourceController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_MANAGEMENT')")
     public ResponseEntity<?> deleteResource(@PathVariable Long id) {
         boolean doResourceHasBeenDeleted = resourceService.deleteResourceById(id);
 
