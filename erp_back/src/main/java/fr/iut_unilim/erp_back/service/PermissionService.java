@@ -45,7 +45,6 @@ public class PermissionService {
         Role role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
         Permission permission = new Permission();
         permission.setRole(role);
-        ErpBackApplication.LOGGER.info("Creating permission for role: " + createRoleRequest.permissions());
         BitSet permBits = convertMapToBitSet(createRoleRequest.permissions());
         permission.setBitSet(permBits);
         permissionRepository.save(permission);
