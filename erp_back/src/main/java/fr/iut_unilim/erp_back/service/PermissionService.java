@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
+import fr.iut_unilim.erp_back.dto.EditCreateRoleRequest;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.RolePermissionResponse;
 import fr.iut_unilim.erp_back.entity.PermissionDefinition;
@@ -40,14 +40,23 @@ public class PermissionService {
         return roleOptional.filter(role -> hasPrivilege(role, permissionKey)).isPresent();
     }
 
-    public RolePermission createPermission(CreateRoleRequest createRoleRequest) {
-        Role role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
+    public boolean createEditPermission(EditCreateRoleRequest createRoleRequest) {
+        Role role;
+        if (createRoleRequest.id() != null) {
+            Optional<Role> roleOptional = roleRepository.findById(createRoleRequest.id());
+            if (roleOptional.isEmpty()) return false;
+            role = roleOptional.get();
+            role.setRoleName(createRoleRequest.roleName());
+        } else {
+            role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
+        }
+
         RolePermission permission = new RolePermission();
         permission.setRole(role);
         BitSet permBits = convertMapToBitSet(createRoleRequest.permissions());
         permission.setBitSet(permBits);
         permissionRepository.save(permission);
-        return permission;
+        return true;
     }
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
@@ -72,6 +81,8 @@ public class PermissionService {
     }
 
     public boolean hasPrivilege(Role role, String permissionKey) {
+        if (role.getId() == 1) return true;
+
         PermissionDefinition permissionDefinition = permissionDefinitionRepository.findByPermissionKey(permissionKey);
 
         if (permissionDefinition == null) return false;

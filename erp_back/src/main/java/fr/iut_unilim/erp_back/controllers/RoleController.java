@@ -1,6 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
+import fr.iut_unilim.erp_back.dto.EditCreateRoleRequest;
 import fr.iut_unilim.erp_back.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,13 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
-    public ResponseEntity<?> createRole(@RequestBody CreateRoleRequest createRoleRequest) {
-        return ResponseEntity.ok(permissionService.createPermission(createRoleRequest));
+    public ResponseEntity<?> createRole(@RequestBody EditCreateRoleRequest createRoleRequest) {
+        boolean hasBeenCreated = permissionService.createEditPermission(createRoleRequest);
+
+        if (!hasBeenCreated) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(permissionService.createEditPermission(createRoleRequest));
     }
 }
