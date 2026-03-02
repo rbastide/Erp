@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
 import Sidebar from './Sidebar.vue';
@@ -15,16 +15,16 @@ onMounted(() => {
   isDarkMode.value = savedTheme === 'dark';
 });
 
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value;
-  if (isDarkMode.value) {
+// Watch pour changer la classe du body et sauvegarder le choix
+watch(isDarkMode, (newValue) => {
+  if (newValue) {
     document.body.classList.add('dark-mode');
     localStorage.setItem('user_theme', 'dark');
   } else {
     document.body.classList.remove('dark-mode');
     localStorage.setItem('user_theme', 'light');
   }
-};
+});
 
 const handleSave = () => {
   showSavedModal.value = true;
@@ -41,13 +41,21 @@ const handleModalClose = () => {
   <AppHeader title="Paramètres" />
 
   <div class="main-content">
-
     <div class="settings-group">
-
       <div class="setting-card">
         <div class="card-header">
           <div class="icon-circle">
-            <svg width="28" height="28" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           </div>
           <h3>Apparence</h3>
         </div>
@@ -59,7 +67,7 @@ const handleModalClose = () => {
           </div>
 
           <label class="switch">
-            <input type="checkbox" :checked="isDarkMode" @change="toggleTheme">
+            <input type="checkbox" v-model="isDarkMode">
             <span class="slider round"></span>
           </label>
         </div>
@@ -68,7 +76,10 @@ const handleModalClose = () => {
       <div class="setting-card">
         <div class="card-header">
           <div class="icon-circle">
-            <svg width="28" height="28" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
           </div>
           <h3>Notifications</h3>
         </div>
@@ -89,14 +100,9 @@ const handleModalClose = () => {
       <div class="actions">
         <button class="btn-save" @click="handleSave">Enregistrer</button>
       </div>
-
     </div>
 
-    <SettingsSavedModal
-        v-if="showSavedModal"
-        @close="handleModalClose"
-    />
-
+    <SettingsSavedModal v-if="showSavedModal" @close="handleModalClose" />
   </div>
 </template>
 
