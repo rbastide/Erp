@@ -63,13 +63,13 @@ public class McccController {
     }
 
     @GetMapping("/mcccs")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMccc(Authentication authentication) {
         return ResponseEntity.ok(mcccService.getAllMcccFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/save")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
@@ -250,28 +250,32 @@ public class McccController {
     }
 
     @GetMapping("/getTeachers")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getTeachers(Authentication authentication) {
         return ResponseEntity.ok(teacherService.getAllTeachersFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getSaes")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getSaes(Authentication authentication) {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getHourlyVolumes")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getCourseHours() {
         return ResponseEntity.ok(courseHoursService.getAllCourseHours());
     }
 
     @PostMapping("/saveHourlyVolume")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
     public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
         courseHoursService.save(courseHours);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
     }
 
     @GetMapping("/getHourlyVolumesID/{id}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getCourseHoursID(@PathVariable Long id) {
         Optional<CourseHours> courseHours = courseHoursService.findById(id);
         if (courseHours.isPresent()) {
@@ -281,12 +285,13 @@ public class McccController {
     }
 
     @GetMapping("/getCreationDate/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
     public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
         return ResponseEntity.ok(mcccService.getCreationDateFromId(id));
     }
 
     @GetMapping("/getReferentIds/{id}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getReferentIds(@PathVariable Long id) {
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
