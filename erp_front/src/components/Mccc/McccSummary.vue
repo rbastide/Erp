@@ -15,6 +15,12 @@ const showSuccessModal = ref(false);
 // Initialisation au montage pour éviter les erreurs d'accès aux propriétés undefined
 onMounted(() => {
   mcccStore.loadMcccStore();
+
+  if(!mcccStore.creationDate){
+    mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
+  }
+  mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
+
 });
 
 // Fonction utilitaire pour formater les heures décimales en HhMM (ex: 1.5 -> 1h30)
@@ -170,6 +176,29 @@ const handleCloseSuccess = () => {
           <span class="footer-value total-value">{{ formattedTotalHours }}</span>
         </div>
       </div>
+
+      <div class="summary-card" style="margin-top: 40px;">
+        <h2 class="card-title">Enseignants Référents</h2>
+        <div v-if="mcccStore.referents && mcccStore.referents.length > 0" class="sae-list">
+          <div v-for="(prof, index) in mcccStore.referents" :key="index" class="sae-tag">
+            {{ prof.firstname }} {{ prof.lastname }}
+          </div>
+        </div>
+        <div v-else class="empty-table">Aucun enseignant associé.</div>
+      </div>
+
+      <div class="info-footer">
+        <div class="footer-item">
+          <span class="footer-label">Créé le</span>
+          <span class="footer-value">{{ mcccStore.creationDate || '--/--/----' }}</span>
+        </div>
+        <div class="footer-item">
+          <span class="footer-label">Dernière modification</span>
+          <span class="footer-value">{{ mcccStore.editDate || '--/--/----' }}</span>
+        </div>
+      </div>
+
+
 
       <div class="container-btn">
         <button @click="handleValidate" class="btn-sys primary">Valider et Sauvegarder</button>
