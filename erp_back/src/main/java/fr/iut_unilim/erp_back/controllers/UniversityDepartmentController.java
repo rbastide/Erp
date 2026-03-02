@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/universityDepartment")
 public class UniversityDepartmentController {
@@ -27,11 +29,15 @@ public class UniversityDepartmentController {
     public ResponseEntity<?> saveUniversityDepartment(@RequestBody UniversityDepartmentRequest dtoRequest) {
 
         UniversityDepartment universityDepartment = new UniversityDepartment();
+        universityDepartment.setUniversityName(dtoRequest.getUniversityName());
+        universityDepartment.setUniversityDepartmentName(dtoRequest.getUniversityDepartmentName());
+        universityDepartment.setCity(dtoRequest.getCity());
+        universityDepartment.setCreationDate(new Date());
+
         return ResponseEntity.ok(universityDepartmentRepository.save(universityDepartment));
-        //TODO
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> deleteUniversityDepartment(@PathVariable Long id) {
 

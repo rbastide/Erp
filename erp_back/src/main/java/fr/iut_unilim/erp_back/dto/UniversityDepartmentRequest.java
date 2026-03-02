@@ -1,17 +1,9 @@
 package fr.iut_unilim.erp_back.dto;
 
-import java.util.Date;
-
 public class UniversityDepartmentRequest {
-    private Long univeristyDepartmentID;
     private String universityName;
     private String universityDepartmentName;
     private String city;
-    private Date creationDate;
-
-    public void setUniversityDepartmentID(Long universityDepartmentID) {
-        this.univeristyDepartmentID = universityDepartmentID;
-    }
 
     public void setUniversityName(String universityName) {
         this.universityName = universityName;
@@ -25,14 +17,6 @@ public class UniversityDepartmentRequest {
         this.city = city;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Long getUniversityDepartmentID() {
-        return univeristyDepartmentID;
-    }
-
     public String getUniversityName() {
         return universityName;
     }
@@ -43,9 +27,5 @@ public class UniversityDepartmentRequest {
 
     public String getCity() {
         return city;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
     }
 }
