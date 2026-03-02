@@ -1,5 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
+import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionResponse;
 import fr.iut_unilim.erp_back.entity.Permission;
@@ -10,10 +12,7 @@ import fr.iut_unilim.erp_back.repository.PermissionRepository;
 import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PermissionService {
@@ -40,7 +39,17 @@ public class PermissionService {
     public boolean hasPermission(Long roleId, String permissionKey) {
         Optional<Role> roleOptional = roleRepository.findById(roleId);
         return roleOptional.filter(role -> hasPrivilege(role, permissionKey)).isPresent();
+    }
 
+    public Permission createPermission(CreateRoleRequest createRoleRequest) {
+        Role role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
+        Permission permission = new Permission();
+        permission.setRole(role);
+        ErpBackApplication.LOGGER.info("Creating permission for role: " + createRoleRequest.permissions());
+        BitSet permBits = convertMapToBitSet(createRoleRequest.permissions());
+        permission.setBitSet(permBits);
+        permissionRepository.save(permission);
+        return permission;
     }
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
@@ -101,5 +110,16 @@ public class PermissionService {
                 roleService.convertEntityToResponse(permission.getRole()),
                 perms
         );
+    }
+
+    private BitSet convertMapToBitSet(Map<Long, Boolean> perms) {
+        BitSet permBits = new BitSet();
+        for (Long permId : perms.keySet()) {
+            Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(permId);
+            if (permissionDefinitionOptional.isEmpty()) continue;
+            int permIndex = permissionDefinitionOptional.get().getPermissionDefinitionBitIndex();
+            permBits.set(permIndex, perms.get(permId));
+        }
+        return permBits;
     }
 }
