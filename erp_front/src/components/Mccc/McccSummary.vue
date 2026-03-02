@@ -136,9 +136,9 @@ const handleCloseSuccess = () => {
 
       <div class="summary-card">
         <h2 class="card-title">SAÉs Associées</h2>
-        <div v-if="mcccStore.saes && mcccStore.saes.length > 0" class="sae-list">
-          <div v-for="sae in mcccStore.saes" :key="sae.saeNum" class="sae-tag">
-            {{ sae.saeNum }} - {{ sae.saeName }}
+        <div v-if="mcccStore.saeCodes && mcccStore.saeCodes.length > 0" class="sae-list">
+          <div v-for="sae in mcccStore.saeCodes" :key="sae.saeCode" class="sae-tag">
+            {{ sae.saeCode.split('.')[0] + '.' + sae.saeCode.split('.')[1].padStart(2, '0') }} - {{ sae.saeName }}
           </div>
         </div>
         <div v-else class="empty-table">Aucune SAÉ associée.</div>
