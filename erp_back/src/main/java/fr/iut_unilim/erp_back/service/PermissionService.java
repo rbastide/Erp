@@ -114,9 +114,10 @@ public class PermissionService {
         BitSet permBits = new BitSet();
         for (Long permId : perms.keySet()) {
             Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(permId);
-            if (permissionDefinitionOptional.isEmpty()) continue;
-            int permIndex = permissionDefinitionOptional.get().getPermissionDefinitionBitIndex();
-            permBits.set(permIndex, perms.get(permId));
+            if (permissionDefinitionOptional.isPresent()) {
+                int permIndex = permissionDefinitionOptional.get().getPermissionDefinitionBitIndex();
+                permBits.set(permIndex, perms.get(permId));
+            }
         }
         return permBits;
     }
