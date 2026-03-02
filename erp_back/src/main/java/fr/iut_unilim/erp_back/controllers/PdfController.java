@@ -24,7 +24,7 @@ public class PdfController {
     }
 
     @GetMapping("/resource-sheet/{id}")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getResourceSheet(@PathVariable Long id) {
         Optional<ResourceSheet> canHaveResourceSheet = resourceSheetService.getResourceSheetFromId(id);
         if (canHaveResourceSheet.isEmpty()) {
