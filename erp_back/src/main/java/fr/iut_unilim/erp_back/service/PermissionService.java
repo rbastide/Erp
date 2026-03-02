@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionResponse;
