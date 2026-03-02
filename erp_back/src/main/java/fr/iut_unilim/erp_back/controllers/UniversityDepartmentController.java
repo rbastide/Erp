@@ -3,7 +3,6 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.UniversityDepartmentRequest;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.UniversityDepartmentRepository;
-import fr.iut_unilim.erp_back.service.UniversityDepartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/universityDepartment")
 public class UniversityDepartmentController {
 
-    private final UniversityDepartmentService universityDepartmentService;
     private final UniversityDepartmentRepository universityDepartmentRepository;
 
-    public UniversityDepartmentController(UniversityDepartmentService universityDepartmentService, UniversityDepartmentRepository universityDepartmentRepository) {
-        this.universityDepartmentService = universityDepartmentService;
+    public UniversityDepartmentController(UniversityDepartmentRepository universityDepartmentRepository) {
         this.universityDepartmentRepository = universityDepartmentRepository;
     }
 
     @GetMapping("/getUniversityDepartments")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> getUniversityDepartments() {
         return ResponseEntity.ok(universityDepartmentRepository.findAll());
     }
@@ -35,7 +32,7 @@ public class UniversityDepartmentController {
     }
 
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> deleteUniversityDepartment(@PathVariable Long id) {
 
         if (!universityDepartmentRepository.existsById(id)) {
