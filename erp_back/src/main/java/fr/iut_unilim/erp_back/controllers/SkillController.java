@@ -46,21 +46,21 @@ public class SkillController {
     }
 
     @GetMapping("/skills")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('SKILL_MANAGEMENT')")
     public ResponseEntity<?> getAllSkills(Authentication authentication) {
         List<Skill> skills = skillService.getAllSkillsFromDepartment(authentication.getName());
         return ResponseEntity.ok(convertSkillEntitiesToDtos(skills));
     }
 
     @PostMapping("/skills")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('SKILL_MANAGEMENT')")
     public ResponseEntity<?> addSkills(@RequestBody @NotNull List<NewSkillDto> skillsDtos, Authentication authentication) {
         convertSkillDtosToEntities(skillsDtos, authentication);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/skills/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('SKILL_MANAGEMENT')")
     public ResponseEntity<?> deleteSkill(@PathVariable Long id) {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
