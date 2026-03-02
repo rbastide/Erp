@@ -1,3 +1,4 @@
+/* --- STYLE DE BASE --- */
 body {
     margin: 0;
     padding: 0;
@@ -7,6 +8,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* --- STRUCTURES / FONDS --- */
 body.dark-mode {
     background-color: #252525 !important;
     color: #e0e0e0 !important;
@@ -23,6 +25,7 @@ body.dark-mode .submenu {
     color: #e0e0e0 !important;
 }
 
+/* --- NAVIGATION (HEADER & SIDEBAR) --- */
 body.dark-mode .page-header,
 body.dark-mode .sidebar,
 body.dark-mode .sidebar-header,
@@ -48,11 +51,12 @@ body.dark-mode .chevron-icon {
     stroke: #ffffff !important;
 }
 
+/* --- SIDEBAR ACTIVE & HOVER (BORDEAUX) --- */
 body.dark-mode .nav-item:hover,
 body.dark-mode .nav-item.active,
 body.dark-mode .sub-item:hover,
 body.dark-mode .sub-item.sub-active {
-    background-color: rgba(181, 22, 33, 0.15) !important; /* Fond bordeaux translucide */
+    background-color: rgba(181, 22, 33, 0.15) !important;
     color: #B51621 !important;
 }
 
@@ -68,6 +72,7 @@ body.dark-mode .nav-item.active {
     border-left: 4px solid #B51621 !important;
 }
 
+/* --- CARTES ET COMPOSANTS UI --- */
 body.dark-mode .resource-card,
 body.dark-mode .user-card,
 body.dark-mode .card-action,
@@ -110,6 +115,27 @@ body.dark-mode .btn-oui {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
 }
 
+/* --- HARMONISATION DES CHAMPS D'HEURES (INPUTS) --- */
+body.dark-mode .time-input-container {
+    background-color: #444444 !important;
+    border-color: #444444 !important;
+}
+
+body.dark-mode .time-input {
+    color: #ffffff !important;
+}
+
+body.dark-mode .time-separator {
+    color: #bbbbbb !important;
+}
+
+body.dark-mode .time-input-container:focus-within {
+    background-color: #333333 !important;
+    border-color: #B51621 !important;
+    box-shadow: 0 0 0 3px rgba(181, 22, 33, 0.1) !important;
+}
+
+/* --- TYPOGRAPHIE / ACCENTS --- */
 body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
 body.dark-mode label, body.dark-mode .resource-id, body.dark-mode .sae-number,
 body.dark-mode .label, body.dark-mode .container-connexion p,
