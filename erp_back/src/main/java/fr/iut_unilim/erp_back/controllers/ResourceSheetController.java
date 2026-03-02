@@ -44,13 +44,13 @@ public class ResourceSheetController {
     }
 
     @GetMapping("/getResourceSheet")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getResourceSheet(Authentication authentication) {
         return ResponseEntity.ok(resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/resource-sheet")
-    @PreAuthorize("hasAuthority('TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
 
         Connection connection = connectionService.getConnectionByIdentifier(authentication.getName());
@@ -205,7 +205,7 @@ public class ResourceSheetController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
         if (!resourceSheetRepository.existsById(id)) {
             return ResponseEntity.ok().build();
@@ -215,7 +215,7 @@ public class ResourceSheetController {
     }
 
     @GetMapping("/getHistory")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
         List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
         List<HistoryResponse> historyList = new ArrayList<>();
