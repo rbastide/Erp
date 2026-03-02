@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted } from 'vue';
-import './assets/css/darkMode.css';
 
 onMounted(() => {
   const savedTheme = localStorage.getItem('user_theme');
