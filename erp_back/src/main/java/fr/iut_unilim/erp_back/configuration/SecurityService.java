@@ -7,8 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Component("securityService")
 public class SecurityService {
 
@@ -32,5 +30,10 @@ public class SecurityService {
         if (connection == null) return false;
 
         return permissionService.hasPrivilege(connection.getRole(), permissionKey);
+    }
+
+    public boolean isLogin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null;
     }
 }

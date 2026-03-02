@@ -54,7 +54,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
@@ -106,7 +106,7 @@ public class AuthController {
     }
 
     @PostMapping("/user")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> editUser(@RequestBody EditUserRequest user) {
         Optional<Connection> existingUser = connectionRepository.findById(user.id());
         if (existingUser.isEmpty()) {
@@ -132,7 +132,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
         Optional<Connection> userToDelete = connectionRepository.findById(id);
         if (userToDelete.isEmpty()) {
@@ -153,7 +153,7 @@ public class AuthController {
     }
 
     @GetMapping("/user-info/{identifier}")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
         if (user == null) {
@@ -169,13 +169,14 @@ public class AuthController {
     }
 
     @GetMapping("/user/department")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserDepartment(Authentication authentication) {
         Connection user = connectionRepository.findByIdentifier(authentication.getName());
         return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from("auth_token", "")
                 .httpOnly(true)
@@ -191,6 +192,7 @@ public class AuthController {
     }
 
     @PatchMapping("/users/department/{departmentId}")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> updateUserDepartment(@PathVariable Long departmentId, Authentication authentication) {
         String userIdentifier = authentication.getName();
 
