@@ -48,4 +48,9 @@ public class PermissionController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/perms/role/{roleId}/{permissionKey}")
+    public ResponseEntity<?> getRolePermissions(@PathVariable Long roleId, @PathVariable String permissionKey) {
+        return ResponseEntity.ok(permissionService.hasPermission(roleId, permissionKey));
+    }
 }
