@@ -21,13 +21,13 @@ public class SaeController {
     }
 
     @GetMapping("/saes")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('SAE_MANAGEMENT')")
     public ResponseEntity<?> getAllSae(Authentication authentication) {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @PostMapping("/edit-sae")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('SAE_MANAGEMENT')")
     public ResponseEntity<?> createAndEditSae(@RequestBody SaeDto saeDto, Authentication authentication) {
         boolean hasBeenSaved = saeService.saveFromDto(saeDto, authentication);
 
@@ -39,7 +39,7 @@ public class SaeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('SAE_MANAGEMENT')")
     public ResponseEntity<?> deleteSae(@PathVariable Long id) {
         if (!saeRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
