@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.dto.PermissionResponse;
 import fr.iut_unilim.erp_back.service.PermissionDefinitionService;
 import fr.iut_unilim.erp_back.service.PermissionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class PermissionController {
     }
 
     @GetMapping("/perms")
+    @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
     public ResponseEntity<?> getAllAvailablePerms() {
         List<PermissionDefinitionResponse> permissions = permissionDefinitionService.getAllPermissionDefinition();
 
@@ -29,6 +31,7 @@ public class PermissionController {
     }
 
     @GetMapping("/perms/roles")
+    @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
     public ResponseEntity<?> getAllRolesPerms() {
         List<PermissionResponse> permissionResponses = permissionService.getAllRolePermissions();
 
@@ -36,6 +39,7 @@ public class PermissionController {
     }
 
     @PostMapping("/perms/role")
+    @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
     public ResponseEntity<?> editRolePermissions(@RequestBody List<EditRolePermissionRequest> editRolePermissionRequests) {
         boolean doErrorOccured = false;
         for (EditRolePermissionRequest editRolePermissionRequest : editRolePermissionRequests) {
@@ -50,6 +54,7 @@ public class PermissionController {
     }
 
     @GetMapping("/perms/role/{roleId}/{permissionKey}")
+    @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
     public ResponseEntity<?> getRolePermissions(@PathVariable Long roleId, @PathVariable String permissionKey) {
         return ResponseEntity.ok(permissionService.hasPermission(roleId, permissionKey));
     }
