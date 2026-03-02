@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.util.BitSet;
 
 @Entity
-@Table(name = "Permission")
-public class Permission {
+@Table(name = "RolePermission")
+public class RolePermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "permissionID")

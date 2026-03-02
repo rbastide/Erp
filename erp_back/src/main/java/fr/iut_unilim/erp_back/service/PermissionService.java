@@ -2,10 +2,10 @@ package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
-import fr.iut_unilim.erp_back.dto.PermissionResponse;
-import fr.iut_unilim.erp_back.entity.Permission;
+import fr.iut_unilim.erp_back.dto.RolePermissionResponse;
 import fr.iut_unilim.erp_back.entity.PermissionDefinition;
 import fr.iut_unilim.erp_back.entity.Role;
+import fr.iut_unilim.erp_back.entity.RolePermission;
 import fr.iut_unilim.erp_back.repository.PermissionDefinitionRepository;
 import fr.iut_unilim.erp_back.repository.PermissionRepository;
 import fr.iut_unilim.erp_back.repository.RoleRepository;
@@ -27,8 +27,8 @@ public class PermissionService {
         this.roleRepository = roleRepository;
     }
 
-    public List<PermissionResponse> getAllRolePermissions() {
-        List<Permission> permissions = permissionRepository.findAll();
+    public List<RolePermissionResponse> getAllRolePermissions() {
+        List<RolePermission> permissions = permissionRepository.findAll();
 
         return permissions.stream()
                 .map(this::convertEntityToResponse)
@@ -40,9 +40,9 @@ public class PermissionService {
         return roleOptional.filter(role -> hasPrivilege(role, permissionKey)).isPresent();
     }
 
-    public Permission createPermission(CreateRoleRequest createRoleRequest) {
+    public RolePermission createPermission(CreateRoleRequest createRoleRequest) {
         Role role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
-        Permission permission = new Permission();
+        RolePermission permission = new RolePermission();
         permission.setRole(role);
         BitSet permBits = convertMapToBitSet(createRoleRequest.permissions());
         permission.setBitSet(permBits);
@@ -51,12 +51,12 @@ public class PermissionService {
     }
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
-        Optional<Permission> permissionOptional = permissionRepository.findById(editRolePermissionRequest.permissionRoleId());
+        Optional<RolePermission> permissionOptional = permissionRepository.findById(editRolePermissionRequest.permissionRoleId());
         Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(editRolePermissionRequest.permissionId());
 
         if (permissionOptional.isEmpty() || permissionDefinitionOptional.isEmpty()) return false;
 
-        Permission permission = permissionOptional.get();
+        RolePermission permission = permissionOptional.get();
         PermissionDefinition permissionDefinition = permissionDefinitionOptional.get();
 
         BitSet permBits = permission.getBitSet();
@@ -80,10 +80,10 @@ public class PermissionService {
     }
 
     public boolean hasPrivilege(Role role, PermissionDefinition permissionDefinition) {
-        List<Permission> permissions = permissionRepository.findByRole(role);
+        List<RolePermission> permissions = permissionRepository.findByRole(role);
         if (permissions.size() != 1) return false;
 
-        Permission permission = permissions.get(0);
+        RolePermission permission = permissions.get(0);
 
         BitSet permBits = permission.getBitSet();
         int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();
@@ -91,7 +91,7 @@ public class PermissionService {
         return permBits.get(permIndex);
     }
 
-    private PermissionResponse convertEntityToResponse(Permission permission) {
+    private RolePermissionResponse convertEntityToResponse(RolePermission permission) {
         HashMap<Long, Boolean> perms = new HashMap<>();
 
         BitSet permBits = permission.getBitSet();
@@ -103,7 +103,7 @@ public class PermissionService {
             perms.put(permId, permState);
         }
 
-        return new PermissionResponse(
+        return new RolePermissionResponse(
                 permission.getPermissionID(),
                 roleService.convertEntityToResponse(permission.getRole()),
                 perms
