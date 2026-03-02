@@ -12,4 +12,6 @@ public interface PermissionDefinitionRepository extends JpaRepository<Permission
     @NotNull
     @Override
     Optional<PermissionDefinition> findById(@NotNull Long id);
+
+    PermissionDefinition findByPermissionKey(String permissionKey);
 }

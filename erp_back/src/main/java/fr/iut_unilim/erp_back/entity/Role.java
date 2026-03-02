@@ -28,4 +28,8 @@ public class Role {
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
+
+    public String per() {
+        return null;
+    }
 }

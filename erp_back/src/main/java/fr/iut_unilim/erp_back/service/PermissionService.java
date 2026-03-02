@@ -1,28 +1,30 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.dto.CreateRoleRequest;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionResponse;
 import fr.iut_unilim.erp_back.entity.Permission;
 import fr.iut_unilim.erp_back.entity.PermissionDefinition;
+import fr.iut_unilim.erp_back.entity.Role;
 import fr.iut_unilim.erp_back.repository.PermissionDefinitionRepository;
 import fr.iut_unilim.erp_back.repository.PermissionRepository;
+import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final PermissionDefinitionRepository permissionDefinitionRepository;
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
-    public PermissionService(PermissionRepository permissionRepository, PermissionDefinitionRepository permissionDefinitionRepository, RoleService roleService) {
+    public PermissionService(PermissionRepository permissionRepository, PermissionDefinitionRepository permissionDefinitionRepository, RoleService roleService, RoleRepository roleRepository) {
         this.permissionRepository = permissionRepository;
         this.permissionDefinitionRepository = permissionDefinitionRepository;
         this.roleService = roleService;
+        this.roleRepository = roleRepository;
     }
 
     public List<PermissionResponse> getAllRolePermissions() {
@@ -31,6 +33,21 @@ public class PermissionService {
         return permissions.stream()
                 .map(this::convertEntityToResponse)
                 .toList();
+    }
+
+    public boolean hasPermission(Long roleId, String permissionKey) {
+        Optional<Role> roleOptional = roleRepository.findById(roleId);
+        return roleOptional.filter(role -> hasPrivilege(role, permissionKey)).isPresent();
+    }
+
+    public Permission createPermission(CreateRoleRequest createRoleRequest) {
+        Role role = roleService.createOrAccessRoleByRoleName(createRoleRequest.roleName());
+        Permission permission = new Permission();
+        permission.setRole(role);
+        BitSet permBits = convertMapToBitSet(createRoleRequest.permissions());
+        permission.setBitSet(permBits);
+        permissionRepository.save(permission);
+        return permission;
     }
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
@@ -42,16 +59,36 @@ public class PermissionService {
         Permission permission = permissionOptional.get();
         PermissionDefinition permissionDefinition = permissionDefinitionOptional.get();
 
-        BitSet bitSet = permission.getBitSet();
+        BitSet permBits = permission.getBitSet();
         int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();
         boolean newState = editRolePermissionRequest.permissionState();
 
-        bitSet.set(permIndex, newState);
+        permBits.set(permIndex, newState);
 
-        permission.setBitSet(bitSet);
+        permission.setBitSet(permBits);
         permissionRepository.save(permission);
 
         return true;
+    }
+
+    public boolean hasPrivilege(Role role, String permissionKey) {
+        PermissionDefinition permissionDefinition = permissionDefinitionRepository.findByPermissionKey(permissionKey);
+
+        if (permissionDefinition == null) return false;
+
+        return hasPrivilege(role, permissionDefinition);
+    }
+
+    public boolean hasPrivilege(Role role, PermissionDefinition permissionDefinition) {
+        List<Permission> permissions = permissionRepository.findByRole(role);
+        if (permissions.size() != 1) return false;
+
+        Permission permission = permissions.get(0);
+
+        BitSet permBits = permission.getBitSet();
+        int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();
+
+        return permBits.get(permIndex);
     }
 
     private PermissionResponse convertEntityToResponse(Permission permission) {
@@ -71,5 +108,16 @@ public class PermissionService {
                 roleService.convertEntityToResponse(permission.getRole()),
                 perms
         );
+    }
+
+    private BitSet convertMapToBitSet(Map<Long, Boolean> perms) {
+        BitSet permBits = new BitSet();
+        for (Long permId : perms.keySet()) {
+            Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(permId);
+            if (permissionDefinitionOptional.isEmpty()) continue;
+            int permIndex = permissionDefinitionOptional.get().getPermissionDefinitionBitIndex();
+            permBits.set(permIndex, perms.get(permId));
+        }
+        return permBits;
     }
 }

@@ -124,7 +124,7 @@ public class AuthController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> getUsers(Authentication authentication) {
         String userIdentifier = authentication.getName();
 

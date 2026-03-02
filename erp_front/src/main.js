@@ -1,4 +1,5 @@
 import "./assets/reset.css"
+import "./assets/css/darkMode.css"
 
 import { createApp } from 'vue'
 import App from './App.vue'
