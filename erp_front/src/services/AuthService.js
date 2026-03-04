@@ -61,6 +61,8 @@ export const authStore = reactive({
     clear() {
         this.firstName = '';
         this.lastName = '';
-        cookieStore.removeItem("auth_token");
+        cookieStore.delete('user_token').then(_ => {
+
+        });
     }
 });
