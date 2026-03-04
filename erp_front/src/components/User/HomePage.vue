@@ -7,7 +7,54 @@ import {authStore} from "@/services/AuthService.js";
 import api from "@/services/api.js";
 
 const router = useRouter();
-const perms = ref('');
+const menus = ref([]);
+
+const icons = {
+  "1": `<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>`,
+
+  "2": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "3": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "4": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "5": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "6": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "7": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "8": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "9": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "10": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+
+  "11": `<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>`,
+};
 
 const handleFill = () => {
   router.push('/resource');
@@ -53,14 +100,14 @@ const handleRecall = () => {
   router.push('/recall-management');
 };
 
-const fetchPerms = async () => {
-  const response = await api.get('/perm/perms/role/{roleId}/{permissionKey}', );
-  perms.value = response.data;
-  console.log(perms.value);
+const fetchAvaliableMenu = async () => {
+  const response = await api.get('/menus', );
+  menus.value = response.data;
+  console.log(menus.value);
 };
 
 onMounted(() => {
-  fetchPerms();
+  fetchAvaliableMenu();
   authStore.load();
 });
 </script>
@@ -71,6 +118,19 @@ onMounted(() => {
     <AppHeader title="Bonjour," :inline="authStore.lastName + ' ' + authStore.firstName" />
 
     <main class="main-content">
+
+      <div class="card-action" v-for="menu in menus" @click="router.push(menu.route);" >
+        <div class="icon-circle">
+          <svg
+              width="40" height="40" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2" fill="none"
+              v-html="icons[menu.iconId]"
+          ></svg>
+        </div>
+        <p>{{menu.label}}</p>
+      </div>
+
+
       <div class="card-action" @click="handleFill">
         <div class="icon-circle">
           <svg width="48" height="48" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
