@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
@@ -11,7 +11,6 @@ const password = ref('');
 const errorMessage = ref('');
 
 const handleLogin = async () => {
-  await AuthService.logout();
   errorMessage.value = '';
 
   /** @type {LoginRequest} */
@@ -40,6 +39,10 @@ const handleLogin = async () => {
         : "Impossible de contacter le serveur.";
   }
 };
+
+onMounted(async () => {
+  await AuthService.logout();
+})
 </script>
 
 <template>
