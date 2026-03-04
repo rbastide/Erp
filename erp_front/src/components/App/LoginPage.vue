@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue';
+import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
@@ -9,8 +9,10 @@ const router = useRouter();
 const username = ref('');
 const password = ref('');
 const errorMessage = ref('');
+const role = ref('');
 
 const handleLogin = async () => {
+  await AuthService.logout();
   errorMessage.value = '';
 
   /** @type {LoginRequest} */
@@ -21,17 +23,12 @@ const handleLogin = async () => {
 
   try {
     const userData = await AuthService.login(credentials);
-    const role = userData.role ? userData.role.toUpperCase() : 'USER';
-
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      await router.push('/home-admin');
-    } else {
-      const response = await api.get(`auth/user-info/${username.value}`);
-      authStore.firstName = response.data.firstname;
-      authStore.lastName = response.data.lastname;
-      authStore.save();
-      await router.push('/home');
-    }
+    role.value = userData.role;
+    const response = await api.get(`auth/user-info/${username.value}`);
+    authStore.firstName = response.data.firstname;
+    authStore.lastName = response.data.lastname;
+    authStore.save();
+    await router.push('/home');
 
   } catch (error) {
     errorMessage.value = error.response?.status === 401
@@ -39,10 +36,6 @@ const handleLogin = async () => {
         : "Impossible de contacter le serveur.";
   }
 };
-
-onMounted(async () => {
-  await AuthService.logout();
-})
 </script>
 
 <template>
