@@ -31,24 +31,7 @@ export default {
   },
 
   lastName: '',
-  firstName: '',
-
-  registerAuthService() {
-    localStorage.setItem("AuthService", JSON.stringify({
-      lastName: this.lastName,
-      firstName: this.firstName
-    }));
-  },
-
-  loadAuthService() {
-    authStore.load();
-  },
-
-  clearAuthService() {
-    this.lastName = '';
-    this.firstName = '';
-    localStorage.removeItem("AuthService");
-  }
+  firstName: ''
 };
 
 export const authStore = reactive({
@@ -78,6 +61,6 @@ export const authStore = reactive({
     clear() {
         this.firstName = '';
         this.lastName = '';
-        localStorage.removeItem("AuthService");
+        cookieStore.removeItem("auth_token");
     }
 });
