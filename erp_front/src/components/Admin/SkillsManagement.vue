@@ -14,7 +14,6 @@ const searchQuery = ref('');
 const showDeleteModal = ref(false);
 const skillToDelete = ref(null);
 
-// CORRECTION 1 : Remplacé reactive par ref
 const currentSkill = ref({
   skillNum: null,
   skillName: '',
@@ -23,7 +22,6 @@ const currentSkill = ref({
 
 const editedSkill = ref({ id: null, skillNum: null, skillName: '', levels: [] });
 
-// CORRECTION 2 : Ajout de .value car currentSkill est maintenant une ref
 const validateNumInput = () => {
   let val = currentSkill.value.skillNum;
   if (val === '' || val === null) return;
@@ -131,7 +129,6 @@ const handleSaveNewCompetence = async () => {
   const currentSkillToAdd = JSON.parse(JSON.stringify(currentSkill.value));
   finalSkills.value.unshift(currentSkillToAdd);
 
-  // Reset clean
   currentSkill.value = {
     skillNum: null,
     skillName: '',

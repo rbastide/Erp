@@ -229,7 +229,7 @@ const handleCloseSuccess = () => {
 .content-wrapper {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 50px 20px;
 }
 
 .summary-card {
