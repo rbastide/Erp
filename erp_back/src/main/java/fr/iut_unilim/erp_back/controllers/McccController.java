@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.model.CriticalConceptModel;
@@ -77,18 +78,14 @@ public class McccController {
         }
 
         Mccc mccc = getCurrentMccc(dto, canHaveResource);
-
         handleDepartment(mccc, authentication);
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
-
         Set<Sae> setSae = getSAEFromDto(dto);
         mccc.setSaesId(setSae);
-
         CourseHours courseHours = getCourseHoursFromDto(dto);
         mccc.setCourseHoursId(courseHours);
-
         try {
             if (dto.getEditDate() != null) {
                 Date editableDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getEditDate());
@@ -112,7 +109,9 @@ public class McccController {
         ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
         if (doCriticalConceptsHasCrashed != null) return doCriticalConceptsHasCrashed;
 
+
         mccc.setCriticalConceptsId(setCriticalConcepts);
+
 
         mcccService.save(mccc);
 
@@ -151,8 +150,7 @@ public class McccController {
         for (LearningRankModel learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
-
-            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels());
+            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels(), ueCode);
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le levels n'existe pas !");
 
             fillNewCriticalConcepts(setCriticalConcepts, learningRank, correspondedRank);
@@ -172,15 +170,20 @@ public class McccController {
     }
 
     @Nullable
-    private Rank extractFirstRankFromRankTitle(@NotNull String rankTitle) {
+    private Rank extractFirstRankFromRankTitle(@NotNull String rankTitle, String ueCode) {
         String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
+
         if (rankCode == null) return null;
 
-        if (!rankService.doRankNumExists(Integer.parseInt(rankCode))) {
+        int rCode = Integer.parseInt(rankCode);
+        int uCode = Integer.parseInt(ueCode);
+
+        List<Rank> ranks = rankService.getRanksByNumAndUe(rCode, uCode);
+
+        if (ranks.isEmpty()) {
             return null;
         }
-
-        return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
+        return ranks.get(0);
     }
 
     private void fillNewCriticalConcepts(Set<CriticalConcept> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
