@@ -20,6 +20,7 @@ body.dark-mode .main-content,
 body.dark-mode .main-div,
 body.dark-mode .content-wrapper,
 body.dark-mode footer,
+body.dark-mode card-title,
 body.dark-mode .submenu {
     background-color: #252525 !important;
     color: #e0e0e0 !important;
@@ -96,6 +97,7 @@ body.dark-mode .card,
 body.dark-mode .summary,
 body.dark-mode .error-card,
 body.dark-mode .info-footer,
+body.dark-mode .summary-card,
 body.dark-mode .modal-card,
 body.dark-mode .admin-card,
 body.dark-mode .is-selected-summary,

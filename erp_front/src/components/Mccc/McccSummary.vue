@@ -48,7 +48,6 @@ const handleBack = () => router.back();
 
 const handleValidate = async () => {
   try {
-    // Utilisation de tableaux vides par défaut pour éviter le crash
     const safeAcsGrouped = mcccStore.acsGrouped || [];
 
     const payload = {
@@ -231,7 +230,7 @@ const handleCloseSuccess = () => {
 .content-wrapper {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 50px 20px;
 }
 
 .summary-card {
