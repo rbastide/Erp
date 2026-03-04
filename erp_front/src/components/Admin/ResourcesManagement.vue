@@ -85,7 +85,7 @@ const blockInvalidChars = (e) => {
 
 const validateSemesterInput = () => {
   let val = editedResource.semester;
-  if (val === '' || val === null)
+  if (val === null)
     return;
   if (val > 10) {
     editedResource.semester = 10;
@@ -112,7 +112,7 @@ const saveResource = async () => {
   const resourceData = {
     num: editedResource.num,
     name: editedResource.name,
-    semester: parseInt(editedResource.semester)
+    semester: Number(editedResource.semester)
   };
 
   if (editedResource.resourceID !== null) {

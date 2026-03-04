@@ -53,7 +53,7 @@ const handleRegister = async () => {
   } catch (error) {
     console.error("Erreur Inscription:", error);
     if (error.response && error.response.data) {
-      errorMessage.value = error.response.data;
+      errorMessage.value = String(error.response.data);
     } else {
       errorMessage.value = "Une erreur est survenue lors de l'inscription.";
     }
