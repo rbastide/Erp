@@ -37,4 +37,8 @@ public class RankService {
     public Optional<Rank> getRankFromId(Long id) {
         return rankRepository.findById(id);
     }
+
+    public List<Rank> getRanksByNumAndUe(int Num, int Ue) {
+        return rankRepository.findByRankNumAndSkillID_SkillNum(Num, Ue);
+    }
 }

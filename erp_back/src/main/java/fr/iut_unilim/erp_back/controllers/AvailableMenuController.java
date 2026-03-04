@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.MenuResponse;
 import fr.iut_unilim.erp_back.service.AvailableMenuService;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ public class AvailableMenuController {
     @GetMapping("")
     public ResponseEntity<?> getMenus(Authentication authentication) {
         String username = authentication.getName();
-        ErpBackApplication.LOGGER.info("test");
         List<MenuResponse> availableMenus = availableMenuService.getAvailableMenusFromUser(username);
 
         return ResponseEntity.ok(availableMenus);

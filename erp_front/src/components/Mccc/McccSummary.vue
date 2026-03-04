@@ -52,37 +52,36 @@ const handleValidate = async () => {
 
     const payload = {
       resourceID: mcccStore.resourceID,
-      courseHoursID: {
-        nbHoursCM: mcccStore.hoursCM,
-        nbHoursTD: mcccStore.hoursTD,
-        nbHoursTP: mcccStore.hoursTP,
-        nbHoursDS: mcccStore.hoursDS,
-        nbHoursDSTP: mcccStore.hoursDSTP,
-      },
-      criticalConceptsID: safeAcsGrouped.flatMap(skill =>
-          skill.allLevels.flatMap((lvl, lvlIdx) =>
-              lvl.acs.map(ac => ({
-                learningNum: ac.learningNum,
-                learningTitle: ac.learningTitle,
-                rankID: {
-                  rankNum: lvlIdx + 1,
-                  rankTitle: lvl.title,
-                  skillID: {
-                    skillNum: skill.skillNum,
-                    skillName: skill.ue
-                  }
-                }
-              }))
-          )
+
+      hoursCM: mcccStore.hoursCM,
+      hoursTD: mcccStore.hoursTD,
+      hoursTP: mcccStore.hoursTP,
+      hoursDS: mcccStore.hoursDS,
+      hoursDSTP: mcccStore.hoursDSTP,
+
+      saeCodes: (mcccStore.saes || []).map(s => ({
+        saeCode: s.saeNum || s.saeCode
+      })),
+
+      acsGrouped: safeAcsGrouped.flatMap(skill =>
+          (skill.allLevels || []).map((lvl, lvlIdx) => ({
+            ue: `UE${skill.skillNum}`,
+            levels: `Niveau ${lvlIdx + 1} - ${lvl.title}`,
+            acs: (lvl.acs || []).map(ac => ({
+              conceptNum: ac.learningNum,
+              conceptTitle: ac.learningTitle
+            }))
+          }))
       ),
-      saesID: (mcccStore.saes || []).map(s => ({
-        saeNum: s.saeNum,
-        saeName: s.saeName
+
+      referents: (mcccStore.referents || []).map(r => ({
+        firstname: r.firstname || r.firstName,
+        lastname: r.lastname || r.lastName
       }))
     };
 
     console.log("Payload envoyé:", payload);
-    await api.post('/mccc/createMccc', payload);
+    await api.post('/mccc/save', payload);
     showSuccessModal.value = true;
 
   } catch (error) {
