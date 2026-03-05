@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
@@ -47,36 +48,11 @@ public class ResourceSheetController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping("/getHistory")
-//    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-//    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
-//        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
-//        List<HistoryResponse> historyList = new ArrayList<>();
-//
-//        for (ResourceSheet sheet : sheets) {
-//            String code = "Inconnu";
-//            String name = "Inconnue";
-//
-//            if (sheet.getResource() != null) {
-//                Optional<Resource> res = resourceRepository.findById(sheet.getResource());
-//                if (res.isPresent()) {
-//                    code = res.get().getNum();
-//                    name = res.get().getName();
-//                }
-//            }
-//
-//            Date dateToUse = sheet.getLastModificationDate() != null ?
-//                    sheet.getLastModificationDate() : sheet.getCreationDate();
-//
-//            historyList.add(new HistoryResponse(
-//                    sheet.getSheetID(),
-//                    code,
-//                    name,
-//                    dateToUse));
-//        }
-//
-//        Collections.reverse(historyList);
-//
-//        return ResponseEntity.ok(historyList);
-//    }
+    @GetMapping("/getHistory")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
+        List<HistoryResponse> historyResponses = resourceSheetService.getHistoryResponses(authentication.getName());
+
+        return ResponseEntity.ok(historyResponses);
+    }
 }

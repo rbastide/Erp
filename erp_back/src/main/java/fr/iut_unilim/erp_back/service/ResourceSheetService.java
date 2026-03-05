@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.CourseHoursResponse;
+import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
@@ -109,6 +110,30 @@ public class ResourceSheetService {
 
         resourceSheetRepository.save(resourceSheet);
         return true;
+    }
+
+    public List<HistoryResponse> getHistoryResponses(String identifier) {
+        List<ResourceSheet> sheets = getAllResourceSheetsFromDepartment(identifier);
+        List<HistoryResponse> historyList = new ArrayList<>();
+
+        for (ResourceSheet sheet : sheets) {
+            Resource resource = sheet.getResource();
+            String code = resource.getNum();
+            String name = resource.getName();
+
+            Date dateToUse = sheet.getLastModificationDate() != null ?
+                    sheet.getLastModificationDate() : sheet.getCreationDate();
+
+            historyList.add(new HistoryResponse(
+                    sheet.getSheetID(),
+                    code,
+                    name,
+                    dateToUse));
+        }
+
+        Collections.reverse(historyList);
+
+        return historyList;
     }
 
     @Nullable
