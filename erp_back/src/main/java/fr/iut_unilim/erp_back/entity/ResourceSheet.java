@@ -46,6 +46,9 @@ public class ResourceSheet {
     @Column(name = "isValidate")
     private boolean isValidate;
 
+    @Column(name = "academicYearStart")
+    private Integer academicYearStart;
+
     public ResourceSheet() {
     }
 
@@ -127,5 +130,13 @@ public class ResourceSheet {
 
     public void setValidate(boolean validate) {
         isValidate = validate;
+    }
+
+    public Integer getAcademicYearStart() {
+        return academicYearStart;
+    }
+
+    public void setAcademicYearStart(Integer academicYearStart) {
+        this.academicYearStart = academicYearStart;
     }
 }

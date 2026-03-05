@@ -57,7 +57,7 @@ public class ResourceSheetService {
         return true;
     }
 
-    public Optional<ResourceSheet> getResourceSheetFromId(@NotNull Long id) {
+    public Optional<ResourceSheet> getResourceSheetById(Long id) {
         return resourceSheetRepository.findById(id);
     }
 
@@ -84,7 +84,8 @@ public class ResourceSheetService {
                 resourceSheet.getTeacherFeedbacks(),
                 resourceSheet.getStudentFeedbacks(),
                 educationalContentService.convertEntitiesToResponses(resourceSheet.getEducationalContents()),
-                resourceSheet.isValidate()
+                resourceSheet.isValidate(),
+                resourceSheet.getAcademicYearStart()
         );
     }
 
@@ -97,6 +98,7 @@ public class ResourceSheetService {
         resourceSheet.setStudentFeedbacks(resourceSheetRequest.studentFeedbacks());
         resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
         resourceSheet.setValidate(false);
+        resourceSheet.setAcademicYearStart(resourceSheetRequest.academicYearStart());
 
         List<EducationalContent> newContents = extractEducationalContentsFromRequest(resourceSheetRequest, resourceSheet);
         if (newContents == null) return false;
@@ -134,7 +136,8 @@ public class ResourceSheetService {
                     sheet.getSheetID(),
                     code,
                     name,
-                    dateToUse));
+                    dateToUse,
+                    sheet.getAcademicYearStart()));
         }
 
         Collections.reverse(historyList);
