@@ -20,7 +20,7 @@ public class UniversityDepartmentController {
     }
 
     @GetMapping("/getUniversityDepartments")
-    @PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
+    //@PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> getUniversityDepartments() {
         return ResponseEntity.ok(universityDepartmentRepository.findAll());
     }
