@@ -12,6 +12,9 @@ const router = useRouter();
     <AppHeader title="Bonjour ADMIN"/>
 
     <main class="main-content">
+      <div class="grid-container">
+        PAGE INUTILE...
+      </div>
     </main>
   </div>
 </template>

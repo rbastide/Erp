@@ -74,6 +74,7 @@ onMounted(() => {
     <main class="main-content">
       <div class="card-action" v-for="menu in menus" @click="router.push(menu.route);" >
         <div class="icon-circle">
+<<<<<<< HEAD
           <svg
               width="40" height="40" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" fill="none"

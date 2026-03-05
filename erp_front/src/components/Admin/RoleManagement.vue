@@ -205,7 +205,7 @@ const handleValidate = () => router.push('/home-admin');
 
         <div v-if="!showAddForm && searchQuery === ''" class="resource-card add-card" @click="handleAddRole">
           <div class="icon-circle plus">
-            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </div>
           <p>Ajouter un rôle</p>
         </div>
@@ -239,7 +239,7 @@ const handleValidate = () => router.push('/home-admin');
             </div>
 
             <button class="save-btn" @click="saveModification">
-              <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
               Ajouter
             </button>
           </div>
@@ -251,7 +251,7 @@ const handleValidate = () => router.push('/home-admin');
 
             <div class="header-view">
               <div class="icon-circle big-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="fill: none;" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
               </div>
@@ -272,18 +272,18 @@ const handleValidate = () => router.push('/home-admin');
 
             <div class="card-actions">
               <button class="action-btn edit" @click="handleModif(roleItem, index)" title="Modifier">
-                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="fill: none;" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               </button>
 
               <button class="action-btn duplicate" @click="handleDuplicate(roleItem)" title="Dupliquer">
-                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="fill: none;" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
               </button>
 
               <button class="action-btn delete" @click="handleDelete(roleItem.id)" title="Supprimer">
-                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="fill: none;" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
             </div>
           </div>
@@ -319,7 +319,7 @@ const handleValidate = () => router.push('/home-admin');
             </div>
 
             <button class="save-btn" @click="saveModification">
-              <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
               Enregistrer
             </button>
           </div>
@@ -331,7 +331,7 @@ const handleValidate = () => router.push('/home-admin');
     <footer class="sticky-bar">
       <div class="sticky-wrapper">
         <div class="search-container">
-          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="fill: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" v-model="searchQuery" placeholder="Rechercher un rôle..." class="search-input" />
         </div>
         <button @click="handleValidate" class="btn-sys primary">Terminer</button>
