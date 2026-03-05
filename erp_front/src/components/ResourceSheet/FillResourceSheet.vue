@@ -226,43 +226,45 @@ const fetchResourceSheetData = async () => {
     const response = await api.get('/resourceSheet/getResourceSheet');
 
     if (response.data && Array.isArray(response.data)) {
+      console.log(response.data, currentResourceId.value)
       const matchingSheets = response.data.filter((f: any) =>
-          f.resourceID === currentResourceId.value
+          f.resourceId === currentResourceId.value
+      );
+      console.log(matchingSheets)
+
+      matchingSheets.sort((a: any, b: any) =>
+          new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime()
       );
 
-      matchingSheets.sort((a: any, b: any) => {
-        return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
-      });
-
-      const resourceData = matchingSheets.length > 0 ? matchingSheets.reverse()[0] : null;
+      const resourceData = matchingSheets.length > 0 ? matchingSheets[0] : null;
 
       if (resourceData) {
-        const getContentByType = (type: string) => {
-          if (!resourceData.educationalContentId) return [];
-          return resourceData.educationalContentId
-              .filter((item: any) => item.classTypeId?.classType === type)
-              .map((item: any) => item.content || '');
-        };
-
-        cmContents.value = getContentByType('CM').length ? getContentByType('CM') : [''];
-        tdContents.value = getContentByType('TD').length ? getContentByType('TD') : [''];
-        tpContents.value = getContentByType('TP').length ? getContentByType('TP') : [''];
-        dsContents.value = getContentByType('DS').length ? getContentByType('DS') : [''];
-
-        const dstp = resourceData.educationalContentId?.filter((item: any) =>
-            ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
-        ).map((item: any) => item.content || '') || [];
-        dstpContents.value = dstp.length ? dstp : [''];
-
-        if (resourceData.teachersFeedbacks?.length) {
-          edFBContents.value = resourceData.teachersFeedbacks.map((f: any) => f.content).join('<br>');
+        const hours = resourceData.courseHours;
+        console.log(hours)
+        if (hours) {
+          splitHours.cm = {h: (hours.cm || 0).toString(), m: '00'};
+          splitHours.td = {h: (hours.td || 0).toString(), m: '00'};
+          splitHours.tp = {h: (hours.tp || 0).toString(), m: '00'};
+          splitHours.ds = {h: (hours.ds || 0).toString(), m: '00'};
+          splitHours.ds_tp = {h: (hours.ds_tp || 0).toString(), m: '00'};
         }
-        if (resourceData.studentsFeedbacks?.length) {
-          stFBContents.value = resourceData.studentsFeedbacks.map((f: any) => f.content).join('<br>');
-        }
-        if (resourceData.improvementIdeas?.length) {
-          upgradesContents.value = resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content).join('<br>');
-        }
+
+        const contents = resourceData.educationalContentID || [];
+
+        const filterBy = (type: string) => contents
+            .filter((c: any) => c.classType === type)
+            .sort((a: any, b: any) => a.courseNumber - b.courseNumber)
+            .map((c: any) => c.content);
+
+        cmContents.value = filterBy('CM').length ? filterBy('CM') : [''];
+        tdContents.value = filterBy('TD').length ? filterBy('TD') : [''];
+        tpContents.value = filterBy('TP').length ? filterBy('TP') : [''];
+        dsContents.value = filterBy('DS').length ? filterBy('DS') : [''];
+        dstpContents.value = filterBy('DS/TP').length ? filterBy('DS/TP') : [''];
+
+        edFBContents.value = (resourceData.teacherFeedbacks || '').replace(/\n/g, '<br>');
+        stFBContents.value = (resourceData.studentFeedbacks || '').replace(/\n/g, '<br>');
+        upgradesContents.value = (resourceData.improvementIdeas || '').replace(/\n/g, '<br>');
 
         await populateRichEditors();
       }
@@ -274,7 +276,7 @@ const fetchResourceSheetData = async () => {
 
 onMounted(async () => {
   await fetchResourceData();
-  await fetchHoursData();
+  // TODO : await fetchHoursData(); -> make trigger only if completion based on MCCC (add back end route to determine correct resource sheet instead of computing in front end)
   await fetchResourceSheetData();
 });
 
@@ -326,7 +328,7 @@ const handleValidate = async () => {
     studentFeedbacks: stFBContents.value,
     improvementsIdeas: upgradesContents.value,
     educationalContents: educationalContentsMap,
-    mainGoal: "Objectif pédagogique principal"
+    academicYearStart: 2026 // TODO : replace with a real selectable component
   };
 
   try {
