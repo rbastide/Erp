@@ -9,9 +9,9 @@ import java.util.Set;
 public record ResourceSheetViewModel(
         Resource resource,
         CourseHours courseHours,
-        List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
-        List<StudentsFeedbacks> studentsFeedbacks,
-        List<ImprovementIdea> improvementIdeas,
+        String educationalTeachersFeedbacks,
+        String studentsFeedbacks,
+        String improvementIdeas,
         int semester,
         Set<Sae> saes,
         Date creationDate,

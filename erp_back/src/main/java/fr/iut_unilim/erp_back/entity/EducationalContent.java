@@ -1,8 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,13 +14,11 @@ public class EducationalContent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resourceSheetId")
-    @JsonBackReference
-    private ResourceSheet resourceSheetId;
+    private ResourceSheet resourceSheet;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classTypeId")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private ClassType classTypeId;
+    private ClassType classType;
 
     @Column(name = "courseNum")
     private Long courseNumber;
@@ -34,12 +30,12 @@ public class EducationalContent {
         return educationalContentId;
     }
 
-    public ResourceSheet getResourceSheetId() {
-        return resourceSheetId;
+    public ResourceSheet getResourceSheet() {
+        return resourceSheet;
     }
 
-    public ClassType getClassTypeId() {
-        return classTypeId;
+    public ClassType getClassType() {
+        return classType;
     }
 
     public Long getCourseNumber() {
@@ -54,12 +50,12 @@ public class EducationalContent {
         this.educationalContentId = educationalContentId;
     }
 
-    public void setResourceSheetId(ResourceSheet ressourceSheetId) {
-        this.resourceSheetId = ressourceSheetId;
+    public void setResourceSheet(ResourceSheet ressourceSheetId) {
+        this.resourceSheet = ressourceSheetId;
     }
 
-    public void setClassTypeId(ClassType classTypeId) {
-        this.classTypeId = classTypeId;
+    public void setClassType(ClassType classTypeId) {
+        this.classType = classTypeId;
     }
 
     public void setCourseNumber(Long courseNumber) {

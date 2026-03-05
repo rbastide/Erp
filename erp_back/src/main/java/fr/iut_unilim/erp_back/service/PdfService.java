@@ -36,18 +36,16 @@ public class PdfService {
 
     @Nullable
     private ResourceSheetViewModel createResourceSheetViewModel(@NotNull ResourceSheet resourceSheet) {
-        Optional<Resource> canHaveResource = resourceService.getResourceById(resourceSheet.getResourceID());
+        Optional<Resource> canHaveResource = resourceService.getResourceById(resourceSheet.getResource().getResourceID());
         if (canHaveResource.isEmpty()) {
             return null;
         }
         Resource resource = canHaveResource.get();
 
-        Optional<CourseHours> courseHours = courseHoursService.findById(resourceSheet.getResourceID());
+        Optional<CourseHours> courseHours = courseHoursService.findById(resourceSheet.getResource().getResourceID());
         if (courseHours.isEmpty()) {
             return null;
         }
-
-        ResourceSheetFeedbacks resourceSheetFeedbacks = handleResourceSheetFeedbacks(resourceSheet);
 
         int semester = resource.getSemester();
 
@@ -65,7 +63,7 @@ public class PdfService {
 
         List<EducationalContent> educationallContents = resourceSheet.getEducationalContentID();
 
-        return new ResourceSheetViewModel(resource, courseHours.get(), resourceSheetFeedbacks.educationalTeachersFeedbacks(), resourceSheetFeedbacks.studentsFeedbacks(), resourceSheetFeedbacks.improvementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
+        return new ResourceSheetViewModel(resource, courseHours.get(), resourceSheet.getTeacherFeedbacks(), resourceSheet.getStudentFeedbacks(), resourceSheet.getImprovementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
     }
 
     @NotNull
@@ -80,19 +78,6 @@ public class PdfService {
         Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
         Set<Skill> skills = mcccService.getSkillsByResource(resource);
         return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalConcepts, skills);
-    }
-
-    @NotNull
-    private static ResourceSheetFeedbacks handleResourceSheetFeedbacks(@NotNull ResourceSheet resourceSheet) {
-        List<TeachersEducationalFeedback> educationalTeachersFeedbacks = resourceSheet.getTeachersFeedbacks();
-        List<StudentsFeedbacks> studentsFeedbacks = resourceSheet.getStudentsFeedbacks();
-        List<ImprovementIdea> improvementIdeas = resourceSheet.getImprovementIdeas();
-        return new ResourceSheetFeedbacks(educationalTeachersFeedbacks, studentsFeedbacks, improvementIdeas);
-    }
-
-    private record ResourceSheetFeedbacks(List<TeachersEducationalFeedback> educationalTeachersFeedbacks,
-                                          List<StudentsFeedbacks> studentsFeedbacks,
-                                          List<ImprovementIdea> improvementIdeas) {
     }
 
     private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<Teacher> teachers,

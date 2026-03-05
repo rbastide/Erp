@@ -29,7 +29,8 @@ public class ResourceSheetService {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
-        return resourceSheetRepository.findAllByUniversityDepartment(department);
+        // TODO : implement better find all to be based on department
+        return resourceSheetRepository.findAll();
     }
 
     public ResourceSheet save(ResourceSheet resourceSheet) {

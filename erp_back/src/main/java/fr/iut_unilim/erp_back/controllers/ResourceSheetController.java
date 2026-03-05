@@ -1,24 +1,20 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
-import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.entity.ClassType;
+import fr.iut_unilim.erp_back.entity.CourseHours;
+import fr.iut_unilim.erp_back.entity.EducationalContent;
+import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
-import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
-import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.CourseHoursService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/resourceSheet")
@@ -27,18 +23,12 @@ public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
     private final ResourceSheetRepository resourceSheetRepository;
-    private final ResourceRepository resourceRepository;
-    private final ConnectionService connectionService;
     private final CourseHoursService courseHoursService;
     private final ClassTypeRepository classTypeRepository;
 
-    private static final Pattern EDUCATIONAL_CONTENT_PATTERN = Pattern.compile("^([A-Z/]+)\\s+(\\d+)\\s*:\\s*(.*)$");
-
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ConnectionService connectionService, CourseHoursService courseHoursService, ClassTypeRepository classTypeRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, CourseHoursService courseHoursService, ClassTypeRepository classTypeRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
-        this.resourceRepository = resourceRepository;
-        this.connectionService = connectionService;
         this.courseHoursService = courseHoursService;
         this.classTypeRepository = classTypeRepository;
     }
@@ -52,156 +42,60 @@ public class ResourceSheetController {
     @PostMapping("/resource-sheet")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
-
-        Connection connection = connectionService.getConnectionByIdentifier(authentication.getName());
-
-        Resource resource;
         ResourceSheet resourceSheet;
-        Long targetResourceId = resourceSheetRequest.getResourceID();
-        Long resourceSheetId = resourceSheetRequest.getSheetsID();
-
-        if (targetResourceId != null && resourceSheetId != null) {
-            resource = resourceRepository.findById(targetResourceId).orElse(new Resource());
-                    resourceSheet = resourceSheetRepository.findById(resourceSheetId).orElse(new ResourceSheet());
-
-            if (resource.getResourceID() == null) {
-                resourceSheet.setCreationDate(new Date());
-            }
-        } else {
-            resource = new Resource();
+        if (resourceSheetRequest.resourceSheetID() == null) {
             resourceSheet = new ResourceSheet();
             resourceSheet.setCreationDate(new Date());
+        } else {
+            Optional<ResourceSheet> existingResourceSheet = resourceSheetRepository.findById(resourceSheetRequest.resourceSheetID());
+            if (existingResourceSheet.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            resourceSheet = existingResourceSheet.get();
         }
 
-        resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
         resourceSheet.setLastModificationDate(new Date());
+        resourceSheet.setImprovementIdeas(resourceSheetRequest.improvementsIdeas());
+        resourceSheet.setStudentFeedbacks(resourceSheetRequest.studentFeedbacks());
+        resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
 
-        if (connection != null) {
-            resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
-        }
+        List<EducationalContent> educationalContents = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : resourceSheetRequest.educationalContents().entrySet()) {
+            long currentCourseNumber = 1;
+            Optional<ClassType> classType = classTypeRepository.findByClassTypeName(entry.getKey());
+            if (classType.isEmpty())
+                return ResponseEntity.badRequest().body("Le type de classe " + entry.getKey() + " n'existe pas");
+            for (String content : entry.getValue()) {
+                EducationalContent educationalContent = new EducationalContent();
+                educationalContent.setResourceSheet(resourceSheet);
+                educationalContent.setContent(content);
+                educationalContent.setCourseNumber(currentCourseNumber);
+                educationalContent.setClassType(classType.get());
 
-        CourseHours courseHours = getCourseHours(resourceSheetRequest);
-
-        CourseHours savedVolume = courseHoursService.save(courseHours);
-        resourceSheet.setCourseHoursID(savedVolume);
-
-        List<String> studentContents = resourceSheetRequest.getStudentFeedbackID();
-        if (studentContents != null) {
-            List<StudentsFeedbacks> studentEntities = studentContents.stream()
-                    .filter(c -> c != null && !c.isBlank())
-                    .map(content -> {
-                        StudentsFeedbacks fb = new StudentsFeedbacks();
-                        fb.setContent(content);
-                        return fb;
-                    })
-                    .collect(Collectors.toList());
-
-            if (resourceSheet.getStudentsFeedbacks() != null) {
-                resourceSheet.getStudentsFeedbacks().clear();
-                resourceSheet.getStudentsFeedbacks().addAll(studentEntities);
-            } else {
-                resourceSheet.setStudentsFeedbacks(studentEntities);
+                educationalContents.add(educationalContent);
+                currentCourseNumber++;
             }
         }
 
-        List<String> teacherContents = resourceSheetRequest.getTeachersFeedbackID();
-        if (teacherContents != null) {
-            List<TeachersEducationalFeedback> teacherEntities = teacherContents.stream()
-                    .filter(c -> c != null && !c.isBlank())
-                    .map(content -> {
-                        TeachersEducationalFeedback fb = new TeachersEducationalFeedback();
-                        fb.setContent(content);
-                        return fb;
-                    })
-                    .collect(Collectors.toList());
+        resourceSheet.setEducationalContentID(educationalContents);
+        resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
 
-            if (resourceSheet.getTeachersFeedbacks() != null) {
-                resourceSheet.getTeachersFeedbacks().clear();
-                resourceSheet.getTeachersFeedbacks().addAll(teacherEntities);
-            } else {
-                resourceSheet.setTeachersFeedbacks(teacherEntities);
-            }
-        }
-        List<String> ideaContents = resourceSheetRequest.getImprovementsIdeaID();
-        if (ideaContents != null) {
-            List<ImprovementIdea> ideaEntities = ideaContents.stream()
-                    .filter(c -> c != null && !c.isBlank())
-                    .map(content -> {
-                        ImprovementIdea idea = new ImprovementIdea();
-                        idea.setIdeaContent(content);
-                        return idea;
-                    })
-                    .collect(Collectors.toList());
+        resourceSheetRepository.save(resourceSheet);
 
-            if (resourceSheet.getImprovementIdeas() != null) {
-                resourceSheet.getImprovementIdeas().clear();
-                resourceSheet.getImprovementIdeas().addAll(ideaEntities);
-            } else {
-                resourceSheet.setImprovementIdeas(ideaEntities);
-            }
-        }
-
-        List<String> educationalContentsStrings = resourceSheetRequest.getEducationalContent();
-        if (educationalContentsStrings != null) {
-            List<EducationalContent> educationalContentEntities = new ArrayList<>();
-
-            for (String rawContent : educationalContentsStrings) {
-                Matcher matcher = EDUCATIONAL_CONTENT_PATTERN.matcher(rawContent);
-
-                if (matcher.find()) {
-                    String typeStr = matcher.group(1);
-                    String numStr = matcher.group(2);
-                    String contentStr = matcher.group(3);
-
-                    Optional<ClassType> classTypeOpt = classTypeRepository.findByClassTypeName(typeStr);
-
-                    if (classTypeOpt.isPresent()) {
-                        EducationalContent eduContent = new EducationalContent();
-                        eduContent.setClassTypeId(classTypeOpt.get());
-                        eduContent.setCourseNumber(Long.parseLong(numStr));
-                        eduContent.setContent(contentStr);
-
-                        eduContent.setResourceSheetId(resourceSheet);
-
-                        educationalContentEntities.add(eduContent);
-                    } else {
-                        System.out.println("Attention: Type de cours inconnu en base de données : " + typeStr);
-                    }
-                }
-            }
-            if (resourceSheet.getEducationalContentID() != null) {
-                resourceSheet.getEducationalContentID().clear();
-                resourceSheet.getEducationalContentID().addAll(educationalContentEntities);
-            } else {
-                resourceSheet.setEducationalContentID(educationalContentEntities);
-            }
-        }
-
-        
-
-        resourceSheetService.save(resourceSheet);
-
-        return ResponseEntity.ok("L'ajout des fiches ressources a été effectué avec succès");
+        return ResponseEntity.ok().build();
     }
 
-    @NotNull
-    private static CourseHours getCourseHours(ResourceSheetRequest resourceSheetRequest) {
-        CourseHours courseHours = new CourseHours();
-
-        if (resourceSheetRequest.getCourseHours() != null) {
-            courseHours.setNbHoursTP(resourceSheetRequest.getCourseHours().getTp());
-            courseHours.setNbHoursDSTP(resourceSheetRequest.getCourseHours().getDs_tp());
-            courseHours.setNbHoursDS(resourceSheetRequest.getCourseHours().getDs());
-            courseHours.setNbHoursTD(resourceSheetRequest.getCourseHours().getTd());
-            courseHours.setNbHoursCM(resourceSheetRequest.getCourseHours().getCm());
-        } else {
-            courseHours.setNbHoursTP(0F);
-            courseHours.setNbHoursDSTP(0F);
-            courseHours.setNbHoursDS(0F);
-            courseHours.setNbHoursTD(0F);
-            courseHours.setNbHoursCM(0F);
+    private CourseHours findOrCreateCourseHoursFromDtoRequest(ResourceSheetRequest resourceSheetRequest) {
+        float hoursCM = resourceSheetRequest.courseHours().get("cm");
+        float hoursTD = resourceSheetRequest.courseHours().get("td");
+        float hoursTP = resourceSheetRequest.courseHours().get("tp");
+        float hoursDSTP = resourceSheetRequest.courseHours().get("ds_tp");
+        float hoursDS = resourceSheetRequest.courseHours().get("ds");
+        List<CourseHours> courseHours = courseHoursService.getAllCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
+        if (courseHours.isEmpty()) {
+            return new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD);
         }
-        return courseHours;
+        return courseHours.get(0);
     }
 
     @DeleteMapping("/{id}")
@@ -214,36 +108,36 @@ public class ResourceSheetController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getHistory")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
-        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
-        List<HistoryResponse> historyList = new ArrayList<>();
-
-        for (ResourceSheet sheet : sheets) {
-            String code = "Inconnu";
-            String name = "Inconnue";
-
-            if (sheet.getResourceID() != null) {
-                Optional<Resource> res = resourceRepository.findById(sheet.getResourceID());
-                if (res.isPresent()) {
-                    code = res.get().getNum();
-                    name = res.get().getName();
-                }
-            }
-
-            Date dateToUse = sheet.getLastModificationDate() != null ?
-                    sheet.getLastModificationDate() : sheet.getCreationDate();
-
-            historyList.add(new HistoryResponse(
-                    sheet.getSheetsID(),
-                    code,
-                    name,
-                    dateToUse));
-        }
-
-        Collections.reverse(historyList);
-
-        return ResponseEntity.ok(historyList);
-    }
+//    @GetMapping("/getHistory")
+//    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+//    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
+//        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
+//        List<HistoryResponse> historyList = new ArrayList<>();
+//
+//        for (ResourceSheet sheet : sheets) {
+//            String code = "Inconnu";
+//            String name = "Inconnue";
+//
+//            if (sheet.getResource() != null) {
+//                Optional<Resource> res = resourceRepository.findById(sheet.getResource());
+//                if (res.isPresent()) {
+//                    code = res.get().getNum();
+//                    name = res.get().getName();
+//                }
+//            }
+//
+//            Date dateToUse = sheet.getLastModificationDate() != null ?
+//                    sheet.getLastModificationDate() : sheet.getCreationDate();
+//
+//            historyList.add(new HistoryResponse(
+//                    sheet.getSheetID(),
+//                    code,
+//                    name,
+//                    dateToUse));
+//        }
+//
+//        Collections.reverse(historyList);
+//
+//        return ResponseEntity.ok(historyList);
+//    }
 }

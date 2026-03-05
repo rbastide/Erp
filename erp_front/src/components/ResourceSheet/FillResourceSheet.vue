@@ -33,9 +33,9 @@ const tpContents = ref([''])
 const dsContents = ref([''])
 const dstpContents = ref([''])
 
-const edFBContents = ref([''])
-const stFBContents = ref([''])
-const upgradesContents = ref([''])
+const edFBContents = ref('')
+const stFBContents = ref('')
+const upgradesContents = ref('')
 
 const cmRefs = ref<HTMLInputElement[]>([])
 const tdRefs = ref<HTMLInputElement[]>([])
@@ -159,17 +159,22 @@ const execCmd = (command: string) => {
   checkFormats();
 };
 
-const updateRichContent = (event: Event, list: string[]) => {
+const updateRichContent = (event: Event, type: 'teachers' | 'students' | 'upgrades') => {
   const target = event.target as HTMLElement;
-  list[0] = target.innerHTML;
+  const content = target.innerText;
+
+  if (type === 'teachers') edFBContents.value = content;
+  if (type === 'students') stFBContents.value = content;
+  if (type === 'upgrades') upgradesContents.value = content;
+
   checkFormats();
 };
 
 const populateRichEditors = async () => {
   await nextTick();
-  if (edFBRef.value) edFBRef.value.innerHTML = edFBContents.value[0] || '';
-  if (stFBRef.value) stFBRef.value.innerHTML = stFBContents.value[0] || '';
-  if (upgradesRef.value) upgradesRef.value.innerHTML = upgradesContents.value[0] || '';
+  if (edFBRef.value) edFBRef.value.innerHTML = edFBContents.value || '';
+  if (stFBRef.value) stFBRef.value.innerHTML = stFBContents.value || '';
+  if (upgradesRef.value) upgradesRef.value.innerHTML = upgradesContents.value || '';
 };
 
 const fetchResourceData = async () => {
@@ -250,13 +255,13 @@ const fetchResourceSheetData = async () => {
         dstpContents.value = dstp.length ? dstp : [''];
 
         if (resourceData.teachersFeedbacks?.length) {
-          edFBContents.value = [resourceData.teachersFeedbacks.map((f: any) => f.content).join('<br>')];
+          edFBContents.value = resourceData.teachersFeedbacks.map((f: any) => f.content).join('<br>');
         }
         if (resourceData.studentsFeedbacks?.length) {
-          stFBContents.value = [resourceData.studentsFeedbacks.map((f: any) => f.content).join('<br>')];
+          stFBContents.value = resourceData.studentsFeedbacks.map((f: any) => f.content).join('<br>');
         }
         if (resourceData.improvementIdeas?.length) {
-          upgradesContents.value = [resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content).join('<br>')];
+          upgradesContents.value = resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content).join('<br>');
         }
 
         await populateRichEditors();
@@ -292,39 +297,35 @@ const addDS = createFieldManager(dsContents, dsRefs)
 const addDSTP = createFieldManager(dstpContents, dstpRefs)
 
 const handleValidate = async () => {
-  const formatForBackend = (type: string, list: string[]) => {
+  const formatForBackend = (list: string[]) => {
     return list
-        .map((content, index) => (content || '').trim() ? `${type} ${index + 1} : ${(content || '').trim()}` : null)
-        .filter((item): item is string => item !== null);
+        .map(content => (content || '').trim())
+        .filter(content => content !== '');
   };
 
-  const allEducationalContent = [
-    ...formatForBackend('CM', cmContents.value),
-    ...formatForBackend('TD', tdContents.value),
-    ...formatForBackend('TP', tpContents.value),
-    ...formatForBackend('DS', dsContents.value),
-    ...formatForBackend('DS/TP', dstpContents.value)
-  ];
-
-  const filterRich = (list: string[]) => list.filter(t => t && t.replace(/<[^>]*>?/gm, '').trim().length > 0);
+  const educationalContentsMap: Record<string, string[]> = {
+    "CM": formatForBackend(cmContents.value),
+    "TD": formatForBackend(tdContents.value),
+    "TP": formatForBackend(tpContents.value),
+    "DS": formatForBackend(dsContents.value),
+    "DS/TP": formatForBackend(dstpContents.value)
+  };
 
   const hoursPayload = {
     cm: convertSplitToDecimal(splitHours.cm),
     td: convertSplitToDecimal(splitHours.td),
     tp: convertSplitToDecimal(splitHours.tp),
     ds: convertSplitToDecimal(splitHours.ds),
-    ds_tp: convertSplitToDecimal(splitHours.ds_tp),
-    student: 0
+    ds_tp: convertSplitToDecimal(splitHours.ds_tp)
   };
-  hoursPayload.student = hoursPayload.cm + hoursPayload.td + hoursPayload.tp + hoursPayload.ds + hoursPayload.ds_tp;
 
   const payload = {
     resourceID: currentResourceId.value,
     courseHours: hoursPayload,
-    teachersFeedbackID: filterRich(edFBContents.value),
-    studentFeedbackID: filterRich(stFBContents.value),
-    improvementsIdeaID: filterRich(upgradesContents.value),
-    educationalContent: allEducationalContent,
+    teacherFeedbacks: edFBContents.value,
+    studentFeedbacks: stFBContents.value,
+    improvementsIdeas: upgradesContents.value,
+    educationalContents: educationalContentsMap,
     mainGoal: "Objectif pédagogique principal"
   };
 
@@ -492,7 +493,7 @@ const pedagogicalSections = computed(() => [
             <div
                 class="rich-editor-content"
                 contenteditable="true"
-                @input="(e) => updateRichContent(e, edFBContents)"
+                @input="(e) => updateRichContent(e, 'teachers')"
                 @keyup="checkFormats"
                 @mouseup="checkFormats"
                 @focus="handleFocus('teachers')"
@@ -526,7 +527,7 @@ const pedagogicalSections = computed(() => [
             <div
                 class="rich-editor-content"
                 contenteditable="true"
-                @input="(e) => updateRichContent(e, stFBContents)"
+                @input="(e) => updateRichContent(e, 'students')"
                 @keyup="checkFormats"
                 @mouseup="checkFormats"
                 @focus="handleFocus('students')"
@@ -560,7 +561,7 @@ const pedagogicalSections = computed(() => [
             <div
                 class="rich-editor-content"
                 contenteditable="true"
-                @input="(e) => updateRichContent(e, upgradesContents)"
+                @input="(e) => updateRichContent(e, 'upgrades')"
                 @keyup="checkFormats"
                 @mouseup="checkFormats"
                 @focus="handleFocus('upgrades')"

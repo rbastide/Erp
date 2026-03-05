@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.model.CriticalConceptModel;
@@ -239,7 +238,7 @@ public class McccController {
 
     @NotNull
     private CourseHours getCourseHoursFromDto(McccRequest dto) {
-        List<CourseHours> allCourseHours = courseHoursService.getAllCourseHoursFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
+        List<CourseHours> allCourseHours = courseHoursService.getAllCourseHoursFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP(), dto.getHoursDS());
         if (allCourseHours.isEmpty()) {
             return new CourseHours(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
         }

@@ -16,8 +16,8 @@ public class CourseHoursService {
         this.courseHoursRepository = courseHoursRepository;
     }
 
-    public List<CourseHours> getAllCourseHoursFromDatas(Float hoursCM, Float hoursTD, Float hoursTP, Float hoursDSTP) {
-        return courseHoursRepository.findByDatas(hoursCM, hoursTD, hoursTP, hoursDSTP);
+    public List<CourseHours> getAllCourseHoursFromDatas(Float hoursCM, Float hoursTD, Float hoursTP, Float hoursDSTP, Float hoursDS) {
+        return courseHoursRepository.findByDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
     }
 
     public CourseHours save(CourseHours courseHours) {
