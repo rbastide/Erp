@@ -1,11 +1,9 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
-import fr.iut_unilim.erp_back.entity.ClassType;
-import fr.iut_unilim.erp_back.entity.CourseHours;
-import fr.iut_unilim.erp_back.entity.EducationalContent;
-import fr.iut_unilim.erp_back.entity.ResourceSheet;
+import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
+import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.CourseHoursService;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
@@ -25,12 +23,14 @@ public class ResourceSheetController {
     private final ResourceSheetRepository resourceSheetRepository;
     private final CourseHoursService courseHoursService;
     private final ClassTypeRepository classTypeRepository;
+    private final ResourceRepository resourceRepository;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, CourseHoursService courseHoursService, ClassTypeRepository classTypeRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, CourseHoursService courseHoursService, ClassTypeRepository classTypeRepository, ResourceRepository resourceRepository) {
         this.resourceSheetService = resourceSheetService;
         this.resourceSheetRepository = resourceSheetRepository;
         this.courseHoursService = courseHoursService;
         this.classTypeRepository = classTypeRepository;
+        this.resourceRepository = resourceRepository;
     }
 
     @GetMapping("/getResourceSheet")
@@ -58,6 +58,7 @@ public class ResourceSheetController {
         resourceSheet.setImprovementIdeas(resourceSheetRequest.improvementsIdeas());
         resourceSheet.setStudentFeedbacks(resourceSheetRequest.studentFeedbacks());
         resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
+        resourceSheet.setValidate(false);
 
         List<EducationalContent> educationalContents = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : resourceSheetRequest.educationalContents().entrySet()) {
@@ -77,6 +78,12 @@ public class ResourceSheetController {
             }
         }
 
+        Optional<Resource> resource = resourceRepository.findById(resourceSheetRequest.resourceID());
+        if (resource.isEmpty()) {
+            return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
+        }
+
+        resourceSheet.setResource(resource.get());
         resourceSheet.setEducationalContentID(educationalContents);
         resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
 

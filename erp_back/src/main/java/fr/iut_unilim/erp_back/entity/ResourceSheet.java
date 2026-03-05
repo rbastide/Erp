@@ -43,6 +43,9 @@ public class ResourceSheet {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheet")
     private List<EducationalContent> educationalContentID;
 
+    @Column(name = "isValidate")
+    private boolean isValidate;
+
     public ResourceSheet() {
     }
 
@@ -116,5 +119,13 @@ public class ResourceSheet {
 
     public List<EducationalContent> getEducationalContentID() {
         return educationalContentID;
+    }
+
+    public boolean isValidate() {
+        return isValidate;
+    }
+
+    public void setValidate(boolean validate) {
+        isValidate = validate;
     }
 }

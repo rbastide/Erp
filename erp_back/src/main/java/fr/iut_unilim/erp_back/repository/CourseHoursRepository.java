@@ -12,8 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface CourseHoursRepository extends JpaRepository<CourseHours, Long> {
-    @Query("SELECT h FROM CourseHours h WHERE h.nbHoursCM = :hoursCM AND h.nbHoursTD = :hoursTD AND h.nbHoursTP = :hoursTP AND h.nbHoursDSTP = :hoursDSTP AND h.nbHoursDS =: hoursDS")
-    List<CourseHours> findByDatas(@Param("hoursCM") Float hoursCM, @Param("hoursTD") Float hoursTD, @Param("hoursTP") Float hoursTP, @Param("hoursDS") Float hoursDS, @Param("hoursDSTP") Float hoursDSTP);
+    @Query("SELECT h FROM CourseHours h WHERE h.nbHoursCM = :hoursCM AND h.nbHoursTD = :hoursTD AND h.nbHoursTP = :hoursTP AND h.nbHoursDSTP = :hoursDSTP AND h.nbHoursDS = :hoursDS")
+    List<CourseHours> findByDatas(@Param("hoursCM") Float hoursCM, @Param("hoursTD") Float hoursTD, @Param("hoursTP") Float hoursTP, @Param("hoursDSTP") Float hoursDSTP, @Param("hoursDS") Float hoursDS);
 
     @NotNull Optional<CourseHours> findById(@NotNull Long courseHoursID);
 }
