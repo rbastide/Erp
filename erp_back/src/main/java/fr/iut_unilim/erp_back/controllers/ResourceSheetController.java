@@ -35,7 +35,7 @@ public class ResourceSheetController {
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
         boolean hasBeenAdded = resourceSheetService.saveFromRequest(resourceSheetRequest);
-        if (hasBeenAdded) return ResponseEntity.notFound().build();
+        if (!hasBeenAdded) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok().build();
     }
