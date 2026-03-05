@@ -1,16 +1,16 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.CourseHoursResponse;
+import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
+import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ResourceSheetService {
@@ -19,12 +19,16 @@ public class ResourceSheetService {
     private final ConnectionService connectionService;
     private final ResourceRepository resourceRepository;
     private final EducationalContentService educationalContentService;
+    private final ClassTypeRepository classTypeRepository;
+    private final CourseHoursService courseHoursService;
 
-    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService) {
+    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService) {
         this.resourceSheetRepository = resourceSheetRepository;
         this.connectionService = connectionService;
         this.resourceRepository = resourceRepository;
         this.educationalContentService = educationalContentService;
+        this.classTypeRepository = classTypeRepository;
+        this.courseHoursService = courseHoursService;
     }
 
     public List<ResourceSheet> getAllResourceSheets() {
@@ -83,5 +87,68 @@ public class ResourceSheetService {
                 educationalContentService.convertEntitiesToResponses(resourceSheet.getEducationalContents()),
                 resourceSheet.isValidate()
         );
+    }
+
+    public boolean saveFromRequest(ResourceSheetRequest resourceSheetRequest) {
+        ResourceSheet resourceSheet;
+        if (resourceSheetRequest.resourceSheetID() == null) {
+            resourceSheet = new ResourceSheet();
+            resourceSheet.setCreationDate(new Date());
+        } else {
+            Optional<ResourceSheet> existingResourceSheet = resourceSheetRepository.findById(resourceSheetRequest.resourceSheetID());
+            if (existingResourceSheet.isEmpty()) {
+                return false;
+            }
+            resourceSheet = existingResourceSheet.get();
+        }
+
+        resourceSheet.setLastModificationDate(new Date());
+        resourceSheet.setImprovementIdeas(resourceSheetRequest.improvementsIdeas());
+        resourceSheet.setStudentFeedbacks(resourceSheetRequest.studentFeedbacks());
+        resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
+        resourceSheet.setValidate(false);
+
+        List<EducationalContent> educationalContents = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : resourceSheetRequest.educationalContents().entrySet()) {
+            long currentCourseNumber = 1;
+            Optional<ClassType> classType = classTypeRepository.findByClassTypeName(entry.getKey());
+            if (classType.isEmpty())
+                return false;
+            for (String content : entry.getValue()) {
+                EducationalContent educationalContent = new EducationalContent();
+                educationalContent.setResourceSheet(resourceSheet);
+                educationalContent.setContent(content);
+                educationalContent.setCourseNumber(currentCourseNumber);
+                educationalContent.setClassType(classType.get());
+
+                educationalContents.add(educationalContent);
+                currentCourseNumber++;
+            }
+        }
+
+        Optional<Resource> resource = resourceRepository.findById(resourceSheetRequest.resourceID());
+        if (resource.isEmpty()) {
+            return false;
+        }
+
+        resourceSheet.setResource(resource.get());
+        resourceSheet.setEducationalContents(educationalContents);
+        resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
+
+        resourceSheetRepository.save(resourceSheet);
+        return true;
+    }
+
+    private CourseHours findOrCreateCourseHoursFromDtoRequest(ResourceSheetRequest resourceSheetRequest) {
+        float hoursCM = resourceSheetRequest.courseHours().get("cm");
+        float hoursTD = resourceSheetRequest.courseHours().get("td");
+        float hoursTP = resourceSheetRequest.courseHours().get("tp");
+        float hoursDSTP = resourceSheetRequest.courseHours().get("ds_tp");
+        float hoursDS = resourceSheetRequest.courseHours().get("ds");
+        List<CourseHours> courseHours = courseHoursService.getAllCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
+        if (courseHours.isEmpty()) {
+            return new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD);
+        }
+        return courseHours.get(0);
     }
 }
