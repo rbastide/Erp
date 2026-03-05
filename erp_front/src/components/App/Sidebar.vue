@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import {useRouter} from 'vue-router';
-import {onMounted, ref, watchEffect} from "vue";
+import { useRouter } from 'vue-router';
+import { onMounted, ref, watchEffect, watch } from "vue";
 import api from '@/services/api';
 
 const props = defineProps({
-  dashboardAdminActive: { type: Boolean, default: false },
   dashboardActive: { type: Boolean, default: false },
   settingsActive: { type: Boolean, default: false },
   helpActive: { type: Boolean, default: false },
@@ -50,18 +49,21 @@ const fetchCurrentDepartment = async () => {
 
 onMounted(() => {
   updateRole();
-  if (props.showDepartments && (userRole.value === 'SUPER_ADMIN' || userRole.value === 'ADMIN')) {
+});
+
+watch(() => props.showDepartments, (newValue) => {
+  if (newValue === true) {
     fetchCurrentDepartment();
     fetchDepartments();
   }
-});
+}, { immediate: true });
 
 watchEffect(() => {
   updateRole();
 });
 
 const handleDashboardClick = () => {
-  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
+  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN') {
     router.push('/home-admin');
   } else {
     router.push('/home');
@@ -101,7 +103,7 @@ const handleDisconnection = () => router.push('/logout');
       <div class="dropdown-container">
         <div
             class="nav-item main-item"
-            :class="{ active: props.dashboardActive || props.dashboardAdminActive }"
+            :class="{ active: props.dashboardActive }"
             @click="handleDashboardClick"
         >
           <div class="icon-wrapper">
@@ -114,12 +116,12 @@ const handleDisconnection = () => router.push('/logout');
           </div>
           <span class="nav-text">Dashboard</span>
 
-          <svg v-if="isExpanded && props.showDepartments && userRole === 'SUPER_ADMIN' && universityDepartments.length > 0" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg v-if="isExpanded && props.showDepartments && universityDepartments.length > 0" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </div>
 
-        <div v-if="props.showDepartments && userRole === 'SUPER_ADMIN'" class="submenu">
+        <div v-if="props.showDepartments" class="submenu">
           <div
               v-for="dept in universityDepartments"
               :key="dept.universityDepartmentID"

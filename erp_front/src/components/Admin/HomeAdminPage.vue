@@ -7,7 +7,7 @@ const router = useRouter();
 </script>
 
 <template>
-  <Sidebar :showDepartments="true" :dashboardAdminActive="true" />
+  <Sidebar :showDepartments="true" />
   <div class="page-container">
     <AppHeader title="Bonjour ADMIN"/>
 
