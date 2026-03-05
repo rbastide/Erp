@@ -3,7 +3,6 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
-import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,11 +17,9 @@ import java.util.List;
 public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
-    private final ResourceSheetRepository resourceSheetRepository;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService) {
         this.resourceSheetService = resourceSheetService;
-        this.resourceSheetRepository = resourceSheetRepository;
     }
 
     @GetMapping("/getResourceSheet")
@@ -35,7 +32,7 @@ public class ResourceSheetController {
 
     @PostMapping("/resource-sheet")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
+    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
         boolean hasBeenAdded = resourceSheetService.saveFromRequest(resourceSheetRequest);
         if (hasBeenAdded) return ResponseEntity.notFound().build();
 
@@ -45,10 +42,8 @@ public class ResourceSheetController {
     @DeleteMapping("/{id}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
-        if (!resourceSheetRepository.existsById(id)) {
-            return ResponseEntity.ok().build();
-        }
-        resourceSheetRepository.deleteById(id);
+        boolean hasBeenDeleted = resourceSheetService.deleteResourceSheetById(id);
+        if (!hasBeenDeleted) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().build();
     }
 
