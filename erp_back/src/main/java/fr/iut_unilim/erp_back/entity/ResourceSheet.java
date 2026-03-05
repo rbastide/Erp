@@ -41,7 +41,7 @@ public class ResourceSheet {
     private String studentFeedbacks;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheet")
-    private List<EducationalContent> educationalContentID;
+    private List<EducationalContent> educationalContents;
 
     @Column(name = "isValidate")
     private boolean isValidate;
@@ -69,8 +69,8 @@ public class ResourceSheet {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public void setEducationalContentID(List<EducationalContent> educationalContentID) {
-        this.educationalContentID = educationalContentID;
+    public void setEducationalContents(List<EducationalContent> educationalContentID) {
+        this.educationalContents = educationalContentID;
     }
 
     public Long getSheetID() {
@@ -117,8 +117,8 @@ public class ResourceSheet {
         this.studentFeedbacks = studentFeedbacks;
     }
 
-    public List<EducationalContent> getEducationalContentID() {
-        return educationalContentID;
+    public List<EducationalContent> getEducationalContents() {
+        return educationalContents;
     }
 
     public boolean isValidate() {

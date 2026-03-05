@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
+import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
@@ -36,7 +37,9 @@ public class ResourceSheetController {
     @GetMapping("/getResourceSheet")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getResourceSheet(Authentication authentication) {
-        return ResponseEntity.ok(resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName()));
+        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
+        List<ResourceSheetResponse> sheetRequests = resourceSheetService.convertToEntitiesToResponses(sheets);
+        return ResponseEntity.ok(sheetRequests);
     }
 
     @PostMapping("/resource-sheet")
@@ -84,7 +87,7 @@ public class ResourceSheetController {
         }
 
         resourceSheet.setResource(resource.get());
-        resourceSheet.setEducationalContentID(educationalContents);
+        resourceSheet.setEducationalContents(educationalContents);
         resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
 
         resourceSheetRepository.save(resourceSheet);
