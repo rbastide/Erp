@@ -1,11 +1,10 @@
 <script setup>
-const props = defineProps({
+defineProps({
   resourceNum: {
     type: String,
     default: ''
   }
 });
-
 const emit = defineEmits(['confirm', 'close']);
 
 const onConfirm = () => emit('confirm');
