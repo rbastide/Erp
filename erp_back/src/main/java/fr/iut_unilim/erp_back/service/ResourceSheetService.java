@@ -98,14 +98,20 @@ public class ResourceSheetService {
         resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
         resourceSheet.setValidate(false);
 
-        List<EducationalContent> educationalContents = extractEducationalContentsFromRequest(resourceSheetRequest, resourceSheet);
-        if (educationalContents == null) return false;
+        List<EducationalContent> newContents = extractEducationalContentsFromRequest(resourceSheetRequest, resourceSheet);
+        if (newContents == null) return false;
+
+        if (resourceSheet.getEducationalContents() == null) {
+            resourceSheet.setEducationalContents(new ArrayList<>(newContents));
+        } else {
+            resourceSheet.getEducationalContents().clear();
+            resourceSheet.getEducationalContents().addAll(newContents);
+        }
 
         Optional<Resource> resource = resourceRepository.findById(resourceSheetRequest.resourceID());
         if (resource.isEmpty()) return false;
 
         resourceSheet.setResource(resource.get());
-        resourceSheet.setEducationalContents(educationalContents);
         resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
 
         resourceSheetRepository.save(resourceSheet);
