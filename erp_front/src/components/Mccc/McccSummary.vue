@@ -59,7 +59,7 @@ const handleValidate = async () => {
       hoursDS: mcccStore.hoursDS,
       hoursDSTP: mcccStore.hoursDSTP,
 
-      saeCodes: (mcccStore.saes || []).map(s => ({
+      saeCodes: (mcccStore.saeCodes || []).map(s => ({
         saeCode: s.saeNum || s.saeCode
       })),
 
