@@ -24,10 +24,10 @@ public class ResourceSheetController {
         this.resourceSheetService = resourceSheetService;
     }
 
-    @GetMapping("/getResourceSheet")
+    @GetMapping("/getResourceSheet/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getResourceSheet(Authentication authentication) {
-        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
+    public ResponseEntity<?> getResourceSheet(Authentication authentication, @PathVariable Integer year) {
+        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartmentAndYear(authentication.getName(), year);
         List<ResourceSheetResponse> sheetRequests = resourceSheetService.convertToEntitiesToResponses(sheets);
         return ResponseEntity.ok(sheetRequests);
     }
@@ -39,7 +39,7 @@ public class ResourceSheetController {
 
         if (resourceSheet.isEmpty()) return ResponseEntity.notFound().build();
 
-        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertToEntityToResponse(resourceSheet.get());
+        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertEntityToResponse(resourceSheet.get());
 
         return ResponseEntity.ok().body(resourceSheetResponse);
     }
@@ -61,10 +61,10 @@ public class ResourceSheetController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getHistory")
+    @GetMapping("/getHistory/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
-        List<HistoryResponse> historyResponses = resourceSheetService.getHistoryResponses(authentication.getName());
+    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication, @PathVariable Integer year) {
+        List<HistoryResponse> historyResponses = resourceSheetService.getHistoryResponses(authentication.getName(), year);
 
         return ResponseEntity.ok(historyResponses);
     }
