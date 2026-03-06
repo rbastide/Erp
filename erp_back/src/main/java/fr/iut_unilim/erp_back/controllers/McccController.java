@@ -7,6 +7,7 @@ import fr.iut_unilim.erp_back.model.LearningRankModel;
 import fr.iut_unilim.erp_back.model.SaeModel;
 import fr.iut_unilim.erp_back.model.TeacherModel;
 import fr.iut_unilim.erp_back.service.*;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,7 @@ public class McccController {
 
     @PostMapping("/save")
     @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
+    @Transactional
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
@@ -81,8 +83,13 @@ public class McccController {
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
+
         Set<Sae> setSae = getSAEFromDto(dto);
-        mccc.setSaesId(setSae);
+        if (mccc.getSaesId() == null) {
+            mccc.setSaesId(new HashSet<>());
+        }
+        mccc.getSaesId().addAll(setSae);
+
         CourseHours courseHours = getCourseHoursFromDto(dto);
         mccc.setCourseHoursId(courseHours);
         try {
