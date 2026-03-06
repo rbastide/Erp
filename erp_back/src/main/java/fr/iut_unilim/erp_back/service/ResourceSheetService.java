@@ -33,16 +33,23 @@ public class ResourceSheetService {
         this.courseHoursService = courseHoursService;
     }
 
-    public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
+    public List<ResourceSheet> getAllResourceSheetsFromDepartmentAndYear(@NotNull String identifier, Integer year) {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<ResourceSheet> resourceSheets = new ArrayList<>();
         for (Resource resource : resourceRepository.findAllByUniversityDepartment(department)) {
-            resourceSheets.addAll(resourceSheetRepository.findAllByResource(resource));
+            resourceSheets.addAll(resourceSheetRepository.findAllByResourceAndAcademicYearStart(resource, year));
         }
 
         return resourceSheets;
+    }
+
+    public Optional<ResourceSheet> getResourceSheetForResourceFromYear(Long resourceID, int academicYearStart) {
+        Optional<Resource> resource = resourceRepository.findById(resourceID);
+        if (resource.isEmpty()) return Optional.empty();
+
+        return resourceSheetRepository.findByResourceAndAcademicYearStart(resource.get(), academicYearStart);
     }
 
     public ResourceSheet save(ResourceSheet resourceSheet) {
@@ -62,10 +69,10 @@ public class ResourceSheetService {
     }
 
     public List<ResourceSheetResponse> convertToEntitiesToResponses(List<ResourceSheet> resourceSheets) {
-        return resourceSheets.stream().map(this::convertToEntityToResponse).toList();
+        return resourceSheets.stream().map(this::convertEntityToResponse).toList();
     }
 
-    public ResourceSheetResponse convertToEntityToResponse(ResourceSheet resourceSheet) {
+    public ResourceSheetResponse convertEntityToResponse(ResourceSheet resourceSheet) {
         CourseHours courseHours = resourceSheet.getCourseHours();
 
         CourseHoursResponse courseHoursResponse = new CourseHoursResponse(
@@ -120,8 +127,8 @@ public class ResourceSheetService {
         return true;
     }
 
-    public List<HistoryResponse> getHistoryResponses(String identifier) {
-        List<ResourceSheet> sheets = getAllResourceSheetsFromDepartment(identifier);
+    public List<HistoryResponse> getHistoryResponses(String identifier, Integer year) {
+        List<ResourceSheet> sheets = getAllResourceSheetsFromDepartmentAndYear(identifier, year);
         List<HistoryResponse> historyList = new ArrayList<>();
 
         for (ResourceSheet sheet : sheets) {
