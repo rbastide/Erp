@@ -19,7 +19,7 @@ const formatDate = (dateString: string) => {
 const fetchHistory = async () => {
   try {
     isLoading.value = true;
-    const response = await api.get('/resourceSheet/getHistory');
+    const response = await api.get('/resourceSheet/getHistory/2026'); // TODO : add year path parameter
     historyItems.value = response.data;
   } catch (error) {
     console.error("Erreur chargement historique :", error);

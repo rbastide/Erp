@@ -223,7 +223,7 @@ const fetchHoursData = async () => {
 
 const fetchResourceSheetData = async () => {
   try {
-    const response = await api.get('/resourceSheet/getResourceSheet');
+    const response = await api.get('/resourceSheet/getResourceSheet/2026'); // TODO : add working year path parameter
 
     if (response.data && Array.isArray(response.data)) {
       console.log(response.data, currentResourceId.value)

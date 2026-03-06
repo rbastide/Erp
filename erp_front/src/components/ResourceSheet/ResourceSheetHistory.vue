@@ -47,7 +47,7 @@ const fetchSheetData = async () => {
   if (!sheetIdFromUrl) return
 
   try {
-    const responseSheets = await api.get('/resourceSheet/getResourceSheet')
+    const responseSheets = await api.get('/resourceSheet/getResourceSheet/2026') // TODO : add year path parameter
     const sheet = responseSheets.data.find((s: any) => s.sheetsID == sheetIdFromUrl)
 
     if (sheet) {
