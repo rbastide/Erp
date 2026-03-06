@@ -44,6 +44,15 @@ public class ResourceSheetController {
         return ResponseEntity.ok().body(resourceSheetResponse);
     }
 
+    @GetMapping("/resource-sheet/{resourceId}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetFromId(@PathVariable Long resourceId) {
+        Optional<ResourceSheet> resourceSheet = resourceSheetService.getResourceSheetById(resourceId);
+        if (resourceSheet.isEmpty()) return ResponseEntity.notFound().build();
+        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertEntityToResponse(resourceSheet.get());
+        return ResponseEntity.ok().body(resourceSheetResponse);
+    }
+
     @PostMapping("/resource-sheet")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
