@@ -49,6 +49,8 @@ const upgradesRef = ref<HTMLElement | null>(null)
 
 const activeSection = ref<string>('');
 
+const resourceSheetId = ref<number | null>(null)
+
 const activeFormats = ref({
   bold: false,
   italic: false,
@@ -223,60 +225,51 @@ const fetchHoursData = async () => {
 
 const fetchResourceSheetData = async () => {
   try {
-    const response = await api.get('/resourceSheet/getResourceSheet');
+    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/2026`); // TODO : add working year path parameter
 
-    if (response.data && Array.isArray(response.data)) {
-      console.log(response.data, currentResourceId.value)
-      const matchingSheets = response.data.filter((f: any) =>
-          f.resourceId === currentResourceId.value
-      );
-      console.log(matchingSheets)
+    const resourceData = response.data;
 
-      matchingSheets.sort((a: any, b: any) =>
-          new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime()
-      );
+    if (resourceData) {
+      resourceSheetId.value = resourceData.resourceSheetId
 
-      const resourceData = matchingSheets.length > 0 ? matchingSheets[0] : null;
-
-      if (resourceData) {
-        const hours = resourceData.courseHours;
-        console.log(hours)
-        if (hours) {
-          splitHours.cm = {h: (hours.cm || 0).toString(), m: '00'};
-          splitHours.td = {h: (hours.td || 0).toString(), m: '00'};
-          splitHours.tp = {h: (hours.tp || 0).toString(), m: '00'};
-          splitHours.ds = {h: (hours.ds || 0).toString(), m: '00'};
-          splitHours.ds_tp = {h: (hours.ds_tp || 0).toString(), m: '00'};
-        }
-
-        const contents = resourceData.educationalContentID || [];
-
-        const filterBy = (type: string) => contents
-            .filter((c: any) => c.classType === type)
-            .sort((a: any, b: any) => a.courseNumber - b.courseNumber)
-            .map((c: any) => c.content);
-
-        cmContents.value = filterBy('CM').length ? filterBy('CM') : [''];
-        tdContents.value = filterBy('TD').length ? filterBy('TD') : [''];
-        tpContents.value = filterBy('TP').length ? filterBy('TP') : [''];
-        dsContents.value = filterBy('DS').length ? filterBy('DS') : [''];
-        dstpContents.value = filterBy('DS/TP').length ? filterBy('DS/TP') : [''];
-
-        edFBContents.value = (resourceData.teacherFeedbacks || '').replace(/\n/g, '<br>');
-        stFBContents.value = (resourceData.studentFeedbacks || '').replace(/\n/g, '<br>');
-        upgradesContents.value = (resourceData.improvementIdeas || '').replace(/\n/g, '<br>');
-
-        await populateRichEditors();
+      const hours = resourceData.courseHours;
+      if (hours) {
+        splitHours.cm = {h: (hours.cm || 0).toString(), m: '00'};
+        splitHours.td = {h: (hours.td || 0).toString(), m: '00'};
+        splitHours.tp = {h: (hours.tp || 0).toString(), m: '00'};
+        splitHours.ds = {h: (hours.ds || 0).toString(), m: '00'};
+        splitHours.ds_tp = {h: (hours.ds_tp || 0).toString(), m: '00'};
       }
+
+      const contents = resourceData.educationalContentID || [];
+
+      const filterBy = (type: string) => contents
+          .filter((c: any) => c.classType === type)
+          .sort((a: any, b: any) => a.courseNumber - b.courseNumber)
+          .map((c: any) => c.content);
+
+      cmContents.value = filterBy('CM').length ? filterBy('CM') : [''];
+      tdContents.value = filterBy('TD').length ? filterBy('TD') : [''];
+      tpContents.value = filterBy('TP').length ? filterBy('TP') : [''];
+      dsContents.value = filterBy('DS').length ? filterBy('DS') : [''];
+      dstpContents.value = filterBy('DS/TP').length ? filterBy('DS/TP') : [''];
+
+      edFBContents.value = (resourceData.teacherFeedbacks || '').replace(/\n/g, '<br>');
+      stFBContents.value = (resourceData.studentFeedbacks || '').replace(/\n/g, '<br>');
+      upgradesContents.value = (resourceData.improvementIdeas || '').replace(/\n/g, '<br>');
+
+      await populateRichEditors();
     }
-  } catch (error) {
-    console.error("Erreur fiches ressources :", error);
+  } catch (_) {
+    console.log("Aucune fiche n'existe pour cette ressource à cette année.");
   }
 };
 
 onMounted(async () => {
   await fetchResourceData();
-  // TODO : await fetchHoursData(); -> make trigger only if completion based on MCCC (add back end route to determine correct resource sheet instead of computing in front end)
+  if (resourceSheetId.value === null) {
+    await fetchHoursData();
+  }
   await fetchResourceSheetData();
 });
 
@@ -322,6 +315,7 @@ const handleValidate = async () => {
   };
 
   const payload = {
+    resourceSheetID: resourceSheetId.value,
     resourceID: currentResourceId.value,
     courseHours: hoursPayload,
     teacherFeedbacks: edFBContents.value,
