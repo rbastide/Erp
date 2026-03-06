@@ -260,14 +260,16 @@ const fetchResourceSheetData = async () => {
 
       await populateRichEditors();
     }
-  } catch (error) {
-    console.error("Erreur fiches ressources :", error);
+  } catch (_) {
+    console.log("Aucune fiche n'existe pour cette ressource à cette année.");
   }
 };
 
 onMounted(async () => {
   await fetchResourceData();
-  // TODO : await fetchHoursData(); -> make trigger only if completion based on MCCC (add back end route to determine correct resource sheet instead of computing in front end)
+  if (resourceSheetId.value === null) {
+    await fetchHoursData();
+  }
   await fetchResourceSheetData();
 });
 
