@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -111,7 +111,7 @@ const handleValidate = () => router.push('/home-admin');
 
         <div v-if="!showAddForm" class="resource-card add-card" @click="handleAddReminder">
           <div class="icon-circle plus">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="40" height="40" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
@@ -173,10 +173,10 @@ const handleValidate = () => router.push('/home-admin');
             </div>
 
             <button class="save-btn" @click="saveReminder">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              <p>Enregistrer</p>
+              Enregistrer
             </button>
           </div>
         </div>
@@ -185,7 +185,7 @@ const handleValidate = () => router.push('/home-admin');
           <div class="card-content view-mode">
             <div class="header-view">
               <div class="icon-circle big-icon" :class="{ 'one-time': reminder.isOneTime }">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="16" y1="2" x2="16" y2="6"></line>
                   <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -209,10 +209,10 @@ const handleValidate = () => router.push('/home-admin');
 
             <div class="card-actions">
               <button class="action-btn edit" @click="handleEdit(reminder, index)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               </button>
               <button class="action-btn delete" @click="handleDelete(reminder.id)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
             </div>
           </div>
@@ -224,7 +224,7 @@ const handleValidate = () => router.push('/home-admin');
     <footer class="sticky-bar">
       <div class="sticky-wrapper">
         <div class="search-container">
-          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -241,7 +241,7 @@ const handleValidate = () => router.push('/home-admin');
   min-height: 100vh;
   background-color: #f8f9fa;
   font-family: 'Roboto', sans-serif;
-  padding-bottom: 120px; /* Plus d'espace pour la barre sticky */
+  padding-bottom: 120px;
 }
 
 .main-content {
@@ -296,7 +296,6 @@ const handleValidate = () => router.push('/home-admin');
   margin-bottom: 15px;
 }
 
-/* Couleur bleue calendaire pour le ponctuel comme EX 2 */
 .icon-circle.big-icon.one-time {
   background: rgba(33, 150, 243, 0.1);
   color: #2196F3;
@@ -440,7 +439,6 @@ const handleValidate = () => router.push('/home-admin');
   border-radius: 5px;
 }
 
-/* --- STYLE DE RECHERCHE ET STICKY FOOTER CORRIGE --- */
 .sticky-bar {
   position: fixed;
   bottom: 0;
