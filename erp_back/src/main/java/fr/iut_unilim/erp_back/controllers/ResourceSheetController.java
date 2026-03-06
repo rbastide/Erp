@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resourceSheet")
@@ -29,6 +30,18 @@ public class ResourceSheetController {
         List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
         List<ResourceSheetResponse> sheetRequests = resourceSheetService.convertToEntitiesToResponses(sheets);
         return ResponseEntity.ok(sheetRequests);
+    }
+
+    @GetMapping("/resource-sheet/{resourceId}/{year}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetForResourceFromYear(@PathVariable Long resourceId, @PathVariable Integer year) {
+        Optional<ResourceSheet> resourceSheet = resourceSheetService.getResourceSheetForResourceFromYear(resourceId, year);
+
+        if (resourceSheet.isEmpty()) return ResponseEntity.notFound().build();
+
+        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertToEntityToResponse(resourceSheet.get());
+
+        return ResponseEntity.ok().body(resourceSheetResponse);
     }
 
     @PostMapping("/resource-sheet")

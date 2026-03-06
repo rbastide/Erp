@@ -45,6 +45,13 @@ public class ResourceSheetService {
         return resourceSheets;
     }
 
+    public Optional<ResourceSheet> getResourceSheetForResourceFromYear(Long resourceID, int academicYearStart) {
+        Optional<Resource> resource = resourceRepository.findById(resourceID);
+        if (resource.isEmpty()) return Optional.empty();
+
+        return resourceSheetRepository.findByResourceAndAcademicYearStart(resource.get(), academicYearStart);
+    }
+
     public ResourceSheet save(ResourceSheet resourceSheet) {
         return resourceSheetRepository.save(resourceSheet);
     }
