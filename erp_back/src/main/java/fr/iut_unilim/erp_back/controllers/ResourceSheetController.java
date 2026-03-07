@@ -77,4 +77,10 @@ public class ResourceSheetController {
 
         return ResponseEntity.ok(historyResponses);
     }
+
+    @GetMapping("available-years")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetYears() {
+        return ResponseEntity.ok(resourceSheetService.getAllYears());
+    }
 }
