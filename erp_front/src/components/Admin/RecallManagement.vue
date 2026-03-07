@@ -94,7 +94,7 @@ const handleDelete = (id: number) => {
   }
 };
 
-const handleValidate = () => router.push('/home-admin');
+const handleValidate = () => router.push('/home');
 </script>
 
 <template>
