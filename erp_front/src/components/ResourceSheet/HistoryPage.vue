@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -10,25 +10,50 @@ const searchQuery = ref('');
 const historyItems = ref([]);
 const isLoading = ref(true);
 
+const selectedYear = ref(new Date().getFullYear());
+const availableYears = ref<number[]>([]);
+
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return date.toLocaleDateString('fr-FR');
 };
 
+const fetchAvailableYears = async () => {
+  try {
+    const response = await api.get('/resourceSheet/resource-sheets');
+    const years = response.data.map((sheet: any) => sheet.year).filter(Boolean);
+    const uniqueYears = [...new Set(years)].sort((a: any, b: any) => b - a) as number[];
+    availableYears.value = uniqueYears;
+    if (uniqueYears.length > 0 && !uniqueYears.includes(selectedYear.value)) {
+      selectedYear.value = uniqueYears[0];
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des années disponibles :", error);
+    availableYears.value = [new Date().getFullYear()];
+  }
+};
+
+
 const fetchHistory = async () => {
   try {
     isLoading.value = true;
-    const response = await api.get('/resourceSheet/getHistory/2026'); // TODO : add year path parameter
+    const response = await api.get(`/resourceSheet/getHistory/${selectedYear.value}`);
     historyItems.value = response.data;
   } catch (error) {
     console.error("Erreur chargement historique :", error);
+    historyItems.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchAvailableYears();
+  await fetchHistory();
+});
+
+watch(selectedYear, () => {
   fetchHistory();
 });
 
@@ -49,31 +74,24 @@ const handleShow = (item: any) => {
     query: {
       id: item.sheetID,
       code: item.resourceCode,
-      date: formatDate(item.date)
+      date: formatDate(item.date),
+      year: selectedYear.value
     }
   });
 };
 
 const handleExportPdf = async (id: number, resourceCode: string) => {
   try {
-    const response = await api.get(`/pdf/resource-sheet/${id}`, {
-      responseType: 'blob'
-    });
+    const response = await api.get(`/pdf/resource-sheet/${id}`, { responseType: 'blob' });
     const file = new Blob([response.data], {type: 'application/pdf'});
     const fileURL = URL.createObjectURL(file);
-
     const link = document.createElement('a');
     link.href = fileURL;
-
-    const fileName = `fiche-ressource-${resourceCode}.pdf`;
-    link.setAttribute('download', fileName);
-
+    link.setAttribute('download', `fiche-ressource-${resourceCode}.pdf`);
     document.body.appendChild(link);
     link.click();
-
     document.body.removeChild(link);
     URL.revokeObjectURL(fileURL);
-
   } catch (error) {
     console.error("Erreur lors de la génération du PDF", error);
   }
@@ -88,15 +106,26 @@ const clearSearch = () => searchQuery.value = '';
 
   <main class="main-content">
     <div class="container">
-      <div class="version-list-container">
 
+      <div class="filter-wrapper">
+        <div class="year-filter">
+          <label for="year-select">Année académique :</label>
+          <select id="year-select" v-model="selectedYear" class="year-select">
+            <option v-for="year in availableYears" :key="year" :value="year">
+              {{ year }} / {{ year + 1 }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="version-list-container">
         <div v-if="isLoading" class="no-result">
           <p>Chargement de l'historique...</p>
         </div>
 
         <div v-else-if="filteredVersions.length === 0" class="no-result">
           <p v-if="searchQuery">Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
-          <p v-else>Aucun historique disponible.</p>
+          <p v-else>Aucun historique disponible pour l'année {{ selectedYear }}.</p>
           <button v-if="searchQuery" @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
         </div>
 
@@ -109,13 +138,15 @@ const clearSearch = () => searchQuery.value = '';
           >
             <div class="info-group">
               <span class="version-code">{{ item.resourceCode }}</span>
-              <span class="version-title">{{ item.resourceName }}</span>
-              <span class="version-date">{{ formatDate(item.date) }}</span>
+              <div class="text-group">
+                <span class="version-title">{{ item.resourceName }}</span>
+                <span class="version-date">Modifiée le {{ formatDate(item.date) }}</span>
+              </div>
             </div>
 
             <button class="btn-icon-container" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
                     title="Exporter en PDF">
-              <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16" fill="none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
                 <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
               </svg>
@@ -159,6 +190,40 @@ const clearSearch = () => searchQuery.value = '';
   max-width: 900px;
 }
 
+.filter-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.year-filter label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.year-select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #B51621;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
 .version-list {
   list-style: none;
   padding: 0;
@@ -187,33 +252,33 @@ const clearSearch = () => searchQuery.value = '';
 .info-group {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 25px;
   flex: 1;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .version-code {
   font-size: 1.8rem;
   font-weight: 700;
   color: #B51621;
-  min-width: 100px;
+  min-width: 110px;
 }
 
 .version-title {
   font-size: 1.1rem;
   color: #333;
   font-weight: 600;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-right: 15px;
 }
 
 .version-date {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #64748b;
-  font-weight: 500;
-  white-space: nowrap;
+  font-weight: 400;
 }
 
 .btn-icon-container {
@@ -230,7 +295,7 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .btn-icon-container:hover {
-  background-color: #e3f2fd;
+  background-color: #fce8e9;
 }
 
 .btn-icon {
@@ -241,7 +306,7 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .btn-icon-container:hover .btn-icon {
-  fill: #1976D2;
+  fill: #B51621;
 }
 
 .no-result {

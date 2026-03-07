@@ -3,7 +3,6 @@ import LoginPage from './components/App/LoginPage.vue';
 import ResourcePage from '@/components/ResourceSheet/ResourcePage.vue';
 import HomePage from './components/User/HomePage.vue';
 import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
-import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
@@ -53,11 +52,6 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: LoginPage
-    },
-    {
-        path: '/home-admin',
-        name: 'HomeAdmin',
-        component: HomeAdminPage
     },
     {
         path: '/new-user',
