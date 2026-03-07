@@ -72,7 +72,7 @@ public class McccController {
     @PostMapping("/save")
     @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
     @Transactional
-    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) throws ParseException {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
@@ -92,24 +92,9 @@ public class McccController {
 
         CourseHours courseHours = getCourseHoursFromDto(dto);
         mccc.setCourseHoursId(courseHours);
-        try {
-            if (dto.getEditDate() != null) {
-                Date editableDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getEditDate());
-                mccc.setLastModificationDate(editableDate);
-            } else {
-                mccc.setLastModificationDate(new Date());
-            }
-            if (mccc.getCreationDate() == null) {
-                if (dto.getCreationDate() != null) {
-                    Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getCreationDate());
-                    mccc.setCreationDate(date);
-                } else {
-                    mccc.setCreationDate(new Date());
-                }
-            }
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
-        }
+
+        getEditDateAndCreationDate(dto, mccc);
+
 
         Set<CriticalConcept> setCriticalConcepts = new HashSet<>();
         ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
@@ -123,6 +108,13 @@ public class McccController {
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
+
+
+    private void getEditDateAndCreationDate(McccRequest dto, Mccc mccc) throws ParseException {
+        mccc.setLastModificationDate(new SimpleDateFormat(("dd/MM/yyyy HH:mm:ss")).parse(dto.getEditDate()));
+        mccc.setCreationDate(new SimpleDateFormat(("dd/MM/yyyy HH:mm:ss")).parse(dto.getCreationDate()));
+    }
+
 
     @NotNull
     private Mccc getCurrentMccc(McccRequest dto, Optional<Resource> canHaveResource) {

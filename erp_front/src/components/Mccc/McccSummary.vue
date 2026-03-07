@@ -50,6 +50,12 @@ const handleValidate = async () => {
   try {
     const safeAcsGrouped = mcccStore.acsGrouped || [];
 
+    const currentTime = new Date().toLocaleTimeString('fr-FR');
+
+    const formattedEditDate = `${mcccStore.editDate} ${currentTime}`;
+
+    const formattedCreationDate = `${mcccStore.creationDate} ${currentTime}`;
+
     const payload = {
       resourceID: mcccStore.resourceID,
 
@@ -77,7 +83,11 @@ const handleValidate = async () => {
       referents: (mcccStore.referents || []).map(r => ({
         firstname: r.firstname || r.firstName,
         lastname: r.lastname || r.lastName
-      }))
+      })),
+
+      creationDate: formattedCreationDate,
+      editDate: formattedEditDate,
+
     };
 
     console.log("Payload envoyé:", payload);
