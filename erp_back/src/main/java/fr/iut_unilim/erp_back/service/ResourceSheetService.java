@@ -76,6 +76,15 @@ public class ResourceSheetService {
         return resourceSheets.stream().map(this::convertEntityToResponse).toList();
     }
 
+    public Set<Integer> getAllYears() {
+        List<ResourceSheet> resourceSheets = resourceSheetRepository.findAll();
+        Set<Integer> years = new HashSet<>();
+        for (ResourceSheet resourceSheet : resourceSheets) {
+            years.add(resourceSheet.getAcademicYearStart());
+        }
+        return years;
+    }
+
     public ResourceSheetResponse convertEntityToResponse(ResourceSheet resourceSheet) {
         CourseHours courseHours = resourceSheet.getCourseHours();
 
