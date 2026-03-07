@@ -20,11 +20,11 @@ const currentCourseHoursId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
 const splitHours = reactive({
-  cm: { h: '', m: '00' },
-  td: { h: '', m: '00' },
-  tp: { h: '', m: '00' },
-  ds: { h: '', m: '00' },
-  ds_tp: { h: '', m: '00' }
+  cm: { h: '0', m: '00' },
+  td: { h: '0', m: '00' },
+  tp: { h: '0', m: '00' },
+  ds: { h: '0', m: '00' },
+  ds_tp: { h: '0', m: '00' }
 });
 
 const cmContents = ref([''])
@@ -111,19 +111,10 @@ const totalGlobal = computed(() => {
   return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
 });
 
-const convertDecimalToSplit = (decimal: number) => {
-  const h = Math.floor(decimal || 0);
-  const m = Math.round(((decimal || 0) - h) * 60);
-  return {
-    h: h.toString(),
-    m: m.toString().padStart(2, '0')
-  };
-};
-
 const convertSplitToDecimal = (time: { h: string, m: string }) => {
   const h = parseInt(time.h || '0');
   const m = parseInt(time.m || '0');
-  return h + (m / 60);
+  return h * 60 + m;
 };
 
 const canAdd = (list: string[]) => {
@@ -208,12 +199,13 @@ const fetchHoursData = async () => {
 
       if (mcccFound && mcccFound.courseHoursId) {
         const vol = mcccFound.courseHoursId;
+        console.log("Vol :", vol);
 
-        splitHours.cm = convertDecimalToSplit(vol.nbHoursCM);
-        splitHours.td = convertDecimalToSplit(vol.nbHoursTD);
-        splitHours.tp = convertDecimalToSplit(vol.nbHoursTP);
-        splitHours.ds = convertDecimalToSplit(vol.nbHoursDS);
-        splitHours.ds_tp = convertDecimalToSplit(vol.nbHoursDSTP);
+        splitHours.cm = convertDecimalToSplit(vol.nbMinCM);
+        splitHours.td = convertDecimalToSplit(vol.nbMinTD);
+        splitHours.tp = convertDecimalToSplit(vol.nbMinTP);
+        splitHours.ds = convertDecimalToSplit(vol.nbMinDS);
+        splitHours.ds_tp = convertDecimalToSplit(vol.nbMinDSTP);
 
         currentCourseHoursId.value = vol.courseHoursID;
       }
@@ -222,6 +214,12 @@ const fetchHoursData = async () => {
     console.error("Erreur MCCC :", error);
   }
 };
+
+const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
+  const min = minutes % 60;
+  const normalizedMin = min < 10 ? `0${min}` : `${min}`;
+  return {h: (Math.floor(minutes / 60) || 0).toString(), m: normalizedMin};
+}
 
 const fetchResourceSheetData = async () => {
   try {
@@ -234,11 +232,11 @@ const fetchResourceSheetData = async () => {
 
       const hours = resourceData.courseHours;
       if (hours) {
-        splitHours.cm = {h: (hours.cm || 0).toString(), m: '00'};
-        splitHours.td = {h: (hours.td || 0).toString(), m: '00'};
-        splitHours.tp = {h: (hours.tp || 0).toString(), m: '00'};
-        splitHours.ds = {h: (hours.ds || 0).toString(), m: '00'};
-        splitHours.ds_tp = {h: (hours.ds_tp || 0).toString(), m: '00'};
+        splitHours.cm = convertDecimalToSplit(hours.cm || 0);
+        splitHours.td = convertDecimalToSplit(hours.td || 0);
+        splitHours.tp = convertDecimalToSplit(hours.tp || 0);
+        splitHours.ds = convertDecimalToSplit(hours.ds || 0);
+        splitHours.ds_tp = convertDecimalToSplit(hours.ds_tp || 0);
       }
 
       const contents = resourceData.educationalContentID || [];

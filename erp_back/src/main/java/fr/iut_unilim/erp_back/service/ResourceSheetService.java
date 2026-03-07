@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.CourseHoursResponse;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
@@ -81,11 +80,11 @@ public class ResourceSheetService {
         CourseHours courseHours = resourceSheet.getCourseHours();
 
         CourseHoursResponse courseHoursResponse = new CourseHoursResponse(
-                courseHours.getNbHoursCM(),
-                courseHours.getNbHoursTD(),
-                courseHours.getNbHoursTP(),
-                courseHours.getNbHoursDS(),
-                courseHours.getNbHoursDSTP()
+                courseHours.getNbMinCM(),
+                courseHours.getNbMinTD(),
+                courseHours.getNbMinTP(),
+                courseHours.getNbMinDS(),
+                courseHours.getNbMinDSTP()
         );
         return new ResourceSheetResponse(resourceSheet.getSheetID(),
                 resourceSheet.getResource().getResourceID(),

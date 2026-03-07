@@ -20,7 +20,7 @@ public class PdfHours {
         hours.addCell(createCenteredCell("h TP"));
         hours.addCell(createCenteredCell("h DS TP"));
 
-        double[] hoursPerCourse = new double[]{courseHours.getNbHoursCM(), courseHours.getNbHoursTD(), courseHours.getNbHoursDS(), courseHours.getNbHoursTP(), courseHours.getNbHoursDSTP()};
+        double[] hoursPerCourse = new double[]{courseHours.getNbMinCM(), courseHours.getNbMinTD(), courseHours.getNbMinDS(), courseHours.getNbMinTP(), courseHours.getNbMinDSTP()};
 
         hours.addCell(createCenteredCell(resourceCode));
         for (double hour : hoursPerCourse) {

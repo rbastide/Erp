@@ -11,62 +11,62 @@ public class CourseHours {
     @Column(name = "courseHoursID")
     private Long courseHoursID;
 
-    @Column(name = "nbHoursCM")
-    private Float nbHoursCM;
+    @Column(name = "nbMinCM")
+    private Float nbMinCM;
 
-    @Column(name = "nbHoursDSTP")
-    private Float nbHoursDSTP;
+    @Column(name = "nbMinDSTP")
+    private Float nbMinDSTP;
 
-    @Column(name = "nbHoursDS")
-    private Float nbHoursDS;
+    @Column(name = "nbMinDS")
+    private Float nbMinDS;
 
-    @Column(name = "nbHoursTP")
-    private Float nbHoursTP;
+    @Column(name = "nbMinTP")
+    private Float nbMinTP;
 
-    @Column(name = "nbHoursTD")
-    private Float nbHoursTD;
+    @Column(name = "nbMinTD")
+    private Float nbMinTD;
 
     public CourseHours() {
     }
 
-    public CourseHours(Float nbHoursCM, Float nbHoursDS, Float nbHoursDSTP, Float nbHoursTP, Float nbHoursTD) {
-        this.nbHoursCM = nbHoursCM;
-        this.nbHoursDSTP = nbHoursDSTP;
-        this.nbHoursDS = nbHoursDS;
-        this.nbHoursTP = nbHoursTP;
-        this.nbHoursTD = nbHoursTD;
+    public CourseHours(Float nbMinCM, Float nbMinDS, Float nbMinDSTP, Float nbMinTP, Float nbMinTD) {
+        this.nbMinCM = nbMinCM;
+        this.nbMinDSTP = nbMinDSTP;
+        this.nbMinDS = nbMinDS;
+        this.nbMinTP = nbMinTP;
+        this.nbMinTD = nbMinTD;
     }
 
     public void setCourseHoursID(Long courseHoursID) {
         this.courseHoursID = courseHoursID;
     }
 
-    public void setNbHoursCM(Float nbHoursCM) {
-        this.nbHoursCM = nbHoursCM;
+    public void setNbMinCM(Float nbMinCM) {
+        this.nbMinCM = nbMinCM;
     }
 
-    public void setNbHoursDSTP(Float nbHoursDSTP) {
-        this.nbHoursDSTP = nbHoursDSTP;
+    public void setNbMinDSTP(Float nbMinDSTP) {
+        this.nbMinDSTP = nbMinDSTP;
     }
 
-    public void setNbHoursDS(Float nbHoursDS) {
-        this.nbHoursDS = nbHoursDS;
+    public void setNbMinDS(Float nbMinDS) {
+        this.nbMinDS = nbMinDS;
     }
 
-    public void setNbHoursTP(Float nbHoursTP) {
-        this.nbHoursTP = nbHoursTP;
+    public void setNbMinTP(Float nbMinTP) {
+        this.nbMinTP = nbMinTP;
     }
 
-    public void setNbHoursTD(Float nbHoursTD) {
-        this.nbHoursTD = nbHoursTD;
+    public void setNbMinTD(Float nbMinTD) {
+        this.nbMinTD = nbMinTD;
     }
 
     public Long getCourseHoursID() {
         return courseHoursID;
     }
-    public Float getNbHoursCM() { return nbHoursCM; }
-    public Float getNbHoursDSTP() { return nbHoursDSTP; }
-    public Float getNbHoursDS() { return nbHoursDS; }
-    public Float getNbHoursTP() { return nbHoursTP; }
-    public Float getNbHoursTD() { return nbHoursTD; }
+    public Float getNbMinCM() { return nbMinCM; }
+    public Float getNbMinDSTP() { return nbMinDSTP; }
+    public Float getNbMinDS() { return nbMinDS; }
+    public Float getNbMinTP() { return nbMinTP; }
+    public Float getNbMinTD() { return nbMinTD; }
 }

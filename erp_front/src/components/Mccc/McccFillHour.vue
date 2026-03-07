@@ -13,43 +13,39 @@ const currentCourseHoursID = ref(null);
 const showModal = ref(false);
 
 const initialState = ref({
-  hoursCM: 0,
-  hoursTD: 0,
-  hoursTP: 0,
-  hoursDS: 0,
-  hoursDSTP: 0
+  minCM: 0,
+  minTD: 0,
+  minTP: 0,
+  minDS: 0,
+  minDSTP: 0
 });
 
 const splitHours = reactive({
-  hoursCM: { h: '', m: '00' },
-  hoursTD: { h: '', m: '00' },
-  hoursTP: { h: '', m: '00' },
-  hoursDS: { h: '', m: '00' },
-  hoursDSTP: { h: '', m: '00' }
+  minCM: { h: '', m: '00' },
+  minTD: { h: '', m: '00' },
+  minTP: { h: '', m: '00' },
+  minDS: { h: '', m: '00' },
+  minDSTP: { h: '', m: '00' }
 });
 
 const hourTypes = [
-  { key: 'hoursCM', label: 'CM', color: '#4DB6AC' },
-  { key: 'hoursTD', label: 'TD', color: '#7986CB' },
-  { key: 'hoursTP', label: 'TP', color: '#4FC3F7' },
-  { key: 'hoursDS', label: 'DS', color: '#FFB74D' },
-  { key: 'hoursDSTP', label: 'DS TP', color: '#BA68C8' },
+  { key: 'minCM', label: 'CM', color: '#4DB6AC' },
+  { key: 'minTD', label: 'TD', color: '#7986CB' },
+  { key: 'minTP', label: 'TP', color: '#4FC3F7' },
+  { key: 'minDS', label: 'DS', color: '#FFB74D' },
+  { key: 'minDSTP', label: 'DS TP', color: '#BA68C8' },
 ];
 
-const convertDecimalToSplit = (decimal: number) => {
-  const val = decimal || 0;
-  const h = Math.floor(val);
-  const m = Math.round((val - h) * 60);
-  return {
-    h: h === 0 ? '' : h.toString(),
-    m: m.toString().padStart(2, '0')
-  };
-};
+const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
+  const min = minutes % 60;
+  const normalizedMin = min < 10 ? `0${min}` : `${min}`;
+  return {h: (Math.floor(minutes / 60) || 0).toString(), m: normalizedMin};
+}
 
 const convertSplitToDecimal = (time: { h: string, m: string }) => {
   const h = parseInt(time.h || '0');
   const m = parseInt(time.m || '0');
-  return h + (m / 60);
+  return h * 60 + m;
 };
 
 
@@ -90,11 +86,11 @@ const formatHoursOnBlur = (key: string) => {
 
 
 const syncSplitFromStore = () => {
-  splitHours.hoursCM = convertDecimalToSplit(mcccStore.hoursCM);
-  splitHours.hoursTD = convertDecimalToSplit(mcccStore.hoursTD);
-  splitHours.hoursTP = convertDecimalToSplit(mcccStore.hoursTP);
-  splitHours.hoursDS = convertDecimalToSplit(mcccStore.hoursDS);
-  splitHours.hoursDSTP = convertDecimalToSplit(mcccStore.hoursDSTP);
+  splitHours.minCM = convertDecimalToSplit(mcccStore.minCM);
+  splitHours.minTD = convertDecimalToSplit(mcccStore.minTD);
+  splitHours.minTP = convertDecimalToSplit(mcccStore.minTP);
+  splitHours.minDS = convertDecimalToSplit(mcccStore.minDS);
+  splitHours.minDSTP = convertDecimalToSplit(mcccStore.minDSTP);
 };
 
 const fetchCourseHours = async () => {
@@ -112,17 +108,17 @@ const fetchCourseHours = async () => {
       const bddData = currentMccc.courseHoursId;
       currentCourseHoursID.value = bddData.courseHoursID;
 
-      mcccStore.hoursCM = bddData.nbHoursCM || 0;
-      mcccStore.hoursTD = bddData.nbHoursTD || 0;
-      mcccStore.hoursTP = bddData.nbHoursTP || 0;
-      mcccStore.hoursDS = bddData.nbHoursDS || 0;
-      mcccStore.hoursDSTP = bddData.nbHoursDSTP || 0;
+      mcccStore.minCM = bddData.nbMinCM || 0;
+      mcccStore.minTD = bddData.nbMinTD || 0;
+      mcccStore.minTP = bddData.nbMinTP || 0;
+      mcccStore.minDS = bddData.nbMinDS || 0;
+      mcccStore.minDSTP = bddData.nbMinDSTP || 0;
     } else {
-      mcccStore.hoursCM = 0;
-      mcccStore.hoursTD = 0;
-      mcccStore.hoursTP = 0;
-      mcccStore.hoursDS = 0;
-      mcccStore.hoursDSTP = 0;
+      mcccStore.minCM = 0;
+      mcccStore.minTD = 0;
+      mcccStore.minTP = 0;
+      mcccStore.minDS = 0;
+      mcccStore.minDSTP = 0;
     }
     mcccStore.registerMcccStore();
     syncSplitFromStore();
@@ -135,11 +131,11 @@ onMounted(async () => {
   mcccStore.loadMcccStore();
 
   const hasLocalData = (
-      (mcccStore.hoursCM || 0) +
-      (mcccStore.hoursTD || 0) +
-      (mcccStore.hoursTP || 0) +
-      (mcccStore.hoursDS || 0) +
-      (mcccStore.hoursDSTP || 0)
+      (mcccStore.minCM || 0) +
+      (mcccStore.minTD || 0) +
+      (mcccStore.minTP || 0) +
+      (mcccStore.minDS || 0) +
+      (mcccStore.minDSTP || 0)
   ) > 0;
 
   if (hasLocalData) {
@@ -149,11 +145,11 @@ onMounted(async () => {
   }
 
   initialState.value = {
-    hoursCM: mcccStore.hoursCM || 0,
-    hoursTD: mcccStore.hoursTD || 0,
-    hoursTP: mcccStore.hoursTP || 0,
-    hoursDS: mcccStore.hoursDS || 0,
-    hoursDSTP: mcccStore.hoursDSTP || 0
+    minCM: mcccStore.minCM || 0,
+    minTD: mcccStore.minTD || 0,
+    minTP: mcccStore.minTP || 0,
+    minDS: mcccStore.minDS || 0,
+    minDSTP: mcccStore.minDSTP || 0
   };
 });
 
@@ -180,11 +176,11 @@ const handleBack = () => {
 };
 
 const onConfirmCancel = () => {
-  mcccStore.hoursCM = initialState.value.hoursCM;
-  mcccStore.hoursTD = initialState.value.hoursTD;
-  mcccStore.hoursTP = initialState.value.hoursTP;
-  mcccStore.hoursDS = initialState.value.hoursDS;
-  mcccStore.hoursDSTP = initialState.value.hoursDSTP;
+  mcccStore.minCM = initialState.value.minCM;
+  mcccStore.minTD = initialState.value.minTD;
+  mcccStore.minTP = initialState.value.minTP;
+  mcccStore.minDS = initialState.value.minDS;
+  mcccStore.minDSTP = initialState.value.minDSTP;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };

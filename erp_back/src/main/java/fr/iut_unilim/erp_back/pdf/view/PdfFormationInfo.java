@@ -30,7 +30,7 @@ public class PdfFormationInfo {
 
         infoTable.addCell(CellUtils.createCenteredCell(resource.getName()));
 
-        double[] hours = new double[]{courseHours.getNbHoursCM(), courseHours.getNbHoursTD(), courseHours.getNbHoursTP()};
+        double[] hours = new double[]{courseHours.getNbMinCM(), courseHours.getNbMinTD(), courseHours.getNbMinTP()};
         for (int i = 0; i < hours.length; i++) {
             infoTable.addCell(CellUtils.createCenteredCell(decimalFormat.format(hours[i]) + "h " + HOURS_CLASS_CORRESPONDANCE[i]));
         }

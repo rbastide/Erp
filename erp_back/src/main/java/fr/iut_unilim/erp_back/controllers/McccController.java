@@ -245,16 +245,16 @@ public class McccController {
 
     @NotNull
     private CourseHours getCourseHoursFromDto(McccRequest dto) {
-        List<CourseHours> allCourseHours = courseHoursService.getAllCourseHoursFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP(), dto.getHoursDS());
+        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getMinDSTP(), dto.getMinDS());
         if (allCourseHours.isEmpty()) {
-            return new CourseHours(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
+            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getMinDSTP(), dto.getMinTP(), dto.getMinTD());
         }
-        CourseHours courseHours = allCourseHours.get(0);
-        courseHours.setNbHoursCM(dto.getHoursCM());
-        courseHours.setNbHoursTD(dto.getHoursTD());
-        courseHours.setNbHoursTP(dto.getHoursTP());
-        courseHours.setNbHoursDS(dto.getHoursDS());
-        courseHours.setNbHoursDSTP(dto.getHoursDSTP());
+        CourseHours courseHours = allCourseHours.get();
+        courseHours.setNbMinCM(dto.getMinCM());
+        courseHours.setNbMinTD(dto.getMinTD());
+        courseHours.setNbMinTP(dto.getMinTP());
+        courseHours.setNbMinDS(dto.getMinDS());
+        courseHours.setNbMinDSTP(dto.getMinDSTP());
         return courseHours;
     }
 

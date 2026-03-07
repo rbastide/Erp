@@ -35,11 +35,11 @@ const formatHour = (decimalVal) => {
 
 // Calcul du total formaté
 const formattedTotalHours = computed(() => {
-  const decimalTotal = (mcccStore.hoursCM || 0) +
-      (mcccStore.hoursDS || 0) +
-      (mcccStore.hoursTP || 0) +
-      (mcccStore.hoursTD || 0) +
-      (mcccStore.hoursDSTP || 0);
+  const decimalTotal = (mcccStore.minCM || 0) +
+      (mcccStore.minDS || 0) +
+      (mcccStore.minTP || 0) +
+      (mcccStore.minTD || 0) +
+      (mcccStore.minDSTP || 0);
 
   return formatHour(decimalTotal);
 });
@@ -53,11 +53,11 @@ const handleValidate = async () => {
     const payload = {
       resourceID: mcccStore.resourceID,
 
-      hoursCM: mcccStore.hoursCM,
-      hoursTD: mcccStore.hoursTD,
-      hoursTP: mcccStore.hoursTP,
-      hoursDS: mcccStore.hoursDS,
-      hoursDSTP: mcccStore.hoursDSTP,
+      minCM: mcccStore.minCM,
+      minTD: mcccStore.minTD,
+      minTP: mcccStore.minTP,
+      minDS: mcccStore.minDS,
+      minDSTP: mcccStore.minDSTP,
 
       saeCodes: (mcccStore.saeCodes || []).map(s => ({
         saeCode: s.saeNum || s.saeCode
@@ -151,23 +151,23 @@ const handleCloseSuccess = () => {
       <div class="info-footer">
         <div class="footer-item">
           <span class="footer-label">Heures CM</span>
-          <span class="footer-value">{{ formatHour(mcccStore.hoursCM) }}</span>
+          <span class="footer-value">{{ formatHour(mcccStore.minCM) }}</span>
         </div>
         <div class="footer-item">
           <span class="footer-label">Heures TD</span>
-          <span class="footer-value">{{ formatHour(mcccStore.hoursTD) }}</span>
+          <span class="footer-value">{{ formatHour(mcccStore.minTD) }}</span>
         </div>
         <div class="footer-item">
           <span class="footer-label">Heures TP</span>
-          <span class="footer-value">{{ formatHour(mcccStore.hoursTP) }}</span>
+          <span class="footer-value">{{ formatHour(mcccStore.minTP) }}</span>
         </div>
         <div class="footer-item">
           <span class="footer-label">Heures DS</span>
-          <span class="footer-value">{{ formatHour(mcccStore.hoursDS) }}</span>
+          <span class="footer-value">{{ formatHour(mcccStore.minDS) }}</span>
         </div>
         <div class="footer-item">
           <span class="footer-label">Heures DS TP</span>
-          <span class="footer-value">{{ formatHour(mcccStore.hoursDSTP) }}</span>
+          <span class="footer-value">{{ formatHour(mcccStore.minDSTP) }}</span>
         </div>
         <div class="footer-item total-item">
           <span class="footer-label">Total Étudiant</span>

@@ -32,10 +32,10 @@ const contents = ref({
 
 const formatHour = (decimal: number) => {
   const val = decimal || 0;
-  const h = Math.floor(val);
-  const m = Math.round((val - h) * 60);
+  const h = Math.floor(val / 60);
+  const m = decimal % 60;
 
-  return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
+  return `${h}h${m}`;
 };
 
 const fetchSheetData = async () => {
