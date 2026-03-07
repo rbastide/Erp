@@ -297,4 +297,10 @@ public class McccController {
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
     }
+    @GetMapping("/available-years")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getMcccYear() {
+        return ResponseEntity.ok(mcccService.getAllYears());
+    }
+
 }

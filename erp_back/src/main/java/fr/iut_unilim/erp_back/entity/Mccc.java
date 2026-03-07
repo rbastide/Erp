@@ -50,16 +50,22 @@ public class Mccc {
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
 
+
+
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
+    @JoinColumn(name ="academicYearStart")
+    private Integer academicYearStart;
+
+    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment, Integer academicYearStart) {
         this.courseHoursId = courseHoursId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalConceptsId = criticalConceptsId;
         this.referencialTeacherId = referencialTeacherId;
         this.universityDepartment = universityDepartment;
+        this.academicYearStart = academicYearStart;
     }
 
     public Mccc() {
@@ -132,4 +138,12 @@ public class Mccc {
     public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
 
     public void setUniversityDepartment(UniversityDepartment universityDepartmentId) { this.universityDepartment = universityDepartmentId; }
+
+    public Integer getAcademicYearStart() {
+        return academicYearStart;
+    }
+
+    public void setAcademicYearStart(Integer academicYearStart) {
+        this.academicYearStart = academicYearStart;
+    }
 }
