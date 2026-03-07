@@ -78,4 +78,15 @@ public class McccService {
     public List<Long> getTeacherIdsByMcccId(Long mcccId) {
         return mcccRepository.findTeacherIdsByMcccId(mcccId);
     }
+
+    public Set<Integer> getAllYears() {
+        List<Mccc> mcccs = mcccRepository.findAll();
+        Set<Integer> years = new HashSet<>();
+        for (Mccc mccc : mcccs) {
+            years.add(mccc.getAcademicYearStart());
+        }
+        return years;
+    }
+
+
 }
