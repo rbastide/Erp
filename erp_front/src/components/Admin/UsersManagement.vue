@@ -11,6 +11,7 @@ const router = useRouter();
 const users = ref([]);
 const editingIndex = ref(null);
 const searchQuery = ref('');
+const roles = ref([]);
 
 const showDeleteModal = ref(false);
 const userToDelete = ref(null);
@@ -25,6 +26,14 @@ const editedUser = reactive({
   newPassword: ''
 });
 
+const fetchRoles = async () => {
+  try {
+    const response = await api.get('/role/all');
+    roles.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const formatRole = (role) => {
   const rolesMap = {
@@ -49,7 +58,10 @@ const fetchUsers = async () => {
   }
 };
 
-onMounted(fetchUsers);
+onMounted(async () => {
+  await fetchUsers();
+  await fetchRoles();
+})
 
 const filteredUsers = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
@@ -219,11 +231,11 @@ const handleAddUser = () => router.push('/new-user');
             </div>
 
             <div class="input-group-compact">
-              <select v-model="editedUser.role" class="card-input-compact select-input">
-                <option value="SUPER_ADMIN">Super Administrateur</option>
-                <option value="ADMIN">Administrateur</option>
-                <option value="TEACHER">Professeur</option>
-                <option value="TEMP_TEACHER">Vacataire</option>
+              <select v-model="editedUser.role" class="card-input-compact select-input" required>
+                <option value="" disabled>-- Veuillez choisir un rôle --</option>
+                <option v-for="roleItem in roles" :key="roleItem.id" :value="roleItem.name">
+                  {{ roleItem.name }}
+                </option>
               </select>
             </div>
 
