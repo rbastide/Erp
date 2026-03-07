@@ -70,7 +70,7 @@ public class McccController {
     }
 
     @PostMapping("/save")
-    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     @Transactional
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) throws ParseException {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
@@ -269,7 +269,7 @@ public class McccController {
     }
 
     @PostMapping("/saveHourlyVolume")
-    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
         courseHoursService.save(courseHours);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
@@ -286,7 +286,7 @@ public class McccController {
     }
 
     @GetMapping("/getCreationDate/{id}")
-    @PreAuthorize("@securityService.hasPermission('MCCC_MANAGEMENT')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
         return ResponseEntity.ok(mcccService.getCreationDateFromId(id));
     }
