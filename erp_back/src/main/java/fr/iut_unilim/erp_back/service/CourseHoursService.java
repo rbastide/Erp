@@ -16,8 +16,14 @@ public class CourseHoursService {
         this.courseHoursRepository = courseHoursRepository;
     }
 
+    @Deprecated
     public List<CourseHours> getAllCourseHoursFromDatas(Float hoursCM, Float hoursTD, Float hoursTP, Float hoursDSTP, Float hoursDS) {
+        // Replace it with findCourseHoursFromDatas
         return courseHoursRepository.findByDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
+    }
+
+    public Optional<CourseHours> findCourseHoursFromDatas(Float hoursCM, Float hoursTD, Float hoursTP, Float hoursDSTP, Float hoursDS) {
+        return courseHoursRepository.findByNbHoursCMAndNbHoursTDAndNbHoursTPAndNbHoursDSTPAndNbHoursDS(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
     }
 
     public CourseHours save(CourseHours courseHours) {

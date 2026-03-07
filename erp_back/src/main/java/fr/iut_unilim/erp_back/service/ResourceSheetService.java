@@ -196,10 +196,7 @@ public class ResourceSheetService {
         float hoursTP = resourceSheetRequest.courseHours().get("tp");
         float hoursDSTP = resourceSheetRequest.courseHours().get("ds_tp");
         float hoursDS = resourceSheetRequest.courseHours().get("ds");
-        List<CourseHours> courseHours = courseHoursService.getAllCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
-        if (courseHours.isEmpty()) {
-            return new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD);
-        }
-        return courseHours.get(0);
+        Optional<CourseHours> courseHours = courseHoursService.findCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
+        return courseHours.orElseGet(() -> new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD));
     }
 }
