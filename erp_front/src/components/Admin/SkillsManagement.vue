@@ -127,6 +127,11 @@ const handleSaveNewCompetence = async () => {
   if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
 
   const currentSkillToAdd = JSON.parse(JSON.stringify(currentSkill.value));
+
+  currentSkillToAdd.levels.forEach((lvl, index) => {
+    lvl.num = index + 1;
+  });
+
   finalSkills.value.unshift(currentSkillToAdd);
 
   currentSkill.value = {
@@ -139,6 +144,10 @@ const handleSaveNewCompetence = async () => {
 };
 
 const saveModification = async (index) => {
+  editedSkill.value.levels.forEach((lvl, idx) => {
+    lvl.num = idx + 1;
+  });
+
   finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
   editingIndex.value = null;
   await syncWithBackend(finalSkills.value[index]);
