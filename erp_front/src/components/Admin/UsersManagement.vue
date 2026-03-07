@@ -139,7 +139,7 @@ const handleCancel = () => {
   });
 };
 
-const handleValidate = () => router.push('/home-admin');
+const handleValidate = () => router.push('/home');
 const handleAddUser = () => router.push('/new-user');
 </script>
 
