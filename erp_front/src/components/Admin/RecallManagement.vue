@@ -5,13 +5,10 @@ import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 
 const router = useRouter();
-
-// États de la page
 const showAddForm = ref(false);
 const editingIndex = ref<number | null>(null);
 const searchQuery = ref('');
 
-// Liste des rappels (Simulation)
 const reminders = ref([
   { id: 1, label: 'EX 1', day: '12', time: '08:00', isOneTime: false, month: '' },
   { id: 2, label: 'EX 2', day: '15', time: '14:30', isOneTime: true, month: 'Mars' }
@@ -69,7 +66,6 @@ const resetForm = () => {
 const saveReminder = () => {
   if (!editedReminder.label || !editedReminder.day || !editedReminder.time) return;
 
-  // Validation sécurité pour le jour (1-28)
   const dayNum = parseInt(editedReminder.day);
   if (dayNum < 1) editedReminder.day = '1';
   if (dayNum > 28) editedReminder.day = '28';
@@ -87,9 +83,9 @@ const saveReminder = () => {
 };
 
 const handleEdit = (reminder: any, index: number) => {
-  showAddForm.value = true;
+  resetForm();
   editingIndex.value = index;
-  Object.assign(editedReminder, reminder);
+  Object.assign(editedReminder, JSON.parse(JSON.stringify(reminder)));
 };
 
 const handleDelete = (id: number) => {
@@ -122,67 +118,82 @@ const handleValidate = () => router.push('/home-admin');
         <div v-if="showAddForm" class="resource-card is-editing">
           <div class="card-content edit-mode">
             <div class="edit-header">
-              <h4>{{ editedReminder.id ? 'Modifier le rappel' : 'Nouveau Rappel' }}</h4>
+              <h4>Nouveau Rappel</h4>
               <button class="cancel-text-btn" @click="resetForm">Annuler</button>
             </div>
-
             <div class="input-group">
               <label class="input-label">Titre du rappel</label>
               <input type="text" v-model="editedReminder.label" class="card-input">
             </div>
-
             <div class="row">
               <div class="input-group">
                 <label class="input-label">Heure</label>
                 <input type="time" v-model="editedReminder.time" class="card-input">
               </div>
-
               <div class="input-group">
                 <label class="input-label">Option ponctuelle</label>
                 <div class="toggle-container" @click="editedReminder.isOneTime = !editedReminder.isOneTime">
-                  <div class="toggle-switch" :class="{ 'active': editedReminder.isOneTime }">
-                    <div class="toggle-knob"></div>
-                  </div>
+                  <div class="toggle-switch" :class="{ 'active': editedReminder.isOneTime }"><div class="toggle-knob"></div></div>
                   <span class="desc">Rappel Ponctuel</span>
                 </div>
               </div>
             </div>
-
             <div class="row">
               <div class="input-group">
                 <label class="input-label">Jour (1 à 28)</label>
-                <input
-                    type="number"
-                    min="1"
-                    max="28"
-                    v-model="editedReminder.day"
-                    class="card-input"
-                    placeholder="Ex: 15"
-                    v-model.number="editedReminder.day"
-                    @input="validateNumInput"
-                    @keydown="blockInvalidChars"
-                >
+                <input type="number" min="1" max="28" v-model.number="editedReminder.day" class="card-input" @input="validateNumInput" @keydown="blockInvalidChars">
               </div>
-
-              <div v-if="editedReminder.isOneTime" class="input-group slide-in">
+              <div v-if="editedReminder.isOneTime" class="input-group">
                 <label class="input-label">Mois</label>
                 <select v-model="editedReminder.month" class="card-input">
                   <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
                 </select>
               </div>
             </div>
-
-            <button class="save-btn" @click="saveReminder">
-              <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Enregistrer
-            </button>
+            <button class="save-btn" @click="saveReminder">Enregistrer</button>
           </div>
         </div>
 
-        <div v-for="(reminder, index) in filteredReminders" :key="reminder.id" class="resource-card">
-          <div class="card-content view-mode">
+        <div v-for="(reminder, index) in filteredReminders" :key="reminder.id" class="resource-card" :class="{ 'is-editing': editingIndex === index }">
+
+          <div v-if="editingIndex === index" class="card-content edit-mode">
+            <div class="edit-header">
+              <h4>Modifier le rappel</h4>
+              <button class="cancel-text-btn" @click="resetForm">Annuler</button>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Titre du rappel</label>
+              <input type="text" v-model="editedReminder.label" class="card-input">
+            </div>
+            <div class="row">
+              <div class="input-group">
+                <label class="input-label">Heure</label>
+                <input type="time" v-model="editedReminder.time" class="card-input">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Option ponctuelle</label>
+                <div class="toggle-container" @click="editedReminder.isOneTime = !editedReminder.isOneTime">
+                  <div class="toggle-switch" :class="{ 'active': editedReminder.isOneTime }"><div class="toggle-knob"></div></div>
+                  <span class="desc">Rappel Ponctuel</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-group">
+                <label class="input-label">Jour (1 à 28)</label>
+                <input type="number" min="1" max="28" v-model.number="editedReminder.day" class="card-input" @input="validateNumInput">
+              </div>
+              <div v-if="editedReminder.isOneTime" class="input-group">
+                <label class="input-label">Mois</label>
+                <select v-model="editedReminder.month" class="card-input">
+                  <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
+                </select>
+              </div>
+            </div>
+            <button class="save-btn" @click="saveReminder">Enregistrer</button>
+          </div>
+
+          <div v-else class="card-content view-mode">
             <div class="header-view">
               <div class="icon-circle big-icon" :class="{ 'one-time': reminder.isOneTime }">
                 <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
@@ -193,46 +204,20 @@ const handleValidate = () => router.push('/home-admin');
                 </svg>
               </div>
               <h3 class="resource-id">{{ reminder.label }}</h3>
-              <p class="resource-title">
-                {{ reminder.isOneTime ? 'Ponctuel' : 'Récurrent (Mensuel)' }}
-              </p>
+              <p class="resource-title">{{ reminder.isOneTime ? 'Ponctuel' : 'Récurrent (Mensuel)' }}</p>
             </div>
-
             <div class="info-container">
-              <div class="info-badge">
-                <span class="time-text">{{ reminder.time }}</span>
-              </div>
-              <div class="date-detail">
-                <span>Le {{ reminder.day }} {{ reminder.month }}</span>
-              </div>
+              <div class="info-badge"><span class="time-text">{{ reminder.time }}</span></div>
+              <div class="date-detail"><span>Le {{ reminder.day }} {{ reminder.month }}</span></div>
             </div>
-
             <div class="card-actions">
-              <button class="action-btn edit" @click="handleEdit(reminder, index)">
-                <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="action-btn delete" @click="handleDelete(reminder.id)">
-                <svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
+              <button class="action-btn edit" @click="handleEdit(reminder, index)"><svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+              <button class="action-btn delete" @click="handleDelete(reminder.id)"><svg width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
             </div>
           </div>
         </div>
-
       </div>
     </main>
-
-    <footer class="sticky-bar">
-      <div class="sticky-wrapper">
-        <div class="search-container">
-          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" v-model="searchQuery" placeholder="Rechercher un rappel..." class="search-input" />
-        </div>
-        <button @click="handleValidate" class="btn-sys primary">Terminer</button>
-      </div>
-    </footer>
   </div>
 </template>
 
