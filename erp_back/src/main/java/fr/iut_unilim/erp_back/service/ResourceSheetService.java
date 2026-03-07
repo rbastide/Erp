@@ -1,13 +1,12 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.CourseHoursResponse;
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
-import fr.iut_unilim.erp_back.repository.ResourceRepository;
-import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
+import fr.iut_unilim.erp_back.repository.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -23,14 +22,20 @@ public class ResourceSheetService {
     private final EducationalContentService educationalContentService;
     private final ClassTypeRepository classTypeRepository;
     private final CourseHoursService courseHoursService;
+    private final ImprovementIdeaRepository improvementIdeaRepository;
+    private final StudentFeedbackRepository studentFeedbackRepository;
+    private final TeacherFeedbackRepository teacherFeedbackRepository;
 
-    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService) {
+    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService, ImprovementIdeaRepository improvementIdeaRepository, StudentFeedbackRepository studentFeedbackRepository, TeacherFeedbackRepository teacherFeedbackRepository) {
         this.resourceSheetRepository = resourceSheetRepository;
         this.connectionService = connectionService;
         this.resourceRepository = resourceRepository;
         this.educationalContentService = educationalContentService;
         this.classTypeRepository = classTypeRepository;
         this.courseHoursService = courseHoursService;
+        this.improvementIdeaRepository = improvementIdeaRepository;
+        this.studentFeedbackRepository = studentFeedbackRepository;
+        this.teacherFeedbackRepository = teacherFeedbackRepository;
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartmentAndYear(@NotNull String identifier, Integer year) {
@@ -87,9 +92,9 @@ public class ResourceSheetService {
                 courseHoursResponse,
                 resourceSheet.getCreationDate(),
                 resourceSheet.getLastModificationDate(),
-                resourceSheet.getImprovementIdeas(),
-                resourceSheet.getTeacherFeedbacks(),
-                resourceSheet.getStudentFeedbacks(),
+                resourceSheet.getImprovementIdeas().getContent(),
+                resourceSheet.getTeacherFeedbacks().getContent(),
+                resourceSheet.getStudentFeedbacks().getContent(),
                 educationalContentService.convertEntitiesToResponses(resourceSheet.getEducationalContents()),
                 resourceSheet.isValidate(),
                 resourceSheet.getAcademicYearStart()
@@ -101,9 +106,7 @@ public class ResourceSheetService {
         if (resourceSheet == null) return false;
 
         resourceSheet.setLastModificationDate(new Date());
-        resourceSheet.setImprovementIdeas(resourceSheetRequest.improvementsIdeas());
-        resourceSheet.setStudentFeedbacks(resourceSheetRequest.studentFeedbacks());
-        resourceSheet.setTeacherFeedbacks(resourceSheetRequest.teacherFeedbacks());
+        fillFeedbacks(resourceSheetRequest, resourceSheet);
         resourceSheet.setValidate(false);
         resourceSheet.setAcademicYearStart(resourceSheetRequest.academicYearStart());
 
@@ -198,5 +201,15 @@ public class ResourceSheetService {
         float hoursDS = resourceSheetRequest.courseHours().get("ds");
         Optional<CourseHours> courseHours = courseHoursService.findCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
         return courseHours.orElseGet(() -> new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD));
+    }
+
+    private void fillFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
+        Optional<ImprovementIdea> improvementIdeaOptional = improvementIdeaRepository.findByContent(resourceSheetRequest.improvementsIdeas());
+        Optional<StudentFeedback> studentFeedbackOptional = studentFeedbackRepository.findByContent(resourceSheetRequest.studentFeedbacks());
+        Optional<TeacherFeedback> teacherFeedbackOptional = teacherFeedbackRepository.findByContent(resourceSheetRequest.teacherFeedbacks());
+
+        resourceSheet.setImprovementIdeas(improvementIdeaOptional.orElseGet(() -> new ImprovementIdea(resourceSheetRequest.improvementsIdeas())));
+        resourceSheet.setStudentFeedbacks(studentFeedbackOptional.orElseGet(() -> new StudentFeedback(resourceSheetRequest.studentFeedbacks())));
+        resourceSheet.setTeacherFeedbacks(teacherFeedbackOptional.orElseGet(() -> new TeacherFeedback(resourceSheetRequest.teacherFeedbacks())));
     }
 }

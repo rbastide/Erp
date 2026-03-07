@@ -63,7 +63,12 @@ public class PdfService {
 
         List<EducationalContent> educationallContents = resourceSheet.getEducationalContents();
 
-        return new ResourceSheetViewModel(resource, courseHours.get(), resourceSheet.getTeacherFeedbacks(), resourceSheet.getStudentFeedbacks(), resourceSheet.getImprovementIdeas(), semester, fromMccc.saes(), fromMccc.creationDate(), fromMccc.lastModificationDate(), fromMccc.teachers(), fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
+        return new ResourceSheetViewModel(resource, courseHours.get(),
+                resourceSheet.getTeacherFeedbacks().getContent(), resourceSheet.getStudentFeedbacks().getContent(),
+                resourceSheet.getImprovementIdeas().getContent(), semester,
+                fromMccc.saes(), fromMccc.creationDate(),
+                fromMccc.lastModificationDate(), fromMccc.teachers(),
+                fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
     }
 
     @NotNull

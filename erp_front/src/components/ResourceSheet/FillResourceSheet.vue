@@ -267,10 +267,10 @@ const fetchResourceSheetData = async () => {
 
 onMounted(async () => {
   await fetchResourceData();
+  await fetchResourceSheetData();
   if (resourceSheetId.value === null) {
     await fetchHoursData();
   }
-  await fetchResourceSheetData();
 });
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {

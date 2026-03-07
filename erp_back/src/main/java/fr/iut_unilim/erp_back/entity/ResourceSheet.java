@@ -19,7 +19,7 @@ public class ResourceSheet {
     @JoinColumn(name = "resourceID")
     private Resource resource;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "courseHoursID")
     private CourseHours courseHours;
 
@@ -31,14 +31,17 @@ public class ResourceSheet {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
     private Date lastModificationDate;
 
-    @Column(name = "improvementIdeas")
-    private String improvementIdeas;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "improvementIdeaID")
+    private ImprovementIdea improvementIdeas;
 
-    @Column(name = "teacherFeedbacks")
-    private String teacherFeedbacks;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "teacherFeedbackID")
+    private TeacherFeedback teacherFeedbacks;
 
-    @Column(name = "studentFeedbacks")
-    private String studentFeedbacks;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "studentFeedbackID")
+    private StudentFeedback studentFeedbacks;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheet")
     private List<EducationalContent> educationalContents;
@@ -96,27 +99,27 @@ public class ResourceSheet {
         return lastModificationDate;
     }
 
-    public String getImprovementIdeas() {
+    public ImprovementIdea getImprovementIdeas() {
         return improvementIdeas;
     }
 
-    public void setImprovementIdeas(String improvementIdeas) {
+    public void setImprovementIdeas(ImprovementIdea improvementIdeas) {
         this.improvementIdeas = improvementIdeas;
     }
 
-    public String getTeacherFeedbacks() {
+    public TeacherFeedback getTeacherFeedbacks() {
         return teacherFeedbacks;
     }
 
-    public void setTeacherFeedbacks(String teacherFeedbacks) {
+    public void setTeacherFeedbacks(TeacherFeedback teacherFeedbacks) {
         this.teacherFeedbacks = teacherFeedbacks;
     }
 
-    public String getStudentFeedbacks() {
+    public StudentFeedback getStudentFeedbacks() {
         return studentFeedbacks;
     }
 
-    public void setStudentFeedbacks(String studentFeedbacks) {
+    public void setStudentFeedbacks(StudentFeedback studentFeedbacks) {
         this.studentFeedbacks = studentFeedbacks;
     }
 
