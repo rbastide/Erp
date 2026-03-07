@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Role;
 import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +26,14 @@ public class RoleService {
                     return roleRepository.save(role);
                 }
         );
+    }
+
+    public List<Role> getAllRole() {
+        return roleRepository.findAll();
+    }
+
+    public List<RoleResponse> convertEntitiesToResponses(List<Role> roles) {
+        return roles.stream().map(this::convertEntityToResponse).toList();
     }
 
     public RoleResponse convertEntityToResponse(Role role) {
