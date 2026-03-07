@@ -237,16 +237,16 @@ public class McccController {
 
     @NotNull
     private CourseHours getCourseHoursFromDto(McccRequest dto) {
-        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getMinDSTP(), dto.getMinDS());
+        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getHoursDSTP(), dto.getMinDS());
         if (allCourseHours.isEmpty()) {
-            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getMinDSTP(), dto.getMinTP(), dto.getMinTD());
+            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getHoursDSTP(), dto.getMinTP(), dto.getMinTD());
         }
         CourseHours courseHours = allCourseHours.get();
         courseHours.setNbMinCM(dto.getMinCM());
         courseHours.setNbMinTD(dto.getMinTD());
         courseHours.setNbMinTP(dto.getMinTP());
         courseHours.setNbMinDS(dto.getMinDS());
-        courseHours.setNbMinDSTP(dto.getMinDSTP());
+        courseHours.setNbMinDSTP(dto.getHoursDSTP());
         return courseHours;
     }
 
