@@ -24,8 +24,9 @@ public class ResourceSheetService {
     private final ImprovementIdeaRepository improvementIdeaRepository;
     private final StudentFeedbackRepository studentFeedbackRepository;
     private final TeacherFeedbackRepository teacherFeedbackRepository;
+    private final SanitizeService sanitizeService;
 
-    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService, ImprovementIdeaRepository improvementIdeaRepository, StudentFeedbackRepository studentFeedbackRepository, TeacherFeedbackRepository teacherFeedbackRepository) {
+    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService, ImprovementIdeaRepository improvementIdeaRepository, StudentFeedbackRepository studentFeedbackRepository, TeacherFeedbackRepository teacherFeedbackRepository, SanitizeService sanitizeService, SanitizeService sanitizeService1) {
         this.resourceSheetRepository = resourceSheetRepository;
         this.connectionService = connectionService;
         this.resourceRepository = resourceRepository;
@@ -35,6 +36,7 @@ public class ResourceSheetService {
         this.improvementIdeaRepository = improvementIdeaRepository;
         this.studentFeedbackRepository = studentFeedbackRepository;
         this.teacherFeedbackRepository = teacherFeedbackRepository;
+        this.sanitizeService = sanitizeService1;
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartmentAndYear(@NotNull String identifier, Integer year) {
@@ -61,7 +63,7 @@ public class ResourceSheetService {
     }
 
     public boolean deleteResourceSheetById(Long id) {
-        if(!resourceSheetRepository.existsById(id)){
+        if (!resourceSheetRepository.existsById(id)){
             return false;
         }
         resourceSheetRepository.deleteById(id);
@@ -212,12 +214,16 @@ public class ResourceSheetService {
     }
 
     private void fillFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        Optional<ImprovementIdea> improvementIdeaOptional = improvementIdeaRepository.findByContent(resourceSheetRequest.improvementsIdeas());
-        Optional<StudentFeedback> studentFeedbackOptional = studentFeedbackRepository.findByContent(resourceSheetRequest.studentFeedbacks());
-        Optional<TeacherFeedback> teacherFeedbackOptional = teacherFeedbackRepository.findByContent(resourceSheetRequest.teacherFeedbacks());
+        String sanitizedImprovementIdea = sanitizeService.sanitize(resourceSheetRequest.improvementsIdeas());
+        String sanitizedStudentFeedback = sanitizeService.sanitize(resourceSheetRequest.studentFeedbacks());
+        String sanitizedTeacherFeedback = sanitizeService.sanitize(resourceSheetRequest.teacherFeedbacks());
 
-        resourceSheet.setImprovementIdeas(improvementIdeaOptional.orElseGet(() -> new ImprovementIdea(resourceSheetRequest.improvementsIdeas())));
-        resourceSheet.setStudentFeedbacks(studentFeedbackOptional.orElseGet(() -> new StudentFeedback(resourceSheetRequest.studentFeedbacks())));
-        resourceSheet.setTeacherFeedbacks(teacherFeedbackOptional.orElseGet(() -> new TeacherFeedback(resourceSheetRequest.teacherFeedbacks())));
+        Optional<ImprovementIdea> improvementIdeaOptional = improvementIdeaRepository.findByContent(sanitizedImprovementIdea);
+        Optional<StudentFeedback> studentFeedbackOptional = studentFeedbackRepository.findByContent(sanitizedStudentFeedback);
+        Optional<TeacherFeedback> teacherFeedbackOptional = teacherFeedbackRepository.findByContent(sanitizedTeacherFeedback);
+
+        resourceSheet.setImprovementIdeas(improvementIdeaOptional.orElseGet(() -> new ImprovementIdea(sanitizedImprovementIdea)));
+        resourceSheet.setStudentFeedbacks(studentFeedbackOptional.orElseGet(() -> new StudentFeedback(sanitizedStudentFeedback)));
+        resourceSheet.setTeacherFeedbacks(teacherFeedbackOptional.orElseGet(() -> new TeacherFeedback(sanitizedTeacherFeedback)));
     }
 }
