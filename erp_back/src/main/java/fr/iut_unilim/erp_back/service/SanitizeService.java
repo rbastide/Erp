@@ -1,7 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
-import com.itextpdf.styledxmlparser.jsoup.Jsoup;
-import com.itextpdf.styledxmlparser.jsoup.safety.Safelist;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 
 @Service
