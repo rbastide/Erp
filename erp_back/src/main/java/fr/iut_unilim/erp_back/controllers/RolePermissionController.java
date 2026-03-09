@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.EditRolePermissionRequest;
 import fr.iut_unilim.erp_back.dto.PermissionDefinitionResponse;
 import fr.iut_unilim.erp_back.dto.RolePermissionResponse;
@@ -42,7 +41,6 @@ public class RolePermissionController {
     @PostMapping("/perms/role")
     @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
     public ResponseEntity<?> editRolePermissions(@RequestBody List<EditRolePermissionRequest> editRolePermissionRequests) {
-        ErpBackApplication.LOGGER.info("test");
         boolean doErrorOccured = false;
         for (EditRolePermissionRequest editRolePermissionRequest : editRolePermissionRequests) {
             doErrorOccured |= !permissionService.editRolePermission(editRolePermissionRequest);
