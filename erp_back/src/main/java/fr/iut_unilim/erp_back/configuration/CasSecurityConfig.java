@@ -35,13 +35,13 @@ public class CasSecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils JwtUtils;
 
-    @Value("${cas.server.url:https://cas.unilim.fr/cas}")
+    @Value("${cas.server}")
     private String casServerUrl;
 
-    @Value("${app.backend.url:https://164.81.120.79:8443}")
+    @Value("${backend.url}")
     private String backendUrl;
 
-    @Value("${app.frontend.url:https://ton-frontend-en-prod.fr}")
+    @Value("${frontend.url}")
     private String frontendUrl;
 
     public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
@@ -51,7 +51,7 @@ public class CasSecurityConfig {
     @Bean
     public ServiceProperties  serviceProperties() {
         ServiceProperties serviceProperties = new ServiceProperties();
-        serviceProperties.setService(backendUrl + "/api/auth/");
+        serviceProperties.setService(backendUrl + "/login/cas");
         serviceProperties.setSendRenew(false);
         return serviceProperties;
     }
