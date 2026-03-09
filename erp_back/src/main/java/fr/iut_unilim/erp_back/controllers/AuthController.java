@@ -153,7 +153,6 @@ public class AuthController {
     @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
-        ErpBackApplication.LOGGER.info("User: " + user + " " + identifier);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -201,4 +200,27 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().body("Département inconnu");
     }
+
+    @GetMapping("/user-info-and-role/{identifier}")
+    @PreAuthorize("@securityService.isLogin()")
+    public ResponseEntity<?> getUserInfoAndRole(@PathVariable String identifier) {
+        Connection user = connectionRepository.findByIdentifier(identifier);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
+        if (teacher == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String roleName = user.getRole().getRoleName();
+
+        return ResponseEntity.ok(Map.of(
+                "role", roleName,
+                "firstname", teacher.getFirstname(),
+                "lastname", teacher.getLastname()
+        ));
+    }
+
+
 }
