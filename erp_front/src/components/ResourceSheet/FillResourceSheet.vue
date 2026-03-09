@@ -59,6 +59,14 @@ const activeFormats = ref({
   ordered: false
 });
 
+const getCurrentAcademicYear = () => {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  return month < 8 ? year - 1 : year;
+};
+
+const academicYearStart = ref(getCurrentAcademicYear());
 
 const validateInput = (type: keyof typeof splitHours, subType: 'h' | 'm', event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -68,7 +76,6 @@ const validateInput = (type: keyof typeof splitHours, subType: 'h' | 'm', event:
     if (val.length > 1 && val.startsWith('0')) {
       val = val.replace(/^0+/, '');
     }
-
     if (val !== '' && parseInt(val) > 999) {
       val = '999';
     }
@@ -199,14 +206,11 @@ const fetchHoursData = async () => {
 
       if (mcccFound && mcccFound.courseHoursId) {
         const vol = mcccFound.courseHoursId;
-        console.log("Vol :", vol);
-
         splitHours.cm = convertDecimalToSplit(vol.nbMinCM);
         splitHours.td = convertDecimalToSplit(vol.nbMinTD);
         splitHours.tp = convertDecimalToSplit(vol.nbMinTP);
         splitHours.ds = convertDecimalToSplit(vol.nbMinDS);
         splitHours.ds_tp = convertDecimalToSplit(vol.nbMinDSTP);
-
         currentCourseHoursId.value = vol.courseHoursID;
       }
     }
@@ -214,15 +218,6 @@ const fetchHoursData = async () => {
     console.error("Erreur MCCC :", error);
   }
 };
-
-const getCurrentAcademicYear = () => {
-  const now = new Date();
-  const month = now.getMonth();
-  const year = now.getFullYear();
-  return month < 8 ? year - 1 : year;
-};
-
-const academicYearStart = getCurrentAcademicYear();
 
 const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
   const min = minutes % 60;
@@ -232,7 +227,7 @@ const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
 
 const fetchResourceSheetData = async () => {
   try {
-    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/${academicYearStart}`);
+    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/${academicYearStart.value}`);
     const resourceData = response.data;
 
     if (resourceData) {
@@ -248,7 +243,6 @@ const fetchResourceSheetData = async () => {
       }
 
       const contents = resourceData.educationalContentID || [];
-
       const filterBy = (type: string) => contents
           .filter((c: any) => c.classType === type)
           .sort((a: any, b: any) => a.courseNumber - b.courseNumber)
@@ -328,7 +322,7 @@ const handleValidate = async () => {
     studentFeedbacks: stFBContents.value,
     improvementsIdeas: upgradesContents.value,
     educationalContents: educationalContentsMap,
-    academicYearStart: academicYearStart
+    academicYearStart: academicYearStart.value
   };
 
   try {
@@ -338,6 +332,17 @@ const handleValidate = async () => {
     console.error("Détails erreur :", error);
     showErrorModal.value = true;
   }
+};
+
+const blockKeyboardInput = (e: KeyboardEvent) => {
+  if (e.key !== 'Tab') {
+    e.preventDefault();
+  }
+};
+
+const validateYearInput = () => {
+  if (academicYearStart.value < 1900) academicYearStart.value = 1900;
+  academicYearStart.value = Math.floor(academicYearStart.value);
 };
 
 const handleBack = () => {
@@ -372,6 +377,25 @@ const pedagogicalSections = computed(() => [
   <main class="main-content">
     <div class="container">
       <div class="required-legend"><span>* champs obligatoires</span></div>
+
+      <section class="form-card year-card">
+        <div class="year-input-group">
+          <label class="field-label">Année académique (début) :</label>
+          <div class="input-with-info">
+            <input
+                type="number"
+                v-model="academicYearStart"
+                class="simple-line-input year-input"
+                @keydown="blockKeyboardInput"
+                @change="fetchResourceSheetData"
+                @input="validateYearInput"
+            />
+            <span class="year-helper">
+              Fiche pour l'année <strong>{{ academicYearStart }} - {{ Number(academicYearStart) + 1 }}</strong>
+            </span>
+          </div>
+        </div>
+      </section>
 
       <section class="form-card">
         <h2 class="section-title">Voici le nombre d'heures de CM, TD et TP : *</h2>
@@ -470,7 +494,6 @@ const pedagogicalSections = computed(() => [
 
       <section class="form-card accent">
         <h2 class="section-title">Bilans et Évolutions</h2>
-
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour pédagogique des professeurs :</label>
           <div class="rich-editor-wrapper">
@@ -580,21 +603,9 @@ const pedagogicalSections = computed(() => [
       </div>
     </div>
 
-    <CancelModal
-        v-if="showModal"
-        @confirm="onConfirmCancel"
-        @close="showModal = false"
-    />
-
-    <ModifSavedModal
-        v-if="showSuccessModal"
-    />
-
-    <ErrorSaveModal
-        v-if="showErrorModal"
-        @close="showErrorModal = false"
-    />
-
+    <CancelModal v-if="showModal" @confirm="onConfirmCancel" @close="showModal = false" />
+    <ModifSavedModal v-if="showSuccessModal" />
+    <ErrorSaveModal v-if="showErrorModal" @close="showErrorModal = false" />
   </main>
 </template>
 
@@ -613,6 +624,36 @@ const pedagogicalSections = computed(() => [
   max-width: 900px;
   margin: 0 auto;
 }
+
+/* Styles spécifique Année */
+.year-card {
+  padding: 20px 35px !important;
+  margin-bottom: 20px;
+}
+.year-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.year-input {
+  width: 120px !important;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.1rem;
+}
+.input-with-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.year-helper {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+.year-helper strong {
+  color: #E92533;
+}
+
 .required-legend {
   text-align: right;
   color: #E92533;
