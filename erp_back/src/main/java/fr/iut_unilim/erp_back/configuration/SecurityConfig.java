@@ -4,6 +4,7 @@ import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Profile("dev")
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
