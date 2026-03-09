@@ -35,8 +35,6 @@ public class TeacherService {
 
 
     public void createTeacherFromRegister(RegisterRequest req, Connection connection) {
-        ErpBackApplication.LOGGER.info("Teacher creation");
-        ErpBackApplication.LOGGER.info("Teacher: " + req.getFirstname() + " " + req.getLastname());
         Teacher teacher = new Teacher();
 
         teacher.setFirstname(req.getFirstname());
