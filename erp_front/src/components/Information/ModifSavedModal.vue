@@ -11,12 +11,7 @@ onMounted(() => {
 });
 
 const handleBack = () => {
-  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
-    router.push('/home-admin');
-  }
-  else {
-    router.push('/home');
-  }
+  router.push('/home');
 };
 </script>
 

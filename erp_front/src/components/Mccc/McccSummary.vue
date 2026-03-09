@@ -101,7 +101,7 @@ const handleValidate = async () => {
 
 const handleCloseSuccess = () => {
   showSuccessModal.value = false;
-  router.push('/home-admin');
+  router.push('/home');
 };
 </script>
 
