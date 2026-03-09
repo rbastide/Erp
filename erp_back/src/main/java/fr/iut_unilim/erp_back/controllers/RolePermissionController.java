@@ -43,7 +43,7 @@ public class RolePermissionController {
     public ResponseEntity<?> editRolePermissions(@RequestBody List<EditRolePermissionRequest> editRolePermissionRequests) {
         boolean doErrorOccured = false;
         for (EditRolePermissionRequest editRolePermissionRequest : editRolePermissionRequests) {
-            doErrorOccured |= permissionService.editRolePermission(editRolePermissionRequest);
+            doErrorOccured |= !permissionService.editRolePermission(editRolePermissionRequest);
         }
 
         if (doErrorOccured) {
