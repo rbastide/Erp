@@ -66,7 +66,7 @@ onMounted(async () => {
 const filteredUsers = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   if (!query) return users.value;
-  return users.value.filter(user =>
+  return users.value  .filter(user =>
       user.identifier.toLowerCase().includes(query) ||
       (user.firstName && user.firstName.toLowerCase().includes(query)) ||
       (user.lastName && user.lastName.toLowerCase().includes(query)) ||
@@ -211,13 +211,13 @@ const handleAddUser = () => router.push('/new-user');
             </div>
 
             <div class="input-group-compact">
-              <input type="text" v-model="editedUser.lastName" class="card-input-compact" placeholder="Nom">
+              <input type="text" v-model="editedUser.lastName" class="card-input-compact" placeholder="Nom" readonly>
             </div>
             <div class="input-group-compact">
-              <input type="text" v-model="editedUser.firstName" class="card-input-compact" placeholder="Prénom">
+              <input type="text" v-model="editedUser.firstName" class="card-input-compact" placeholder="Prénom" readonly>
             </div>
             <div class="input-group-compact">
-              <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Nouvel email">
+              <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Nouvel email" readonly>
             </div>
 
             <hr class="separator"/>
