@@ -164,6 +164,7 @@ const saveModification = async () => {
 
   try {
     await api.post('perm/perms/role', [payload]);
+    console.log("perm enregistrée !", payload)
     await fetchRoles();
     handleCancel();
   } catch (error) {

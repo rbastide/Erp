@@ -154,7 +154,7 @@ const execCmd = (command: string) => {
 
 const updateRichContent = (event: Event, type: 'teachers' | 'students' | 'upgrades') => {
   const target = event.target as HTMLElement;
-  const content = target.innerText;
+  const content = target.innerHTML;
 
   if (type === 'teachers') edFBContents.value = content;
   if (type === 'students') stFBContents.value = content;
@@ -252,9 +252,9 @@ const fetchResourceSheetData = async () => {
       dsContents.value = filterBy('DS').length ? filterBy('DS') : [''];
       dstpContents.value = filterBy('DS/TP').length ? filterBy('DS/TP') : [''];
 
-      edFBContents.value = (resourceData.teacherFeedbacks || '').replace(/\n/g, '<br>');
-      stFBContents.value = (resourceData.studentFeedbacks || '').replace(/\n/g, '<br>');
-      upgradesContents.value = (resourceData.improvementIdeas || '').replace(/\n/g, '<br>');
+      edFBContents.value = resourceData.teacherFeedbacks || '';
+      stFBContents.value = resourceData.studentFeedbacks || '';
+      upgradesContents.value = resourceData.improvementIdeas || '';
 
       await populateRichEditors();
     }
