@@ -215,6 +215,15 @@ const fetchHoursData = async () => {
   }
 };
 
+const getCurrentAcademicYear = () => {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  return month < 8 ? year - 1 : year;
+};
+
+const academicYearStart = getCurrentAcademicYear();
+
 const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
   const min = minutes % 60;
   const normalizedMin = min < 10 ? `0${min}` : `${min}`;
@@ -223,8 +232,7 @@ const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
 
 const fetchResourceSheetData = async () => {
   try {
-    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/2026`); // TODO : add working year path parameter
-
+    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/${academicYearStart}`);
     const resourceData = response.data;
 
     if (resourceData) {
@@ -320,7 +328,7 @@ const handleValidate = async () => {
     studentFeedbacks: stFBContents.value,
     improvementsIdeas: upgradesContents.value,
     educationalContents: educationalContentsMap,
-    academicYearStart: 2026 // TODO : replace with a real selectable component
+    academicYearStart: academicYearStart
   };
 
   try {
@@ -468,20 +476,20 @@ const pedagogicalSections = computed(() => [
           <div class="rich-editor-wrapper">
             <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'teachers' }">
               <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'teachers' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
               </button>
               <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'teachers' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'teachers' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
               </button>
               <span class="sep"></span>
               <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'teachers' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'teachers' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
               </button>
             </div>
             <div
@@ -502,20 +510,20 @@ const pedagogicalSections = computed(() => [
           <div class="rich-editor-wrapper">
             <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'students' }">
               <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'students' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
               </button>
               <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'students' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'students' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
               </button>
               <span class="sep"></span>
               <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'students' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'students' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
               </button>
             </div>
             <div
@@ -536,20 +544,20 @@ const pedagogicalSections = computed(() => [
           <div class="rich-editor-wrapper">
             <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'upgrades' }">
               <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'upgrades' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
               </button>
               <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'upgrades' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'upgrades' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
               </button>
               <span class="sep"></span>
               <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'upgrades' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
               </button>
               <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'upgrades' }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
               </button>
             </div>
             <div
