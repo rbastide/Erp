@@ -48,7 +48,6 @@ const handleRegister = async () => {
   };
 
   try {
-    console.log(userPayload);
     await AuthService.register(userPayload);
     await router.push('/users-management');
   } catch (error) {
@@ -65,7 +64,6 @@ const fetchRoles = async () => {
   try {
     const response = await api.get('/role/all');
     roles.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
-    console.log(roles.value);
   } catch (error) {
     console.error(error);
   }

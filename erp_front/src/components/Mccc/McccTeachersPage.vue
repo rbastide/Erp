@@ -69,7 +69,6 @@ onMounted(async () => {
   const hasLocalEdits = mcccStore.referents && mcccStore.referents.length > 0;
 
   if (hasLocalEdits) {
-    console.log("Utilisation des données du Store (navigation locale)");
     selectedTeacherIds.value = mcccStore.referents.map(ref => {
       const found = allTeachers.value.find(t =>
           (t.lastname || "").toLowerCase() === (ref.lastname || "").toLowerCase() &&
@@ -78,7 +77,6 @@ onMounted(async () => {
       return found ? found.teacherID : null;
     }).filter(id => id !== null);
   } else {
-    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedTeachers();
   }
 

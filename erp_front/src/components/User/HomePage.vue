@@ -57,7 +57,6 @@ const fetchAvaliableMenu = async () => {
   const response = await api.get('/menus');
   menus.value = response.data;
   isSuperAdmin.value = menus.value.some(menu => menu.id === 1);
-  console.log(menus.value);
 };
 
 onMounted(() => {

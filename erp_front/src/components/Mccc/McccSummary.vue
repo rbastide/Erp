@@ -90,7 +90,6 @@ const handleValidate = async () => {
 
     };
 
-    console.log("Payload envoyé:", payload);
     await api.post('/mccc/save', payload);
     showSuccessModal.value = true;
 
