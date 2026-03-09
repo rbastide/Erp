@@ -9,6 +9,8 @@ const router = useRouter();
 const searchQuery = ref('');
 const historyItems = ref([]);
 const isLoading = ref(true);
+const showDeleteModal = ref(false);
+const itemToDelete = ref<{ id: number, code: string } | null>(null);
 
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
@@ -21,9 +23,10 @@ const formatDate = (dateString: string) => {
 
 const fetchAvailableYears = async () => {
   try {
-    const response = await api.get('/resourceSheet/resource-sheets');
-    const years = response.data.map((sheet: any) => sheet.year).filter(Boolean);
-    const uniqueYears = [...new Set(years)].sort((a: any, b: any) => b - a) as number[];
+    const response = await api.get('/resourceSheet/available-years');
+    const yearsData = response.data.filter(Boolean);
+    const yearsNumbers = yearsData.map((item: any) => item.year === undefined ? item : item.year);
+    const uniqueYears = [...new Set(yearsNumbers)].sort((a: any, b: any) => b - a) as number[];
     availableYears.value = uniqueYears;
     if (uniqueYears.length > 0 && !uniqueYears.includes(selectedYear.value)) {
       selectedYear.value = uniqueYears[0];
@@ -40,6 +43,7 @@ const fetchHistory = async () => {
     isLoading.value = true;
     const response = await api.get(`/resourceSheet/getHistory/${selectedYear.value}`);
     historyItems.value = response.data;
+    historyItems.value = historyItems.value.filter((item: any) => item.isValidate === true)
   } catch (error) {
     console.error("Erreur chargement historique :", error);
     historyItems.value = [];
@@ -78,6 +82,26 @@ const handleShow = (item: any) => {
       year: selectedYear.value
     }
   });
+};
+
+const handleDelete = (id: number, code: string) => {
+  itemToDelete.value = { id, code };
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = async () => {
+  if (!itemToDelete.value) return;
+  const id = itemToDelete.value.id;
+
+  try {
+    await api.delete(`/resourceSheet/${id}`);
+    historyItems.value = historyItems.value.filter((item: any) => (item.sheetID || item.id) !== id);
+    showDeleteModal.value = false;
+    itemToDelete.value = null;
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    alert("Une erreur est survenue lors de la suppression.");
+  }
 };
 
 const handleExportPdf = async (id: number, resourceCode: string) => {
@@ -146,9 +170,22 @@ const clearSearch = () => searchQuery.value = '';
 
             <button class="btn-icon-container" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
                     title="Exporter en PDF">
-              <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="24" height="24" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
                 <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              </svg>
+            </button>
+
+            <button
+                class="btn-icon-container delete"
+                @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
+                title="Supprimer la fiche"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
               </svg>
             </button>
           </li>
@@ -295,18 +332,18 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .btn-icon-container:hover {
-  background-color: #fce8e9;
+  background-color: #ffebee;
 }
 
 .btn-icon {
   width: 28px;
   height: 28px;
-  fill: #64748b;
-  transition: fill 0.2s;
+  color: #64748b;
+  transition: color 0.2s;
 }
 
 .btn-icon-container:hover .btn-icon {
-  fill: #B51621;
+  color: #B51621;
 }
 
 .no-result {

@@ -7,13 +7,15 @@ public class HistoryResponse {
     private String resourceCode;
     private String resourceName;
     private Date date;
+    private Boolean isValidate;
     private Integer academicYearStart;
 
-    public HistoryResponse(Long sheetID, String resourceCode, String resourceName, Date date, Integer academicYearStart) {
+    public HistoryResponse(Long sheetID, String resourceCode, String resourceName, Date date, Boolean isValidate,  Integer academicYearStart) {
         this.sheetID = sheetID;
         this.resourceCode = resourceCode;
         this.resourceName = resourceName;
         this.date = date;
+        this.isValidate = isValidate;
         this.academicYearStart = academicYearStart;
     }
 
@@ -27,6 +29,9 @@ public class HistoryResponse {
     public void setResourceName(String resourceName) { this.resourceName = resourceName; }
 
     public Date getDate() { return date; }
+
+    public Boolean getIsValidate(){ return isValidate; }
+    public void setIsValidate(Boolean isValidate){ this.isValidate = isValidate;}
 
     public Integer getAcademicYearStart() {
         return academicYearStart;

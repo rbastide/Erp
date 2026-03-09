@@ -157,6 +157,7 @@ public class ResourceSheetService {
                     code,
                     name,
                     dateToUse,
+                    sheet.isValidate(),
                     sheet.getAcademicYearStart()));
         }
 

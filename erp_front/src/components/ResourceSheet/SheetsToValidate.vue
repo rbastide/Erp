@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -9,6 +9,11 @@ const router = useRouter();
 const searchQuery = ref('');
 const historyItems = ref([]);
 const isLoading = ref(true);
+const showDeleteModal = ref(false);
+const itemToDelete = ref<{ id: number, code: string } | null>(null);
+
+const selectedYear = ref(new Date().getFullYear());
+const availableYears = ref<number[]>([]);
 
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
@@ -16,19 +21,43 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString('fr-FR');
 };
 
+const fetchAvailableYears = async () => {
+  try {
+    const response = await api.get('/resourceSheet/available-years');
+    const yearsData = response.data.filter(Boolean);
+    const yearsNumbers = yearsData.map((item: any) => item.year === undefined ? item : item.year);
+    const uniqueYears = [...new Set(yearsNumbers)].sort((a: any, b: any) => b - a) as number[];
+    availableYears.value = uniqueYears;
+    if (uniqueYears.length > 0 && !uniqueYears.includes(selectedYear.value)) {
+      selectedYear.value = uniqueYears[0];
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération des années disponibles :", error);
+    availableYears.value = [new Date().getFullYear()];
+  }
+};
+
+
 const fetchHistory = async () => {
   try {
     isLoading.value = true;
-    const response = await api.get('/resourceSheet/getHistory');
+    const response = await api.get(`/resourceSheet/getHistory/${selectedYear.value}`);
     historyItems.value = response.data;
+    historyItems.value = historyItems.value.filter(historyItem => historyItem.isValidate === false);
   } catch (error) {
     console.error("Erreur chargement historique :", error);
+    historyItems.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchAvailableYears();
+  await fetchHistory();
+});
+
+watch(selectedYear, () => {
   fetchHistory();
 });
 
@@ -45,35 +74,48 @@ const handleBack = () => router.back();
 
 const handleShow = (item: any) => {
   router.push({
-    path: '/resource-sheet-to-validate',
+    path: '/resource-sheet-history',
     query: {
       id: item.sheetID,
       code: item.resourceCode,
-      date: formatDate(item.date)
+      date: formatDate(item.date),
+      year: selectedYear.value
     }
   });
 };
 
+const handleDelete = (id: number, code: string) => {
+  itemToDelete.value = { id, code };
+  showDeleteModal.value = true;
+};
+
+const confirmDeletion = async () => {
+  if (!itemToDelete.value) return;
+  const id = itemToDelete.value.id;
+
+  try {
+    await api.delete(`/resourceSheet/${id}`);
+    historyItems.value = historyItems.value.filter((item: any) => (item.sheetID || item.id) !== id);
+    showDeleteModal.value = false;
+    itemToDelete.value = null;
+  } catch (error) {
+    console.error("Erreur lors de la suppression :", error);
+    alert("Une erreur est survenue lors de la suppression.");
+  }
+};
+
 const handleExportPdf = async (id: number, resourceCode: string) => {
   try {
-    const response = await api.get(`/pdf/resource-sheet/${id}`, {
-      responseType: 'blob'
-    });
+    const response = await api.get(`/pdf/resource-sheet/${id}`, { responseType: 'blob' });
     const file = new Blob([response.data], {type: 'application/pdf'});
     const fileURL = URL.createObjectURL(file);
-
     const link = document.createElement('a');
     link.href = fileURL;
-
-    const fileName = `fiche-ressource-${resourceCode}.pdf`;
-    link.setAttribute('download', fileName);
-
+    link.setAttribute('download', `fiche-ressource-${resourceCode}.pdf`);
     document.body.appendChild(link);
     link.click();
-
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(fileURL);
-
   } catch (error) {
     console.error("Erreur lors de la génération du PDF", error);
   }
@@ -88,15 +130,26 @@ const clearSearch = () => searchQuery.value = '';
 
   <main class="main-content">
     <div class="container">
-      <div class="version-list-container">
 
+      <div class="filter-wrapper">
+        <div class="year-filter">
+          <label for="year-select">Année académique :</label>
+          <select id="year-select" v-model="selectedYear" class="year-select">
+            <option v-for="year in availableYears" :key="year" :value="year">
+              {{ year }} / {{ year + 1 }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="version-list-container">
         <div v-if="isLoading" class="no-result">
           <p>Chargement de l'historique...</p>
         </div>
 
         <div v-else-if="filteredVersions.length === 0" class="no-result">
           <p v-if="searchQuery">Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
-          <p v-else>Aucun historique disponible.</p>
+          <p v-else>Aucune fiche à valider pour l'année {{ selectedYear }}.</p>
           <button v-if="searchQuery" @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
         </div>
 
@@ -109,15 +162,30 @@ const clearSearch = () => searchQuery.value = '';
           >
             <div class="info-group">
               <span class="version-code">{{ item.resourceCode }}</span>
-              <span class="version-title">{{ item.resourceName }}</span>
-              <span class="version-date">{{ formatDate(item.date) }}</span>
+              <div class="text-group">
+                <span class="version-title">{{ item.resourceName }}</span>
+                <span class="version-date">Modifiée le {{ formatDate(item.date) }}</span>
+              </div>
             </div>
 
             <button class="btn-icon-container" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
                     title="Exporter en PDF">
-              <svg xmlns="http://www.w3.org/2000/svg" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16" style="fill: none;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="24" height="24" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
                 <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              </svg>
+            </button>
+
+            <button
+                class="btn-icon-container delete"
+                @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
+                title="Supprimer la fiche"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
               </svg>
             </button>
           </li>
@@ -159,6 +227,40 @@ const clearSearch = () => searchQuery.value = '';
   max-width: 900px;
 }
 
+.filter-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.year-filter label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.year-select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #B51621;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
 .version-list {
   list-style: none;
   padding: 0;
@@ -187,33 +289,33 @@ const clearSearch = () => searchQuery.value = '';
 .info-group {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 25px;
   flex: 1;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .version-code {
   font-size: 1.8rem;
   font-weight: 700;
   color: #B51621;
-  min-width: 100px;
+  min-width: 110px;
 }
 
 .version-title {
   font-size: 1.1rem;
   color: #333;
   font-weight: 600;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-right: 15px;
 }
 
 .version-date {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #64748b;
-  font-weight: 500;
-  white-space: nowrap;
+  font-weight: 400;
 }
 
 .btn-icon-container {
@@ -230,18 +332,18 @@ const clearSearch = () => searchQuery.value = '';
 }
 
 .btn-icon-container:hover {
-  background-color: #e3f2fd;
+  background-color: #ffebee;
 }
 
 .btn-icon {
   width: 28px;
   height: 28px;
-  fill: #64748b;
-  transition: fill 0.2s;
+  color: #64748b;
+  transition: color 0.2s;
 }
 
 .btn-icon-container:hover .btn-icon {
-  fill: #1976D2;
+  color: #B51621;
 }
 
 .no-result {
