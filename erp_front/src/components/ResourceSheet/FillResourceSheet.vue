@@ -106,16 +106,17 @@ const formatHoursOnBlur = (type: keyof typeof splitHours) => {
 
 const totalGlobal = computed(() => {
   let totalMinutes = 0;
+
   Object.values(splitHours).forEach(time => {
-    const h = parseInt(time.h || '0');
-    const m = parseInt(time.m || '0');
+    const h = Number(time.h) || 0;
+    const m = Number(time.m) || 0;
     totalMinutes += (h * 60) + m;
   });
 
   const h = Math.floor(totalMinutes / 60);
-  const m = Math.round(totalMinutes % 60);
+  const m = totalMinutes % 60;
 
-  return m > 0 ? `${h}h${m.toString().padStart(2, '0')}` : `${h}h`;
+  return `${h}h${m.toString().padStart(2, '0')}`;
 });
 
 const convertSplitToDecimal = (time: { h: string, m: string }) => {
@@ -219,10 +220,14 @@ const fetchHoursData = async () => {
   }
 };
 
-const convertDecimalToSplit = (minutes: number): { h: string, m: string } => {
-  const min = minutes % 60;
-  const normalizedMin = min < 10 ? `0${min}` : `${min}`;
-  return {h: (Math.floor(minutes / 60) || 0).toString(), m: normalizedMin};
+const convertDecimalToSplit = (minutes: number | null | undefined): { h: string, m: string } => {
+  const safeMinutes = minutes || 0;
+  const h = Math.floor(safeMinutes / 60);
+  const m = safeMinutes % 60;
+  return {
+    h: h.toString(),
+    m: m.toString().padStart(2, '0')
+  };
 }
 
 const fetchResourceSheetData = async () => {
@@ -463,7 +468,7 @@ const pedagogicalSections = computed(() => [
         <h2 class="section-title">Voici le contenu pédagogique : *</h2>
         <div v-for="section in pedagogicalSections" :key="section.type" class="pedagogic-group">
           <h3 class="group-label">{{ section.type }}</h3>
-          <div v-for="(content, index) in section.list" :key="index" class="content-block">
+          <div v-for="(_, index) in section.list" :key="index" class="content-block">
             <label class="item-label">{{ section.type }} {{ index + 1 }}</label>
             <div class="input-wrapper">
               <input

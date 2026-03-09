@@ -16,12 +16,7 @@ const handleBack = () => {
 
 const onConfirmCancel = () => {
   mcccStore.restoreBackup(); // On remet les données comme avant
-
-  if (userRole.value === "ADMIN" || userRole.value === 'SUPER_ADMIN'){
-    router.push('/home-admin');
-  } else {
-    router.push('/home');
-  }
+  router.push('/home');
 };
 
 const handleHours = () => {

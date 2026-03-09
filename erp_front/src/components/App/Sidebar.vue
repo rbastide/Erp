@@ -63,11 +63,7 @@ watchEffect(() => {
 });
 
 const handleDashboardClick = () => {
-  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN') {
-    router.push('/home-admin');
-  } else {
-    router.push('/home');
-  }
+  router.push('/home');
 };
 
 const selectDept = async (id: number) => {
