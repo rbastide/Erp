@@ -75,7 +75,6 @@ export const mcccStore = reactive({
             this.backup = null;
 
             this.registerMcccStore();
-            console.log("✅ Restauration effectuée.");
         } catch (e) {
             console.error("Erreur Restauration:", e);
         }

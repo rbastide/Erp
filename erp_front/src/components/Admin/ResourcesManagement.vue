@@ -28,7 +28,6 @@ const fetchResources = async () => {
   try {
     const response = await api.get('resources/resources');
     resources.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
-    console.log(response.data);
   } catch (error) {
     console.error(error);
   }
