@@ -4,6 +4,7 @@ import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import DeleteHistoryModal from "@/components/Information/DeleteHistoryModal.vue";
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -11,7 +12,7 @@ const historyItems = ref([]);
 const isLoading = ref(true);
 const showDeleteModal = ref(false);
 const itemToDelete = ref<{ id: number, code: string } | null>(null);
-
+const userRole = ref('');
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
@@ -37,6 +38,11 @@ const fetchAvailableYears = async () => {
   }
 };
 
+const getRole = () => {
+  const role = localStorage.getItem('user_role');
+  userRole.value = role.toUpperCase() || 'Not Found';
+};
+
 
 const fetchHistory = async () => {
   try {
@@ -55,6 +61,7 @@ const fetchHistory = async () => {
 onMounted(async () => {
   await fetchAvailableYears();
   await fetchHistory();
+  getRole();
 });
 
 watch(selectedYear, () => {
@@ -114,7 +121,7 @@ const handleExportPdf = async (id: number, resourceCode: string) => {
     link.setAttribute('download', `fiche-ressource-${resourceCode}.pdf`);
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(fileURL);
   } catch (error) {
     console.error("Erreur lors de la génération du PDF", error);
@@ -177,6 +184,7 @@ const clearSearch = () => searchQuery.value = '';
             </button>
 
             <button
+                v-if="userRole.valueOf() === 'ADMIN' || userRole.valueOf() === 'SUPER-ADMIN'"
                 class="btn-icon-container delete"
                 @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
                 title="Supprimer la fiche"
@@ -208,6 +216,12 @@ const clearSearch = () => searchQuery.value = '';
         <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </footer>
+    <DeleteHistoryModal
+        v-if="showDeleteModal"
+        :code="itemToDelete?.code"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
+    />
   </main>
 </template>
 

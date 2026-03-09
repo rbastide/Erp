@@ -6,7 +6,6 @@ import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
-import HistoryAdminPage from "./components/Admin/HistoryAdminPage.vue";
 import McccResourcePage from "./components/Mccc/McccResourcePage.vue";
 import McccFillHourPage from "./components/Mccc/McccFillHour.vue";
 import McccMenuPage from "./components/Mccc/McccMenuPage.vue";
@@ -72,11 +71,6 @@ const routes = [
         path: '/mccc-menu',
         name: 'McccMenuPage',
         component: McccMenuPage
-    },
-    {
-        path: '/history-admin',
-        name: 'HistoryAdminPage',
-        component: HistoryAdminPage
     },
     {
         path: '/mccc-resource',

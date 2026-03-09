@@ -4,6 +4,7 @@ import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
+import DeleteHistoryModal from "@/components/Information/DeleteHistoryModal.vue";
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -11,7 +12,7 @@ const historyItems = ref([]);
 const isLoading = ref(true);
 const showDeleteModal = ref(false);
 const itemToDelete = ref<{ id: number, code: string } | null>(null);
-
+const userRole = ref('');
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
@@ -43,7 +44,7 @@ const fetchHistory = async () => {
     isLoading.value = true;
     const response = await api.get(`/resourceSheet/getHistory/${selectedYear.value}`);
     historyItems.value = response.data;
-    historyItems.value = historyItems.value.filter(historyItem => historyItem.isValidate === false);
+    historyItems.value = historyItems.value.filter((historyItem: any) => historyItem.isValidate === false);
   } catch (error) {
     console.error("Erreur chargement historique :", error);
     historyItems.value = [];
@@ -52,9 +53,15 @@ const fetchHistory = async () => {
   }
 };
 
+const getRole = () => {
+  const role = localStorage.getItem('user_role');
+  userRole.value = role ? role.toUpperCase() : 'Not Found';
+};
+
 onMounted(async () => {
   await fetchAvailableYears();
   await fetchHistory();
+  getRole();
 });
 
 watch(selectedYear, () => {
@@ -82,6 +89,10 @@ const handleShow = (item: any) => {
       year: selectedYear.value
     }
   });
+};
+
+const handleValidateSheet = (item: any) => {
+  console.log(`Fiche validée : ${item.resourceCode}`);
 };
 
 const handleDelete = (id: number, code: string) => {
@@ -168,7 +179,14 @@ const clearSearch = () => searchQuery.value = '';
               </div>
             </div>
 
-            <button class="btn-icon-container" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
+            <button class="btn-icon-container validate" @click.stop="handleValidateSheet(item)"
+                    title="Valider la fiche">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+
+            <button class="btn-icon-container export" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
                     title="Exporter en PDF">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="24" height="24" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
                 <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/>
@@ -177,6 +195,7 @@ const clearSearch = () => searchQuery.value = '';
             </button>
 
             <button
+                v-if="userRole.valueOf() === 'ADMIN' || userRole.valueOf() === 'SUPER-ADMIN'"
                 class="btn-icon-container delete"
                 @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
                 title="Supprimer la fiche"
@@ -208,6 +227,12 @@ const clearSearch = () => searchQuery.value = '';
         <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </footer>
+    <DeleteHistoryModal
+        v-if="showDeleteModal"
+        :code="itemToDelete?.code"
+        @confirm="confirmDeletion"
+        @close="showDeleteModal = false"
+    />
   </main>
 </template>
 
@@ -344,6 +369,22 @@ const clearSearch = () => searchQuery.value = '';
 
 .btn-icon-container:hover .btn-icon {
   color: #B51621;
+}
+
+.btn-icon-container.validate:hover {
+  background-color: #e8f5e9;
+}
+
+.btn-icon-container.validate:hover .btn-icon {
+  color: #2e7d32;
+}
+
+.btn-icon-container.export:hover {
+  background-color: #e8f5e9;
+}
+
+.btn-icon-container.export:hover .btn-icon {
+  color: #0846aa;
 }
 
 .no-result {
