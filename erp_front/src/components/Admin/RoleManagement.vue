@@ -129,7 +129,7 @@ const handleModif = (roleItem, index) => {
   } else {
     showAddForm.value = false;
     editingIndex.value = index;
-    editedRole.id = roleItem.id;
+    editedRole.id = roleItem.id || roleItem.role?.id;
     editedRole.name = roleItem.role?.name || roleItem.name || '';
     editedRole.label = roleItem.role?.name || roleItem.label || '';
     editedRole.permissions = getActivePermissions(roleItem.permissions);
@@ -144,27 +144,22 @@ const saveModification = async () => {
   if (!editedRole.name) {
     editedRole.name = editedRole.label
         .toUpperCase()
-        .normalize("NFD").replaceAll(/[\u0300-\u036f]/g, "")
-        .replaceAll(/[^A-Z0-9]/g, '_');
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^A-Z0-9]/g, '_');
   }
 
-  const permsObject = {};
-  perms.value.forEach(p => {
-    permsObject[p.id] = editedRole.permissions.includes(String(p.id));
+  const payload = perms.value.map(p => {
+    const isGranted = editedRole.permissions.includes(String(p.id));
+    return {
+      permissionRoleId: p.id,
+      permissionId: p.id,
+      permissionState: isGranted
+    };
   });
 
-  const payload = {
-    id: editedRole.id,
-    role: {
-      id: editedRole.id,
-      name: editedRole.name
-    },
-    permissions: permsObject
-  };
-
   try {
-    await api.post('perm/perms/role', [payload]);
-    console.log("perm enregistrée !", payload)
+    await api.post('perm/perms/role', payload);
+    console.log("c'est bon : ", payload);
     await fetchRoles();
     handleCancel();
   } catch (error) {

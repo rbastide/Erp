@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
+import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.model.CriticalConceptModel;
 import fr.iut_unilim.erp_back.model.LearningRankModel;
@@ -17,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
 
@@ -48,25 +52,14 @@ public class McccController {
         this.connectionService = connectionService;
     }
 
-    @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccRequest dto, Mccc mccc) {
-        String creationDate = dto.getCreationDate();
-        String editDate = dto.getEditDate();
-        try {
-            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
-            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
-            mccc.setCreationDate(date);
-            mccc.setLastModificationDate(editableDate);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
-        }
-        return null;
-    }
-
     @GetMapping("/mcccs")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMccc(Authentication authentication) {
-        return ResponseEntity.ok(mcccService.getAllMcccFromDepartment(authentication.getName()));
+        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartment(authentication.getName())
+                .stream()
+                .map(McccResponse::new)
+                .toList();
+        return ResponseEntity.ok(mcccResponses);
     }
 
     @PostMapping("/save")
@@ -102,9 +95,6 @@ public class McccController {
 
 
         mccc.setCriticalConceptsId(setCriticalConcepts);
-
-
-        mcccService.save(mccc);
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
@@ -297,6 +287,7 @@ public class McccController {
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
     }
+
     @GetMapping("/available-years")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMcccYear() {
