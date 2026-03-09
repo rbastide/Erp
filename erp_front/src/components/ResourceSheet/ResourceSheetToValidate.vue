@@ -329,10 +329,6 @@ const hourConfig = {
   margin-bottom: 10px;
 }
 
-.large {
-  min-height: 110px;
-}
-
 .actions-footer {
   display: flex;
   justify-content: center;
