@@ -11,7 +11,7 @@ import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createSubTitle;
 public class PdfDescription {
     public static void addToDocument(Document document, ResourceSheetViewModel resourceSheet) {
         document.add(createSubTitle("Compétences :"));
-        document.add(PdfSkills.create(resourceSheet.criticalLearnings()));
+        document.add(PdfSkills.create(resourceSheet.criticalConcepts()));
 
         Table saes = PdfSae.create(resourceSheet.saes());
         saes.setMarginTop(4);

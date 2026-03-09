@@ -69,7 +69,6 @@ onMounted(async () => {
   const hasLocalEdits = mcccStore.referents && mcccStore.referents.length > 0;
 
   if (hasLocalEdits) {
-    console.log("Utilisation des données du Store (navigation locale)");
     selectedTeacherIds.value = mcccStore.referents.map(ref => {
       const found = allTeachers.value.find(t =>
           (t.lastname || "").toLowerCase() === (ref.lastname || "").toLowerCase() &&
@@ -78,7 +77,6 @@ onMounted(async () => {
       return found ? found.teacherID : null;
     }).filter(id => id !== null);
   } else {
-    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedTeachers();
   }
 
@@ -114,7 +112,7 @@ const toggleTeacher = (id) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   if (selectedTeacherIds.value.length === 0) {
     errorMessage.value = "Veuillez sélectionner au moins un référent.";
     return;
@@ -124,7 +122,7 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -136,6 +134,7 @@ const onConfirmCancel = () => {
 };
 
 const clearSearch = () => searchQuery.value = '';
+const isActive = ref(false);
 </script>
 
 <template>
@@ -147,7 +146,7 @@ const clearSearch = () => searchQuery.value = '';
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
       <div class="selection-section" v-if="selectedTeachersList.length > 0">
-        <h2 class="section-title selected-title">Référents sélectionnés ({{ selectedTeachersList.length }}) :</h2>
+        <h2 class="section-title selected-title">Enseignant(s) sélectionné(s) ({{ selectedTeachersList.length }}) :</h2>
         <div class="grid-container">
           <div
               v-for="teacher in selectedTeachersList"
@@ -160,8 +159,18 @@ const clearSearch = () => searchQuery.value = '';
                 {{ teacher.firstname ? teacher.firstname[0] : '' }}{{ teacher.lastname ? teacher.lastname[0] : '' }}
               </div>
               <h3 class="teacher-name">{{ teacher.firstname }} {{ teacher.lastname }}</h3>
+              <div class="manager">
+                <p>Référent</p>
+                <div
+                    class="toggle-switch"
+                    :class="{ 'active': isActive }"
+                    @click.stop="isActive = !isActive"
+                >
+                  <div class="toggle-knob"></div>
+                </div>
+              </div>
               <div class="check-indicator">
-                <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
@@ -191,7 +200,7 @@ const clearSearch = () => searchQuery.value = '';
             Aucun autre enseignant trouvé pour "{{ searchQuery }}"
           </div>
           <div v-if="availableTeachersList.length === 0 && !searchQuery && selectedTeachersList.length === allTeachers.length" class="no-result">
-            Tous les enseignants sont sélectionnés.
+            Tous les enseignants sont sélectionnés ou aucun enseignant trouvé.
           </div>
         </div>
       </div>
@@ -211,8 +220,8 @@ const clearSearch = () => searchQuery.value = '';
         </div>
 
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
+          <button @click="handleValidate" class="btn-sys primary">Valider</button>
+          <button @click="handleBack" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>
@@ -259,6 +268,45 @@ const clearSearch = () => searchQuery.value = '';
   gap: 20px;
   width: 100%;
 }
+
+.toggle-switch {
+  width: 38px;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+}
+
+.manager{
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.manager p{
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+}
+
+.toggle-switch.active { background-color: #B51621; }
+
+.toggle-knob {
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.active .toggle-knob { transform: translateX(18px); }
 
 .teacher-card {
   background: white;

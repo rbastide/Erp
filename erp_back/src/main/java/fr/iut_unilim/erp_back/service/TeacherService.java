@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Teacher;
@@ -21,23 +22,11 @@ public class TeacherService {
         this.connectionService = connectionService;
     }
 
-    public List<Teacher> getAllTeachers() {
-        return teacherRepository.findAll();
-    }
-
     public List<Teacher> getAllTeachersFromDepartment(@NotNull String identifier) {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         return teacherRepository.findAllByUniversityDepartment(department);
-    }
-
-    public List<Teacher> findByLastname(String lastname) {
-        return teacherRepository.findByLastnameContaining(lastname);
-    }
-
-    public List<Teacher> findByFirstname(String firstname) {
-        return teacherRepository.findByFirstnameContaining(firstname);
     }
 
     public List<Teacher> findByFirstnameAndLastname(String lastname, String firstname) {

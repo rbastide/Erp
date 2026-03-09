@@ -1,9 +1,8 @@
 import  {createRouter, createWebHistory} from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
 import ResourcePage from '@/components/ResourceSheet/ResourcePage.vue';
-import HomePage from './components/User/HomePage.vue';
+import HomePage from './components/App/HomePage.vue';
 import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
-import HomeAdminPage from './components/Admin/HomeAdminPage.vue';
 import CreateNewUserPage from './components/Admin/CreateNewUserPage.vue';
 import HelpPage from './components/App/HelpPage.vue';
 import FillResourceSheet from "@/components/ResourceSheet/FillResourceSheet.vue";
@@ -15,13 +14,17 @@ import McccTeachersPage from "./components/Mccc/McccTeachersPage.vue";
 import McccSAE from "./components/Mccc/McccSAE.vue";
 import McccSkills from "./components/Mccc/McccSkills.vue";
 import McccSummaryPage from "./components/Mccc/McccSummary.vue";
-import SkillsGestion from "./components/Admin/SkillsGestion.vue";
+import SkillsManagement from "./components/Admin/SkillsManagement.vue";
 import ResourceSheetHistory from "@/components/ResourceSheet/ResourceSheetHistory.vue";
-import ResourcesGestion from "./components/Admin/ResourcesGestion.vue";
-import UsersGestion from "./components/Admin/UsersGestion.vue";
-import SaeGestion from "./components/Admin/SaeGestion.vue";
+import ResourcesManagement from "./components/Admin/ResourcesManagement.vue";
+import UsersManagement from "./components/Admin/UsersManagement.vue";
+import SaeManagement from "./components/Admin/SaeManagement.vue";
 import Settings from "./components/App/Settings.vue";
 import LogoutModal from "./components/Information/LogoutModal.vue";
+import RoleManagement from "@/components/Admin/RoleManagement.vue";
+import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
+import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
+import RecallManagement from "@/components/Admin/RecallManagement.vue";
 
 
 const routes = [
@@ -49,11 +52,6 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: LoginPage
-    },
-    {
-        path: '/home-admin',
-        name: 'HomeAdmin',
-        component: HomeAdminPage
     },
     {
         path: '/new-user',
@@ -113,7 +111,7 @@ const routes = [
     {
         path: '/skill-creating',
         name: 'SkillsGestionPage',
-        component: SkillsGestion
+        component: SkillsManagement
     },
     {
         path: '/resource-sheet-history',
@@ -121,19 +119,19 @@ const routes = [
         component: ResourceSheetHistory
     },
     {
-        path: '/resources-gestion',
+        path: '/resources-management',
         name: 'ResourcesGestion',
-        component: ResourcesGestion
+        component: ResourcesManagement
     },
     {
-        path: '/users-gestion',
+        path: '/users-management',
         name: 'UsersGestion',
-        component: UsersGestion
+        component: UsersManagement
     },
     {
-        path: '/sae-gestion',
+        path: '/sae-management',
         name: 'SaeGestion',
-        component: SaeGestion
+        component: SaeManagement
     },
     {
         path: '/settings',
@@ -144,6 +142,26 @@ const routes = [
         path:'/logout',
         name: 'LogoutModal',
         component: LogoutModal
+    },
+    {
+        path:'/role-management',
+        name: RoleManagement,
+        component: RoleManagement
+    },
+    {
+        path:'/to-validate',
+        name: SheetsToValidate,
+        component: SheetsToValidate
+    },
+    {
+        path:'/resource-sheet-to-validate',
+        name: ResourceSheetToValidate,
+        component: ResourceSheetToValidate
+    },
+    {
+        path:'/recall-management',
+        name: RecallManagement,
+        component: RecallManagement
     }
 ];
 

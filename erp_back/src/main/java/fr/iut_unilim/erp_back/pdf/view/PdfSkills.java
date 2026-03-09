@@ -8,7 +8,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import fr.iut_unilim.erp_back.entity.CriticalLearning;
+import fr.iut_unilim.erp_back.entity.CriticalConcept;
 import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ import java.util.*;
 public class PdfSkills {
     private static final float BORDER_WIDTH = 1.f;
 
-    public static Table create(@NotNull Set<CriticalLearning> criticalLearnings) {
+    public static Table create(@NotNull Set<CriticalConcept> criticalConcepts) {
         Table table = new Table(UnitValue.createPercentArray(new float[]{25, 25, 25, 25}));
         table.useAllAvailableWidth();
         table.setBorder(Border.NO_BORDER);
@@ -25,13 +25,13 @@ public class PdfSkills {
         table.addCell(CellUtils.createCenteredCell("Compétences", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
         table.addCell(CellUtils.createCenteredCell("Apprentissages critiques", 1, 2).setBorder(new SolidBorder(BORDER_WIDTH)));
 
-        addSkillsToTable(table, criticalLearnings);
+        addSkillsToTable(table, criticalConcepts);
 
         return table;
     }
 
-    private static void addSkillsToTable(Table table, Set<CriticalLearning> criticalLearnings) {
-        Map<String, List<String>> skills = flattenSkills(criticalLearnings);
+    private static void addSkillsToTable(Table table, Set<CriticalConcept> criticalConcepts) {
+        Map<String, List<String>> skills = flattenSkills(criticalConcepts);
         for (Map.Entry<String, List<String>> skill : skills.entrySet()) {
             List<String> learnings = skill.getValue();
             int nbLearnings = learnings.size();
@@ -60,14 +60,14 @@ public class PdfSkills {
         }
     }
 
-    private static Map<String, List<String>> flattenSkills(@NotNull Set<CriticalLearning> criticalLearnings) {
+    private static Map<String, List<String>> flattenSkills(@NotNull Set<CriticalConcept> criticalConcepts) {
         Map<String, List<String>> flattennedSkills = new HashMap<>();
 
-        for (CriticalLearning criticalLearning : criticalLearnings) {
-            String skillName = criticalLearning.getRankID().getSkillID().getSkillName();
-            List<String> criticalLearningsFromSkills = flattennedSkills.getOrDefault(skillName, new ArrayList<>());
-            criticalLearningsFromSkills.add(criticalLearning.getCriticalLearningTitle());
-            flattennedSkills.put(skillName, criticalLearningsFromSkills);
+        for (CriticalConcept criticalConcept : criticalConcepts) {
+            String skillName = criticalConcept.getRankID().getSkillID().getSkillName();
+            List<String> criticalConceptsFromSkills = flattennedSkills.getOrDefault(skillName, new ArrayList<>());
+            criticalConceptsFromSkills.add(criticalConcept.getCriticalConceptTitle());
+            flattennedSkills.put(skillName, criticalConceptsFromSkills);
         }
 
         return flattennedSkills;

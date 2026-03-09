@@ -10,11 +10,11 @@ import java.util.List;
 public class McccRequest {
     private Long resourceID;
 
-    private int hoursCM;
-    private int hoursTD;
-    private int hoursTP;
-    private int hoursDS;
-    private int hoursDSTP;
+    private Float minCM;
+    private Float minTD;
+    private Float minTP;
+    private Float minDS;
+    private Float hoursDSTP;
 
     private String creationDate;
     private String editDate;
@@ -31,23 +31,23 @@ public class McccRequest {
         return resourceID;
     }
 
-    public int getHoursCM() {
-        return hoursCM;
+    public Float getMinCM() {
+        return minCM;
     }
 
-    public int getHoursTD() {
-        return hoursTD;
+    public Float getMinTD() {
+        return minTD;
     }
 
-    public int getHoursTP() {
-        return hoursTP;
+    public Float getMinTP() {
+        return minTP;
     }
 
-    public int getHoursDS() {
-        return hoursDS;
+    public Float getMinDS() {
+        return minDS;
     }
 
-    public int getHoursDSTP() {
+    public Float getHoursDSTP() {
         return hoursDSTP;
     }
 

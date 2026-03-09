@@ -3,25 +3,24 @@ package fr.iut_unilim.erp_back.controllers;
 import fr.iut_unilim.erp_back.dto.UniversityDepartmentRequest;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.UniversityDepartmentRepository;
-import fr.iut_unilim.erp_back.service.UniversityDepartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/universityDepartment")
 public class UniversityDepartmentController {
 
-    private final UniversityDepartmentService universityDepartmentService;
     private final UniversityDepartmentRepository universityDepartmentRepository;
 
-    public UniversityDepartmentController(UniversityDepartmentService universityDepartmentService, UniversityDepartmentRepository universityDepartmentRepository) {
-        this.universityDepartmentService = universityDepartmentService;
+    public UniversityDepartmentController(UniversityDepartmentRepository universityDepartmentRepository) {
         this.universityDepartmentRepository = universityDepartmentRepository;
     }
 
     @GetMapping("/getUniversityDepartments")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    //@PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> getUniversityDepartments() {
         return ResponseEntity.ok(universityDepartmentRepository.findAll());
     }
@@ -30,12 +29,16 @@ public class UniversityDepartmentController {
     public ResponseEntity<?> saveUniversityDepartment(@RequestBody UniversityDepartmentRequest dtoRequest) {
 
         UniversityDepartment universityDepartment = new UniversityDepartment();
+        universityDepartment.setUniversityName(dtoRequest.getUniversityName());
+        universityDepartment.setUniversityDepartmentName(dtoRequest.getUniversityDepartmentName());
+        universityDepartment.setCity(dtoRequest.getCity());
+        universityDepartment.setCreationDate(new Date());
+
         return ResponseEntity.ok(universityDepartmentRepository.save(universityDepartment));
-        //TODO
     }
 
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("@securityService.hasPermission('DEPARTMENT_MANAGEMENT')")
     public ResponseEntity<?> deleteUniversityDepartment(@PathVariable Long id) {
 
         if (!universityDepartmentRepository.existsById(id)) {

@@ -18,8 +18,9 @@ const confirmPassword = ref('');
 const role = ref('');
 const errorMessage = ref('');
 const universityDepartments = ref([]);
+const roles = ref([]);
 
-const handleRetour = () => {
+const handleBack = () => {
   router.back();
 };
 
@@ -47,22 +48,35 @@ const handleRegister = async () => {
   };
 
   try {
-    console.log(userPayload);
     await AuthService.register(userPayload);
-    await router.push('/users-gestion');
+    await router.push('/users-management');
   } catch (error) {
     console.error("Erreur Inscription:", error);
     if (error.response && error.response.data) {
-      errorMessage.value = error.response.data;
+      errorMessage.value = String(error.response.data);
     } else {
       errorMessage.value = "Une erreur est survenue lors de l'inscription.";
     }
   }
 };
 
-onMounted(async () => {
+const fetchRoles = async () => {
+  try {
+    const response = await api.get('/role/all');
+    roles.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const fetchDepartment = async () => {
   const response = await api.get('/universityDepartment/getUniversityDepartments');
   universityDepartments.value = response.data;
+}
+
+onMounted(async () => {
+  await fetchDepartment();
+  await fetchRoles();
 })
 </script>
 
@@ -152,10 +166,9 @@ onMounted(async () => {
         <label for="role">Rôle de l'utilisateur</label>
         <select id="role" v-model="role" required>
           <option value="" disabled selected>-- Veuillez choisir un rôle --</option>
-          <option value="SUPER_ADMIN">Superadmin</option>
-          <option value="ADMIN">Administrateur</option>
-          <option value="TEMP_TEACHER">Vacataire</option>
-          <option value="TEACHER">Professeur</option>
+          <option v-for="roleItem in roles" :key="roleItem.id" :value="roleItem.name">
+            {{ roleItem.name }}
+          </option>
         </select>
       </div>
 
@@ -168,7 +181,7 @@ onMounted(async () => {
   </main>
 
   <footer>
-    <div @click="handleRetour" class="quit-btn">Retour</div>
+    <div @click="handleBack" class="quit-btn">Retour</div>
   </footer>
 </template>
 

@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
 import api from "@/services/api.js";
@@ -9,11 +9,13 @@ const router = useRouter();
 const username = ref('');
 const password = ref('');
 const errorMessage = ref('');
+const role = ref('');
 
 const handleLogin = async () => {
-  AuthService.logout();
+  await AuthService.logout();
   errorMessage.value = '';
 
+  /** @type {LoginRequest} */
   const credentials = {
     identifier: username.value,
     password: password.value
@@ -21,17 +23,12 @@ const handleLogin = async () => {
 
   try {
     const userData = await AuthService.login(credentials);
-    const role = userData.role ? userData.role.toUpperCase() : 'USER';
-
-    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-      await router.push('/home-admin');
-    } else {
-      const response = await api.get(`auth/user-info/${username.value}`);
-      authStore.firstName = response.data.firstname;
-      authStore.lastName = response.data.lastname;
-      authStore.save();
-      await router.push('/home');
-    }
+    role.value = userData.role;
+    const response = await api.get(`auth/user-info/${username.value}`);
+    authStore.firstName = response.data.firstname;
+    authStore.lastName = response.data.lastname;
+    authStore.save();
+    await router.push('/home');
 
   } catch (error) {
     errorMessage.value = error.response?.status === 401

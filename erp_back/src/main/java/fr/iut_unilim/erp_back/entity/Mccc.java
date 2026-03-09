@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "MCCC")
+@Table(name = "Mccc")
 public class Mccc {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,8 +14,8 @@ public class Mccc {
     private Long mcccId;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "hourlyVolID")
-    private HourlyVolume hourlyVolId;
+    @JoinColumn(name = "courseHoursID")
+    private CourseHours courseHoursId;
 
     @ManyToOne
     @JoinColumn(name = "resourceID")
@@ -24,7 +24,7 @@ public class Mccc {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "McccSaes",
+            name = "L_McccSae",
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "saeID")
     )
@@ -32,15 +32,15 @@ public class Mccc {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "McccCriticalLearning",
+            name = "L_McccCriticalConcept",
             joinColumns = @JoinColumn(name = "mcccID"),
-            inverseJoinColumns = @JoinColumn(name = "criticalLearningID")
+            inverseJoinColumns = @JoinColumn(name = "criticalConceptID")
     )
-    private Set<CriticalLearning> criticalLearningsId;
+    private Set<CriticalConcept> criticalConceptsId;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "MCCCTeachers",
+            name = "L_McccTeacher",
             joinColumns = @JoinColumn(name = "mcccID"),
             inverseJoinColumns = @JoinColumn(name = "teacherID")
     )
@@ -50,16 +50,22 @@ public class Mccc {
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
 
+
+
     private Date creationDate;
     private Date lastModificationDate;
 
-    public Mccc(HourlyVolume hourlyVolId, Resource resourceId, Set<Sae> saesId, Set<CriticalLearning> criticalLearningsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment) {
-        this.hourlyVolId = hourlyVolId;
+    @JoinColumn(name ="academicYearStart")
+    private Integer academicYearStart;
+
+    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment, Integer academicYearStart) {
+        this.courseHoursId = courseHoursId;
         this.resourceId = resourceId;
         this.saesId = saesId;
-        this.criticalLearningsId = criticalLearningsId;
+        this.criticalConceptsId = criticalConceptsId;
         this.referencialTeacherId = referencialTeacherId;
         this.universityDepartment = universityDepartment;
+        this.academicYearStart = academicYearStart;
     }
 
     public Mccc() {
@@ -73,12 +79,12 @@ public class Mccc {
         this.mcccId = mcccId;
     }
 
-    public HourlyVolume getHourlyVolId() {
-        return hourlyVolId;
+    public CourseHours getCourseHoursId() {
+        return courseHoursId;
     }
 
-    public void setHourlyVolId(HourlyVolume hourlyVolId) {
-        this.hourlyVolId = hourlyVolId;
+    public void setCourseHoursId(CourseHours courseHours) {
+        this.courseHoursId = courseHours;
     }
 
     public Resource getResourceId() {
@@ -97,12 +103,12 @@ public class Mccc {
         this.saesId = saeId;
     }
 
-    public Set<CriticalLearning> getCriticalLearningsId() {
-        return criticalLearningsId;
+    public Set<CriticalConcept> getCriticalConceptsId() {
+        return criticalConceptsId;
     }
 
-    public void setCriticalLearningsId(Set<CriticalLearning> skillId) {
-        this.criticalLearningsId = skillId;
+    public void setCriticalConceptsId(Set<CriticalConcept> skillId) {
+        this.criticalConceptsId = skillId;
     }
 
     public Set<Teacher> getReferencialTeacherId() {
@@ -132,4 +138,12 @@ public class Mccc {
     public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
 
     public void setUniversityDepartment(UniversityDepartment universityDepartmentId) { this.universityDepartment = universityDepartmentId; }
+
+    public Integer getAcademicYearStart() {
+        return academicYearStart;
+    }
+
+    public void setAcademicYearStart(Integer academicYearStart) {
+        this.academicYearStart = academicYearStart;
+    }
 }

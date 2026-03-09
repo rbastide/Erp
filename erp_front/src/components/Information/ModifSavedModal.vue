@@ -10,13 +10,8 @@ onMounted(() => {
   userRole.value = role ? role.toUpperCase() : 'USER';
 });
 
-const handleRetour = () => {
-  if (userRole.value === 'ADMIN' || userRole.value === 'SUPER_ADMIN' || userRole.value === 'ROLE_ADMIN') {
-    router.push('/home-admin');
-  }
-  else {
-    router.push('/home');
-  }
+const handleBack = () => {
+  router.push('/home');
 };
 </script>
 
@@ -25,7 +20,7 @@ const handleRetour = () => {
     <div class="modal-card">
 
       <div class="icon-circle success">
-        <svg width="60" height="60" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <svg width="60" height="60" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -34,7 +29,7 @@ const handleRetour = () => {
       <p class="sub-text">Vos modifications ont bien été enregistrées dans le système.</p>
 
       <div class="modal-actions">
-        <button @click="handleRetour" class="btn-modal primary">
+        <button @click="handleBack" class="btn-modal primary">
           Retour au menu
         </button>
       </div>

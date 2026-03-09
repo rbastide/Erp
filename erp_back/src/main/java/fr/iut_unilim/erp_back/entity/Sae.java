@@ -4,17 +4,17 @@ import fr.iut_unilim.erp_back.model.SaeModel;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "SAE")
+@Table(name = "Sae")
 public class Sae {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="saeID")
     private Long SaeID;
 
-    @Column(name = "num")
+    @Column(name = "saeNum")
     private String num;
 
-    @Column(name = "title")
+    @Column(name = "saeTitle")
     private String title;
 
     @ManyToOne

@@ -1,26 +1,27 @@
 package fr.iut_unilim.erp_back.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "ResourceSheets")
+@Table(name = "ResourceSheet")
 public class ResourceSheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sheetsID")
-    private Long sheetsID;
+    @Column(name = "resourceSheetID")
+    private Long sheetID;
 
-    @Column(name = "resourceID")
-    private Long resourceID;
+    @ManyToOne
+    @JoinColumn(name = "resourceID")
+    private Resource resource;
 
-    @Column(name = "hourlyVolumeID")
-    private Long hourlyVolumeID;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "courseHoursID")
+    private CourseHours courseHours;
 
     @Column(name = "creationDate")
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
@@ -30,67 +31,40 @@ public class ResourceSheet {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Europe/Paris")
     private Date lastModificationDate;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "sheetID")
-    @JsonManagedReference
-    private List<EducationalTeachersFeedbacks> teachersFeedbacks;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "improvementIdeaID")
+    private ImprovementIdea improvementIdeas;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "sheetID")
-    @JsonManagedReference
-    private List<StudentsFeedbacks> studentsFeedbacks;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "teacherFeedbackID")
+    private TeacherFeedback teacherFeedbacks;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "sheetID")
-    @JsonManagedReference
-    private List<ImprovementIdeas> improvementIdeas;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "studentFeedbackID")
+    private StudentFeedback studentFeedbacks;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "ressourceSheetId")
-    @JsonManagedReference
-    private List<EducationalContent> educationalContentID;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "resourceSheet")
+    private List<EducationalContent> educationalContents;
 
-    @ManyToOne
-    @JoinColumn(name = "universityDepartmentID")
-    private UniversityDepartment universityDepartment;
+    @Column(name = "isValidate")
+    private boolean isValidate;
+
+    @Column(name = "academicYearStart")
+    private Integer academicYearStart;
 
     public ResourceSheet() {
     }
 
-    public ResourceSheet(Long sheetsID, Long resourceID, Long hourlyVolumeID, List<EducationalTeachersFeedbacks> teachersFeedbacks, List<StudentsFeedbacks> studentsFeedbacks, List<ImprovementIdeas> improvementIdeas, Date creationDate, Date lastModificationDate, List<EducationalContent> educationalContentsID, UniversityDepartment universityDepartment) {
-        this.sheetsID = sheetsID;
-        this.resourceID = resourceID;
-        this.hourlyVolumeID = hourlyVolumeID;
-        this.teachersFeedbacks = teachersFeedbacks;
-        this.studentsFeedbacks = studentsFeedbacks;
-        this.improvementIdeas = improvementIdeas;
-        this.creationDate = creationDate;
-        this.lastModificationDate = lastModificationDate;
-        this.educationalContentID = educationalContentsID;
-        this.universityDepartment = universityDepartment;
+    public void setSheetID(Long sheetsID) {
+        this.sheetID = sheetsID;
     }
 
-    public void setSheetsID(Long sheetsID) {
-        this.sheetsID = sheetsID;
+    public void setResource(Resource resourceID) {
+        this.resource = resourceID;
     }
 
-    public void setResourceID(Long resourceID) {
-        this.resourceID = resourceID;
-    }
-
-    public void setHourlyVolumeID(Long hourlyVolumeID) {
-        this.hourlyVolumeID = hourlyVolumeID;
-    }
-
-    public void setTeachersFeedbacks(List<EducationalTeachersFeedbacks> teachersFeedbacks) {
-        this.teachersFeedbacks = teachersFeedbacks;
-    }
-
-    public void setStudentsFeedbacks(List<StudentsFeedbacks> studentsFeedbacks) {
-        this.studentsFeedbacks = studentsFeedbacks;
-    }
-
-    public void setImprovementIdeas(List<ImprovementIdeas> improvementIdeas) {
-        this.improvementIdeas = improvementIdeas;
+    public void setCourseHours(CourseHours courseHours) {
+        this.courseHours = courseHours;
     }
 
     public void setCreationDate(Date creationDate) {
@@ -101,32 +75,20 @@ public class ResourceSheet {
         this.lastModificationDate = lastModificationDate;
     }
 
-    public void setEducationalContentID(List<EducationalContent> educationalContentID) {
-        this.educationalContentID = educationalContentID;
+    public void setEducationalContents(List<EducationalContent> educationalContentID) {
+        this.educationalContents = educationalContentID;
     }
 
-    public Long getSheetsID() {
-        return sheetsID;
+    public Long getSheetID() {
+        return sheetID;
     }
 
-    public Long getResourceID() {
-        return resourceID;
+    public Resource getResource() {
+        return resource;
     }
 
-    public Long getHourlyVolumeID() {
-        return hourlyVolumeID;
-    }
-
-    public List<StudentsFeedbacks> getStudentsFeedbacks() {
-        return studentsFeedbacks;
-    }
-
-    public List<EducationalTeachersFeedbacks> getTeachersFeedbacks() {
-        return teachersFeedbacks;
-    }
-
-    public List<ImprovementIdeas> getImprovementIdeas() {
-        return improvementIdeas;
+    public CourseHours getCourseHours() {
+        return courseHours;
     }
 
     public Date getCreationDate() {
@@ -137,15 +99,47 @@ public class ResourceSheet {
         return lastModificationDate;
     }
 
-    public List<EducationalContent> getEducationalContentID() {
-        return educationalContentID;
+    public ImprovementIdea getImprovementIdeas() {
+        return improvementIdeas;
     }
 
-    public UniversityDepartment getUniversityDepartment() {
-        return universityDepartment;
+    public void setImprovementIdeas(ImprovementIdea improvementIdeas) {
+        this.improvementIdeas = improvementIdeas;
     }
 
-    public void setUniversityDepartment(UniversityDepartment universityDepartment) {
-        this.universityDepartment = universityDepartment;
+    public TeacherFeedback getTeacherFeedbacks() {
+        return teacherFeedbacks;
+    }
+
+    public void setTeacherFeedbacks(TeacherFeedback teacherFeedbacks) {
+        this.teacherFeedbacks = teacherFeedbacks;
+    }
+
+    public StudentFeedback getStudentFeedbacks() {
+        return studentFeedbacks;
+    }
+
+    public void setStudentFeedbacks(StudentFeedback studentFeedbacks) {
+        this.studentFeedbacks = studentFeedbacks;
+    }
+
+    public List<EducationalContent> getEducationalContents() {
+        return educationalContents;
+    }
+
+    public boolean isValidate() {
+        return isValidate;
+    }
+
+    public void setValidate(boolean validate) {
+        isValidate = validate;
+    }
+
+    public Integer getAcademicYearStart() {
+        return academicYearStart;
+    }
+
+    public void setAcademicYearStart(Integer academicYearStart) {
+        this.academicYearStart = academicYearStart;
     }
 }

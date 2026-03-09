@@ -3,12 +3,12 @@ import {reactive} from 'vue';
 export const mcccStore = reactive({
     resourceID: 0,
     resourceCode: '',
-    hoursCM: 0,
-    hoursTD: 0,
-    hoursTP: 0,
-    hoursDS: 0,
-    hoursDSTP: 0,
-    hoursTotal: 0,
+    minCM: 0,
+    minTD: 0,
+    minTP: 0,
+    minDS: 0,
+    minDSTP: 0,
+    minTotal: 0,
     creationDate: '',
     editDate: '',
     saeCodes: [],
@@ -38,11 +38,11 @@ export const mcccStore = reactive({
         }
 
         const dataToSave = {
-            hoursCM: this.hoursCM,
-            hoursTD: this.hoursTD,
-            hoursTP: this.hoursTP,
-            hoursDS: this.hoursDS,
-            hoursDSTP: this.hoursDSTP,
+            minCM: this.minCM,
+            minTD: this.minTD,
+            minTP: this.minTP,
+            minDS: this.minDS,
+            minDSTP: this.minDSTP,
             acsGrouped: JSON.parse(JSON.stringify(this.acsGrouped)),
             saeCodes: JSON.parse(JSON.stringify(this.saeCodes)),
             referents: JSON.parse(JSON.stringify(this.referents)),
@@ -61,11 +61,11 @@ export const mcccStore = reactive({
         try {
             const oldData = JSON.parse(this.backup);
 
-            this.hoursCM = oldData.hoursCM;
-            this.hoursTD = oldData.hoursTD;
-            this.hoursTP = oldData.hoursTP;
-            this.hoursDS = oldData.hoursDS;
-            this.hoursDSTP = oldData.hoursDSTP;
+            this.minCM = oldData.minCM;
+            this.minTD = oldData.minTD;
+            this.minTP = oldData.minTP;
+            this.minDS = oldData.minDS;
+            this.minDSTP = oldData.minDSTP;
             this.acsGrouped = oldData.acsGrouped || [];
             this.saeCodes = oldData.saeCodes || [];
             this.referents = oldData.referents || [];
@@ -75,7 +75,6 @@ export const mcccStore = reactive({
             this.backup = null;
 
             this.registerMcccStore();
-            console.log("✅ Restauration effectuée.");
         } catch (e) {
             console.error("Erreur Restauration:", e);
         }
@@ -84,12 +83,12 @@ export const mcccStore = reactive({
     clearMcccStore() {
         this.resourceCode = '';
         this.resourceID = 0;
-        this.hoursCM = 0;
-        this.hoursTD = 0;
-        this.hoursTP = 0;
-        this.hoursDS = 0;
-        this.hoursDSTP = 0;
-        this.hoursTotal = 0;
+        this.minCM = 0;
+        this.minTD = 0;
+        this.minTP = 0;
+        this.minDS = 0;
+        this.minDSTP = 0;
+        this.minTotal = 0;
         this.saeCodes = [];
         this.acsGrouped = [];
         this.referents = [];

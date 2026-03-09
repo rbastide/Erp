@@ -1,17 +1,17 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
 import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.Teacher;
-import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
+import fr.iut_unilim.erp_back.service.RoleService;
 import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,9 +40,9 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final TeacherService teacherService;
     private final TeacherRepository teacherRepository;
+    private final RoleService roleService;
 
-
-    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService, TeacherRepository teacherRepository) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService, TeacherRepository teacherRepository, RoleService roleService) {
         this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.passwordEncoder = passwordEncoder;
@@ -50,11 +50,12 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
         this.teacherService = teacherService;
         this.teacherRepository = teacherRepository;
+        this.roleService = roleService;
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req,Authentication authentication) {
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
         }
@@ -63,15 +64,12 @@ public class AuthController {
         user.setIdentifier(req.getIdentifier());
         user.setEmail(req.getEmail());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setRole(req.getRole());
+        user.setRole(roleService.createOrAccessRoleByRoleName(req.getRole()));
         user.setUniversityDepartment(req.getUniversityDepartment());
 
 
         Connection connection = connectionRepository.save(user);
-
-        if ("TEACHER".equalsIgnoreCase(req.getRole())) {
-            teacherService.createTeacherFromRegister(req, connection);
-        }
+        teacherService.createTeacherFromRegister(req, connection);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -105,7 +103,7 @@ public class AuthController {
     }
 
     @PostMapping("/user")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> editUser(@RequestBody EditUserRequest user) {
         Optional<Connection> existingUser = connectionRepository.findById(user.id());
         if (existingUser.isEmpty()) {
@@ -113,7 +111,7 @@ public class AuthController {
         }
         Connection userToEdit = existingUser.get();
         userToEdit.setIdentifier(user.identifier());
-        userToEdit.setRole(user.role());
+        userToEdit.setRole(roleService.createOrAccessRoleByRoleName(user.role()));
         userToEdit.setEmail(user.email());
         if (user.newPassword() != null) {
             userToEdit.setPassword(passwordEncoder.encode(user.newPassword()));
@@ -123,7 +121,7 @@ public class AuthController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> getUsers(Authentication authentication) {
         String userIdentifier = authentication.getName();
 
@@ -131,7 +129,7 @@ public class AuthController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
         Optional<Connection> userToDelete = connectionRepository.findById(id);
         if (userToDelete.isEmpty()) {
@@ -152,9 +150,10 @@ public class AuthController {
     }
 
     @GetMapping("/user-info/{identifier}")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
+        ErpBackApplication.LOGGER.info("User: " + user + " " + identifier);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -168,13 +167,14 @@ public class AuthController {
     }
 
     @GetMapping("/user/department")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserDepartment(Authentication authentication) {
         Connection user = connectionRepository.findByIdentifier(authentication.getName());
         return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from("auth_token", "")
                 .httpOnly(true)
@@ -190,6 +190,7 @@ public class AuthController {
     }
 
     @PatchMapping("/users/department/{departmentId}")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> updateUserDepartment(@PathVariable Long departmentId, Authentication authentication) {
         String userIdentifier = authentication.getName();
 

@@ -2,14 +2,14 @@ package fr.iut_unilim.erp_back.pdf.parts;
 
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
-import fr.iut_unilim.erp_back.entity.HourlyVolume;
+import fr.iut_unilim.erp_back.entity.CourseHours;
 import org.jetbrains.annotations.NotNull;
 
 import static fr.iut_unilim.erp_back.pdf.PdfGenerator.decimalFormat;
 import static fr.iut_unilim.erp_back.pdf.utils.CellUtils.createCenteredCell;
 
 public class PdfHours {
-    public static Table create(@NotNull String resourceCode, @NotNull HourlyVolume hourlyVolume) {
+    public static Table create(@NotNull String resourceCode, @NotNull CourseHours courseHours) {
         Table hours = new Table(UnitValue.createPercentArray(new float[]{50, 10, 10, 10, 10, 10}));
         hours.useAllAvailableWidth();
 
@@ -20,7 +20,7 @@ public class PdfHours {
         hours.addCell(createCenteredCell("h TP"));
         hours.addCell(createCenteredCell("h DS TP"));
 
-        double[] hoursPerCourse = new double[]{hourlyVolume.getNbHoursCM(), hourlyVolume.getNbHoursTD(), hourlyVolume.getNbHoursDS(), hourlyVolume.getNbHoursTP(), hourlyVolume.getNbHoursDSTP()};
+        double[] hoursPerCourse = new double[]{courseHours.getNbMinCM(), courseHours.getNbMinTD(), courseHours.getNbMinDS(), courseHours.getNbMinTP(), courseHours.getNbMinDSTP()};
 
         hours.addCell(createCenteredCell(resourceCode));
         for (double hour : hoursPerCourse) {

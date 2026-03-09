@@ -48,22 +48,22 @@ public class McccService {
     }
 
     @Nullable
-    public Set<CriticalLearning> getCriticalLearningsByResource(@NotNull Resource resource) {
+    public Set<CriticalConcept> getCriticalConceptsByResource(@NotNull Resource resource) {
         Optional<Mccc> currentMccc = getCurrentMcccFromResource(resource);
-        return currentMccc.map(Mccc::getCriticalLearningsId).orElse(null);
+        return currentMccc.map(Mccc::getCriticalConceptsId).orElse(null);
     }
 
     @Nullable
     public Set<Skill> getSkillsByResource(@NotNull Resource resource) {
-        Set<CriticalLearning> criticalLearnings = getCriticalLearningsByResource(resource);
+        Set<CriticalConcept> criticalConcepts = getCriticalConceptsByResource(resource);
 
-        if (criticalLearnings == null) {
+        if (criticalConcepts == null) {
             return null;
         }
 
         Set<Skill> skills = new HashSet<>();
-        for (CriticalLearning criticalLearning : criticalLearnings) {
-            skills.add(criticalLearning.getRankID().getSkillID());
+        for (CriticalConcept criticalConcept : criticalConcepts) {
+            skills.add(criticalConcept.getRankID().getSkillID());
         }
 
         return skills;
@@ -78,4 +78,15 @@ public class McccService {
     public List<Long> getTeacherIdsByMcccId(Long mcccId) {
         return mcccRepository.findTeacherIdsByMcccId(mcccId);
     }
+
+    public Set<Integer> getAllYears() {
+        List<Mccc> mcccs = mcccRepository.findAll();
+        Set<Integer> years = new HashSet<>();
+        for (Mccc mccc : mcccs) {
+            years.add(mccc.getAcademicYearStart());
+        }
+        return years;
+    }
+
+
 }

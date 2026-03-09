@@ -1,0 +1,187 @@
+/* --- STYLE DE BASE --- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- STRUCTURES / FONDS --- */
+body.dark-mode {
+    background-color: #252525 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .screen-layout,
+body.dark-mode .page-container,
+body.dark-mode .main-content,
+body.dark-mode .main-div,
+body.dark-mode .content-wrapper,
+body.dark-mode footer,
+body.dark-mode card-title,
+body.dark-mode .submenu {
+    background-color: #252525 !important;
+    color: #e0e0e0 !important;
+}
+
+/* --- NAVIGATION (HEADER & SIDEBAR) --- */
+body.dark-mode .page-header,
+body.dark-mode .sidebar,
+body.dark-mode .sidebar-header,
+body.dark-mode .app-header,
+body.dark-mode .sticky-footer,
+body.dark-mode .app-footer {
+    background: #333333 !important;
+    border-color: #444444 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .nav-text,
+body.dark-mode .sidebar span,
+body.dark-mode .header-title,
+body.dark-mode .header-dep {
+    color: #ffffff !important;
+}
+
+body.dark-mode .sidebar svg,
+body.dark-mode .hamburger-icon,
+body.dark-mode .chevron-icon {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+/* --- SIDEBAR ACTIVE & HOVER (BORDEAUX) --- */
+body.dark-mode .nav-item:hover,
+body.dark-mode .nav-item.active,
+body.dark-mode .sub-item:hover,
+body.dark-mode .sub-item.sub-active {
+    background-color: rgba(181, 22, 33, 0.15) !important;
+    color: #B51621 !important;
+}
+
+body.dark-mode .nav-item:hover svg,
+body.dark-mode .nav-item.active svg,
+body.dark-mode .nav-item:hover .nav-text,
+body.dark-mode .nav-item.active .nav-text {
+    color: #B51621 !important;
+    stroke: #B51621 !important;
+}
+
+body.dark-mode .nav-item.active {
+    border-left: 4px solid #B51621 !important;
+}
+
+/* --- CARTES ET COMPOSANTS UI --- */
+body.dark-mode .resource-card,
+body.dark-mode .user-card,
+body.dark-mode .card-action,
+body.dark-mode .skill-card,
+body.dark-mode .login-card,
+body.dark-mode .logout-card,
+body.dark-mode .warning-card,
+body.dark-mode .success-card,
+body.dark-mode .setting-card,
+body.dark-mode .help-card,
+body.dark-mode .sae-card,
+body.dark-mode .hour-card,
+body.dark-mode .teacher-card,
+body.dark-mode .teacher-display-card,
+body.dark-mode .big-square,
+body.dark-mode .semester-column,
+body.dark-mode .form-card,
+body.dark-mode .push-button,
+body.dark-mode .version-item,
+body.dark-mode .card,
+body.dark-mode .summary,
+body.dark-mode .error-card,
+body.dark-mode .info-footer,
+body.dark-mode .summary-card,
+body.dark-mode .modal-card,
+body.dark-mode .admin-card,
+body.dark-mode .is-selected-summary,
+body.dark-mode .edit-level-group,
+body.dark-mode .rich-editor-content,
+body.dark-mode .grey-square,
+body.dark-mode .box-static,
+body.dark-mode .read-only-box,
+body.dark-mode .lvl-number,
+body.dark-mode .input-container,
+body.dark-mode .hour-badge,
+body.dark-mode .btn-non,
+body.dark-mode .btn-oui {
+    background-color: #333333 !important;
+    border-color: #444444 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+/* --- HARMONISATION DES CHAMPS D'HEURES (INPUTS) --- */
+body.dark-mode .time-input-container {
+    background-color: #444444 !important;
+    border-color: #444444 !important;
+}
+
+body.dark-mode .time-input {
+    color: #ffffff !important;
+}
+
+body.dark-mode .time-separator {
+    color: #bbbbbb !important;
+}
+
+body.dark-mode .time-input-container:focus-within {
+    background-color: #333333 !important;
+    border-color: #B51621 !important;
+    box-shadow: 0 0 0 3px rgba(181, 22, 33, 0.1) !important;
+}
+
+/* --- TYPOGRAPHIE / ACCENTS --- */
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
+body.dark-mode label, body.dark-mode .resource-id, body.dark-mode .sae-number,
+body.dark-mode .label, body.dark-mode .container-connexion p,
+body.dark-mode #card-title, body.dark-mode #title, body.dark-mode .group-label,
+body.dark-mode .field-label, body.dark-mode .lvl-label, body.dark-mode .level-title,
+body.dark-mode .modal-card h2, body.dark-mode .card-title, body.dark-mode .section-main-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .title, body.dark-mode .section-title, body.dark-mode .description,
+body.dark-mode .title-hour, body.dark-mode .version-code, body.dark-mode .highlight,
+body.dark-mode .total-number, body.dark-mode .ac-tag, body.dark-mode .close-icon,
+body.dark-mode .sae-chip {
+    color: #B51621 !important;
+}
+
+body.dark-mode p, body.dark-mode .sub-text, body.dark-mode .desc,
+body.dark-mode .ac-list li, body.dark-mode .ac-detail-item {
+    color: #bbbbbb !important;
+}
+
+body.dark-mode input[type="text"], body.dark-mode input[type="password"],
+body.dark-mode input[type="number"], body.dark-mode select, body.dark-mode textarea,
+body.dark-mode .card-input, body.dark-mode .search-input, body.dark-mode .modern-textarea {
+    background-color: #444444 !important;
+    border-color: #555555 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .btn-sys, body.dark-mode .save-btn, body.dark-mode .login-button,
+body.dark-mode .btn-primary, body.dark-mode .btn-validate {
+    background-color: #B51621 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+body.dark-mode .btn-sys:hover, body.dark-mode .save-btn:hover {
+    background-color: #94121b !important;
+}
+
+body.dark-mode .separator-line, body.dark-mode .sep, body.dark-mode .total-separator {
+    background-color: #444444 !important;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #555555 !important;
+}

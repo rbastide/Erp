@@ -8,16 +8,16 @@ import java.util.Set;
 
 public record ResourceSheetViewModel(
         Resource resource,
-        HourlyVolume hourlyVolume,
-        List<EducationalTeachersFeedbacks> educationalTeachersFeedbacks,
-        List<StudentsFeedbacks> studentsFeedbacks,
-        List<ImprovementIdeas> improvementIdeas,
+        CourseHours courseHours,
+        String educationalTeachersFeedbacks,
+        String studentsFeedbacks,
+        String improvementIdeas,
         int semester,
         Set<Sae> saes,
         Date creationDate,
         Date lastModificationDate,
         Set<Teacher> teachers,
-        Set<CriticalLearning> criticalLearnings,
+        Set<CriticalConcept> criticalConcepts,
         List<EducationalContent> educationalContent,
         Set<Skill> skills) {
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, onMounted, ref} from 'vue'
+import {computed, nextTick, onMounted, reactive, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
@@ -16,32 +16,167 @@ const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
 
 const resourceCode = ref('');
-const currentHourlyVolId = ref<number | null>(null);
+const currentCourseHoursId = ref<number | null>(null);
 const currentResourceId = ref<number | null>(null);
 
-const hours = ref({ cm: 0, td: 0, ds: 0, tp: 0, ds_tp: 0, student: 0 })
+const splitHours = reactive({
+  cm: { h: '0', m: '00' },
+  td: { h: '0', m: '00' },
+  tp: { h: '0', m: '00' },
+  ds: { h: '0', m: '00' },
+  ds_tp: { h: '0', m: '00' }
+});
+
 const cmContents = ref([''])
 const tdContents = ref([''])
 const tpContents = ref([''])
 const dsContents = ref([''])
 const dstpContents = ref([''])
-const edFBContents = ref([''])
-const stFBContents = ref([''])
-const upgradesContents = ref([''])
-const cmRefs = ref<HTMLTextAreaElement[]>([])
-const tdRefs = ref<HTMLTextAreaElement[]>([])
-const tpRefs = ref<HTMLTextAreaElement[]>([])
-const dsRefs = ref<HTMLTextAreaElement[]>([])
-const dstpRefs = ref<HTMLTextAreaElement[]>([])
-const edFBRefs = ref<HTMLTextAreaElement[]>([])
-const stFBRefs = ref<HTMLTextAreaElement[]>([])
-const upgradesRefs = ref<HTMLTextAreaElement[]>([])
+
+const edFBContents = ref('')
+const stFBContents = ref('')
+const upgradesContents = ref('')
+
+const cmRefs = ref<HTMLInputElement[]>([])
+const tdRefs = ref<HTMLInputElement[]>([])
+const tpRefs = ref<HTMLInputElement[]>([])
+const dsRefs = ref<HTMLInputElement[]>([])
+const dstpRefs = ref<HTMLInputElement[]>([])
+
+const edFBRef = ref<HTMLElement | null>(null)
+const stFBRef = ref<HTMLElement | null>(null)
+const upgradesRef = ref<HTMLElement | null>(null)
+
+const activeSection = ref<string>('');
+
+const resourceSheetId = ref<number | null>(null)
+
+const activeFormats = ref({
+  bold: false,
+  italic: false,
+  underline: false,
+  unordered: false,
+  ordered: false
+});
+
+const getCurrentAcademicYear = () => {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  return month < 8 ? year - 1 : year;
+};
+
+const academicYearStart = ref(getCurrentAcademicYear());
+
+const validateInput = (type: keyof typeof splitHours, subType: 'h' | 'm', event: Event) => {
+  const input = event.target as HTMLInputElement;
+  let val = input.value.replace(/[^0-9]/g, '');
+
+  if (subType === 'h') {
+    if (val.length > 1 && val.startsWith('0')) {
+      val = val.replace(/^0+/, '');
+    }
+    if (val !== '' && parseInt(val) > 999) {
+      val = '999';
+    }
+  } else {
+    if (val !== '' && parseInt(val) > 59) {
+      val = '59';
+    }
+  }
+
+  splitHours[type][subType] = val;
+  input.value = val;
+};
+
+const formatMinutesOnBlur = (type: keyof typeof splitHours) => {
+  let val = splitHours[type].m;
+  if (!val) {
+    splitHours[type].m = '00';
+  } else if (val.length === 1) {
+    splitHours[type].m = '0' + val;
+  }
+};
+
+const formatHoursOnBlur = (type: keyof typeof splitHours) => {
+  if (!splitHours[type].h) {
+    splitHours[type].h = '0';
+  }
+};
+
+const totalGlobal = computed(() => {
+  let totalMinutes = 0;
+
+  Object.values(splitHours).forEach(time => {
+    const h = Number(time.h) || 0;
+    const m = Number(time.m) || 0;
+    totalMinutes += (h * 60) + m;
+  });
+
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+
+  return `${h}h${m.toString().padStart(2, '0')}`;
+});
+
+const convertSplitToDecimal = (time: { h: string, m: string }) => {
+  const h = parseInt(time.h || '0');
+  const m = parseInt(time.m || '0');
+  return h * 60 + m;
+};
 
 const canAdd = (list: string[]) => {
   if (!list || list.length === 0) return true;
   const lastItem = list[list.length - 1];
-  return (lastItem || '').trim().length > 0;
+  const stripped = (lastItem || '').replace(/<[^>]*>?/gm, '').trim();
+  return stripped.length > 0;
 }
+
+const removeLine = (list: string[], index: number) => {
+  list.splice(index, 1);
+};
+
+const checkFormats = () => {
+  activeFormats.value = {
+    bold: document.queryCommandState('bold'),
+    italic: document.queryCommandState('italic'),
+    underline: document.queryCommandState('underline'),
+    unordered: document.queryCommandState('insertUnorderedList'),
+    ordered: document.queryCommandState('insertOrderedList')
+  };
+};
+
+const handleFocus = (sectionName: string) => {
+  activeSection.value = sectionName;
+  checkFormats();
+};
+
+const handleBlur = () => {
+  activeSection.value = '';
+};
+
+const execCmd = (command: string) => {
+  document.execCommand(command, false, undefined);
+  checkFormats();
+};
+
+const updateRichContent = (event: Event, type: 'teachers' | 'students' | 'upgrades') => {
+  const target = event.target as HTMLElement;
+  const content = target.innerHTML;
+
+  if (type === 'teachers') edFBContents.value = content;
+  if (type === 'students') stFBContents.value = content;
+  if (type === 'upgrades') upgradesContents.value = content;
+
+  checkFormats();
+};
+
+const populateRichEditors = async () => {
+  await nextTick();
+  if (edFBRef.value) edFBRef.value.innerHTML = edFBContents.value || '';
+  if (stFBRef.value) stFBRef.value.innerHTML = stFBContents.value || '';
+  if (upgradesRef.value) upgradesRef.value.innerHTML = upgradesContents.value || '';
+};
 
 const fetchResourceData = async () => {
   try {
@@ -70,17 +205,14 @@ const fetchHoursData = async () => {
           m.resourceId && m.resourceId.num === resourceCode.value
       );
 
-      if (mcccFound && mcccFound.hourlyVolId) {
-        const vol = mcccFound.hourlyVolId;
-        hours.value = {
-          cm: vol.nbHoursCM,
-          td: vol.nbHoursTD,
-          tp: vol.nbHoursTP,
-          ds: vol.nbHoursDS,
-          ds_tp: vol.nbHoursDSTP,
-          student: vol.nbHoursDSTP + vol.nbHoursDS + vol.nbHoursTP + vol.nbHoursTD + vol.nbHoursCM
-        };
-        currentHourlyVolId.value = vol.hourlyVolID;
+      if (mcccFound && mcccFound.courseHoursId) {
+        const vol = mcccFound.courseHoursId;
+        splitHours.cm = convertDecimalToSplit(vol.nbMinCM);
+        splitHours.td = convertDecimalToSplit(vol.nbMinTD);
+        splitHours.tp = convertDecimalToSplit(vol.nbMinTP);
+        splitHours.ds = convertDecimalToSplit(vol.nbMinDS);
+        splitHours.ds_tp = convertDecimalToSplit(vol.nbMinDSTP);
+        currentCourseHoursId.value = vol.courseHoursID;
       }
     }
   } catch (error) {
@@ -88,68 +220,62 @@ const fetchHoursData = async () => {
   }
 };
 
+const convertDecimalToSplit = (minutes: number | null | undefined): { h: string, m: string } => {
+  const safeMinutes = minutes || 0;
+  const h = Math.floor(safeMinutes / 60);
+  const m = safeMinutes % 60;
+  return {
+    h: h.toString(),
+    m: m.toString().padStart(2, '0')
+  };
+}
+
 const fetchResourceSheetData = async () => {
   try {
-    const response = await api.get('/resourceSheet/getResourceSheet');
+    const response = await api.get(`/resourceSheet/resource-sheet/${currentResourceId.value}/${academicYearStart.value}`);
+    const resourceData = response.data;
 
-    if (response.data && Array.isArray(response.data)) {
+    if (resourceData) {
+      resourceSheetId.value = resourceData.resourceSheetId
 
-      const matchingSheets = response.data.filter((f: any) =>
-          f.resourceID === currentResourceId.value
-      );
-
-      matchingSheets.sort((a: any, b: any) => {
-        return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
-      });
-
-      const resourceData = matchingSheets.length > 0 ? matchingSheets.reverse()[0] : null;
-
-      if (resourceData) {
-        const getContentByType = (type: string) => {
-          if (!resourceData.pedagologicalContentId) return [];
-          return resourceData.pedagologicalContentId
-              .filter((item: any) => item.classTypeId?.classType === type)
-              .map((item: any) => item.content || '');
-        };
-
-        const cm = getContentByType('CM');
-        cmContents.value = cm.length > 0 ? cm : [''];
-        const td = getContentByType('TD');
-        tdContents.value = td.length > 0 ? td : [''];
-        const tp = getContentByType('TP');
-        tpContents.value = tp.length > 0 ? tp : [''];
-        const ds = getContentByType('DS');
-        dsContents.value = ds.length > 0 ? ds : [''];
-
-        const dstpRaw = resourceData.pedagologicalContentId?.filter((item: any) =>
-            ['DSTP', 'DS TP', 'DS/TP'].includes(item.classTypeId?.classType)
-        ) || [];
-        const dstp = dstpRaw.map((item: any) => item.content || '');
-        dstpContents.value = dstp.length > 0 ? dstp : [''];
-
-        if (resourceData.teachersFeedbacks) {
-          const tFeedbacks = resourceData.teachersFeedbacks.map((f: any) => f.content || '');
-          edFBContents.value = tFeedbacks.length > 0 ? tFeedbacks : [''];
-        }
-        if (resourceData.studentsFeedbacks) {
-          const sFeedbacks = resourceData.studentsFeedbacks.map((f: any) => f.content || '');
-          stFBContents.value = sFeedbacks.length > 0 ? sFeedbacks : [''];
-        }
-        if (resourceData.improvementIdeas) {
-          const ideas = resourceData.improvementIdeas.map((i: any) => i.ideaContent || i.content || '');
-          upgradesContents.value = ideas.length > 0 ? ideas : [''];
-        }
+      const hours = resourceData.courseHours;
+      if (hours) {
+        splitHours.cm = convertDecimalToSplit(hours.cm || 0);
+        splitHours.td = convertDecimalToSplit(hours.td || 0);
+        splitHours.tp = convertDecimalToSplit(hours.tp || 0);
+        splitHours.ds = convertDecimalToSplit(hours.ds || 0);
+        splitHours.ds_tp = convertDecimalToSplit(hours.ds_tp || 0);
       }
+
+      const contents = resourceData.educationalContentID || [];
+      const filterBy = (type: string) => contents
+          .filter((c: any) => c.classType === type)
+          .sort((a: any, b: any) => a.courseNumber - b.courseNumber)
+          .map((c: any) => c.content);
+
+      cmContents.value = filterBy('CM').length ? filterBy('CM') : [''];
+      tdContents.value = filterBy('TD').length ? filterBy('TD') : [''];
+      tpContents.value = filterBy('TP').length ? filterBy('TP') : [''];
+      dsContents.value = filterBy('DS').length ? filterBy('DS') : [''];
+      dstpContents.value = filterBy('DS/TP').length ? filterBy('DS/TP') : [''];
+
+      edFBContents.value = resourceData.teacherFeedbacks || '';
+      stFBContents.value = resourceData.studentFeedbacks || '';
+      upgradesContents.value = resourceData.improvementIdeas || '';
+
+      await populateRichEditors();
     }
-  } catch (error) {
-    console.error("Erreur fiches ressources :", error);
+  } catch (_) {
+    console.log("Aucune fiche n'existe pour cette ressource à cette année.");
   }
 };
 
 onMounted(async () => {
   await fetchResourceData();
-  await fetchHoursData();
   await fetchResourceSheetData();
+  if (resourceSheetId.value === null) {
+    await fetchHoursData();
+  }
 });
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {
@@ -169,63 +295,68 @@ const addTD = createFieldManager(tdContents, tdRefs)
 const addTP = createFieldManager(tpContents, tpRefs)
 const addDS = createFieldManager(dsContents, dsRefs)
 const addDSTP = createFieldManager(dstpContents, dstpRefs)
-const addEducationalFeedback = createFieldManager(edFBContents, edFBRefs)
-const addStudentFeedback = createFieldManager(stFBContents, stFBRefs)
-const addUpgrades = createFieldManager(upgradesContents, upgradesRefs)
 
-const handleValider = async () => {
-  const formatForBackend = (type: string, list: string[]) => {
+const handleValidate = async () => {
+  const formatForBackend = (list: string[]) => {
     return list
-        .map((content, index) => (content || '').trim() ? `${type} ${index + 1} : ${(content || '').trim()}` : null)
-        .filter((item): item is string => item !== null);
+        .map(content => (content || '').trim())
+        .filter(content => content !== '');
   };
 
-  const allPedagogicalContent = [
-    ...formatForBackend('CM', cmContents.value),
-    ...formatForBackend('TD', tdContents.value),
-    ...formatForBackend('TP', tpContents.value),
-    ...formatForBackend('DS', dsContents.value),
-    ...formatForBackend('DS/TP', dstpContents.value)
-  ];
+  const educationalContentsMap: Record<string, string[]> = {
+    "CM": formatForBackend(cmContents.value),
+    "TD": formatForBackend(tdContents.value),
+    "TP": formatForBackend(tpContents.value),
+    "DS": formatForBackend(dsContents.value),
+    "DS/TP": formatForBackend(dstpContents.value)
+  };
+
+  const hoursPayload = {
+    cm: convertSplitToDecimal(splitHours.cm),
+    td: convertSplitToDecimal(splitHours.td),
+    tp: convertSplitToDecimal(splitHours.tp),
+    ds: convertSplitToDecimal(splitHours.ds),
+    ds_tp: convertSplitToDecimal(splitHours.ds_tp)
+  };
 
   const payload = {
+    resourceSheetID: resourceSheetId.value,
     resourceID: currentResourceId.value,
-    hourlyVolumeID: currentHourlyVolId.value,
-    teachersFeedbackID: edFBContents.value.filter(t => (t || '').trim()),
-    studentFeedbackID: stFBContents.value.filter(t => (t || '').trim()),
-    improvementsIdeaID: upgradesContents.value.filter(t => (t || '').trim()),
-    educationalContent: allPedagogicalContent,
-    semester: 1,
-    year: new Date().getFullYear(),
-    mainGoal: "Objectif pédagogique principal"
+    courseHours: hoursPayload,
+    teacherFeedbacks: edFBContents.value,
+    studentFeedbacks: stFBContents.value,
+    improvementsIdeas: upgradesContents.value,
+    educationalContents: educationalContentsMap,
+    academicYearStart: academicYearStart.value
   };
 
   try {
     await api.post('/resourceSheet/resource-sheet', payload);
     showSuccessModal.value = true;
   } catch (error: any) {
-    const errorMsg = error.response?.data || "Erreur lors de l'enregistrement";
     console.error("Détails erreur :", error);
     showErrorModal.value = true;
   }
 };
 
-const handleRetour = () => {
+const blockKeyboardInput = (e: KeyboardEvent) => {
+  if (e.key !== 'Tab') {
+    e.preventDefault();
+  }
+};
+
+const validateYearInput = () => {
+  if (academicYearStart.value < 1900) academicYearStart.value = 1900;
+  academicYearStart.value = Math.floor(academicYearStart.value);
+};
+
+const handleBack = () => {
   showModal.value = true;
 };
 
 const onConfirmCancel = () => {
   router.back();
 };
-
-
-const totalGlobal = computed(() => {
-  return (hours.value.cm || 0) + (hours.value.td || 0) + (hours.value.ds || 0) + (hours.value.tp || 0) + (hours.value.ds_tp || 0);
-})
-
-const validatePositive = (key: keyof typeof hours.value) => {
-  if (hours.value[key] < 0 || hours.value[key] === null) hours.value[key] = 0;
-}
 
 const hourConfig = {
   cm: { label: 'CM', color: '#4DB6AC' },
@@ -252,23 +383,82 @@ const pedagogicalSections = computed(() => [
     <div class="container">
       <div class="required-legend"><span>* champs obligatoires</span></div>
 
+      <section class="form-card year-card">
+        <div class="year-input-group">
+          <label class="field-label">Année académique (début) :</label>
+          <div class="input-with-info">
+            <input
+                type="number"
+                v-model="academicYearStart"
+                class="simple-line-input year-input"
+                @keydown="blockKeyboardInput"
+                @change="fetchResourceSheetData"
+                @input="validateYearInput"
+            />
+            <span class="year-helper">
+              Fiche pour l'année <strong>{{ academicYearStart }} - {{ Number(academicYearStart) + 1 }}</strong>
+            </span>
+          </div>
+        </div>
+      </section>
+
       <section class="form-card">
         <h2 class="section-title">Voici le nombre d'heures de CM, TD et TP : *</h2>
         <div class="hours-grid-wrapper">
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <input type="number" v-model.number="hours[key]" class="box-input" min="0" @input="validatePositive(key)">
+              <div class="time-input-container">
+                <input
+                    type="text"
+                    v-model="splitHours[key].h"
+                    @input="validateInput(key, 'h', $event)"
+                    @blur="formatHoursOnBlur(key)"
+                    placeholder="0"
+                    maxlength="3"
+                    class="time-input"
+                >
+                <span class="time-separator">h</span>
+                <input
+                    type="text"
+                    v-model="splitHours[key].m"
+                    @input="validateInput(key, 'm', $event)"
+                    @blur="formatMinutesOnBlur(key)"
+                    placeholder="00"
+                    maxlength="2"
+                    class="time-input"
+                >
+              </div>
             </div>
           </div>
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <input type="number" v-model.number="hours[key]" class="box-input" min="0" @input="validatePositive(key)">
+              <div class="time-input-container">
+                <input
+                    type="text"
+                    v-model="splitHours[key].h"
+                    @input="validateInput(key, 'h', $event)"
+                    @blur="formatHoursOnBlur(key)"
+                    placeholder="0"
+                    maxlength="3"
+                    class="time-input"
+                >
+                <span class="time-separator">h</span>
+                <input
+                    type="text"
+                    v-model="splitHours[key].m"
+                    @input="validateInput(key, 'm', $event)"
+                    @blur="formatMinutesOnBlur(key)"
+                    placeholder="00"
+                    maxlength="2"
+                    class="time-input"
+                >
+              </div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
-              <div class="box-static total-highlight">{{ totalGlobal }} h</div>
+              <div class="box-static total-highlight">{{ totalGlobal }}</div>
             </div>
           </div>
         </div>
@@ -278,14 +468,23 @@ const pedagogicalSections = computed(() => [
         <h2 class="section-title">Voici le contenu pédagogique : *</h2>
         <div v-for="section in pedagogicalSections" :key="section.type" class="pedagogic-group">
           <h3 class="group-label">{{ section.type }}</h3>
-          <div v-for="(content, index) in section.list" :key="index" class="content-block">
+          <div v-for="(_, index) in section.list" :key="index" class="content-block">
             <label class="item-label">{{ section.type }} {{ index + 1 }}</label>
-            <textarea
-                v-model="section.list[index]"
-                :ref="(el) => { if(el) (section.refs.value as any)[index] = el }"
-                class="modern-textarea"
-                placeholder="Saisissez le contenu...">
-            </textarea>
+            <div class="input-wrapper">
+              <input
+                  type="text"
+                  v-model="section.list[index]"
+                  :ref="(el) => { if(el) (section.refs.value as any)[index] = el }"
+                  class="simple-line-input"
+                  placeholder="Saisissez le titre ou le contenu..."
+              />
+              <button
+                  v-if="index > 0"
+                  class="delete-btn"
+                  @click="removeLine(section.list, index)"
+                  title="Supprimer la ligne"
+              >✕</button>
+            </div>
           </div>
           <button
               class="btn-add-line"
@@ -293,7 +492,7 @@ const pedagogicalSections = computed(() => [
               :disabled="!canAdd(section.list)"
               :class="{ 'disabled-btn': !canAdd(section.list) }"
           >
-            + Ajouter un bloc {{ section.type }}
+            + Ajouter une ligne {{ section.type }}
           </button>
         </div>
       </section>
@@ -302,67 +501,116 @@ const pedagogicalSections = computed(() => [
         <h2 class="section-title">Bilans et Évolutions</h2>
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour pédagogique des professeurs :</label>
-          <div v-for="(content, index) in edFBContents" :key="index" class="content-block">
-             <textarea
-                 v-model="edFBContents[index]"
-                 :ref="(el) => { if(el) edFBRefs[index] = el as HTMLTextAreaElement }"
-                 class="modern-textarea large">
-            </textarea>
+          <div class="rich-editor-wrapper">
+            <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'teachers' }">
+              <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'teachers' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'teachers' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'teachers' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+              </button>
+              <span class="sep"></span>
+              <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'teachers' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'teachers' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+              </button>
+            </div>
+            <div
+                class="rich-editor-content"
+                contenteditable="true"
+                @input="(e) => updateRichContent(e, 'teachers')"
+                @keyup="checkFormats"
+                @mouseup="checkFormats"
+                @focus="handleFocus('teachers')"
+                @blur="handleBlur"
+                ref="edFBRef"
+            ></div>
           </div>
-          <button class="btn-add-line" @click="addEducationalFeedback" :disabled="!canAdd(edFBContents)" :class="{ 'disabled-btn': !canAdd(edFBContents) }">
-            + Ajouter une ligne
-          </button>
         </div>
+
         <div class="pedagogic-group">
           <label class="field-label">Voici le retour des étudiants :</label>
-          <div v-for="(content, index) in stFBContents" :key="index" class="content-block">
-            <textarea
-                v-model="stFBContents[index]"
-                :ref="(el) => { if(el) stFBRefs[index] = el as HTMLTextAreaElement }"
-                class="modern-textarea large">
-            </textarea>
+          <div class="rich-editor-wrapper">
+            <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'students' }">
+              <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'students' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'students' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'students' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+              </button>
+              <span class="sep"></span>
+              <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'students' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'students' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+              </button>
+            </div>
+            <div
+                class="rich-editor-content"
+                contenteditable="true"
+                @input="(e) => updateRichContent(e, 'students')"
+                @keyup="checkFormats"
+                @mouseup="checkFormats"
+                @focus="handleFocus('students')"
+                @blur="handleBlur"
+                ref="stFBRef"
+            ></div>
           </div>
-          <button class="btn-add-line" @click="addStudentFeedback" :disabled="!canAdd(stFBContents)" :class="{ 'disabled-btn': !canAdd(stFBContents) }">
-            + Ajouter une ligne
-          </button>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Voici les améliorations à apporter :</label>
-          <div v-for="(content, index) in upgradesContents" :key="index" class="content-block">
-            <textarea
-                v-model="upgradesContents[index]"
-                :ref="(el) => { if(el) upgradesRefs[index] = el as HTMLTextAreaElement }"
-                class="modern-textarea large">
-            </textarea>
+          <div class="rich-editor-wrapper">
+            <div class="rich-toolbar" :class="{ 'disabled-bar': activeSection !== 'upgrades' }">
+              <button @mousedown.prevent="execCmd('bold')" :class="{ 'is-active': activeFormats.bold && activeSection === 'upgrades' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('italic')" :class="{ 'is-active': activeFormats.italic && activeSection === 'upgrades' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('underline')" :class="{ 'is-active': activeFormats.underline && activeSection === 'upgrades' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg>
+              </button>
+              <span class="sep"></span>
+              <button @mousedown.prevent="execCmd('insertUnorderedList')" :class="{ 'is-active': activeFormats.unordered && activeSection === 'upgrades' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </button>
+              <button @mousedown.prevent="execCmd('insertOrderedList')" :class="{ 'is-active': activeFormats.ordered && activeSection === 'upgrades' }">
+                <svg width="16" height="16" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+              </button>
+            </div>
+            <div
+                class="rich-editor-content"
+                contenteditable="true"
+                @input="(e) => updateRichContent(e, 'upgrades')"
+                @keyup="checkFormats"
+                @mouseup="checkFormats"
+                @focus="handleFocus('upgrades')"
+                @blur="handleBlur"
+                ref="upgradesRef"
+            ></div>
           </div>
-          <button class="btn-add-line" @click="addUpgrades" :disabled="!canAdd(upgradesContents)" :class="{ 'disabled-btn': !canAdd(upgradesContents) }">
-            + Ajouter une ligne
-          </button>
         </div>
       </section>
 
       <div class="actions-footer">
-        <button @click="handleValider" class="btn btn-primary">Valider la saisie</button>
-        <button @click="handleRetour" class="btn btn-outline">Annuler</button>
+        <button @click="handleValidate" class="btn btn-primary">Valider la saisie</button>
+        <button @click="handleBack" class="btn btn-outline">Annuler</button>
       </div>
     </div>
 
-    <CancelModal
-        v-if="showModal"
-        @confirm="onConfirmCancel"
-        @close="showModal = false"
-    />
-
-    <ModifSavedModal
-        v-if="showSuccessModal"
-    />
-
-    <ErrorSaveModal
-        v-if="showErrorModal"
-        @close="showErrorModal = false"
-    />
-
+    <CancelModal v-if="showModal" @confirm="onConfirmCancel" @close="showModal = false" />
+    <ModifSavedModal v-if="showSuccessModal" />
+    <ErrorSaveModal v-if="showErrorModal" @close="showErrorModal = false" />
   </main>
 </template>
 
@@ -381,6 +629,36 @@ const pedagogicalSections = computed(() => [
   max-width: 900px;
   margin: 0 auto;
 }
+
+/* Styles spécifique Année */
+.year-card {
+  padding: 20px 35px !important;
+  margin-bottom: 20px;
+}
+.year-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.year-input {
+  width: 120px !important;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.1rem;
+}
+.input-with-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.year-helper {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+.year-helper strong {
+  color: #E92533;
+}
+
 .required-legend {
   text-align: right;
   color: #E92533;
@@ -414,6 +692,9 @@ const pedagogicalSections = computed(() => [
 .hour-block {
   flex: 1;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .hour-block label {
   display: block;
@@ -422,18 +703,55 @@ const pedagogicalSections = computed(() => [
   margin-bottom: 8px;
   text-transform: uppercase;
 }
-.box-input {
-  width: 100%;
+
+.time-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
+  padding: 5px 10px;
+  width: 120px;
   height: 45px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  text-align: center;
+  box-sizing: border-box;
 }
+
+.time-input {
+  width: 35px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #333;
+  outline: none;
+  padding: 0;
+}
+
+.time-input::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.time-separator {
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: -2px;
+}
+
+.time-input-container:focus-within {
+  border-color: #E92533;
+  box-shadow: 0 0 0 3px rgba(233, 37, 51, 0.1);
+  background: #fff;
+}
+
 .box-static {
   height: 45px;
+  width: 100%;
+  min-width: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -476,22 +794,123 @@ const pedagogicalSections = computed(() => [
   text-transform: uppercase;
   margin-left: 2px;
 }
-.modern-textarea {
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+}
+
+.simple-line-input {
+  flex: 1;
   box-sizing: border-box;
-  padding: 15px;
+  padding: 10px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: #fbfbfb;
+}
+.simple-line-input:focus {
+  border-color: #E92533;
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(233, 37, 51, 0.1);
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #ef5350;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-btn:hover {
+  color: #d32f2f;
+  transform: scale(1.1);
+}
+
+.rich-editor-wrapper {
+  width: 100%;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  font-size: 1rem;
-  resize: vertical;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: white;
 }
-.modern-textarea:focus {
-  border-color: #E92533;
+.rich-toolbar {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.rich-toolbar.disabled-bar {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.rich-toolbar button {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #555;
+}
+.rich-toolbar button:hover {
+  background: #e9e9e9;
+  color: #B51621;
+  border-color: #B51621;
+}
+.rich-toolbar button.is-active {
+  background-color: #e3f2fd;
+  color: #B51621;
+  border-color: #B51621;
+}
+
+.sep {
+  width: 1px;
+  height: 24px;
+  background: #ddd;
+  margin: 0 5px;
+}
+
+.rich-editor-content {
+  min-height: 120px;
+  padding: 15px;
   outline: none;
+  font-size: 1rem;
+  line-height: 1.5;
 }
-.large {
-  min-height: 110px;
+.rich-editor-content:focus {
+  background-color: #fffdfd;
 }
+
+:deep(.rich-editor-content b), :deep(.rich-editor-content strong) { font-weight: bold !important; }
+:deep(.rich-editor-content i), :deep(.rich-editor-content em) { font-style: italic !important; }
+:deep(.rich-editor-content u) { text-decoration: underline !important; }
+:deep(.rich-editor-content ul) { list-style: disc inside !important; margin-left: 10px; }
+:deep(.rich-editor-content ol) { list-style: decimal inside !important; margin-left: 10px; }
+
 .btn-add-line {
   background: transparent;
   border: none;
@@ -506,6 +925,7 @@ const pedagogicalSections = computed(() => [
 .disabled-btn {
   color: #cbd5e1;
   cursor: not-allowed;
+  pointer-events: none;
 }
 .actions-footer {
   display: flex;

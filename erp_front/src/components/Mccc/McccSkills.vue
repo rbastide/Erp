@@ -36,7 +36,6 @@ const fetchLinkedSkills = async () => {
   }
 
   const targetId = String(mcccStore.resourceID);
-  console.log("Recherche des compétences pour resourceID :", targetId);
 
   try {
     const response = await api.get('/mccc/mcccs');
@@ -50,14 +49,12 @@ const fetchLinkedSkills = async () => {
       return;
     }
 
-    if (!currentMccc.criticalLearningsId || currentMccc.criticalLearningsId.length === 0) {
-      console.warn("MCCC trouvé, mais liste criticalLearningsId vide.");
+    if (!currentMccc.criticalConceptsId || currentMccc.criticalConceptsId.length === 0) {
+      console.warn("MCCC trouvé, mais liste criticalConceptsId vide.");
       return;
     }
 
-    console.log("ACs trouvés en BDD :", currentMccc.criticalLearningsId);
-
-    const acsFromBdd = currentMccc.criticalLearningsId;
+    const acsFromBdd = currentMccc.criticalConceptsId;
     const groupedResult = [];
 
     acsFromBdd.forEach(acItem => {
@@ -95,7 +92,6 @@ const fetchLinkedSkills = async () => {
 
     mcccStore.acsGrouped = groupedResult;
     mcccStore.registerMcccStore();
-    console.log("Store ACs mis à jour depuis BDD :", mcccStore.acsGrouped);
 
   } catch (error) {
     console.error("Erreur chargement des compétences liées :", error);
@@ -112,10 +108,7 @@ onMounted(async () => {
   await fetchReferential();
 
   if (mcccStore.acsGrouped.length === 0) {
-    console.log("Store vide, chargement depuis la BDD...");
     await fetchLinkedSkills();
-  } else {
-    console.log("Compétences chargées depuis le Store local");
   }
 
   mcccStore.saveBackup();
@@ -136,10 +129,31 @@ const filteredSkills = computed(() => {
       return s.skillNum?.toString().includes(numToSearch);
     }
 
-    return (
+    const matchSkill = (
         s.skillName.toLowerCase().includes(query) ||
         s.skillNum?.toString().includes(query)
     );
+
+    if (matchSkill) return true;
+
+    if (s.levels && Array.isArray(s.levels)) {
+      return s.levels.some(level => {
+        if (level.acs && Array.isArray(level.acs)) {
+          return level.acs.some(ac => {
+            const title = ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "";
+            const num = ac.num || ac.acNum || ac.learningNum || "";
+
+            return (
+                String(title).toLowerCase().includes(query) ||
+                String(num).toLowerCase().includes(query)
+            );
+          });
+        }
+        return false;
+      });
+    }
+
+    return false;
   });
 });
 
@@ -171,12 +185,12 @@ const removeGroup = (index) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -265,7 +279,7 @@ const clearSearch = () => searchQuery.value = '';
 
         <div v-if="!isLoading && filteredSkills.length === 0" class="no-result">
           <span v-if="searchQuery">Aucune compétence ne correspond à "{{ searchQuery }}"</span>
-          <span v-else>Toutes les compétences sont sélectionnées.</span>
+          <span v-else>Toutes les compétences sont sélectionnées ou aucune compétence trouvé.</span>
         </div>
       </div>
 
@@ -278,14 +292,14 @@ const clearSearch = () => searchQuery.value = '';
           <input
               v-model="searchQuery"
               type="text"
-              placeholder="Rechercher par nom ou numéro (ex : #3)"
+              placeholder="Rechercher par nom, numéro ou AC..."
               class="search-input"
           />
           <button v-if="searchQuery" @click="clearSearch" class="clear-input-btn">✕</button>
         </div>
         <div class="footer-buttons">
-          <button @click="handleValider" class="btn-sys primary">Valider</button>
-          <button @click="handleRetour" class="btn-sys secondary">Annuler</button>
+          <button @click="handleValidate" class="btn-sys primary">Valider</button>
+          <button @click="handleBack" class="btn-sys secondary">Annuler</button>
         </div>
       </div>
     </footer>
@@ -613,80 +627,5 @@ const clearSearch = () => searchQuery.value = '';
   .footer-buttons {
     justify-content: space-between;
   }
-}
-
-:global(body.dark-mode) .main-content {
-  background-color: #252525;
-}
-:global(body.dark-mode) .section-title {
-  color: #ef5350;
-}
-:global(body.dark-mode) .separator-line {
-  background: #444;
-}
-:global(body.dark-mode) .admin-card {
-  background: #333;
-  border-color: #444;
-}
-:global(body.dark-mode) .admin-card:hover {
-  background-color: #383838;
-  border-color: #ef5350;
-}
-:global(body.dark-mode) .is-selected-summary {
-  background-color: rgba(239, 83, 80, 0.15);
-  border-color: #ef5350;
-}
-:global(body.dark-mode) .icon-circle {
-  background: rgba(255,255,255,0.05);
-  color: #ef5350;
-}
-:global(body.dark-mode) .selected-icon,
-:global(body.dark-mode) .admin-card:hover .icon-circle {
-  background: #B51621;
-  color: white;
-}
-:global(body.dark-mode) .card-title {
-  color: #ffffff;
-}
-:global(body.dark-mode) .level-entry:not(:first-child) {
-  border-top-color: #444;
-}
-:global(body.dark-mode) .rank-info-bold {
-  color: #ef5350;
-}
-:global(body.dark-mode) .ac-detail-item {
-  color: #bbb;
-}
-:global(body.dark-mode) .ac-detail-item strong {
-  color: #ef5350;
-}
-:global(body.dark-mode) .btn-add-footer {
-  color: #ef5350;
-  border-color: #ef5350;
-}
-:global(body.dark-mode) .admin-card:hover .btn-add-footer {
-  background-color: #B51621;
-  color: white;
-}
-:global(body.dark-mode) .sticky-footer {
-  background: #333;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-}
-:global(body.dark-mode) .search-input {
-  background: #444;
-  border-color: #555;
-  color: white;
-}
-:global(body.dark-mode) .search-input:focus {
-  border-color: #ef5350;
-  background: #333;
-}
-:global(body.dark-mode) .clear-input-btn {
-  background: #555;
-  color: #fff;
-}
-:global(body.dark-mode) .loading,
-:global(body.dark-mode) .no-result {
-  color: #777;
 }
 </style>

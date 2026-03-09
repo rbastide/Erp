@@ -2,6 +2,7 @@ package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.UserResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.TeacherRepository;
@@ -39,7 +40,7 @@ public class ConnectionService {
             userResponses.add(new UserResponse(
                     connection.getId(),
                     connection.getIdentifier(),
-                    connection.getRole(),
+                    connection.getRole().getRoleName(),
                     connection.getEmail(),
                     lastname,
                     firstname
@@ -80,8 +81,9 @@ public class ConnectionService {
     }
 
     private UserResponse convertToUserResponse(Connection connection) {
-        String lastname = teacherRepository.findLastnameByTeacherID(connection.getId());
-        String firstname = teacherRepository.findFirstnameByTeacherID(connection.getId());
+        Teacher teacher = teacherRepository.findByUserID(connection.getId());
+        String lastname = teacher.getLastname();
+        String firstname = teacher.getFirstname();
 
         if (lastname == null) lastname = "";
         if (firstname == null) firstname = "";
@@ -89,7 +91,7 @@ public class ConnectionService {
         return new UserResponse(
                 connection.getId(),
                 connection.getIdentifier(),
-                connection.getRole(),
+                connection.getRole().getRoleName(),
                 connection.getEmail(),
                 lastname,
                 firstname

@@ -32,7 +32,7 @@ onMounted(() => {
   mcccStore.saveBackup();
 });
 
-const handleRetour = () => {
+const handleBack = () => {
   router.back();
 };
 
@@ -61,7 +61,7 @@ const handleMccc = (code: string, id: number) => {
             @click="handleMccc(res.num, res.resourceID)"
         >
           <div class="icon-circle">
-            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <svg width="40" height="40" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
@@ -76,7 +76,7 @@ const handleMccc = (code: string, id: number) => {
       </div>
 
       <div class="footer-actions">
-        <button @click="handleRetour" class="quit-btn">Retour</button>
+        <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </main>
   </div>

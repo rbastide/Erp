@@ -3,10 +3,8 @@ package fr.iut_unilim.erp_back.entity;
 import fr.iut_unilim.erp_back.model.TeacherModel;
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
-@Table(name = "Teachers")
+@Table(name = "Teacher")
 public class Teacher {
 
     @Id
@@ -22,14 +20,6 @@ public class Teacher {
 
     @JoinColumn(name = "userID")
     private Long userID;
-
-    @ManyToMany
-    @JoinTable(
-            name = "ResourceSheetTeachers",
-            joinColumns = @JoinColumn(name = "teacherID"),
-            inverseJoinColumns = @JoinColumn(name = "sheetID")
-    )
-    private List<ResourceSheet> resourceSheets;
 
     public Teacher() {}
 

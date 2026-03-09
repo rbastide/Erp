@@ -1,12 +1,14 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
+import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.model.CriticalLearningModel;
+import fr.iut_unilim.erp_back.model.CriticalConceptModel;
 import fr.iut_unilim.erp_back.model.LearningRankModel;
 import fr.iut_unilim.erp_back.model.SaeModel;
 import fr.iut_unilim.erp_back.model.TeacherModel;
 import fr.iut_unilim.erp_back.service.*;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
 
@@ -26,98 +31,80 @@ import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegex
 public class McccController {
 
     private final McccService mcccService;
-    private final HourlyVolumeService hourlyVolumeService;
+    private final CourseHoursService courseHoursService;
     private final ResourceService resourceService;
     private final TeacherService teacherService;
     private final SaeService saeService;
     private final SkillService skillService;
     private final RankService rankService;
-    private final CriticalLearningService criticalLearningService;
+    private final CriticalConceptService criticalConceptService;
     private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, HourlyVolumeService hourlyVolumeService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalLearningService criticalLearningService, ConnectionService connectionService) {
+    public McccController(McccService mcccService, CourseHoursService courseHoursService, ResourceService resourceService, TeacherService teacherService, SaeService saeService, SkillService skillService, RankService rankService, CriticalConceptService criticalConceptService, ConnectionService connectionService) {
         this.mcccService = mcccService;
-        this.hourlyVolumeService = hourlyVolumeService;
+        this.courseHoursService = courseHoursService;
         this.resourceService = resourceService;
         this.teacherService = teacherService;
         this.saeService = saeService;
         this.skillService = skillService;
         this.rankService = rankService;
-        this.criticalLearningService = criticalLearningService;
+        this.criticalConceptService = criticalConceptService;
         this.connectionService = connectionService;
     }
 
-    @Nullable
-    private static ResponseEntity<Object> getCreationdateAndEditDateFromDto(McccRequest dto, Mccc mccc) {
-        String creationDate = dto.getCreationDate();
-        String editDate = dto.getEditDate();
-        try {
-            Date date = new SimpleDateFormat("dd/MM/yyyy").parse(creationDate);
-            Date editableDate = new SimpleDateFormat("dd/MM/yyyy").parse(editDate);
-            mccc.setCreationDate(date);
-            mccc.setLastModificationDate(editableDate);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
-        }
-        return null;
-    }
-
     @GetMapping("/mcccs")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMccc(Authentication authentication) {
-        return ResponseEntity.ok(mcccService.getAllMcccFromDepartment(authentication.getName()));
+        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartment(authentication.getName())
+                .stream()
+                .map(McccResponse::new)
+                .toList();
+        return ResponseEntity.ok(mcccResponses);
     }
 
     @PostMapping("/save")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    @Transactional
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) throws ParseException {
         Optional<Resource> canHaveResource = resourceService.getResourceById(dto.getResourceID());
         if (canHaveResource.isEmpty()) {
             return ResponseEntity.badRequest().body("Le code de ressource n'existe pas !");
         }
 
         Mccc mccc = getCurrentMccc(dto, canHaveResource);
-
         handleDepartment(mccc, authentication);
 
         Set<Teacher> setTeacher = getTeachersFromDto(dto);
         mccc.setReferencialTeacherId(setTeacher);
 
         Set<Sae> setSae = getSAEFromDto(dto);
-        mccc.setSaesId(setSae);
-
-        HourlyVolume hourlyVolume = getHourlyVolumeFromDto(dto);
-        mccc.setHourlyVolId(hourlyVolume);
-
-        try {
-            if (dto.getEditDate() != null) {
-                Date editableDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getEditDate());
-                mccc.setLastModificationDate(editableDate);
-            } else {
-                mccc.setLastModificationDate(new Date());
-            }
-            if (mccc.getCreationDate() == null) {
-                if (dto.getCreationDate() != null) {
-                    Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dto.getCreationDate());
-                    mccc.setCreationDate(date);
-                } else {
-                    mccc.setCreationDate(new Date());
-                }
-            }
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Format de date non valide ! (dd/MM/yyyy)");
+        if (mccc.getSaesId() == null) {
+            mccc.setSaesId(new HashSet<>());
         }
+        mccc.getSaesId().addAll(setSae);
 
-        Set<CriticalLearning> setCriticalLearnings = new HashSet<>();
-        ResponseEntity<Object> doCriticalLearningHasCrashed = fillCriticalLearnings(dto, setCriticalLearnings);
-        if (doCriticalLearningHasCrashed != null) return doCriticalLearningHasCrashed;
+        CourseHours courseHours = getCourseHoursFromDto(dto);
+        mccc.setCourseHoursId(courseHours);
 
-        mccc.setCriticalLearningsId(setCriticalLearnings);
+        getEditDateAndCreationDate(dto, mccc);
 
-        mcccService.save(mccc);
+
+        Set<CriticalConcept> setCriticalConcepts = new HashSet<>();
+        ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
+        if (doCriticalConceptsHasCrashed != null) return doCriticalConceptsHasCrashed;
+
+
+        mccc.setCriticalConceptsId(setCriticalConcepts);
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
+
+
+    private void getEditDateAndCreationDate(McccRequest dto, Mccc mccc) throws ParseException {
+        mccc.setLastModificationDate(new SimpleDateFormat(("dd/MM/yyyy HH:mm:ss")).parse(dto.getEditDate()));
+        mccc.setCreationDate(new SimpleDateFormat(("dd/MM/yyyy HH:mm:ss")).parse(dto.getCreationDate()));
+    }
+
 
     @NotNull
     private Mccc getCurrentMccc(McccRequest dto, Optional<Resource> canHaveResource) {
@@ -146,16 +133,15 @@ public class McccController {
 
 
     @Nullable
-    private ResponseEntity<Object> fillCriticalLearnings(@NotNull McccRequest dto, @NotNull Set<CriticalLearning> setCriticalLearnings) {
+    private ResponseEntity<Object> fillCriticalConcepts(@NotNull McccRequest dto, @NotNull Set<CriticalConcept> setCriticalConcepts) {
         List<LearningRankModel> acs = dto.getAcsGrouped();
         for (LearningRankModel learningRank : acs) {
             String ueCode = extractCodeFromSkillTitle(learningRank.ue());
             if (ueCode == null) return ResponseEntity.badRequest().body("L'UE n'existe pas !");
-
-            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels());
+            Rank correspondedRank = extractFirstRankFromRankTitle(learningRank.levels(), ueCode);
             if (correspondedRank == null) return ResponseEntity.badRequest().body("Le levels n'existe pas !");
 
-            fillNewCriticalLearnings(setCriticalLearnings, learningRank, correspondedRank);
+            fillNewCriticalConcepts(setCriticalConcepts, learningRank, correspondedRank);
         }
         return null;
     }
@@ -172,33 +158,38 @@ public class McccController {
     }
 
     @Nullable
-    private Rank extractFirstRankFromRankTitle(@NotNull String rankTitle) {
+    private Rank extractFirstRankFromRankTitle(@NotNull String rankTitle, String ueCode) {
         String rankCode = getFirstRegexOccurence("[0-9]+", rankTitle);
+
         if (rankCode == null) return null;
 
-        if (!rankService.doRankNumExists(Integer.parseInt(rankCode))) {
+        int rCode = Integer.parseInt(rankCode);
+        int uCode = Integer.parseInt(ueCode);
+
+        List<Rank> ranks = rankService.getRanksByNumAndUe(rCode, uCode);
+
+        if (ranks.isEmpty()) {
             return null;
         }
-
-        return rankService.getRanksByNum(Integer.parseInt(rankCode)).get(0);
+        return ranks.get(0);
     }
 
-    private void fillNewCriticalLearnings(Set<CriticalLearning> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
-        List<CriticalLearningModel> criticalLearnings = learningRank.acs();
-        for (CriticalLearningModel criticalLearning : criticalLearnings) {
-            CriticalLearning newCriticalLearning = verifyPresenceOfCriticalLearning(criticalLearning, correspondedRank);
-            setAcs.add(newCriticalLearning);
+    private void fillNewCriticalConcepts(Set<CriticalConcept> setAcs, LearningRankModel learningRank, Rank correspondedRank) {
+        List<CriticalConceptModel> criticalConcepts = learningRank.acs();
+        for (CriticalConceptModel criticalConcept : criticalConcepts) {
+            CriticalConcept newCriticalConcept = verifyPresenceOfCriticalConcept(criticalConcept, correspondedRank);
+            setAcs.add(newCriticalConcept);
         }
     }
 
 
     @NotNull
-    private CriticalLearning verifyPresenceOfCriticalLearning(CriticalLearningModel criticalLearning, Rank rank) {
-        List<CriticalLearning> criticalLearnings = criticalLearningService.getCriticalLearningsWithNumAndTitleAndRank(criticalLearning.learningNum(), criticalLearning.learningTitle(), rank);
-        if (criticalLearnings.isEmpty()) {
-            return new CriticalLearning(criticalLearning, rank);
+    private CriticalConcept verifyPresenceOfCriticalConcept(CriticalConceptModel criticalConcept, Rank rank) {
+        List<CriticalConcept> criticalConcepts = criticalConceptService.getCriticalConceptWithNumAndTitleAndRank(criticalConcept.conceptNum(), criticalConcept.conceptTitle(), rank);
+        if (criticalConcepts.isEmpty()) {
+            return new CriticalConcept(criticalConcept, rank);
         } else {
-            return criticalLearnings.get(0);
+            return criticalConcepts.get(0);
         }
     }
 
@@ -235,60 +226,72 @@ public class McccController {
     }
 
     @NotNull
-    private HourlyVolume getHourlyVolumeFromDto(McccRequest dto) {
-        List<HourlyVolume> hourlyVolumes = hourlyVolumeService.getAllHourlyVolumesFromDatas(dto.getHoursCM(), dto.getHoursTD(), dto.getHoursTP(), dto.getHoursDSTP());
-        if (hourlyVolumes.isEmpty()) {
-            return new HourlyVolume(dto.getHoursCM(), dto.getHoursDS(), dto.getHoursDSTP(), dto.getHoursTP(), dto.getHoursTD());
+    private CourseHours getCourseHoursFromDto(McccRequest dto) {
+        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getHoursDSTP(), dto.getMinDS());
+        if (allCourseHours.isEmpty()) {
+            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getHoursDSTP(), dto.getMinTP(), dto.getMinTD());
         }
-        HourlyVolume hourlyVolume = hourlyVolumes.get(0);
-        hourlyVolume.setNbHoursCM(dto.getHoursCM());
-        hourlyVolume.setNbHoursTD(dto.getHoursTD());
-        hourlyVolume.setNbHoursTP(dto.getHoursTP());
-        hourlyVolume.setNbHoursDS(dto.getHoursDS());
-        hourlyVolume.setNbHoursDSTP(dto.getHoursDSTP());
-        return hourlyVolume;
+        CourseHours courseHours = allCourseHours.get();
+        courseHours.setNbMinCM(dto.getMinCM());
+        courseHours.setNbMinTD(dto.getMinTD());
+        courseHours.setNbMinTP(dto.getMinTP());
+        courseHours.setNbMinDS(dto.getMinDS());
+        courseHours.setNbMinDSTP(dto.getHoursDSTP());
+        return courseHours;
     }
 
     @GetMapping("/getTeachers")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getTeachers(Authentication authentication) {
         return ResponseEntity.ok(teacherService.getAllTeachersFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getSaes")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getSaes(Authentication authentication) {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
     @GetMapping("/getHourlyVolumes")
-    public ResponseEntity<?> getHourlyVolumes() {
-        return ResponseEntity.ok(hourlyVolumeService.getAllHourlyVolume());
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getCourseHours() {
+        return ResponseEntity.ok(courseHoursService.getAllCourseHours());
     }
 
     @PostMapping("/saveHourlyVolume")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> saveHourlyVolume(@RequestBody HourlyVolume hourlyVolume) {
-        hourlyVolumeService.save(hourlyVolume);
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
+        courseHoursService.save(courseHours);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
     }
 
     @GetMapping("/getHourlyVolumesID/{id}")
-    public ResponseEntity<?> getHourlyVolumesID(@PathVariable Long id) {
-        Optional<HourlyVolume> hourlyVolume = hourlyVolumeService.findById(id);
-        if (hourlyVolume.isPresent()) {
-            return ResponseEntity.ok(hourlyVolume.get());
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getCourseHoursID(@PathVariable Long id) {
+        Optional<CourseHours> courseHours = courseHoursService.findById(id);
+        if (courseHours.isPresent()) {
+            return ResponseEntity.ok(courseHours.get());
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/getCreationDate/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
         return ResponseEntity.ok(mcccService.getCreationDateFromId(id));
     }
 
     @GetMapping("/getReferentIds/{id}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getReferentIds(@PathVariable Long id) {
         List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
         return ResponseEntity.ok(teacherIds);
     }
+
+    @GetMapping("/available-years")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getMcccYear() {
+        return ResponseEntity.ok(mcccService.getAllYears());
+    }
+
 }

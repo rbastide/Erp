@@ -7,8 +7,7 @@ import api from '@/services/api'
 
 let isAdmin = false;
 const role = localStorage.getItem('user_role');
-console.log(role);
-isAdmin = role == 'SUPER_ADMIN';
+isAdmin = role == 'Super-Admin';
 
 const router = useRouter()
 const route = useRoute()
@@ -26,10 +25,18 @@ const contents = ref({
   tp: [] as string[],
   ds: [] as string[],
   ds_tp: [] as string[],
-  teacherFeedback: [] as string[],
-  studentFeedback: [] as string[],
-  upgrades: [] as string[]
+  teacherFeedback: "" as string,
+  studentFeedback: "" as string,
+  upgrades: "" as string
 })
+
+const formatHour = (decimal: number) => {
+  const val = decimal || 0;
+  const h = Math.floor(val / 60);
+  const m = decimal % 60;
+
+  return `${h}h${m}`;
+};
 
 const fetchSheetData = async () => {
   const sheetIdFromUrl = route.query.id
@@ -39,43 +46,32 @@ const fetchSheetData = async () => {
   if (!sheetIdFromUrl) return
 
   try {
-    const responseSheets = await api.get('/resourceSheet/getResourceSheet')
-    const sheet = responseSheets.data.find((s: any) => s.sheetsID == sheetIdFromUrl)
+    const response = await api.get(`/resourceSheet/resource-sheet/${sheetIdFromUrl}`)
+    const sheet = response.data
 
-    if (sheet) {
-      contents.value.teacherFeedback = sheet.teachersFeedbacks?.map((f: any) => f.content) || []
-      contents.value.studentFeedback = sheet.studentsFeedbacks?.map((f: any) => f.content) || []
-      contents.value.upgrades = sheet.improvementIdeas?.map((i: any) => i.ideaContent || i.content) || []
+    contents.value.teacherFeedback = sheet.teacherFeedbacks || '';
+    contents.value.studentFeedback = sheet.studentFeedbacks || '';
+    contents.value.upgrades = sheet.improvementIdeas || '';
 
-      if (sheet.pedagologicalContentId) {
-        const pedago = sheet.pedagologicalContentId
-        const getBlocks = (type: string) => pedago
-            .filter((p: any) => p.classTypeId?.classType === type)
-            .map((p: any) => p.content)
+    const pedago = sheet.educationalContentID
+    const getBlocks = (type: string) => pedago
+        .filter((p: any) => p.classType === type)
+        .map((p: any) => p.content)
 
-        contents.value.cm = getBlocks('CM')
-        contents.value.td = getBlocks('TD')
-        contents.value.tp = getBlocks('TP')
-        contents.value.ds = getBlocks('DS')
-        contents.value.ds_tp = getBlocks('DS/TP')
-      }
+    contents.value.cm = getBlocks('CM')
+    contents.value.td = getBlocks('TD')
+    contents.value.tp = getBlocks('TP')
+    contents.value.ds = getBlocks('DS')
+    contents.value.ds_tp = getBlocks('DS/TP')
 
-      if (sheet.hourlyVolumeID) {
-        const responseMccc = await api.get('/mccc/mcccs')
-        const mcccMatch = responseMccc.data.find((m: any) => m.hourlyVolId?.hourlyVolID == sheet.hourlyVolumeID)
-
-        if (mcccMatch && mcccMatch.hourlyVolId) {
-          const v = mcccMatch.hourlyVolId
-          hours.value = {
-            cm: v.nbHoursCM || 0,
-            td: v.nbHoursTD || 0,
-            tp: v.nbHoursTP || 0,
-            ds: v.nbHoursDS || 0,
-            ds_tp: v.nbHoursDSTP || 0,
-            student: (v.nbHoursCM || 0) + (v.nbHoursTD || 0) + (v.nbHoursTP || 0) + (v.nbHoursDS || 0) + (v.nbHoursDSTP || 0)
-          }
-        }
-      }
+    let sheetHours = sheet.courseHours
+    hours.value = {
+      cm: sheetHours.cm || 0,
+      td: sheetHours.td || 0,
+      tp: sheetHours.tp || 0,
+      ds: sheetHours.ds || 0,
+      ds_tp: sheetHours.ds_tp || 0,
+      student: (sheetHours.nbHoursCM || 0) + (sheetHours.nbHoursTD || 0) + (sheetHours.nbHoursTP || 0) + (sheetHours.nbHoursDS || 0) + (sheetHours.nbHoursDSTP || 0)
     }
   } catch (error) {
     console.error("Erreur technique :", error)
@@ -138,17 +134,17 @@ const hourConfig = {
           <div class="hours-row">
             <div class="hour-block" v-for="key in (['cm', 'td', 'ds'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }} h</div>
+              <div class="box-static">{{ formatHour(hours[key]) }}</div>
             </div>
           </div>
           <div class="hours-row mt-25">
             <div class="hour-block" v-for="key in (['tp', 'ds_tp'] as const)" :key="key">
               <label :style="{ color: hourConfig[key].color }">{{ hourConfig[key].label }}</label>
-              <div class="box-static">{{ hours[key] }} h</div>
+              <div class="box-static">{{ formatHour(hours[key]) }}</div>
             </div>
             <div class="hour-block">
               <label style="color: #64748b;">Total Global</label>
-              <div class="box-static total-highlight">{{ totalGlobal }} h</div>
+              <div class="box-static total-highlight">{{ formatHour(totalGlobal) }}</div>
             </div>
           </div>
         </div>
@@ -158,29 +154,46 @@ const hourConfig = {
         <h2 class="section-title">Contenu pédagogique</h2>
         <div v-for="type in (['cm', 'td', 'tp', 'ds', 'ds_tp'] as const)" :key="type" class="pedagogic-group">
           <h3 class="group-label">{{ hourConfig[type].label }}</h3>
+
           <template v-if="contents[type].length > 0">
-            <div v-for="(block, idx) in contents[type]" :key="idx" class="content-item">
-              <label class="item-index-label">{{ hourConfig[type].label }} {{ idx + 1 }}</label>
-              <div class="read-only-box">{{ block }}</div>
+            <div v-for="(block, idx) in contents[type]" :key="idx" class="content-block">
+              <label class="item-label">{{ hourConfig[type].label }} {{ idx + 1 }}</label>
+              <div class="input-wrapper">
+                <div class="simple-line-input read-only-input">{{ block }}</div>
+              </div>
             </div>
           </template>
-          <div v-else class="read-only-box empty">Aucun contenu répertorié</div>
+
+          <div v-else class="content-block">
+            <div class="input-wrapper">
+              <div class="simple-line-input read-only-input empty">Aucun contenu répertorié</div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section class="form-card accent">
         <h2 class="section-title">Bilans et Évolutions</h2>
+
         <div class="pedagogic-group">
           <label class="field-label">Retour pédagogique des professeurs :</label>
-          <div v-for="(fb, i) in contents.teacherFeedback" :key="i" class="read-only-box mb-10">{{ fb }}</div>
+          <div class="rich-editor-wrapper">
+            <div class="rich-editor-content read-only-editor" v-html="contents.teacherFeedback"></div>
+          </div>
         </div>
+
         <div class="pedagogic-group">
           <label class="field-label">Retour des étudiants :</label>
-          <div v-for="(fb, i) in contents.studentFeedback" :key="i" class="read-only-box mb-10">{{ fb }}</div>
+          <div class="rich-editor-wrapper">
+            <div class="rich-editor-content read-only-editor" v-html="contents.studentFeedback"></div>
+          </div>
         </div>
+
         <div class="pedagogic-group">
           <label class="field-label">Améliorations à apporter :</label>
-          <div v-for="(up, i) in contents.upgrades" :key="i" class="read-only-box mb-10">{{ up }}</div>
+          <div class="rich-editor-wrapper">
+            <div class="rich-editor-content read-only-editor" v-html="contents.upgrades"></div>
+          </div>
         </div>
       </section>
 
@@ -220,6 +233,7 @@ const hourConfig = {
 .section-title {
   color: #E92533;
   font-size: 1.4rem;
+  font-weight: 500;
   border-left: 5px solid #E92533;
   padding-left: 15px;
   margin-bottom: 25px;
@@ -238,6 +252,9 @@ const hourConfig = {
 .hour-block {
   flex: 1;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hour-block label {
@@ -245,10 +262,13 @@ const hourConfig = {
   font-size: 0.9rem;
   font-weight: 800;
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .box-static {
   height: 45px;
+  width: 100%;
+  min-width: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,51 +289,82 @@ const hourConfig = {
   margin-bottom: 35px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   width: 100%;
 }
 
 .group-label,
 .field-label {
   font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.content-item {
   margin-bottom: 15px;
+  color: #1e293b;
   width: 100%;
 }
 
-.item-index-label {
-  font-size: 0.8rem;
+.content-block {
+  width: 100%;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: #64748b;
+  margin-bottom: 5px;
   text-transform: uppercase;
-  margin-bottom: 4px;
-  display: block;
+  margin-left: 2px;
 }
 
-.read-only-box {
-  padding: 15px;
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.simple-line-input {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 10px 15px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #fdfdfd;
-  color: #546e7a;
-  white-space: pre-wrap;
-  min-height: 80px;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fbfbfb;
+  color: #333;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
 }
 
-.read-only-box.empty {
+.simple-line-input.empty {
   color: #cbd5e1;
   font-style: italic;
 }
 
-.mb-10 {
-  margin-bottom: 10px;
+.rich-editor-wrapper {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: white;
 }
 
-.large {
-  min-height: 110px;
+.rich-editor-content {
+  min-height: 120px;
+  padding: 15px;
+  font-size: 1rem;
+  line-height: 1.5;
+  background: #fbfbfb;
 }
+
+:deep(.rich-editor-content b), :deep(.rich-editor-content strong) { font-weight: bold !important; }
+:deep(.rich-editor-content i), :deep(.rich-editor-content em) { font-style: italic !important; }
+:deep(.rich-editor-content u) { text-decoration: underline !important; }
+:deep(.rich-editor-content ul) { list-style: disc inside !important; margin-left: 20px; }
+:deep(.rich-editor-content ol) { list-style: decimal inside !important; margin-left: 20px; }
 
 .actions-footer {
   display: flex;

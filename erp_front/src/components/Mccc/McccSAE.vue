@@ -107,7 +107,7 @@ const toggleSae = (saeId) => {
   mcccStore.registerMcccStore();
 };
 
-const handleValider = () => {
+const handleValidate = () => {
   if (selectedSaeIds.value.length === 0) {
     errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
     return;
@@ -123,7 +123,7 @@ const handleValider = () => {
   router.push('/mccc-menu');
 };
 
-const handleRetour = () => {
+const handleBack = () => {
   showModal.value = true;
 };
 
@@ -162,7 +162,7 @@ const onConfirmCancel = () => {
                 <span class="sae-number">{{ sae.id }}</span>
                 <span class="sae-title">{{ sae.title }}</span>
                 <div class="check-indicator" v-if="selectedSaeIds.includes(sae.id)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
@@ -176,8 +176,8 @@ const onConfirmCancel = () => {
       </div>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <div class="footer-actions">
-        <button @click="handleValider" class="btn-main">Valider</button>
-        <button @click="handleRetour" class="btn-sub">Annuler</button>
+        <button @click="handleValidate" class="btn-main">Valider</button>
+        <button @click="handleBack" class="btn-sub">Annuler</button>
       </div>
     </div>
 

@@ -2,21 +2,16 @@ package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.HistoryResponse;
 import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
-import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
-import fr.iut_unilim.erp_back.repository.ResourceRepository;
-import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
-import fr.iut_unilim.erp_back.service.ConnectionService;
+import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
+import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/resourceSheet")
@@ -24,198 +19,68 @@ import java.util.regex.Pattern;
 public class ResourceSheetController {
 
     private final ResourceSheetService resourceSheetService;
-    private final ResourceSheetRepository resourceSheetRepository;
-    private final ResourceRepository resourceRepository;
-    private final ClassTypeRepository classTypeRepository;
-    private final ConnectionService connectionService;
 
-    public ResourceSheetController(ResourceSheetService resourceSheetService, ResourceSheetRepository resourceSheetRepository, ResourceRepository resourceRepository, ClassTypeRepository classTypeRepository, ConnectionService connectionService) {
+    public ResourceSheetController(ResourceSheetService resourceSheetService) {
         this.resourceSheetService = resourceSheetService;
-        this.resourceSheetRepository = resourceSheetRepository;
-        this.resourceRepository = resourceRepository;
-        this.classTypeRepository = classTypeRepository;
-        this.connectionService = connectionService;
     }
 
-    @GetMapping("/getResourceSheet")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<?> getResourceSheet(Authentication authentication) {
-        return ResponseEntity.ok(resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName()));
+    @GetMapping("/getResourceSheet/{year}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheet(Authentication authentication, @PathVariable Integer year) {
+        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartmentAndYear(authentication.getName(), year);
+        List<ResourceSheetResponse> sheetRequests = resourceSheetService.convertToEntitiesToResponses(sheets);
+        return ResponseEntity.ok(sheetRequests);
+    }
+
+    @GetMapping("/resource-sheet/{resourceId}/{year}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetForResourceFromYear(@PathVariable Long resourceId, @PathVariable Integer year) {
+        Optional<ResourceSheet> resourceSheet = resourceSheetService.getResourceSheetForResourceFromYear(resourceId, year);
+
+        if (resourceSheet.isEmpty()) return ResponseEntity.notFound().build();
+
+        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertEntityToResponse(resourceSheet.get());
+
+        return ResponseEntity.ok().body(resourceSheetResponse);
+    }
+
+    @GetMapping("/resource-sheet/{resourceId}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetFromId(@PathVariable Long resourceId) {
+        Optional<ResourceSheet> resourceSheet = resourceSheetService.getResourceSheetById(resourceId);
+        if (resourceSheet.isEmpty()) return ResponseEntity.notFound().build();
+        ResourceSheetResponse resourceSheetResponse = resourceSheetService.convertEntityToResponse(resourceSheet.get());
+        return ResponseEntity.ok().body(resourceSheetResponse);
     }
 
     @PostMapping("/resource-sheet")
-    @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest, Authentication authentication) {
-        ResourceSheet resourceSheet;
-        Long resourceSheetID = resourceSheetRequest.getSheetsID();
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> saveResourceSheet(@RequestBody ResourceSheetRequest resourceSheetRequest) {
+        boolean hasBeenAdded = resourceSheetService.saveFromRequest(resourceSheetRequest);
+        if (!hasBeenAdded) return ResponseEntity.notFound().build();
 
-        if (resourceSheetID != null) {
-            Optional<ResourceSheet> canHaveResourceSheet = resourceSheetRepository.findById(resourceSheetID);
-            if (canHaveResourceSheet.isPresent()) {
-                resourceSheet = canHaveResourceSheet.get();
-                clearExistingContent(resourceSheet);
-            } else {
-                resourceSheet = new ResourceSheet();
-                initDefaultValues(resourceSheet);
-            }
-        } else {
-            resourceSheet = new ResourceSheet();
-            initDefaultValues(resourceSheet);
-        }
-
-        handleDepartment(resourceSheet, authentication);
-
-        if (resourceSheetRequest.getResourceID() == null) return ResponseEntity.badRequest().body("resourceID is null");
-        resourceSheet.setResourceID(resourceSheetRequest.getResourceID());
-
-        if (resourceSheetRequest.getHourlyVolumeID() == null)
-            return ResponseEntity.badRequest().body("HourlyVolumeID is null");
-        resourceSheet.setHourlyVolumeID(resourceSheetRequest.getHourlyVolumeID());
-
-        handleTeacherFeedbacks(resourceSheetRequest, resourceSheet);
-        handleStudentFeedbacks(resourceSheetRequest, resourceSheet);
-        handleImprovementIdeasFeedbacks(resourceSheetRequest, resourceSheet);
-
-        ResponseEntity<String> educationalContent = handleEducationalContent(resourceSheetRequest, resourceSheet);
-        if (educationalContent != null) return educationalContent;
-
-        resourceSheet.setLastModificationDate(new Date());
-
-        resourceSheetService.save(resourceSheet);
-
-        return ResponseEntity.ok("Fiche ressource sauvegardée avec succès !");
-    }
-
-    private void handleDepartment(ResourceSheet resourceSheet, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
-
-        if (connection == null) return;
-
-        resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
-    }
-
-    private static void handleImprovementIdeasFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> ideasReq = resourceSheetRequest.getImprovementsIdeaID();
-        if (ideasReq != null) {
-            for (String content : ideasReq) {
-                ImprovementIdeas item = new ImprovementIdeas();
-                item.setIdeaContent(content);
-                resourceSheet.getImprovementIdeas().add(item);
-            }
-        }
-    }
-
-    private static void handleStudentFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> studentFeedbacksReq = resourceSheetRequest.getStudentFeedbackID();
-        if (studentFeedbacksReq != null) {
-            for (String content : studentFeedbacksReq) {
-                StudentsFeedbacks item = new StudentsFeedbacks();
-                item.setContent(content);
-                resourceSheet.getStudentsFeedbacks().add(item);
-            }
-        }
-    }
-
-    private static void handleTeacherFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        List<String> teacherFeedbacksReq = resourceSheetRequest.getTeachersFeedbackID();
-        if (teacherFeedbacksReq != null) {
-            for (String content : teacherFeedbacksReq) {
-                EducationalTeachersFeedbacks item = new EducationalTeachersFeedbacks();
-                item.setContent(content);
-                resourceSheet.getTeachersFeedbacks().add(item);
-            }
-        }
-    }
-
-    private static void initDefaultValues(ResourceSheet resourceSheet) {
-        resourceSheet.setCreationDate(new Date());
-
-        resourceSheet.setTeachersFeedbacks(new ArrayList<>());
-        resourceSheet.setStudentsFeedbacks(new ArrayList<>());
-        resourceSheet.setImprovementIdeas(new ArrayList<>());
-        resourceSheet.setEducationalContentID(new ArrayList<>());
-    }
-
-    private static void clearExistingContent(ResourceSheet resourceSheet) {
-        if (resourceSheet.getTeachersFeedbacks() != null) resourceSheet.getTeachersFeedbacks().clear();
-        if (resourceSheet.getStudentsFeedbacks() != null) resourceSheet.getStudentsFeedbacks().clear();
-        if (resourceSheet.getImprovementIdeas() != null) resourceSheet.getImprovementIdeas().clear();
-        if (resourceSheet.getEducationalContentID() != null) resourceSheet.getEducationalContentID().clear();
-    }
-
-    @Nullable
-    private ResponseEntity<String> handleEducationalContent(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {
-        if (resourceSheetRequest.getEducationalContent() != null) {
-            String regex = "^(TP|CM|TD|DS|DS/TP)\\s*(\\d+)\\s*:\\s*(.*)$";
-            Pattern pattern = Pattern.compile(regex);
-
-            for (String educationalContent : resourceSheetRequest.getEducationalContent()) {
-                Matcher matcher = pattern.matcher(educationalContent);
-
-                if (!matcher.find()) {
-                    return ResponseEntity.badRequest().body("Contenu invalide : " + educationalContent);
-                }
-
-                String typeName = matcher.group(1);
-                String numero = matcher.group(2);
-                String description = matcher.group(3);
-
-                EducationalContent contentEntity = new EducationalContent();
-
-                ClassType existingType = classTypeRepository.findByClassType(typeName)
-                        .orElseThrow(() -> new RuntimeException("Type introuvable : " + typeName));
-                contentEntity.setClassTypeId(existingType);
-
-                contentEntity.setCourseNumber(Long.valueOf(numero));
-                contentEntity.setContent(description);
-                contentEntity.setRessourceSheetId(resourceSheet);
-
-                resourceSheet.getEducationalContentID().add(contentEntity);
-            }
-        }
-        return null;
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('TEACHER')")
-    public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
-        if (!resourceSheetRepository.existsById(id)) {
-            return ResponseEntity.ok().build();
-        }
-        resourceSheetRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getHistory")
-    @PreAuthorize("hasAuthority('TEMP_TEACHER')")
-    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication) {
-        List<ResourceSheet> sheets = resourceSheetService.getAllResourceSheetsFromDepartment(authentication.getName());
-        List<HistoryResponse> historyList = new ArrayList<>();
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> deleteResourceSheet(@PathVariable Long id) {
+        boolean hasBeenDeleted = resourceSheetService.deleteResourceSheetById(id);
+        if (!hasBeenDeleted) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
+    }
 
-        for (ResourceSheet sheet : sheets) {
-            String code = "Inconnu";
-            String name = "Inconnue";
+    @GetMapping("/getHistory/{year}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<List<HistoryResponse>> getHistory(Authentication authentication, @PathVariable Integer year) {
+        List<HistoryResponse> historyResponses = resourceSheetService.getHistoryResponses(authentication.getName(), year);
 
-            if (sheet.getResourceID() != null) {
-                Optional<Resource> res = resourceRepository.findById(sheet.getResourceID());
-                if (res.isPresent()) {
-                    code = res.get().getNum();
-                    name = res.get().getName();
-                }
-            }
+        return ResponseEntity.ok(historyResponses);
+    }
 
-            Date dateToUse = sheet.getLastModificationDate() != null ?
-                    sheet.getLastModificationDate() : sheet.getCreationDate();
-
-            historyList.add(new HistoryResponse(
-                    sheet.getSheetsID(),
-                    code,
-                    name,
-                    dateToUse));
-        }
-
-        Collections.reverse(historyList);
-
-        return ResponseEntity.ok(historyList);
+    @GetMapping("available-years")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getResourceSheetYears() {
+        return ResponseEntity.ok(resourceSheetService.getAllYears());
     }
 }

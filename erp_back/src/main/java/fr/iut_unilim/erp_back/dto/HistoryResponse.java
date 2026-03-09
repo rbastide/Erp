@@ -7,12 +7,14 @@ public class HistoryResponse {
     private String resourceCode;
     private String resourceName;
     private Date date;
+    private Integer academicYearStart;
 
-    public HistoryResponse(Long sheetID, String resourceCode, String resourceName, Date date) {
+    public HistoryResponse(Long sheetID, String resourceCode, String resourceName, Date date, Integer academicYearStart) {
         this.sheetID = sheetID;
         this.resourceCode = resourceCode;
         this.resourceName = resourceName;
         this.date = date;
+        this.academicYearStart = academicYearStart;
     }
 
     public Long getSheetID() { return sheetID; }
@@ -25,5 +27,14 @@ public class HistoryResponse {
     public void setResourceName(String resourceName) { this.resourceName = resourceName; }
 
     public Date getDate() { return date; }
+
+    public Integer getAcademicYearStart() {
+        return academicYearStart;
+    }
+
+    public void setAcademicYearStart(Integer academicYearStart) {
+        this.academicYearStart = academicYearStart;
+    }
+
     public void setDate(Date date) { this.date = date; }
 }
