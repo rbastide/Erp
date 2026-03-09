@@ -27,7 +27,6 @@ import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegex
 
 @RestController
 @RequestMapping("/api/mccc")
-@CrossOrigin(origins = "http://localhost:5173")
 public class McccController {
 
     private final McccService mcccService;
