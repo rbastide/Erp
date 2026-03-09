@@ -468,7 +468,7 @@ const pedagogicalSections = computed(() => [
         <h2 class="section-title">Voici le contenu pédagogique : *</h2>
         <div v-for="section in pedagogicalSections" :key="section.type" class="pedagogic-group">
           <h3 class="group-label">{{ section.type }}</h3>
-          <div v-for="(content, index) in section.list" :key="index" class="content-block">
+          <div v-for="(_, index) in section.list" :key="index" class="content-block">
             <label class="item-label">{{ section.type }} {{ index + 1 }}</label>
             <div class="input-wrapper">
               <input
