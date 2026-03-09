@@ -199,7 +199,6 @@ const fetchHoursData = async () => {
 
       if (mcccFound && mcccFound.courseHoursId) {
         const vol = mcccFound.courseHoursId;
-        console.log("Vol :", vol);
 
         splitHours.cm = convertDecimalToSplit(vol.nbMinCM);
         splitHours.td = convertDecimalToSplit(vol.nbMinTD);

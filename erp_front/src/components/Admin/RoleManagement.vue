@@ -67,6 +67,7 @@ const fetchRoles = async () => {
   try {
     const response = await api.get('perm/perms/roles');
     roles.value = Array.isArray(response.data) ? response.data : (response.data.content || []);
+    roles.value = roles.value.filter(role => role.id !== 1);
   } catch (error) {
     console.error(error);
   }
@@ -144,14 +145,14 @@ const saveModification = async () => {
   if (!editedRole.name) {
     editedRole.name = editedRole.label
         .toUpperCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^A-Z0-9]/g, '_');
+        .normalize("NFD").replaceAll(/[\u0300-\u036f]/g, "")
+        .replaceAll(/[^A-Z0-9]/g, '_');
   }
 
   const payload = perms.value.map(p => {
     const isGranted = editedRole.permissions.includes(String(p.id));
     return {
-      permissionRoleId: p.id,
+      permissionRoleId: editedRole.id,
       permissionId: p.id,
       permissionState: isGranted
     };
@@ -159,7 +160,6 @@ const saveModification = async () => {
 
   try {
     await api.post('perm/perms/role', payload);
-    console.log("c'est bon : ", payload);
     await fetchRoles();
     handleCancel();
   } catch (error) {

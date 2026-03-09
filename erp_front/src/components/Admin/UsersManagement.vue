@@ -217,7 +217,7 @@ const handleAddUser = () => router.push('/new-user');
               <input type="text" v-model="editedUser.firstName" class="card-input-compact" placeholder="Prénom">
             </div>
             <div class="input-group-compact">
-              <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Email">
+              <input type="email" v-model="editedUser.email" class="card-input-compact" placeholder="Nouvel email">
             </div>
 
             <hr class="separator"/>
