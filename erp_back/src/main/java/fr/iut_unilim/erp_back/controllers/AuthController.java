@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -32,7 +33,6 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    public static final String TEACHER = "TEACHER";
     private final ConnectionRepository connectionRepository;
     private final ConnectionService connectionService;
     private final PasswordEncoder passwordEncoder;
@@ -69,10 +69,7 @@ public class AuthController {
 
 
         Connection connection = connectionRepository.save(user);
-
-        if (TEACHER.equalsIgnoreCase(req.getRole())) {
-            teacherService.createTeacherFromRegister(req, connection);
-        }
+        teacherService.createTeacherFromRegister(req, connection);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -156,6 +153,7 @@ public class AuthController {
     @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
         Connection user = connectionRepository.findByIdentifier(identifier);
+        ErpBackApplication.LOGGER.info("User: " + user + " " + identifier);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
