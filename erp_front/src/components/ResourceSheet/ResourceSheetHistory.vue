@@ -14,6 +14,7 @@ const route = useRoute()
 
 const resourceCode = ref('')
 const resourceDate = ref('')
+const academicYear = ref<number>(2025)
 
 const hours = ref({
   cm: 0, td: 0, tp: 0, ds: 0, ds_tp: 0, student: 0
@@ -33,15 +34,18 @@ const contents = ref({
 const formatHour = (decimal: number) => {
   const val = decimal || 0;
   const h = Math.floor(val / 60);
-  const m = decimal % 60;
-
-  return `${h}h${m}`;
+  const m = val % 60;
+  return `${h}h${m.toString().padStart(2, '0')}`;
 };
 
 const fetchSheetData = async () => {
   const sheetIdFromUrl = route.query.id
   resourceCode.value = (route.query.code as string) || 'Inconnu'
   resourceDate.value = (route.query.date as string) || ''
+
+  const now = new Date();
+  const defaultYear = now.getMonth() < 8 ? now.getFullYear() - 1 : now.getFullYear();
+  academicYear.value = route.query.year ? parseInt(route.query.year as string) : defaultYear;
 
   if (!sheetIdFromUrl) return
 
@@ -53,9 +57,15 @@ const fetchSheetData = async () => {
     contents.value.studentFeedback = sheet.studentFeedbacks || '';
     contents.value.upgrades = sheet.improvementIdeas || '';
 
-    const pedago = sheet.educationalContentID
+    // Si l'année est stockée dans la fiche reçue, on met à jour l'affichage
+    if (sheet.academicYearStart) {
+      academicYear.value = sheet.academicYearStart;
+    }
+
+    const pedago = sheet.educationalContentID || []
     const getBlocks = (type: string) => pedago
         .filter((p: any) => p.classType === type)
+        .sort((a: any, b: any) => (a.courseNumber || 0) - (b.courseNumber || 0))
         .map((p: any) => p.content)
 
     contents.value.cm = getBlocks('CM')
@@ -64,7 +74,7 @@ const fetchSheetData = async () => {
     contents.value.ds = getBlocks('DS')
     contents.value.ds_tp = getBlocks('DS/TP')
 
-    let sheetHours = sheet.courseHours
+    let sheetHours = sheet.courseHours || {}
     hours.value = {
       cm: sheetHours.cm || 0,
       td: sheetHours.td || 0,
@@ -74,7 +84,7 @@ const fetchSheetData = async () => {
       student: (sheetHours.nbHoursCM || 0) + (sheetHours.nbHoursTD || 0) + (sheetHours.nbHoursTP || 0) + (sheetHours.nbHoursDS || 0) + (sheetHours.nbHoursDSTP || 0)
     }
   } catch (error) {
-    console.error("Erreur technique :", error)
+    console.error("Erreur technique lors de la récupération de la fiche :", error)
   }
 }
 
@@ -87,6 +97,7 @@ const totalGlobal = computed(() => {
 })
 
 const handleFermer = () => router.back()
+
 const handleExport = async () => {
   try {
     const response = await api.get(`/pdf/resource-sheet/${route.query.id}`, {
@@ -94,23 +105,18 @@ const handleExport = async () => {
     });
     const file = new Blob([response.data], {type: 'application/pdf'});
     const fileURL = URL.createObjectURL(file);
-
     const link = document.createElement('a');
     link.href = fileURL;
-
-    const fileName = `fiche-ressource-${resourceCode.value}.pdf`;
-    link.setAttribute('download', fileName);
-
+    link.setAttribute('download', `fiche-ressource-${resourceCode.value}-${academicYear.value}.pdf`);
     document.body.appendChild(link);
     link.click();
-
     document.body.removeChild(link);
     URL.revokeObjectURL(fileURL);
-
   } catch (error) {
     console.error("Erreur lors de la génération du PDF", error);
   }
 }
+
 const handleModifier = () => router.push("fill-resource-sheet?code=" + resourceCode.value);
 
 const hourConfig = {
@@ -124,10 +130,18 @@ const hourConfig = {
 
 <template>
   <Sidebar />
-  <AppHeader title="Consultation Ressource" :inline="`${resourceCode} du ${resourceDate}`" />
+  <AppHeader title="Consultation Ressource" :inline="`${resourceCode}`" />
 
   <main class="main-content">
     <div class="container">
+
+      <section class="form-card year-display-card">
+        <div class="year-info">
+          <span class="label">Période :</span>
+          <span class="year-badge">Année Universitaire {{ academicYear }} - {{ academicYear + 1 }}</span>
+        </div>
+      </section>
+
       <section class="form-card">
         <h2 class="section-title">Volume horaire global</h2>
         <div class="hours-grid-wrapper">
@@ -178,29 +192,29 @@ const hourConfig = {
         <div class="pedagogic-group">
           <label class="field-label">Retour pédagogique des professeurs :</label>
           <div class="rich-editor-wrapper">
-            <div class="rich-editor-content read-only-editor" v-html="contents.teacherFeedback"></div>
+            <div class="rich-editor-content" v-html="contents.teacherFeedback || '<i>Aucun retour.</i>'"></div>
           </div>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Retour des étudiants :</label>
           <div class="rich-editor-wrapper">
-            <div class="rich-editor-content read-only-editor" v-html="contents.studentFeedback"></div>
+            <div class="rich-editor-content" v-html="contents.studentFeedback || '<i>Aucun retour.</i>'"></div>
           </div>
         </div>
 
         <div class="pedagogic-group">
           <label class="field-label">Améliorations à apporter :</label>
           <div class="rich-editor-wrapper">
-            <div class="rich-editor-content read-only-editor" v-html="contents.upgrades"></div>
+            <div class="rich-editor-content" v-html="contents.upgrades || '<i>Aucune amélioration listée.</i>'"></div>
           </div>
         </div>
       </section>
 
       <div class="actions-footer">
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
-        <button @click="handleFermer" class="btn btn-primary">Fermer et Valider</button>
-        <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier</button>
+        <button @click="handleFermer" class="btn btn-outline">Retour</button>
+        <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier la fiche</button>
       </div>
     </div>
   </main>
@@ -219,6 +233,31 @@ const hourConfig = {
 .container {
   width: 100%;
   max-width: 900px;
+}
+
+/* Styles spécifique Année */
+.year-display-card {
+  padding: 20px 35px !important;
+  margin-bottom: 20px;
+}
+.year-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.year-info .label {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 1rem;
+}
+.year-badge {
+  background: #E92533;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(233, 37, 51, 0.2);
 }
 
 .form-card {
@@ -304,8 +343,6 @@ const hourConfig = {
 .content-block {
   width: 100%;
   margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
 }
 
 .item-label {
@@ -315,13 +352,6 @@ const hourConfig = {
   margin-bottom: 5px;
   text-transform: uppercase;
   margin-left: 2px;
-}
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
 }
 
 .simple-line-input {
@@ -339,7 +369,7 @@ const hourConfig = {
 }
 
 .simple-line-input.empty {
-  color: #cbd5e1;
+  color: #94a3b8;
   font-style: italic;
 }
 
@@ -348,37 +378,38 @@ const hourConfig = {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 20px;
-  background: white;
+  background: #fbfbfb;
 }
 
 .rich-editor-content {
-  min-height: 120px;
-  padding: 15px;
+  min-height: 80px;
+  padding: 20px;
   font-size: 1rem;
-  line-height: 1.5;
-  background: #fbfbfb;
+  line-height: 1.6;
+  color: #334155;
 }
 
 :deep(.rich-editor-content b), :deep(.rich-editor-content strong) { font-weight: bold !important; }
 :deep(.rich-editor-content i), :deep(.rich-editor-content em) { font-style: italic !important; }
 :deep(.rich-editor-content u) { text-decoration: underline !important; }
-:deep(.rich-editor-content ul) { list-style: disc inside !important; margin-left: 20px; }
-:deep(.rich-editor-content ol) { list-style: decimal inside !important; margin-left: 20px; }
+:deep(.rich-editor-content ul) { list-style: disc inside !important; margin-left: 10px; }
+:deep(.rich-editor-content ol) { list-style: decimal inside !important; margin-left: 10px; }
 
 .actions-footer {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
+  margin-bottom: 50px;
 }
 
 .btn {
-  padding: 15px 45px;
+  padding: 15px 40px;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   border: none;
+  transition: all 0.2s;
 }
 
 .btn-primary {
@@ -386,8 +417,19 @@ const hourConfig = {
   color: white;
 }
 
+.btn-outline {
+  background: white;
+  color: #E92533;
+  border: 2px solid #E92533;
+}
+
 .btn-dark {
-  background: #333333;
+  background: #334155;
   color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 </style>
