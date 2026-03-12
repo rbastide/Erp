@@ -181,9 +181,9 @@ const handleAddUser = () => router.push('/new-user');
               </svg>
             </div>
 
-            <h3 class="user-id">{{ user.identifier }}</h3>
+            <h3 class="user-id">{{ user.firstName }} {{ user.lastName }}</h3>
             <p class="user-name" v-if="user.firstName || user.lastName">
-              {{ user.firstName }} {{ user.lastName }}
+              {{ user.identifier }}
             </p>
 
             <span class="role-badge">{{ formatRole(user.role) }}</span>
