@@ -25,6 +25,7 @@ import RoleManagement from "@/components/Admin/RoleManagement.vue";
 import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
 import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
 import RecallManagement from "@/components/Admin/RecallManagement.vue";
+import AuthSuccess from "@/components/App/AuthSuccess.vue";
 
 
 const routes = [
@@ -162,6 +163,11 @@ const routes = [
         path:'/recall-management',
         name: RecallManagement,
         component: RecallManagement
+    },
+    {
+        path: '/success',
+        name: 'Success',
+        component: AuthSuccess
     }
 ];
 

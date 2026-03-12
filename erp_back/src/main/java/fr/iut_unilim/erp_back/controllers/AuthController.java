@@ -74,6 +74,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/cas-login")
+    public void casLogin() {
+        // This endpoint is protected, so accessing it will trigger CAS authentication
+        // The user will never reach this point - they'll be redirected to CAS
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {

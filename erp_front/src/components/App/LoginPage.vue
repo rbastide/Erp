@@ -36,6 +36,10 @@ const handleLogin = async () => {
         : "Impossible de contacter le serveur.";
   }
 };
+
+const loginWithCAS = () => {
+  window.location.replace(`https://164.81.120.79:8449/login/cas`);
+};
 </script>
 
 <template>
@@ -66,6 +70,12 @@ const handleLogin = async () => {
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <button type="submit" class="login-button">Se connecter</button>
     </form>
+    <div class="cas-login-section">
+      <div class="divider">ou</div>
+      <button type="button" @click="loginWithCAS" class="cas-button">
+        Se connecter avec le CAS
+      </button>
+    </div>
   </main>
 </template>
 
