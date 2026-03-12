@@ -51,6 +51,20 @@ const filteredSaes = computed(() => {
   );
 });
 
+const isDuplicateSae = (num, title, excludeId = null) => {
+  const searchNum = num.trim().toLowerCase();
+  const searchTitle = title.trim().toLowerCase();
+
+  return saes.value.some(sae => {
+    if (excludeId !== null && sae.saeID === excludeId) return false;
+
+    const hasSameNum = sae.num && sae.num.trim().toLowerCase() === searchNum;
+    const hasSameTitle = sae.title && sae.title.trim().toLowerCase() === searchTitle;
+
+    return hasSameNum || hasSameTitle;
+  });
+};
+
 const handleValidate = () => router.back();
 
 const handleAddSae = () => {
@@ -117,8 +131,8 @@ const saveSae = async (isNew = false) => {
     return;
   }
 
-  if(saes.value.some(sae => sae.num === saeObject.num && sae.title === saeObject.title)){
-    alert("la SAE existe déjà")
+  if (isDuplicateSae(saeObject.num, saeObject.title, isNew ? null : saeObject.saeID)) {
+    alert("Erreur : Une SAE avec ce numéro ou cet intitulé existe déjà.");
     return;
   }
 
