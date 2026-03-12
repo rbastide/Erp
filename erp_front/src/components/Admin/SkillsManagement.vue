@@ -57,15 +57,20 @@ const validateAcNum = (ac) => {
 
 const canAddAc = (acs) => {
   if (!acs || acs.length === 0) return true;
-  const last = acs[acs.length - 1];
-  return last.num > 0 && last.title && last.title.trim().length > 0;
+  return acs.every(ac => ac.num !== null && ac.num > 0 && ac.title && ac.title.trim() !== '');
 };
 
 const canAddLevel = (levels) => {
   if (levels.length >= 3) return false;
-  if (levels.length === 0) return true;
-  const last = levels[levels.length - 1];
-  return last.title && last.title.trim().length > 0 && canAddAc(last.acs);
+  if (!levels || levels.length === 0) return true;
+  return levels.every(lvl => lvl.title && lvl.title.trim() !== '' && canAddAc(lvl.acs));
+};
+
+const isDuplicateSkill = (num, name, excludeId = null) => {
+  return finalSkills.value.some(s => {
+    if (excludeId !== null && s.id === excludeId) return false;
+    return s.skillNum === num || (s.skillName && s.skillName.toLowerCase().trim() === name.toLowerCase().trim());
+  });
 };
 
 const fetchSkills = async () => {
@@ -124,7 +129,17 @@ const syncWithBackend = async (skill) => {
 };
 
 const handleSaveNewCompetence = async () => {
-  if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) return alert('Numéro et intitulé requis.');
+  if (!currentSkill.value.skillNum || !currentSkill.value.skillName.trim()) {
+    return alert('Le numéro et l\'intitulé de la compétence sont requis.');
+  }
+
+  if (!canAddLevel(currentSkill.value.levels)) {
+    return alert('Veuillez remplir tous les champs (titre et numéro) des Niveaux et AC avant d\'enregistrer.');
+  }
+
+  if (isDuplicateSkill(currentSkill.value.skillNum, currentSkill.value.skillName)) {
+    return alert('Une compétence avec ce numéro ou ce nom existe déjà.');
+  }
 
   const currentSkillToAdd = JSON.parse(JSON.stringify(currentSkill.value));
 
@@ -143,18 +158,36 @@ const handleSaveNewCompetence = async () => {
   await syncWithBackend(currentSkillToAdd);
 };
 
-const saveModification = async (index) => {
+const saveModification = async () => {
+  if (!editedSkill.value.skillNum || !editedSkill.value.skillName.trim()) {
+    return alert('Le numéro et l\'intitulé de la compétence sont requis.');
+  }
+
+  if (!canAddLevel(editedSkill.value.levels)) {
+    return alert('Veuillez remplir tous les champs (titre et numéro) des Niveaux et AC avant d\'enregistrer.');
+  }
+
+  if (isDuplicateSkill(editedSkill.value.skillNum, editedSkill.value.skillName, editedSkill.value.id)) {
+    return alert('Une compétence avec ce numéro ou ce nom existe déjà.');
+  }
+
   editedSkill.value.levels.forEach((lvl, idx) => {
     lvl.num = idx + 1;
   });
 
-  finalSkills.value[index] = JSON.parse(JSON.stringify(editedSkill.value));
+  const realIndex = finalSkills.value.findIndex(s => s.id === editedSkill.value.id);
+  if (realIndex !== -1) {
+    finalSkills.value[realIndex] = JSON.parse(JSON.stringify(editedSkill.value));
+    await syncWithBackend(finalSkills.value[realIndex]);
+  }
+
   editingIndex.value = null;
-  await syncWithBackend(finalSkills.value[index]);
 };
 
 const handleDelete = (index) => {
-  skillToDelete.value = { index, skill: finalSkills.value[index] };
+  const realSkill = filteredSkills.value[index];
+  const realIndex = finalSkills.value.findIndex(s => s.id === realSkill.id);
+  skillToDelete.value = { index: realIndex, skill: realSkill };
   showDeleteModal.value = true;
 };
 
@@ -399,7 +432,7 @@ const handleValider = () => router.back();
                 </button>
               </div>
             </div>
-            <button class="save-btn" @click="saveModification(index)">Mettre à jour</button>
+            <button class="save-btn" @click="saveModification">Mettre à jour</button>
           </div>
         </div>
       </div>

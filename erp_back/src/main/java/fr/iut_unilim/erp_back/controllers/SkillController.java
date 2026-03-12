@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/skill")
@@ -65,13 +66,8 @@ public class SkillController {
         if (skillService.getSkillsFromId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        List<Rank> ranks = rankService.getRanksFromSkill(skillService.getSkillsFromId(id).get());
-        for (Rank rank : ranks) {
-            List<CriticalConcept> criticalConcepts = criticalConceptRepository.findByRankID(rank);
-            criticalConceptRepository.deleteAll(criticalConcepts);
-        }
-        rankRepository.deleteAll(ranks);
         skillRepository.deleteById(id);
+
         return ResponseEntity.ok().build();
     }
 

@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.entity;
 
-
 import fr.iut_unilim.erp_back.model.CriticalConceptModel;
 import jakarta.persistence.*;
 
@@ -10,7 +9,6 @@ public class CriticalConcept {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Column(name = "criticalConceptID")
     private Long criticalConceptID;
 
@@ -20,7 +18,7 @@ public class CriticalConcept {
     @Column(name = "criticalConceptTitle")
     private String criticalConceptTitle;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "rankID")
     private Rank rankID;
 
@@ -37,35 +35,13 @@ public class CriticalConcept {
         this(criticalConcept.conceptNum(), criticalConcept.conceptTitle(), rankID);
     }
 
-    public Long getCriticalConceptID() {
-        return criticalConceptID;
-    }
+    public Long getCriticalConceptID() { return criticalConceptID; }
+    public int getCriticalConceptNum() { return criticalConceptNum; }
+    public String getCriticalConceptTitle() { return criticalConceptTitle; }
+    public Rank getRankID() { return rankID; }
 
-    public int getCriticalConceptNum() {
-        return criticalConceptNum;
-    }
-
-    public String getCriticalConceptTitle() {
-        return criticalConceptTitle;
-    }
-
-    public Rank getRankID() {
-        return rankID;
-    }
-
-    public void setCriticalConceptID(Long learningID) {
-        this.criticalConceptID = learningID;
-    }
-
-    public void setCriticalConceptNum(int learningNum) {
-        this.criticalConceptNum = learningNum;
-    }
-
-    public void setCriticalConceptTitle(String learningTitle) {
-        this.criticalConceptTitle = learningTitle;
-    }
-
-    public void setRankID(Rank rankID) {
-        this.rankID = rankID;
-    }
+    public void setCriticalConceptID(Long learningID) { this.criticalConceptID = learningID; }
+    public void setCriticalConceptNum(int learningNum) { this.criticalConceptNum = learningNum; }
+    public void setCriticalConceptTitle(String learningTitle) { this.criticalConceptTitle = learningTitle; }
+    public void setRankID(Rank rankID) { this.rankID = rankID; }
 }
