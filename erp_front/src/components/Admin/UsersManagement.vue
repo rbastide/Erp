@@ -50,6 +50,7 @@ const fetchUsers = async () => {
     const response = await api.get('/auth/users');
     if (Array.isArray(response.data)) {
       users.value = response.data;
+      users.value = users.value.filter(user => user.role !== "Super-Admin");
     } else if (response.data && Array.isArray(response.data.content)) {
       users.value = response.data.content;
     }
