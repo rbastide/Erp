@@ -35,11 +35,11 @@ public class McccService {
         return mcccRepository.findAll();
     }
 
-    public List<Mccc> getAllMcccFromDepartment(@NotNull String identifier) {
+    public List<Mccc> getAllMcccFromDepartmentAndYear(@NotNull String identifier, Integer year) {
         Connection senderConnection = connectionService.findByIdentifier(identifier);
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
-        return mcccRepository.findAllByUniversityDepartment(department);
+        return mcccRepository.findAllByUniversityDepartmentAndAcademicYearStart(department, year);
     }
 
     @NotNull
