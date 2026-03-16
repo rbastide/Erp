@@ -28,8 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         List<Connection> users = userRepository.findAll();
 
-        ErpBackApplication.LOGGER.info(String.join(" ", users.stream().map(Connection::getIdentifier).toList()));
-
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
