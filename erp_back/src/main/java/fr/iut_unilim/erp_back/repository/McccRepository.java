@@ -24,4 +24,6 @@ public interface McccRepository extends JpaRepository<Mccc, McccId> {
     List<Long> findTeacherIdsByMcccId(@Param("mcccId") Long mcccId);
 
     List<Mccc> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
+
+    List<Mccc> findAllByUniversityDepartmentAndAcademicYearStart(UniversityDepartment universityDepartment, Integer academicYearStart);
 }

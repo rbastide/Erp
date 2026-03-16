@@ -51,10 +51,10 @@ public class McccController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping("/mcccs")
+    @GetMapping("/mcccs/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getMccc(Authentication authentication) {
-        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartment(authentication.getName())
+    public ResponseEntity<?> getMccc(Authentication authentication, @PathVariable Integer year) {
+        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartmentAndYear(authentication.getName(), year)
                 .stream()
                 .map(McccResponse::new)
                 .toList();
@@ -92,8 +92,8 @@ public class McccController {
         ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
         if (doCriticalConceptsHasCrashed != null) return doCriticalConceptsHasCrashed;
 
-
         mccc.setCriticalConceptsId(setCriticalConcepts);
+        mccc.setAcademicYearStart(dto.getYear());
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
