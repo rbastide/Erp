@@ -26,8 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Connection user = userRepository.findByIdentifier(username);
 
-        List<Connection> users = userRepository.findAll();
-
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
