@@ -56,6 +56,20 @@ const filteredResources = computed(() => {
   });
 });
 
+const isDuplicateResource = (num, name, excludeId = null) => {
+  const searchNum = num ? num.trim().toLowerCase() : '';
+  const searchName = name ? name.trim().toLowerCase() : '';
+
+  return resources.value.some(res => {
+    if (excludeId !== null && res.resourceID === excludeId) return false;
+
+    const hasSameNum = res.num && res.num.trim().toLowerCase() === searchNum;
+    const hasSameName = res.name && res.name.trim().toLowerCase() === searchName;
+
+    return hasSameNum || hasSameName;
+  });
+};
+
 const handleDelete = (resource) => {
   resourceToDelete.value = resource;
   showDeleteModal.value = true;
@@ -108,6 +122,11 @@ const saveResource = async () => {
     return;
   }
 
+  if (isDuplicateResource(editedResource.num, editedResource.name, editedResource.resourceID)) {
+    alert("Erreur : Une ressource avec ce code ou ce nom existe déjà.");
+    return;
+  }
+
   const resourceData = {
     num: editedResource.num,
     name: editedResource.name,
@@ -116,11 +135,6 @@ const saveResource = async () => {
 
   if (editedResource.resourceID !== null) {
     resourceData.resourceID = editedResource.resourceID;
-  }
-
-  if(resources.value.some(resource => resource.num === editedResource.num && resource.name === editedResource.name && resource.semester === editedResource.semester)){
-    alert("La ressource existe déjà")
-    return;
   }
 
   try {
