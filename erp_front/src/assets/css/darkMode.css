@@ -186,3 +186,129 @@ body.dark-mode .separator-line, body.dark-mode .sep, body.dark-mode .total-separ
 body.dark-mode ::-webkit-scrollbar-thumb {
     background: #555555 !important;
 }
+
+/* --- GESTION DES RÔLES (RoleManagement.vue) --- */
+
+body.dark-mode .perm-tag {
+    background-color: #444444 !important;
+    border-color: #555555 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .permissions-edit-list {
+    background-color: #2b2b2b !important;
+    border-color: #444444 !important;
+}
+
+body.dark-mode .perm-toggle-row {
+    border-color: #444444 !important;
+}
+
+body.dark-mode .perm-label {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .toggle-switch {
+    background-color: #555555 !important;
+}
+
+body.dark-mode .toggle-switch.active {
+    background-color: #B51621 !important;
+}
+
+body.dark-mode .toggle-knob {
+    background-color: #e0e0e0 !important;
+}
+
+body.dark-mode .add-card {
+    border-color: #555555 !important;
+}
+
+body.dark-mode .add-card:hover {
+    background-color: rgba(181, 22, 33, 0.1) !important;
+    border-color: #B51621 !important;
+}
+
+body.dark-mode .icon-circle.plus {
+    background-color: #444444 !important;
+    color: #bbbbbb !important;
+}
+
+body.dark-mode .icon-circle.big-icon {
+    background-color: rgba(181, 22, 33, 0.15) !important;
+}
+
+body.dark-mode .action-btn {
+    background-color: #444444 !important;
+    color: #bbbbbb !important;
+}
+
+body.dark-mode .action-btn.edit:hover {
+    background-color: rgba(25, 118, 210, 0.2) !important;
+    color: #64b5f6 !important;
+}
+
+body.dark-mode .action-btn.delete:hover {
+    background-color: rgba(198, 40, 40, 0.2) !important;
+    color: #ef5350 !important;
+}
+
+body.dark-mode .action-btn.duplicate:hover {
+    background-color: rgba(46, 125, 50, 0.2) !important;
+    color: #81c784 !important;
+}
+
+body.dark-mode .empty-state, body.dark-mode .no-perm {
+    color: #888888 !important;
+}
+
+body.dark-mode .close-icon:hover {
+    color: #ffffff !important;
+}
+
+/* --- ÉDITEUR DE TEXTE RICHE (Rich Text Editor) --- */
+
+body.dark-mode .rich-editor-wrapper {
+    background-color: #333333 !important;
+    border-color: #555555 !important;
+}
+
+body.dark-mode .rich-toolbar {
+    background-color: #2a2a2a !important;
+    border-bottom-color: #555555 !important;
+}
+
+body.dark-mode .rich-toolbar button {
+    background-color: #3a3a3a !important;
+    border-color: #555555 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .rich-toolbar button:hover {
+    background-color: #4a4a4a !important;
+    color: #B51621 !important;
+    border-color: #B51621 !important;
+}
+
+body.dark-mode .rich-toolbar button.is-active {
+    background-color: rgba(181, 22, 33, 0.2) !important;
+    color: #B51621 !important;
+    border-color: #B51621 !important;
+}
+
+body.dark-mode .rich-toolbar .sep {
+    background-color: #555555 !important;
+}
+
+body.dark-mode .rich-editor-content {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .rich-editor-content:focus {
+    background-color: #3a3a3a !important;
+}
+
+body.dark-mode .rich-toolbar.disabled-bar {
+    opacity: 0.3 !important;
+}
