@@ -10,10 +10,14 @@ import CancelModal from '../Information/CancelModal.vue';
 const router = useRouter();
 const searchQuery = ref('');
 const allTeachers = ref([]);
+
 const selectedTeacherIds = ref([]);
+const referentTeacherIds = ref([]);
+
 const errorMessage = ref('');
 const showModal = ref(false);
-const initialState = ref([]);
+
+const initialState = ref({ selected: [], referents: [] });
 
 const fetchTeachers = async () => {
   try {
@@ -59,7 +63,12 @@ const fetchLinkedTeachers = async () => {
 const updateStoreReferents = () => {
   mcccStore.referents = selectedTeacherIds.value.map(teacherId => {
     const user = allTeachers.value.find(u => u.teacherID === teacherId);
-    return user ? { lastname: user.lastname, firstname: user.firstname } : null;
+    return user ? {
+      teacherID: user.teacherID,
+      lastname: user.lastname,
+      firstname: user.firstname,
+      isReferent: referentTeacherIds.value.includes(teacherId)
+    } : null;
   }).filter(Boolean);
 };
 
@@ -69,19 +78,30 @@ onMounted(async () => {
   const hasLocalEdits = mcccStore.referents && mcccStore.referents.length > 0;
 
   if (hasLocalEdits) {
-    selectedTeacherIds.value = mcccStore.referents.map(ref => {
+    selectedTeacherIds.value = [];
+    referentTeacherIds.value = [];
+
+    mcccStore.referents.forEach(refObj => {
       const found = allTeachers.value.find(t =>
-          (t.lastname || "").toLowerCase() === (ref.lastname || "").toLowerCase() &&
-          (t.firstname || "").toLowerCase() === (ref.firstname || "").toLowerCase()
+          (t.lastname || "").toLowerCase() === (refObj.lastname || "").toLowerCase() &&
+          (t.firstname || "").toLowerCase() === (refObj.firstname || "").toLowerCase()
       );
-      return found ? found.teacherID : null;
-    }).filter(id => id !== null);
+      if (found) {
+        selectedTeacherIds.value.push(found.teacherID);
+        if (refObj.isReferent) {
+          referentTeacherIds.value.push(found.teacherID);
+        }
+      }
+    });
   } else {
     await fetchLinkedTeachers();
   }
 
   mcccStore.saveBackup();
-  initialState.value = [...selectedTeacherIds.value];
+  initialState.value = {
+    selected: [...selectedTeacherIds.value],
+    referents: [...referentTeacherIds.value]
+  };
 });
 
 const selectedTeachersList = computed(() => {
@@ -105,6 +125,7 @@ const toggleTeacher = (id) => {
   const idNumber = Number(id);
   if (selectedTeacherIds.value.includes(idNumber)) {
     selectedTeacherIds.value = selectedTeacherIds.value.filter(itemId => itemId !== idNumber);
+    referentTeacherIds.value = referentTeacherIds.value.filter(rId => rId !== idNumber);
   } else {
     selectedTeacherIds.value.push(idNumber);
   }
@@ -112,9 +133,20 @@ const toggleTeacher = (id) => {
   mcccStore.registerMcccStore();
 };
 
+  const toggleReferent = (id) => {
+  const idNumber = Number(id);
+  if (referentTeacherIds.value.includes(idNumber)) {
+    referentTeacherIds.value = referentTeacherIds.value.filter(rId => rId !== idNumber);
+  } else {
+    referentTeacherIds.value.push(idNumber);
+  }
+  updateStoreReferents();
+  mcccStore.registerMcccStore();
+};
+
 const handleValidate = () => {
   if (selectedTeacherIds.value.length === 0) {
-    errorMessage.value = "Veuillez sélectionner au moins un référent.";
+    errorMessage.value = "Veuillez sélectionner au moins un enseignant.";
     return;
   }
   updateStoreReferents();
@@ -127,19 +159,19 @@ const handleBack = () => {
 };
 
 const onConfirmCancel = () => {
-  selectedTeacherIds.value = [...initialState.value];
+  selectedTeacherIds.value = [...initialState.value.selected];
+  referentTeacherIds.value = [...initialState.value.referents];
   updateStoreReferents();
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
 
 const clearSearch = () => searchQuery.value = '';
-const isActive = ref(false);
 </script>
 
 <template>
   <Sidebar />
-  <AppHeader title="Référents de la" :inline="mcccStore.resourceCode" />
+  <AppHeader title="Enseignants de la" :inline="mcccStore.resourceCode" />
 
   <main class="main-content">
     <div class="content-wrapper">
@@ -159,12 +191,12 @@ const isActive = ref(false);
                 {{ teacher.firstname ? teacher.firstname[0] : '' }}{{ teacher.lastname ? teacher.lastname[0] : '' }}
               </div>
               <h3 class="teacher-name">{{ teacher.firstname }} {{ teacher.lastname }}</h3>
-              <div class="manager">
+              <div class="manager" @click.stop>
                 <p>Référent</p>
                 <div
                     class="toggle-switch"
-                    :class="{ 'active': isActive }"
-                    @click.stop="isActive = !isActive"
+                    :class="{ 'active': referentTeacherIds.includes(teacher.teacherID) }"
+                    @click.stop="toggleReferent(teacher.teacherID)"
                 >
                   <div class="toggle-knob"></div>
                 </div>
@@ -290,6 +322,7 @@ const isActive = ref(false);
 .manager p{
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
+  margin: 0;
 }
 
 .toggle-switch.active { background-color: #B51621; }
@@ -390,12 +423,8 @@ const isActive = ref(false);
 }
 
 @keyframes popIn {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
 }
 
 .no-result {
