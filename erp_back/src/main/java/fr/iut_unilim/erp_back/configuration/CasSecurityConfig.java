@@ -1,7 +1,9 @@
 package fr.iut_unilim.erp_back.configuration;
 
 
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.filter.JwtFilter;
+import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
 import org.apereo.cas.client.validation.Cas30ServiceTicketValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.cas.ServiceProperties;
+import org.springframework.security.cas.authentication.CasAssertionAuthenticationToken;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
+import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
 import org.springframework.security.cas.web.CasAuthenticationFilter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -27,6 +31,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +41,7 @@ public class CasSecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils JwtUtils;
+    private final ConnectionRepository connectionRepository;
 
     @Value("${cas.server}")
     private String casServerUrl;
@@ -46,9 +52,10 @@ public class CasSecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
+    public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils, ConnectionRepository connectionRepository) {
         this.customUserDetailsService = customUserDetailsService;
         this.JwtUtils = jwtUtils;
+        this.connectionRepository = connectionRepository;
     }
 
 
@@ -87,10 +94,46 @@ public class CasSecurityConfig {
     public AuthenticationSuccessHandler casSuccessHandler() {
         return (request, response, authentication) -> {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
             String username = userDetails.getUsername();
-            String jwt = JwtUtils.generateToken(username);
+            String email = "";
 
+            if (authentication instanceof CasAuthenticationToken casToken) {
+                Map<String,Object> attributes = casToken.getAssertion().getPrincipal().getAttributes();
+
+                Connection user = connectionRepository.findByIdentifier(username);
+
+
+                boolean needUpdate = false;
+                if (user != null) {
+
+                    if (attributes.containsKey("mail")) {
+                        String casEmail = (String) attributes.get("mail");
+
+                        if (casEmail != null && !casEmail.equals(user.getEmail())) {
+                            user.setEmail(casEmail);
+                            needUpdate = true;
+                        }
+                    }
+
+                    if (attributes.containsKey("sn")) {
+                        user.setLastName((String) attributes.get("sn"));
+                        needUpdate = true;
+                    }
+
+                    if (attributes.containsKey("givenName")) {
+                        user.setFirstName((String) attributes.get("givenName"));
+                        needUpdate = true;
+                    }
+                }
+
+                System.out.println(needUpdate);
+
+                    if (needUpdate) {
+                        connectionRepository.save(user);
+                    }
+                }
+
+            String jwt = JwtUtils.generateToken(username);
             response.sendRedirect(frontendUrl + "/success?token=" + jwt);
         };
     }
@@ -102,13 +145,6 @@ public class CasSecurityConfig {
         filter.setServiceProperties(serviceProperties());
         filter.setFilterProcessesUrl("/login/cas");
         filter.setAuthenticationSuccessHandler(casSuccessHandler());
-
-        // Test debug
-        filter.setAuthenticationFailureHandler((request, response, exception) -> {
-            System.out.println("ERREUR D'AUTHENTIFICATION CAS : " + exception.getMessage());
-            exception.printStackTrace();
-            response.sendError(401, "Erreur CAS : " + exception.getMessage());
-        });
 
         return filter;
     }

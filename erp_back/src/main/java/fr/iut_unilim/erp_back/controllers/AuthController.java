@@ -63,7 +63,6 @@ public class AuthController {
         Connection user = new Connection();
         user.setIdentifier(req.getIdentifier());
         user.setEmail(req.getEmail());
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(roleService.createOrAccessRoleByRoleName(req.getRole()));
         user.setUniversityDepartment(req.getUniversityDepartment());
 
@@ -119,9 +118,6 @@ public class AuthController {
         userToEdit.setIdentifier(user.identifier());
         userToEdit.setRole(roleService.createOrAccessRoleByRoleName(user.role()));
         userToEdit.setEmail(user.email());
-        if (user.newPassword() != null) {
-            userToEdit.setPassword(passwordEncoder.encode(user.newPassword()));
-        }
         connectionRepository.save(userToEdit);
         return ResponseEntity.ok().build();
     }
