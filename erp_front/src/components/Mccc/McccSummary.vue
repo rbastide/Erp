@@ -12,7 +12,6 @@ const router = useRouter();
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 
-// Initialisation au montage pour éviter les erreurs d'accès aux propriétés undefined
 onMounted(() => {
   mcccStore.loadMcccStore();
 
@@ -23,17 +22,15 @@ onMounted(() => {
 
 });
 
-// Fonction utilitaire pour formater les heures décimales en HhMM (ex: 1.5 -> 1h30)
 const formatHour = (decimalVal) => {
   const val = decimalVal || 0;
   const h = Math.floor(val);
   const m = Math.round((val - h) * 60);
 
-  if (m === 0) return `${h} h`; // Affiche "12 h" si pile
-  return `${h}h${m.toString().padStart(2, '0')}`; // Affiche "12h30"
+  if (m === 0) return `${h} h`;
+  return `${h}h${m.toString().padStart(2, '0')}`;
 };
 
-// Calcul du total formaté
 const formattedTotalHours = computed(() => {
   const decimalTotal = (mcccStore.minCM || 0) +
       (mcccStore.minDS || 0) +
@@ -82,7 +79,8 @@ const handleValidate = async () => {
 
       referents: (mcccStore.referents || []).map(r => ({
         firstname: r.firstname || r.firstName,
-        lastname: r.lastname || r.lastName
+        lastname: r.lastname || r.lastName,
+        isReferent: !!r.isReferent
       })),
 
       creationDate: formattedCreationDate,
@@ -185,10 +183,10 @@ const handleCloseSuccess = () => {
       </div>
 
       <div class="summary-card" style="margin-top: 40px;">
-        <h2 class="card-title">Enseignants Référents</h2>
+        <h2 class="card-title">Enseignants</h2>
         <div v-if="mcccStore.referents && mcccStore.referents.length > 0" class="sae-list">
-          <div v-for="(prof, index) in mcccStore.referents" :key="index" class="sae-tag">
-            {{ prof.firstname }} {{ prof.lastname }}
+          <div v-for="(prof, index) in mcccStore.referents" :key="index" class="sae-tag" :class="{'referent-tag': prof.isReferent}">
+            {{ prof.firstname }} {{ prof.lastname }} {{ prof.isReferent ? '(Référent)' : '' }}
           </div>
         </div>
         <div v-else class="empty-table">Aucun enseignant associé.</div>
@@ -319,6 +317,12 @@ const handleCloseSuccess = () => {
   font-weight: bold;
   font-size: 0.95rem;
   white-space: nowrap;
+}
+
+.referent-tag {
+  background: #B51621;
+  color: white;
+  border-color: #94121b;
 }
 
 .empty-table {
