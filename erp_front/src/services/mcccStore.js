@@ -3,6 +3,7 @@ import {reactive} from 'vue';
 export const mcccStore = reactive({
     resourceID: 0,
     resourceCode: '',
+    year: new Date().getFullYear(),
     minCM: 0,
     minTD: 0,
     minTP: 0,
@@ -17,6 +18,7 @@ export const mcccStore = reactive({
     acs: [],
     acsGrouped: [],
     referents: [],
+
 
     backup: null,
 
