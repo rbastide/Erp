@@ -14,7 +14,8 @@ public class McccRequest {
     private Float minTD;
     private Float minTP;
     private Float minDS;
-    private Float hoursDSTP;
+    private Float minDSTP;
+    public Integer year;
 
     private String creationDate;
     private String editDate;
@@ -47,8 +48,8 @@ public class McccRequest {
         return minDS;
     }
 
-    public Float getHoursDSTP() {
-        return hoursDSTP;
+    public Float getMinDSTP() {
+        return minDSTP;
     }
 
     public String getCreationDate() {
@@ -72,4 +73,6 @@ public class McccRequest {
     }
 
     public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
+
+    public Integer getYear() { return year; }
 }

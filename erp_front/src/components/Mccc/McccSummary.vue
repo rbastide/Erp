@@ -12,7 +12,13 @@ const router = useRouter();
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
 
-// Initialisation au montage pour éviter les erreurs d'accès aux propriétés undefined
+const getCurrentAcademicYear = () => {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  return month < 8 ? year - 1 : year;
+};
+
 onMounted(() => {
   mcccStore.loadMcccStore();
 
@@ -20,28 +26,25 @@ onMounted(() => {
     mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
   }
   mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
-
 });
 
-// Fonction utilitaire pour formater les heures décimales en HhMM (ex: 1.5 -> 1h30)
-const formatHour = (decimalVal) => {
-  const val = decimalVal || 0;
-  const h = Math.floor(val);
-  const m = Math.round((val - h) * 60);
+const formatHour = (minutesVal) => {
+  const val = minutesVal || 0;
+  const h = Math.floor(val / 60);
+  const m = Math.round(val % 60);
 
-  if (m === 0) return `${h} h`; // Affiche "12 h" si pile
-  return `${h}h${m.toString().padStart(2, '0')}`; // Affiche "12h30"
+  if (m === 0) return `${h} h`;
+  return `${h}h${m.toString().padStart(2, '0')}`;
 };
 
-// Calcul du total formaté
 const formattedTotalHours = computed(() => {
-  const decimalTotal = (mcccStore.minCM || 0) +
+  const totalMinutes = (mcccStore.minCM || 0) +
       (mcccStore.minDS || 0) +
       (mcccStore.minTP || 0) +
       (mcccStore.minTD || 0) +
       (mcccStore.minDSTP || 0);
 
-  return formatHour(decimalTotal);
+  return formatHour(totalMinutes);
 });
 
 const handleBack = () => router.back();
@@ -49,26 +52,20 @@ const handleBack = () => router.back();
 const handleValidate = async () => {
   try {
     const safeAcsGrouped = mcccStore.acsGrouped || [];
-
     const currentTime = new Date().toLocaleTimeString('fr-FR');
-
     const formattedEditDate = `${mcccStore.editDate} ${currentTime}`;
-
     const formattedCreationDate = `${mcccStore.creationDate} ${currentTime}`;
 
     const payload = {
       resourceID: mcccStore.resourceID,
-
       minCM: mcccStore.minCM,
       minTD: mcccStore.minTD,
       minTP: mcccStore.minTP,
       minDS: mcccStore.minDS,
       minDSTP: mcccStore.minDSTP,
-
       saeCodes: (mcccStore.saeCodes || []).map(s => ({
         saeCode: s.saeNum || s.saeCode
       })),
-
       acsGrouped: safeAcsGrouped.flatMap(skill =>
           (skill.allLevels || []).map((lvl, lvlIdx) => ({
             ue: `UE${skill.skillNum}`,
@@ -79,15 +76,14 @@ const handleValidate = async () => {
             }))
           }))
       ),
-
       referents: (mcccStore.referents || []).map(r => ({
         firstname: r.firstname || r.firstName,
-        lastname: r.lastname || r.lastName
+        lastname: r.lastname || r.lastName,
+        isReferent: !!r.isReferent
       })),
-
       creationDate: formattedCreationDate,
       editDate: formattedEditDate,
-
+      year: mcccStore.year || getCurrentAcademicYear()
     };
 
     await api.post('/mccc/save', payload);
@@ -185,10 +181,10 @@ const handleCloseSuccess = () => {
       </div>
 
       <div class="summary-card" style="margin-top: 40px;">
-        <h2 class="card-title">Enseignants Référents</h2>
+        <h2 class="card-title">Enseignants</h2>
         <div v-if="mcccStore.referents && mcccStore.referents.length > 0" class="sae-list">
-          <div v-for="(prof, index) in mcccStore.referents" :key="index" class="sae-tag">
-            {{ prof.firstname }} {{ prof.lastname }}
+          <div v-for="(prof, index) in mcccStore.referents" :key="index" class="sae-tag" :class="{'referent-tag': prof.isReferent}">
+            {{ prof.firstname }} {{ prof.lastname }} {{ prof.isReferent ? '(Référent)' : '' }}
           </div>
         </div>
         <div v-else class="empty-table">Aucun enseignant associé.</div>
@@ -204,8 +200,6 @@ const handleCloseSuccess = () => {
           <span class="footer-value">{{ mcccStore.editDate || '--/--/----' }}</span>
         </div>
       </div>
-
-
 
       <div class="container-btn">
         <button @click="handleValidate" class="btn-sys primary">Valider et Sauvegarder</button>
@@ -319,6 +313,12 @@ const handleCloseSuccess = () => {
   font-weight: bold;
   font-size: 0.95rem;
   white-space: nowrap;
+}
+
+.referent-tag {
+  background: #B51621;
+  color: white;
+  border-color: #94121b;
 }
 
 .empty-table {

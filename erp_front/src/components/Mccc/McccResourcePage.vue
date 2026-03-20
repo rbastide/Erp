@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
-import {mcccStore} from '@/services/mcccStore';
+import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { mcccStore } from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -16,20 +16,48 @@ interface Resource {
 }
 
 const resources = ref<Resource[]>([]);
+const availableYears = ref<number[]>([]);
+const selectedYear = ref<number>(new Date().getFullYear());
 
-const fetchResources = async () => {
+const fetchYears = async () => {
   try {
-    const response = await api.get('/resources/resources');
-    resources.value = response.data;
+    const response = await api.get('/mccc/available-years');
+    availableYears.value = response.data.sort((a: number, b: number) => b - a);
+    if (availableYears.value.length > 0 && !availableYears.value.includes(selectedYear.value)) {
+      selectedYear.value = availableYears.value[0];
+    }
   } catch (error) {
-    console.error("Erreur lors du chargement des ressources:", error);
+    console.error("Erreur années:", error);
+  }
+};
+
+const fetchMcccsByYear = async () => {
+  try {
+    const response = await api.get(`/mccc/mcccs/${selectedYear.value}`);
+
+    resources.value = response.data.map((item: any) => {
+      return {
+        resourceID: item.resourceId.resourceID,
+        num: item.resourceId.num,
+        name: item.resourceId.name
+      };
+    });
+  } catch (error) {
+    console.error("Erreur ressources:", error);
+    resources.value = [];
   }
 };
 
 onMounted(() => {
-  fetchResources();
+  fetchMcccsByYear();
+  fetchYears();
   mcccStore.loadMcccStore();
   mcccStore.saveBackup();
+});
+
+watch(selectedYear, (newYear) => {
+  mcccStore.year = newYear;
+  fetchMcccsByYear();
 });
 
 const handleBack = () => {
@@ -40,6 +68,7 @@ const handleMccc = (code: string, id: number) => {
   mcccStore.loadMcccStore();
   mcccStore.resourceCode = code;
   mcccStore.resourceID = id;
+  mcccStore.year = selectedYear.value;
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 }
@@ -51,7 +80,19 @@ const handleMccc = (code: string, id: number) => {
     <AppHeader title="Choix ressources" />
 
     <main class="main-content">
-      <div class="section-title">Veuillez choisir la ressource :</div>
+      <div class="top-controls">
+        <div class="section-title">Veuillez choisir la ressource :</div>
+        <div class="year-filter-wrapper">
+          <div class="year-filter">
+            <label for="year-select">Année :</label>
+            <select id="year-select" v-model="selectedYear" class="year-select">
+              <option v-for="year in availableYears" :key="year" :value="year">
+                {{ year }} / {{ year + 1 }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       <div class="grid-container">
         <div
@@ -97,14 +138,52 @@ const handleMccc = (code: string, id: number) => {
   margin-top: 175px;
 }
 
-.section-title {
+.top-controls {
   width: 100%;
   max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 40px;
+}
+
+.section-title {
   font-size: 32px;
   font-weight: 400;
   color: #E92533;
-  text-align: left;
+}
+
+.year-filter-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.year-filter label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.year-select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
 }
 
 .grid-container {
@@ -178,10 +257,6 @@ const handleMccc = (code: string, id: number) => {
   font-style: italic;
 }
 
-.card-action:hover p {
-  color: #B51621;
-}
-
 .footer-actions {
   margin-top: 60px;
   width: 100%;
@@ -206,16 +281,15 @@ const handleMccc = (code: string, id: number) => {
 .quit-btn:hover {
   background-color: transparent;
   color: #B51621;
-  transform: scale(1.05);
 }
 
 @media (max-width: 750px) {
-  .section-title {
-    text-align: center;
-    font-size: 24px;
+  .top-controls {
+    flex-direction: column;
+    gap: 20px;
   }
-  .main-content {
-    margin-top: 150px;
+  .section-title {
+    font-size: 24px;
   }
 }
 </style>

@@ -51,10 +51,10 @@ public class McccController {
         this.connectionService = connectionService;
     }
 
-    @GetMapping("/mcccs")
+    @GetMapping("/mcccs/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getMccc(Authentication authentication) {
-        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartment(authentication.getName())
+    public ResponseEntity<?> getMccc(Authentication authentication, @PathVariable Integer year) {
+        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartmentAndYear(authentication.getName(), year)
                 .stream()
                 .map(McccResponse::new)
                 .toList();
@@ -92,8 +92,8 @@ public class McccController {
         ResponseEntity<Object> doCriticalConceptsHasCrashed = fillCriticalConcepts(dto, setCriticalConcepts);
         if (doCriticalConceptsHasCrashed != null) return doCriticalConceptsHasCrashed;
 
-
         mccc.setCriticalConceptsId(setCriticalConcepts);
+        mccc.setAcademicYearStart(dto.getYear());
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
@@ -226,16 +226,16 @@ public class McccController {
 
     @NotNull
     private CourseHours getCourseHoursFromDto(McccRequest dto) {
-        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getHoursDSTP(), dto.getMinDS());
+        Optional<CourseHours> allCourseHours = courseHoursService.findCourseHoursFromDatas(dto.getMinCM(), dto.getMinTD(), dto.getMinTP(), dto.getMinDSTP(), dto.getMinDS());
         if (allCourseHours.isEmpty()) {
-            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getHoursDSTP(), dto.getMinTP(), dto.getMinTD());
+            return new CourseHours(dto.getMinCM(), dto.getMinDS(), dto.getMinDSTP(), dto.getMinTP(), dto.getMinTD());
         }
         CourseHours courseHours = allCourseHours.get();
         courseHours.setNbMinCM(dto.getMinCM());
         courseHours.setNbMinTD(dto.getMinTD());
         courseHours.setNbMinTP(dto.getMinTP());
         courseHours.setNbMinDS(dto.getMinDS());
-        courseHours.setNbMinDSTP(dto.getHoursDSTP());
+        courseHours.setNbMinDSTP(dto.getMinDSTP());
         return courseHours;
     }
 
