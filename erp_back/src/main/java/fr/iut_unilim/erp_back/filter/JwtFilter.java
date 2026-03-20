@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.filter;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -31,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         String token = null;
+        boolean pdfRequest = request.getRequestURI() != null && request.getRequestURI().startsWith("/api/pdf/");
 
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
@@ -39,16 +41,30 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         }
+        if (pdfRequest) {
+            ErpBackApplication.LOGGER.info("PDF [auth] uri=" + request.getRequestURI() + ", jwtCookiePresent=" + (token != null));
+        }
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String username = jwtUtils.extractUsername(token);
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            try {
+                String username = jwtUtils.extractUsername(token);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            if (jwtUtils.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtUtils.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (pdfRequest) {
+                        ErpBackApplication.LOGGER.info("PDF [auth] authenticated user=" + username);
+                    }
+                } else if (pdfRequest) {
+                    ErpBackApplication.LOGGER.warning("PDF [auth] token invalide");
+                }
+            } catch (RuntimeException e) {
+                if (pdfRequest) {
+                    ErpBackApplication.LOGGER.warning("PDF [auth] échec lecture token: " + e.getMessage());
+                }
             }
         }
         filterChain.doFilter(request, response);

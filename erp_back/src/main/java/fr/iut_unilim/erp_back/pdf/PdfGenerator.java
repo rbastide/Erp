@@ -11,6 +11,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
@@ -21,7 +22,6 @@ import fr.iut_unilim.erp_back.pdf.view.PdfFormationInfo;
 import fr.iut_unilim.erp_back.pdf.view.PdfHeader;
 import fr.iut_unilim.erp_back.pdf.view.PdfPedalogicalContent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
@@ -35,39 +35,49 @@ import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createTitle;
 public class PdfGenerator {
     public final static DecimalFormat decimalFormat = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.FRANCE));
 
-    public static final String BASE_PATH = "src/main/resources/";
     private static final String IUT_ICON_PATH = "assets/logo_iut.png";
     public static final int DOCUMENT_FONT_SIZE = 10;
 
-    @Nullable
-    public static byte[] createPdf(ResourceSheetViewModel resourceSheet) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public static byte[] createPdf(ResourceSheetViewModel resourceSheet, String requestId) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        PdfWriter writer = new PdfWriter(baos);
+            PdfWriter writer = new PdfWriter(baos);
 
-        PdfDocument pdf = new PdfDocument(writer);
+            PdfDocument pdf = new PdfDocument(writer);
 
-        Document document = new Document(pdf);
-        document.setFontSize(DOCUMENT_FONT_SIZE);
-        FooterHandler handler = new FooterHandler(resourceSheet.resource().getNum(), new ArrayList<>());
-        pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
+            Document document = new Document(pdf);
+            document.setFontSize(DOCUMENT_FONT_SIZE);
+            FooterHandler handler = new FooterHandler(resourceSheet.resource().getNum(), new ArrayList<>());
+            pdf.addEventHandler(PdfDocumentEvent.END_PAGE, handler);
 
-        List<String> referancialTeachers = resourceSheet.teachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
-        String referencialTeachersString = String.join(", ", referancialTeachers);
+            List<String> referancialTeachers = resourceSheet.teachers().stream().map(PdfGenerator::mergeFirstNameAndLastName).toList();
+            String referencialTeachersString = String.join(", ", referancialTeachers);
 
-        if (!generateFirstPage(document, resourceSheet, referencialTeachersString)) return null;
+            if (!generateFirstPage(document, resourceSheet, referencialTeachersString)) {
+                throw new IllegalStateException("[" + requestId + "] Génération en-tête/page 1 impossible");
+            }
 
-        document.add(new AreaBreak());
+            document.add(new AreaBreak());
 
-        if (!generateSecondPage(document, resourceSheet)) return null;
+            if (!generateSecondPage(document, resourceSheet)) {
+                throw new IllegalStateException("[" + requestId + "] Génération page 2 impossible");
+            }
 
-        document.add(new AreaBreak());
+            document.add(new AreaBreak());
 
-        if (!generateThirdPage(document, resourceSheet, referencialTeachersString)) return null;
+            if (!generateThirdPage(document, resourceSheet, referencialTeachersString)) {
+                throw new IllegalStateException("[" + requestId + "] Génération page 3 impossible");
+            }
 
-        document.close();
-
-        return baos.toByteArray();
+            document.close();
+            byte[] pdfBytes = baos.toByteArray();
+            ErpBackApplication.LOGGER.info("PDF [" + requestId + "] génération terminée, taille: " + pdfBytes.length + " octets");
+            return pdfBytes;
+        } catch (RuntimeException e) {
+            ErpBackApplication.LOGGER.severe("PDF [" + requestId + "] échec de génération: " + e.getMessage());
+            throw e;
+        }
     }
 
     private static boolean generateFirstPage(Document document, ResourceSheetViewModel resourceSheet, String referencialTeachersString) {

@@ -10,7 +10,6 @@ import fr.iut_unilim.erp_back.pdf.utils.CellUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static fr.iut_unilim.erp_back.pdf.PdfGenerator.BASE_PATH;
 import static fr.iut_unilim.erp_back.pdf.utils.ImageDataUtils.createImageData;
 import static fr.iut_unilim.erp_back.pdf.utils.ParagraphUtils.createMultipleLinesParagraph;
 
@@ -20,9 +19,7 @@ public class PdfHeader {
 
     @Nullable
     public static Table create(String iconPath, @NotNull ResourceSheetViewModel resourceSheet) {
-        String imagePath = BASE_PATH + iconPath;
-
-        ImageData dataLogoIut = createImageData(imagePath);
+        ImageData dataLogoIut = createImageData(iconPath);
         if (dataLogoIut == null) return null;
 
         Image logoIut = new Image(dataLogoIut);
