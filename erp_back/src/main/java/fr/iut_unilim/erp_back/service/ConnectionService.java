@@ -2,10 +2,8 @@ package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.UserResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
-import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -16,37 +14,11 @@ import java.util.Optional;
 @Service
 public class ConnectionService {
     private final ConnectionRepository connectionRepository;
-    private final TeacherRepository teacherRepository;
     private final UniversityDepartmentService universityDepartmentService;
 
-    public ConnectionService(ConnectionRepository connectionRepository, TeacherRepository teacherRepository, UniversityDepartmentService universityDepartmentService) {
+    public ConnectionService(ConnectionRepository connectionRepository, UniversityDepartmentService universityDepartmentService) {
         this.connectionRepository = connectionRepository;
-        this.teacherRepository = teacherRepository;
         this.universityDepartmentService = universityDepartmentService;
-    }
-
-    public List<UserResponse> getAllConnections() {
-        List<Connection> connections = connectionRepository.findAll();
-        List<UserResponse> userResponses = new ArrayList<>();
-
-        for (Connection connection : connections) {
-
-            String lastname = teacherRepository.findLastnameByTeacherID(connection.getId());
-            String firstname = teacherRepository.findFirstnameByTeacherID(connection.getId());
-
-            if (lastname == null) lastname = "";
-            if (firstname == null) firstname = "";
-
-            userResponses.add(new UserResponse(
-                    connection.getId(),
-                    connection.getIdentifier(),
-                    connection.getRole().getRoleName(),
-                    connection.getEmail(),
-                    lastname,
-                    firstname
-            ));
-        }
-        return userResponses;
     }
 
     public List<UserResponse> getAllConnectionFromDepartment(@NotNull String identifier) {
@@ -81,20 +53,13 @@ public class ConnectionService {
     }
 
     private UserResponse convertToUserResponse(Connection connection) {
-        Teacher teacher = teacherRepository.findByUserID(connection.getId());
-        String lastname = teacher.getLastname();
-        String firstname = teacher.getFirstname();
-
-        if (lastname == null) lastname = "";
-        if (firstname == null) firstname = "";
-
         return new UserResponse(
                 connection.getId(),
                 connection.getIdentifier(),
                 connection.getRole().getRoleName(),
                 connection.getEmail(),
-                lastname,
-                firstname
+                connection.getLastName(),
+                connection.getFirstName()
         );
     }
 }

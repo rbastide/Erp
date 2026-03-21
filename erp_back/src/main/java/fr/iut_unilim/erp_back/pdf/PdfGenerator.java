@@ -12,7 +12,8 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import fr.iut_unilim.erp_back.ErpBackApplication;
-import fr.iut_unilim.erp_back.entity.Teacher;
+import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.TeacherResource;
 import fr.iut_unilim.erp_back.pdf.handlers.FooterHandler;
 import fr.iut_unilim.erp_back.pdf.model.ResourceSheetViewModel;
 import fr.iut_unilim.erp_back.pdf.parts.PdfDescription;
@@ -149,7 +150,8 @@ public class PdfGenerator {
     }
 
     @NotNull
-    private static String mergeFirstNameAndLastName(@NotNull Teacher teacher) {
-        return teacher.getFirstname() + " " + teacher.getLastname();
+    private static String mergeFirstNameAndLastName(@NotNull TeacherResource teacherResource) {
+        Connection teacher = teacherResource.getConnection();
+        return teacher.getFirstName() + " " + teacher.getLastName();
     }
 }

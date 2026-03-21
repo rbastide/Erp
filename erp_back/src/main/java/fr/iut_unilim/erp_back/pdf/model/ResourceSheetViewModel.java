@@ -16,7 +16,7 @@ public record ResourceSheetViewModel(
         Set<Sae> saes,
         Date creationDate,
         Date lastModificationDate,
-        Set<Teacher> teachers,
+        Set<TeacherResource> teachers,
         Set<CriticalConcept> criticalConcepts,
         List<EducationalContent> educationalContent,
         Set<Skill> skills) {

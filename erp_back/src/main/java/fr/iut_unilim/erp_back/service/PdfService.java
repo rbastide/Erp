@@ -82,14 +82,14 @@ public class PdfService {
         Date creationDate = resourceSheet.getCreationDate();
         Date lastModificationDate = resourceSheet.getLastModificationDate();
 
-        Set<Teacher> teachers = mccc.getReferencialTeacherId();
+        Set<TeacherResource> teachers = mccc.getTeacherResources();
 
         Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
         Set<Skill> skills = mcccService.getSkillsByResource(resource);
         return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalConcepts, skills);
     }
 
-    private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<Teacher> teachers,
+    private record McccDatas(Set<Sae> saes, Date creationDate, Date lastModificationDate, Set<TeacherResource> teachers,
                              Set<CriticalConcept> criticalConcepts, Set<Skill> skills) {
     }
 }

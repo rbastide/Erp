@@ -25,7 +25,7 @@ public record McccResponse(
                 mccc.getResourceId() == null ? null : new ResourceResponse(mccc.getResourceId()),
                 mapSaes(mccc.getSaesId()),
                 mapCriticalConcepts(mccc.getCriticalConceptsId()),
-                mapTeachers(mccc.getReferencialTeacherId()),
+                mapTeachers(mccc.getTeacherResources()),
                 mccc.getCreationDate(),
                 mccc.getLastModificationDate()
         );
@@ -44,9 +44,12 @@ public record McccResponse(
     }
 
 
-    private static List<TeacherResponse> mapTeachers(Set<Teacher> teachers) {
+    private static List<TeacherResponse> mapTeachers(Set<TeacherResource> teachers) {
         if (teachers == null) return List.of();
-        return teachers.stream().map(TeacherResponse::new).toList();
+        return teachers.stream().map(teacherResource -> new TeacherResponse(
+                teacherResource.getConnection().getLastName(),
+                teacherResource.getConnection().getFirstName()
+        )).toList();
     }
 
 
@@ -97,24 +100,6 @@ public record McccResponse(
             this(sae.getSaeID(), sae.getNum(), sae.getTitle());
         }
     }
-
-
-    public record TeacherResponse(
-            Long teacherID,
-            String lastname,
-            String firstname,
-            Long userID
-    ) {
-        public TeacherResponse(Teacher teacher) {
-            this(
-                    teacher.getTeacherID(),
-                    teacher.getLastname(),
-                    teacher.getFirstname(),
-                    teacher.getuserID()
-            );
-        }
-    }
-
 
     public record CriticalConceptResponse(
             Long criticalConceptID,

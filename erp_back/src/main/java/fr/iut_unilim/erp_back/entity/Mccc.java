@@ -38,19 +38,13 @@ public class Mccc {
     )
     private Set<CriticalConcept> criticalConceptsId;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "L_McccTeacher",
-            joinColumns = @JoinColumn(name = "mcccID"),
-            inverseJoinColumns = @JoinColumn(name = "teacherID")
-    )
-    private Set<Teacher> referencialTeacherId;
+    @OneToMany
+    @JoinColumn(name = "resourceID", referencedColumnName = "resourceID", insertable = false, updatable = false)
+    private Set<TeacherResource> teacherResources;
 
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
-
-
 
     private Date creationDate;
     private Date lastModificationDate;
@@ -58,12 +52,12 @@ public class Mccc {
     @JoinColumn(name ="academicYearStart")
     private Integer academicYearStart;
 
-    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<Teacher> referencialTeacherId, UniversityDepartment universityDepartment, Integer academicYearStart) {
+    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<TeacherResource> teacherResources, UniversityDepartment universityDepartment, Integer academicYearStart) {
         this.courseHoursId = courseHoursId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalConceptsId = criticalConceptsId;
-        this.referencialTeacherId = referencialTeacherId;
+        this.teacherResources = teacherResources;
         this.universityDepartment = universityDepartment;
         this.academicYearStart = academicYearStart;
     }
@@ -111,12 +105,12 @@ public class Mccc {
         this.criticalConceptsId = skillId;
     }
 
-    public Set<Teacher> getReferencialTeacherId() {
-        return referencialTeacherId;
+    public Set<TeacherResource> getTeacherResources() {
+        return teacherResources;
     }
 
-    public void setReferencialTeacherId(Set<Teacher> referencialTeacherId) {
-        this.referencialTeacherId = referencialTeacherId;
+    public void setTeacherResources(Set<TeacherResource> teacherResources) {
+        this.teacherResources = teacherResources;
     }
 
     public Date getCreationDate() {

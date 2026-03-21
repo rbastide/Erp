@@ -1,7 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.model.McccId;
 import fr.iut_unilim.erp_back.repository.McccRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,20 +18,12 @@ public class McccService {
         this.connectionService = connectionService;
     }
 
-    public Optional<Mccc> getMcccById(McccId id) {
-        return mcccRepository.findById(id);
-    }
-
     public Optional<Mccc> findById(Long id) {
         return mcccRepository.findByMcccId(id);
     }
 
     public void save(Mccc mccc) {
         mcccRepository.save(mccc);
-    }
-
-    public List<Mccc> getAllMccc() {
-        return mcccRepository.findAll();
     }
 
     public List<Mccc> getAllMcccFromDepartmentAndYear(@NotNull String identifier, Integer year) {
@@ -76,7 +67,14 @@ public class McccService {
     }
 
     public List<Long> getTeacherIdsByMcccId(Long mcccId) {
-        return mcccRepository.findTeacherIdsByMcccId(mcccId);
+        Optional<Mccc> mccc = mcccRepository.findByMcccId(mcccId);
+        if (mccc.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Mccc mcccEntity = mccc.get();
+        Set<TeacherResource> teacherResources = mcccEntity.getTeacherResources();
+        return teacherResources.stream().map(TeacherResource::getConnection).map(Connection::getId).toList();
     }
 
     public Set<Integer> getAllYears() {

@@ -6,12 +6,9 @@ import fr.iut_unilim.erp_back.dto.EditUserRequest;
 import fr.iut_unilim.erp_back.dto.LoginRequest;
 import fr.iut_unilim.erp_back.dto.RegisterRequest;
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Teacher;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
-import fr.iut_unilim.erp_back.repository.TeacherRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.RoleService;
-import fr.iut_unilim.erp_back.service.TeacherService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -35,17 +32,13 @@ public class AuthController {
     private final ConnectionService connectionService;
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
-    private final TeacherService teacherService;
-    private final TeacherRepository teacherRepository;
     private final RoleService roleService;
 
-    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, JwtUtils jwtUtils, AuthenticationManager authenticationManager, TeacherService teacherService, TeacherRepository teacherRepository, RoleService roleService) {
+    public AuthController(ConnectionRepository connectionRepository, ConnectionService connectionService, JwtUtils jwtUtils, AuthenticationManager authenticationManager, RoleService roleService) {
         this.connectionRepository = connectionRepository;
         this.connectionService = connectionService;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
-        this.teacherService = teacherService;
-        this.teacherRepository = teacherRepository;
         this.roleService = roleService;
     }
 
@@ -61,11 +54,10 @@ public class AuthController {
         user.setEmail(req.getEmail());
         user.setRole(roleService.createOrAccessRoleByRoleName(req.getRole()));
         user.setUniversityDepartment(req.getUniversityDepartment());
+        user.setFirstName(req.getFirstname());
+        user.setLastName(req.getLastname());
 
-
-        Connection connection = connectionRepository.save(user);
-        teacherService.createTeacherFromRegister(req, connection);
-
+        connectionRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -139,10 +131,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Impossible de supprimer votre propre compte");
         }
 
-        Teacher teacher = teacherService.getTeacherInfoByUser(id);
-        if (teacher != null) {
-            teacherRepository.delete(teacher);
-        }
         connectionRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
@@ -155,12 +143,7 @@ public class AuthController {
             return ResponseEntity.notFound().build();
         }
 
-        Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
-        if (teacher == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(Map.of("firstname", teacher.getFirstname(), "lastname", teacher.getLastname()));
+        return ResponseEntity.ok(Map.of("firstname", user.getFirstName(), "lastname", user.getLastName()));
     }
 
     @GetMapping("/user/department")
@@ -207,18 +190,12 @@ public class AuthController {
             return ResponseEntity.notFound().build();
         }
 
-        Teacher teacher = teacherService.getTeacherInfoByUser(user.getId());
-        if (teacher == null) {
-            return ResponseEntity.notFound().build();
-        }
         String roleName = user.getRole().getRoleName();
 
         return ResponseEntity.ok(Map.of(
                 "role", roleName,
-                "firstname", teacher.getFirstname(),
-                "lastname", teacher.getLastname()
+                "firstname", user.getFirstName(),
+                "lastname", user.getLastName()
         ));
     }
-
-
 }
