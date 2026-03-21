@@ -1,4 +1,2 @@
 /.idea/
-erp_back/.env
-erp_front/.env
-/.env
+.env
