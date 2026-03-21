@@ -126,8 +126,6 @@ public class CasSecurityConfig {
                     }
                 }
 
-                System.out.println(needUpdate);
-
                     if (needUpdate) {
                         connectionRepository.save(user);
                     }
