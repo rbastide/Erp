@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
-import api from "@/services/api.js";
+import api, {connectWithCas} from "@/services/api.js";
 
 const router = useRouter();
 const username = ref('');
@@ -38,7 +38,7 @@ const handleLogin = async () => {
 };
 
 const loginWithCAS = () => {
-  window.location.replace(`https://164.81.120.79:8449/login/cas`);
+  connectWithCas()
 };
 </script>
 

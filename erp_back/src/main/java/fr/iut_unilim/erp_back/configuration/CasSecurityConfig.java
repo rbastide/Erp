@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.cas.ServiceProperties;
-import org.springframework.security.cas.authentication.CasAssertionAuthenticationToken;
 import org.springframework.security.cas.authentication.CasAuthenticationProvider;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.cas.web.CasAuthenticationEntryPoint;
@@ -116,12 +115,12 @@ public class CasSecurityConfig {
                     }
 
                     if (attributes.containsKey("sn")) {
-                        user.setLastName((String) attributes.get("sn"));
+                        // TODO : user.setLastName((String) attributes.get("sn"));
                         needUpdate = true;
                     }
 
                     if (attributes.containsKey("givenName")) {
-                        user.setFirstName((String) attributes.get("givenName"));
+                        // TODO : user.setFirstName((String) attributes.get("givenName"));
                         needUpdate = true;
                     }
                 }

@@ -14,6 +14,16 @@ public class Connection {
     @Column(name = "identifier")
     private String identifier;
 
+    @Column(name = "hashedPassword")
+    private String hashedPassword;
+
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
 
     @ManyToOne
     @JoinColumn(name = "roleID")
@@ -22,12 +32,6 @@ public class Connection {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "firstName")
-    private String firstName;
-
-    @Column(name = "lastName")
-    private String lastName;
-
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
@@ -35,13 +39,11 @@ public class Connection {
     public Connection() {
     }
 
-    public Connection(String identifier,  Role role, String email, UniversityDepartment universityDepartment, String firstName, String lastName) {
+    public Connection(String identifier, Role role, String email, UniversityDepartment universityDepartment) {
         this.identifier = identifier;
         this.role = role;
         this.email = email;
         this.universityDepartment = universityDepartment;
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
 
     public Long getId() {
@@ -80,21 +82,5 @@ public class Connection {
 
     public void setUniversityDepartment(UniversityDepartment universityDepartment) {
         this.universityDepartment = universityDepartment;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 }

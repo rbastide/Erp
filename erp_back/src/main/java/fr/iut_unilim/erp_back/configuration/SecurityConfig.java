@@ -2,7 +2,6 @@ package fr.iut_unilim.erp_back.configuration;
 
 import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -27,9 +26,6 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
-
-    @Value("${FRONTEND_URL:http://localhost:5174}")
-    private String frontendUrl;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
         this.customUserDetailsService = customUserDetailsService;
