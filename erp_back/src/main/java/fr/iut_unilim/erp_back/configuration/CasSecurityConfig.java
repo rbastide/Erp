@@ -115,12 +115,12 @@ public class CasSecurityConfig {
                     }
 
                     if (attributes.containsKey("sn")) {
-                        // TODO : user.setLastName((String) attributes.get("sn"));
+                        user.setLastName((String) attributes.get("sn"));
                         needUpdate = true;
                     }
 
                     if (attributes.containsKey("givenName")) {
-                        // TODO : user.setFirstName((String) attributes.get("givenName"));
+                        user.setFirstName((String) attributes.get("givenName"));
                         needUpdate = true;
                     }
                 }

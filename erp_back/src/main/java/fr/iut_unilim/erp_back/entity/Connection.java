@@ -14,17 +14,6 @@ public class Connection {
     @Column(name = "identifier")
     private String identifier;
 
-    @Column(name = "hashedPassword")
-    private String hashedPassword;
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
     @ManyToOne
     @JoinColumn(name = "roleID")
     private Role role;
@@ -35,6 +24,12 @@ public class Connection {
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
+
+    @JoinColumn(name = "firstName")
+    private String firstName;
+
+    @JoinColumn(name = "lastName")
+    private String lastName;
 
     public Connection() {
     }
@@ -54,7 +49,6 @@ public class Connection {
         return identifier;
     }
 
-
     public Role getRole() {
         return role;
     }
@@ -62,7 +56,6 @@ public class Connection {
     public String getEmail() {
         return email;
     }
-
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
@@ -82,5 +75,21 @@ public class Connection {
 
     public void setUniversityDepartment(UniversityDepartment universityDepartment) {
         this.universityDepartment = universityDepartment;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

@@ -79,7 +79,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.getIdentifier(), req.getPassword())
+                    new UsernamePasswordAuthenticationToken(req.identifier(), "")
             );
             if (auth.isAuthenticated()) {
                 String subject = auth.getName();

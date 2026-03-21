@@ -7,7 +7,6 @@ import api, {connectWithCas} from "@/services/api.js";
 
 const router = useRouter();
 const username = ref('');
-const password = ref('');
 const errorMessage = ref('');
 const role = ref('');
 
@@ -17,8 +16,7 @@ const handleLogin = async () => {
 
   /** @type {LoginRequest} */
   const credentials = {
-    identifier: username.value,
-    password: password.value
+    identifier: username.value
   };
 
   try {
@@ -62,10 +60,6 @@ const loginWithCAS = () => {
       <div class="form-group">
         <label for="username">Identifiant</label>
         <input type="text" id="username" v-model="username" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" v-model="password" required />
       </div>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <button type="submit" class="login-button">Se connecter</button>
