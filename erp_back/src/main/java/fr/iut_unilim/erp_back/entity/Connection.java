@@ -14,8 +14,6 @@ public class Connection {
     @Column(name = "identifier")
     private String identifier;
 
-    @Column(name = "hashedPassword")
-    private String hashedPassword;
 
     @ManyToOne
     @JoinColumn(name = "roleID")
@@ -24,6 +22,12 @@ public class Connection {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "firstName")
+    private String firstName;
+
+    @Column(name = "lastName")
+    private String lastName;
+
     @ManyToOne
     @JoinColumn(name = "universityDepartmentID")
     private UniversityDepartment universityDepartment;
@@ -31,12 +35,13 @@ public class Connection {
     public Connection() {
     }
 
-    public Connection(String identifier, String hashedPassword, Role role, String email, UniversityDepartment universityDepartment) {
+    public Connection(String identifier,  Role role, String email, UniversityDepartment universityDepartment, String firstName, String lastName) {
         this.identifier = identifier;
-        this.hashedPassword = hashedPassword;
         this.role = role;
         this.email = email;
         this.universityDepartment = universityDepartment;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Long getId() {
@@ -47,9 +52,6 @@ public class Connection {
         return identifier;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
 
     public Role getRole() {
         return role;
@@ -59,9 +61,6 @@ public class Connection {
         return email;
     }
 
-    public void setPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
@@ -81,5 +80,21 @@ public class Connection {
 
     public void setUniversityDepartment(UniversityDepartment universityDepartment) {
         this.universityDepartment = universityDepartment;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }
