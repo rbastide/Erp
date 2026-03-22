@@ -2,7 +2,7 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -13,6 +13,9 @@ public class Mccc {
     @Column(name = "mcccID")
     private Long mcccId;
 
+    @JoinColumn(name = "academicYearStart")
+    private Integer academicYearStart;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "courseHoursID")
     private CourseHours courseHoursId;
@@ -20,7 +23,6 @@ public class Mccc {
     @ManyToOne
     @JoinColumn(name = "resourceID")
     private Resource resourceId;
-
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -38,27 +40,19 @@ public class Mccc {
     )
     private Set<CriticalConcept> criticalConceptsId;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "resourceID", referencedColumnName = "resourceID", insertable = false, updatable = false)
     private Set<TeacherResource> teacherResources;
 
-    @ManyToOne
-    @JoinColumn(name = "universityDepartmentID")
-    private UniversityDepartment universityDepartment;
+    private LocalDateTime creationDate;
+    private LocalDateTime lastModificationDate;
 
-    private Date creationDate;
-    private Date lastModificationDate;
-
-    @JoinColumn(name ="academicYearStart")
-    private Integer academicYearStart;
-
-    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<TeacherResource> teacherResources, UniversityDepartment universityDepartment, Integer academicYearStart) {
+    public Mccc(CourseHours courseHoursId, Resource resourceId, Set<Sae> saesId, Set<CriticalConcept> criticalConceptsId, Set<TeacherResource> teacherResources, Integer academicYearStart) {
         this.courseHoursId = courseHoursId;
         this.resourceId = resourceId;
         this.saesId = saesId;
         this.criticalConceptsId = criticalConceptsId;
         this.teacherResources = teacherResources;
-        this.universityDepartment = universityDepartment;
         this.academicYearStart = academicYearStart;
     }
 
@@ -113,25 +107,21 @@ public class Mccc {
         this.teacherResources = teacherResources;
     }
 
-    public Date getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
-    public Date getLastModificationDate() {
+    public LocalDateTime getLastModificationDate() {
         return lastModificationDate;
     }
 
-    public void setLastModificationDate(Date lastModificationDate) {
+    public void setLastModificationDate(LocalDateTime lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
     }
-
-    public UniversityDepartment getUniversityDepartment() { return universityDepartment; }
-
-    public void setUniversityDepartment(UniversityDepartment universityDepartmentId) { this.universityDepartment = universityDepartmentId; }
 
     public Integer getAcademicYearStart() {
         return academicYearStart;

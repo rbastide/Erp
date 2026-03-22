@@ -1,80 +1,130 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.repository.McccRepository;
+import fr.iut_unilim.erp_back.model.TeacherMccModel;
+import fr.iut_unilim.erp_back.repository.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class McccService {
     private final McccRepository mcccRepository;
-    private final ConnectionService connectionService;
+    private final ResourceRepository resourceRepository;
+    private final CourseHoursService courseHoursService;
+    private final SkillRepository skillRepository;
+    private final SaeRepository saeRepository;
+    private final TeacherResourceRepository teacherResourceRepository;
+    private final ConnectionRepository connectionRepository;
 
-    public McccService(McccRepository mcccRepository, ConnectionService connectionService) {
+    public McccService(McccRepository mcccRepository, ResourceRepository resourceRepository, CourseHoursService courseHoursService, SkillRepository skillRepository, SaeRepository saeRepository, TeacherResourceRepository teacherResourceRepository, ConnectionRepository connectionRepository) {
         this.mcccRepository = mcccRepository;
-        this.connectionService = connectionService;
+        this.resourceRepository = resourceRepository;
+        this.courseHoursService = courseHoursService;
+        this.skillRepository = skillRepository;
+        this.saeRepository = saeRepository;
+        this.teacherResourceRepository = teacherResourceRepository;
+        this.connectionRepository = connectionRepository;
     }
 
     public Optional<Mccc> findById(Long id) {
         return mcccRepository.findByMcccId(id);
     }
 
-    public void save(Mccc mccc) {
+    public Optional<Mccc> saveFromDto(McccRequest mcccRequest) {
+        Optional<Resource> resourceOptional = resourceRepository.findById(mcccRequest.resourceID());
+        if (resourceOptional.isEmpty()) return Optional.empty();
+
+        Optional<Mccc> mcccOptional = mcccRepository.findByResourceIdAndAcademicYearStart(resourceOptional.get(), mcccRequest.year());
+        Mccc mccc = mcccOptional.orElse(createNewMccc());
+        mccc.setLastModificationDate(LocalDateTime.now());
+        mccc.setResourceId(resourceOptional.get());
+        mccc.setAcademicYearStart(mcccRequest.year());
+        mccc.setCourseHoursId(getCorrespondingCourseHours(mcccRequest));
+
+        try {
+            mccc.setCriticalConceptsId(getCriticalConceptsFromDto(mcccRequest));
+            mccc.setSaesId(getSaesFromDto(mcccRequest));
+            mccc.setTeacherResources(getTeacherResourcesFromDto(mcccRequest, resourceOptional.get()));
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+
         mcccRepository.save(mccc);
-    }
 
-    public List<Mccc> getAllMcccFromDepartmentAndYear(@NotNull String identifier, Integer year) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
-        UniversityDepartment department = senderConnection.getUniversityDepartment();
-
-        return mcccRepository.findAllByUniversityDepartmentAndAcademicYearStart(department, year);
+        return Optional.of(mccc);
     }
 
     @NotNull
-    public Optional<Mccc> getCurrentMcccFromResource(Resource resource) {
-        return mcccRepository.findFirstByResourceIdOrderByLastModificationDateDesc(resource);
+    private Mccc createNewMccc() {
+        Mccc mccc = new Mccc();
+        mccc.setCreationDate(LocalDateTime.now());
+        return mccc;
     }
 
-    @Nullable
-    public Set<CriticalConcept> getCriticalConceptsByResource(@NotNull Resource resource) {
-        Optional<Mccc> currentMccc = getCurrentMcccFromResource(resource);
-        return currentMccc.map(Mccc::getCriticalConceptsId).orElse(null);
+    @NotNull
+    private CourseHours getCorrespondingCourseHours(McccRequest mcccRequest) {
+        return courseHoursService.findOrCreateCourseHoursFromHours(
+                mcccRequest.minCM(),
+                mcccRequest.minTD(),
+                mcccRequest.minTP(),
+                mcccRequest.minDSTP(),
+                mcccRequest.minDS()
+        );
     }
 
-    @Nullable
-    public Set<Skill> getSkillsByResource(@NotNull Resource resource) {
-        Set<CriticalConcept> criticalConcepts = getCriticalConceptsByResource(resource);
-
-        if (criticalConcepts == null) {
-            return null;
+    @NotNull
+    private Set<CriticalConcept> getCriticalConceptsFromDto(McccRequest mcccRequest) {
+        Set<CriticalConcept> criticalConcepts = new HashSet<>();
+        Long[] skillIds = mcccRequest.skillIDs();
+        for (Long skillId : skillIds) {
+            Optional<Skill> skillOptional = skillRepository.findById(skillId);
+            Skill skill = skillOptional.orElseThrow();
+            List<Rank> ranks = skill.getRanks();
+            for (Rank rank : ranks) {
+                List<CriticalConcept> criticalConceptsFromRank = rank.getCriticalConcepts();
+                criticalConcepts.addAll(criticalConceptsFromRank);
+            }
         }
 
-        Set<Skill> skills = new HashSet<>();
-        for (CriticalConcept criticalConcept : criticalConcepts) {
-            skills.add(criticalConcept.getRankID().getSkillID());
-        }
-
-        return skills;
+        return criticalConcepts;
     }
 
-    @Nullable
-    public Date getCreationDateFromId(@NotNull Long id) {
-        Optional<Mccc> mccc = mcccRepository.findByMcccId(id);
-        return mccc.map(Mccc::getCreationDate).orElse(null);
-    }
-
-    public List<Long> getTeacherIdsByMcccId(Long mcccId) {
-        Optional<Mccc> mccc = mcccRepository.findByMcccId(mcccId);
-        if (mccc.isEmpty()) {
-            return Collections.emptyList();
+    @NotNull
+    private Set<Sae> getSaesFromDto(McccRequest mcccRequest) {
+        Set<Sae> saes = new HashSet<>();
+        Long[] saeIds = mcccRequest.saeIDs();
+        for (Long saeId : saeIds) {
+            Optional<Sae> saeOptional = saeRepository.findById(saeId);
+            Sae sae = saeOptional.orElseThrow();
+            saes.add(sae);
         }
 
-        Mccc mcccEntity = mccc.get();
-        Set<TeacherResource> teacherResources = mcccEntity.getTeacherResources();
-        return teacherResources.stream().map(TeacherResource::getConnection).map(Connection::getId).toList();
+        return saes;
+    }
+
+    @NotNull
+    private Set<TeacherResource> getTeacherResourcesFromDto(McccRequest mcccRequest, Resource resource) {
+        Set<TeacherResource> teacherResources = new HashSet<>();
+        TeacherMccModel[] teacherMccModels = mcccRequest.teachers();
+        for (TeacherMccModel teacherMccModel : teacherMccModels) {
+            Optional<Connection> connectionOptional = connectionRepository.findById(teacherMccModel.teacherID());
+            Connection connection = connectionOptional.orElseThrow();
+            Optional<TeacherResource> teacherResourceOptional = teacherResourceRepository.findByConnectionAndResource(
+                    connection,
+                    resource
+            );
+            TeacherResource teacherResource = teacherResourceOptional.orElseGet(() ->
+                    new TeacherResource(connectionOptional.orElseThrow(), resource)
+            );
+            teacherResource.setIsManager(teacherMccModel.isManager());
+            teacherResources.add(teacherResource);
+        }
+
+        return teacherResources;
     }
 
     public Set<Integer> getAllYears() {
@@ -86,5 +136,23 @@ public class McccService {
         return years;
     }
 
+    public Optional<Mccc> getCurrentMcccFromResource(Resource resource, Integer academicYearStart) {
+        return mcccRepository.findByResourceIdAndAcademicYearStart(resource, academicYearStart);
+    }
 
+    public Set<Skill> getSkillsByResource(Resource resource, Integer academicYearStart) {
+        Optional<Mccc> mcccOptional = getCurrentMcccFromResource(resource, academicYearStart);
+        if (mcccOptional.isEmpty()) return null;
+
+        Mccc mccc = mcccOptional.get();
+        Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
+        Set<Skill> skills = new HashSet<>();
+        for (CriticalConcept criticalConcept : criticalConcepts) {
+            Rank rank = criticalConcept.getRankID();
+            Skill skill = rank.getSkillID();
+            skills.add(skill);
+        }
+
+        return skills;
+    }
 }

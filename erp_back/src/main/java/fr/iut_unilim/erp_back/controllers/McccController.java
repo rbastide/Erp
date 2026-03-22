@@ -1,22 +1,18 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
-import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.CourseHours;
-import fr.iut_unilim.erp_back.service.*;
+import fr.iut_unilim.erp_back.entity.Mccc;
+import fr.iut_unilim.erp_back.service.CourseHoursService;
+import fr.iut_unilim.erp_back.service.McccService;
+import fr.iut_unilim.erp_back.service.SaeService;
 import jakarta.transaction.Transactional;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.util.List;
 import java.util.Optional;
-
-import static fr.iut_unilim.erp_back.tools.utils.RegexManipulation.getFirstRegexOccurence;
 
 @RestController
 @RequestMapping("/api/mccc")
@@ -24,50 +20,29 @@ public class McccController {
 
     private final McccService mcccService;
     private final CourseHoursService courseHoursService;
-    private final ResourceService resourceService;
     private final SaeService saeService;
-    private final SkillService skillService;
-    private final RankService rankService;
-    private final CriticalConceptService criticalConceptService;
-    private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, CourseHoursService courseHoursService, ResourceService resourceService, SaeService saeService, SkillService skillService, RankService rankService, CriticalConceptService criticalConceptService, ConnectionService connectionService) {
+    public McccController(McccService mcccService, CourseHoursService courseHoursService, SaeService saeService) {
         this.mcccService = mcccService;
         this.courseHoursService = courseHoursService;
-        this.resourceService = resourceService;
         this.saeService = saeService;
-        this.skillService = skillService;
-        this.rankService = rankService;
-        this.criticalConceptService = criticalConceptService;
-        this.connectionService = connectionService;
     }
 
     @GetMapping("/mcccs/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMccc(Authentication authentication, @PathVariable Integer year) {
-        List<McccResponse> mcccResponses = mcccService.getAllMcccFromDepartmentAndYear(authentication.getName(), year)
-                .stream()
-                .map(McccResponse::new)
-                .toList();
-        return ResponseEntity.ok(mcccResponses);
+        return ResponseEntity.ok(null);
     }
 
     @PostMapping("/save")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     @Transactional
-    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) throws ParseException {
-        return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
-    }
-
-    @Nullable
-    private String extractCodeFromSkillTitle(@NotNull String skillTitle) {
-        String ueCode = getFirstRegexOccurence("[0-9]+", skillTitle);
-        if (ueCode == null) return null;
-
-        if (!skillService.doSkillNumExists(Integer.parseInt(ueCode))) {
-            return null;
+    public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
+        Optional<Mccc> hasBeenSaved = mcccService.saveFromDto(dto);
+        if (hasBeenSaved.isEmpty()) {
+            return ResponseEntity.badRequest().body("Une erreur est survenue lors de la sauvegarde de la MCCC");
         }
-        return ueCode;
+
+        return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
     }
 
     @GetMapping("/getTeachers")
@@ -109,14 +84,13 @@ public class McccController {
     @GetMapping("/getCreationDate/{id}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
-        return ResponseEntity.ok(mcccService.getCreationDateFromId(id));
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/getReferentIds/{id}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getReferentIds(@PathVariable Long id) {
-        List<Long> teacherIds = mcccService.getTeacherIdsByMcccId(id);
-        return ResponseEntity.ok(teacherIds);
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/available-years")

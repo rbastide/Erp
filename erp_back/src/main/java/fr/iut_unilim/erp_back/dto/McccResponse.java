@@ -3,7 +3,7 @@ package fr.iut_unilim.erp_back.dto;
 
 import fr.iut_unilim.erp_back.entity.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -15,8 +15,8 @@ public record McccResponse(
         List<SaeResponse> saesId,
         List<CriticalConceptResponse> criticalConceptsId,
         List<TeacherResponse> referencialTeacherId,
-        Date creationDate,
-        Date lastModificationDate
+        LocalDateTime creationDate,
+        LocalDateTime lastModificationDate
 ) {
     public McccResponse(Mccc mccc) {
         this(

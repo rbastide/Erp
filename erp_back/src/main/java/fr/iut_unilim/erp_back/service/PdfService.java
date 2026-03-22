@@ -43,7 +43,7 @@ public class PdfService {
 
         int semester = resource.getSemester();
 
-        Optional<Mccc> canHaveMccc = mcccService.getCurrentMcccFromResource(resource);
+        Optional<Mccc> canHaveMccc = mcccService.getCurrentMcccFromResource(resource, resourceSheet.getAcademicYearStart());
         if (canHaveMccc.isEmpty()) {
             throw new IllegalStateException("[" + requestId + "] MCCC introuvable pour la ressource " + resource.getNum());
         }
@@ -85,7 +85,7 @@ public class PdfService {
         Set<TeacherResource> teachers = mccc.getTeacherResources();
 
         Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
-        Set<Skill> skills = mcccService.getSkillsByResource(resource);
+        Set<Skill> skills = mcccService.getSkillsByResource(resource, resourceSheet.getAcademicYearStart());
         return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalConcepts, skills);
     }
 

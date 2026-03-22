@@ -134,7 +134,13 @@ public class ResourceSheetService {
         if (resource.isEmpty()) return false;
 
         resourceSheet.setResource(resource.get());
-        resourceSheet.setCourseHours(findOrCreateCourseHoursFromDtoRequest(resourceSheetRequest));
+        resourceSheet.setCourseHours(courseHoursService.findOrCreateCourseHoursFromHours(
+                resourceSheetRequest.courseHours().get("cm"),
+                resourceSheetRequest.courseHours().get("td"),
+                resourceSheetRequest.courseHours().get("tp"),
+                resourceSheetRequest.courseHours().get("ds_tp"),
+                resourceSheetRequest.courseHours().get("ds")
+        ));
 
         resourceSheetRepository.save(resourceSheet);
         return true;
@@ -201,17 +207,6 @@ public class ResourceSheetService {
             }
         }
         return educationalContents;
-    }
-
-    @NotNull
-    private CourseHours findOrCreateCourseHoursFromDtoRequest(ResourceSheetRequest resourceSheetRequest) {
-        float hoursCM = resourceSheetRequest.courseHours().get("cm");
-        float hoursTD = resourceSheetRequest.courseHours().get("td");
-        float hoursTP = resourceSheetRequest.courseHours().get("tp");
-        float hoursDSTP = resourceSheetRequest.courseHours().get("ds_tp");
-        float hoursDS = resourceSheetRequest.courseHours().get("ds");
-        Optional<CourseHours> courseHours = courseHoursService.findCourseHoursFromDatas(hoursCM, hoursTD, hoursTP, hoursDSTP, hoursDS);
-        return courseHours.orElseGet(() -> new CourseHours(hoursCM, hoursDS, hoursDSTP, hoursTP, hoursTD));
     }
 
     private void fillFeedbacks(ResourceSheetRequest resourceSheetRequest, ResourceSheet resourceSheet) {

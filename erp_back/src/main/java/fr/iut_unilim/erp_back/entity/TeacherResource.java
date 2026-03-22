@@ -1,15 +1,18 @@
 package fr.iut_unilim.erp_back.entity;
 
+import fr.iut_unilim.erp_back.model.TeacherResourceId;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "TeacherResource")
+@IdClass(TeacherResourceId.class)
 public class TeacherResource {
     @Id
     @ManyToOne
     @JoinColumn(name = "connectionID")
     private Connection connection;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "resourceID")
     private Resource resource;
