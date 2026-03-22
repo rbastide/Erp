@@ -18,8 +18,11 @@ export const mcccStore = reactive({
     acs: [],
     acsGrouped: [],
     referents: [],
+    /** @type {number[]} */
     saeIds: [],
+    /** @type {number[]} */
     skillIds: [],
+    /** @type {TeacherMccDto[]} */
     teacherIds: [],
 
     backup: null,
