@@ -1,10 +1,11 @@
-  <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { onMounted, ref } from 'vue';
+<script setup>
+import {useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import { mcccStore } from '@/services/mcccStore';
+import {mcccStore} from '@/services/mcccStore';
 import CancelModal from '../Information/CancelModal.vue';
+import api from '@/services/api';
 
 const router = useRouter();
 const showModal = ref(false);
@@ -41,10 +42,35 @@ const handleCompetences = () => {
   router.push('/mccc-skills');
 }
 
-onMounted(() => {
+const retrieveData = async () => {
+  try {
+    const mcccResponse = await api.get(`/mccc/${mcccStore.year}/${mcccStore.resourceID}`);
+    /** @type {McccResponse} */
+    const mcccData = mcccResponse.data;
+    mcccStore.resourceID = mcccData.resourceID;
+    mcccStore.resourceCode = mcccData.resourceCode;
+    mcccStore.minCM = mcccData.minCM;
+    mcccStore.minTD = mcccData.minTD;
+    mcccStore.minTP = mcccData.minTP;
+    mcccStore.minDS = mcccData.minDS;
+    mcccStore.minDSTP = mcccData.minDSTP;
+    mcccStore.saeIds = mcccData.saeIDs;
+    mcccStore.skillIds = mcccData.skillIDs;
+    mcccStore.teacherIds = mcccData.teachers;
+    mcccStore.creationDate = mcccData.creationDate;
+    mcccStore.editDate = mcccData.editDate;
+  } catch (error) {
+    console.log("Création d'un MCCC non existant");
+  }
+}
+
+onMounted(async () => {
   mcccStore.loadMcccStore();
   mcccStore.saveBackup();
   userRole.value = localStorage.getItem('user_role') || 'user';
+  await retrieveData()
+  mcccStore.registerMcccStore();
+  mcccStore.saveBackup();
 });
 
 </script>

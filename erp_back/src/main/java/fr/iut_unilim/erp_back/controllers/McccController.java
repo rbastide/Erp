@@ -4,6 +4,7 @@ import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.dto.ResourceResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Mccc;
+import fr.iut_unilim.erp_back.entity.McccResponse;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.McccService;
@@ -48,6 +49,18 @@ public class McccController {
         }
 
         return ResponseEntity.ok("MCCC sauvegardée/mise à jour avec succès !");
+    }
+
+    @GetMapping("/{year}/{resourceID}")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getMccc(@PathVariable Integer year, @PathVariable Long resourceID) {
+        Optional<Mccc> mcccOptional = mcccService.getCurrentMcccFromResource(resourceID, year);
+        if (mcccOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Mccc mccc = mcccOptional.get();
+        McccResponse mcccResponse = mcccService.convertToEntityToResponse(mccc);
+        return ResponseEntity.ok(mcccResponse);
     }
 
     @GetMapping("/getTeachers")

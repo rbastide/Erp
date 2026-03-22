@@ -2,13 +2,14 @@ package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.dto.ResourceResponse;
+import fr.iut_unilim.erp_back.dto.TeacherMccDto;
 import fr.iut_unilim.erp_back.entity.*;
-import fr.iut_unilim.erp_back.model.TeacherMccModel;
 import fr.iut_unilim.erp_back.repository.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -40,6 +41,7 @@ public class McccService {
         if (resourceOptional.isEmpty()) return Optional.empty();
 
         boolean isUniversityDepartmentValid = verifyUniversityDepartment(connection, resourceOptional.get());
+        if (!isUniversityDepartmentValid) return Optional.empty();
 
         Optional<Mccc> mcccOptional = mcccRepository.findByResourceIdAndAcademicYearStart(resourceOptional.get(), mcccRequest.year());
         Mccc mccc = mcccOptional.orElse(createNewMccc());
@@ -122,8 +124,8 @@ public class McccService {
     @NotNull
     private Set<TeacherResource> getTeacherResourcesFromDto(McccRequest mcccRequest, Resource resource) {
         Set<TeacherResource> teacherResources = new HashSet<>();
-        TeacherMccModel[] teacherMccModels = mcccRequest.teachers();
-        for (TeacherMccModel teacherMccModel : teacherMccModels) {
+        TeacherMccDto[] teacherMccModels = mcccRequest.teachers();
+        for (TeacherMccDto teacherMccModel : teacherMccModels) {
             Optional<Connection> connectionOptional = connectionRepository.findById(teacherMccModel.teacherID());
             Connection connection = connectionOptional.orElseThrow();
             Optional<TeacherResource> teacherResourceOptional = teacherResourceRepository.findByConnectionAndResource(
@@ -154,6 +156,12 @@ public class McccService {
         return mcccRepository.findByResourceIdAndAcademicYearStart(resource, academicYearStart);
     }
 
+    public Optional<Mccc> getCurrentMcccFromResource(Long resourceID, Integer academicYearStart) {
+        Optional<Resource> resourceOptional = resourceRepository.findById(resourceID);
+        if (resourceOptional.isEmpty()) return Optional.empty();
+        return getCurrentMcccFromResource(resourceOptional.get(), academicYearStart);
+    }
+
     public Set<Skill> getSkillsByResource(Resource resource, Integer academicYearStart) {
         Optional<Mccc> mcccOptional = getCurrentMcccFromResource(resource, academicYearStart);
         if (mcccOptional.isEmpty()) return null;
@@ -174,5 +182,30 @@ public class McccService {
         List<Mccc> correspondingMcccs = mcccRepository.findByAcademicYearStartAndUniversityDepartment(department, year);
 
         return correspondingMcccs.stream().map(Mccc::getResourceId).map(ResourceResponse::new).toList();
+    }
+
+    public McccResponse convertToEntityToResponse(Mccc mccc) {
+        Set<Sae> saes = mccc.getSaesId();
+        Set<Skill> skills = getSkillsByResource(mccc.getResourceId(), mccc.getAcademicYearStart());
+        Set<TeacherResource> teacherResources = mccc.getTeacherResources();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String creationDate = mccc.getCreationDate().format(formatter);
+        String lastModificationDate = mccc.getLastModificationDate().format(formatter);
+
+        return new McccResponse(
+                mccc.getResourceId().getResourceID(),
+                mccc.getResourceId().getNum(),
+                mccc.getCourseHoursId().getNbMinCM(),
+                mccc.getCourseHoursId().getNbMinTD(),
+                mccc.getCourseHoursId().getNbMinTP(),
+                mccc.getCourseHoursId().getNbMinDSTP(),
+                mccc.getCourseHoursId().getNbMinDS(),
+                mccc.getAcademicYearStart(),
+                saes.stream().map(Sae::getSaeID).toList(),
+                skills.stream().map(Skill::getSkillID).toList(),
+                teacherResources.stream().map(TeacherMccDto::new).toList(),
+                creationDate,
+                lastModificationDate
+        );
     }
 }

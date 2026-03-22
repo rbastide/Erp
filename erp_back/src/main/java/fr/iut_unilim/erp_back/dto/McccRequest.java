@@ -1,7 +1,5 @@
 package fr.iut_unilim.erp_back.dto;
 
-import fr.iut_unilim.erp_back.model.TeacherMccModel;
-
 public record McccRequest(Long resourceID,
                           Float minCM,
                           Float minTD,
@@ -11,5 +9,5 @@ public record McccRequest(Long resourceID,
                           Integer year,
                           Long[] saeIDs,
                           Long[] skillIDs,
-                          TeacherMccModel[] teachers) {
+                          TeacherMccDto[] teachers) {
 }

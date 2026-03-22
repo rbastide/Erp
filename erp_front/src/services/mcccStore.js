@@ -18,7 +18,9 @@ export const mcccStore = reactive({
     acs: [],
     acsGrouped: [],
     referents: [],
-
+    saeIds: [],
+    skillIds: [],
+    teacherIds: [],
 
     backup: null,
 
@@ -49,7 +51,10 @@ export const mcccStore = reactive({
             saeCodes: JSON.parse(JSON.stringify(this.saeCodes)),
             referents: JSON.parse(JSON.stringify(this.referents)),
             resourceCode: this.resourceCode,
-            resourceID: this.resourceID
+            resourceID: this.resourceID,
+            saeIds: JSON.parse(JSON.stringify(this.saeIds)),
+            skillIds: JSON.parse(JSON.stringify(this.skillIds)),
+            teacherIds: JSON.parse(JSON.stringify(this.teacherIds)),
         };
 
         this.backup = JSON.stringify(dataToSave);
@@ -73,6 +78,9 @@ export const mcccStore = reactive({
             this.referents = oldData.referents || [];
             this.resourceID = oldData.resourceID;
             this.resourceCode = oldData.resourceCode;
+            this.saeIds = oldData.saeIds || [];
+            this.skillIds = oldData.skillIds || [];
+            this.teacherIds = oldData.teacherIds || [];
 
             this.backup = null;
 
@@ -94,6 +102,9 @@ export const mcccStore = reactive({
         this.saeCodes = [];
         this.acsGrouped = [];
         this.referents = [];
+        this.saeIds = [];
+        this.skillIds = [];
+        this.teacherIds = [];
         this.backup = null;
         localStorage.removeItem("mcccStore");
     }
