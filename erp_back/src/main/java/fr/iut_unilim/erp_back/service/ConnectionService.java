@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -42,6 +43,11 @@ public class ConnectionService {
         connection.setUniversityDepartment(universityDepartment.get());
         connectionRepository.save(connection);
         return true;
+    }
+
+    public UniversityDepartment findByDepartmentFromAuthentification(Authentication authentication) {
+        Connection connection = findByIdentifier(authentication.getName());
+        return connection.getUniversityDepartment();
     }
 
     private List<UserResponse> convertToUserResponse(List<Connection> connections) {

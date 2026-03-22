@@ -1,6 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
+import fr.iut_unilim.erp_back.dto.McccResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.model.TeacherMccModel;
 import fr.iut_unilim.erp_back.repository.*;
@@ -34,9 +35,11 @@ public class McccService {
         return mcccRepository.findByMcccId(id);
     }
 
-    public Optional<Mccc> saveFromDto(McccRequest mcccRequest) {
+    public Optional<Mccc> saveFromDto(McccRequest mcccRequest, Connection connection) {
         Optional<Resource> resourceOptional = resourceRepository.findById(mcccRequest.resourceID());
         if (resourceOptional.isEmpty()) return Optional.empty();
+
+        boolean isUniversityDepartmentValid = verifyUniversityDepartment(connection, resourceOptional.get());
 
         Optional<Mccc> mcccOptional = mcccRepository.findByResourceIdAndAcademicYearStart(resourceOptional.get(), mcccRequest.year());
         Mccc mccc = mcccOptional.orElse(createNewMccc());
@@ -56,6 +59,16 @@ public class McccService {
         mcccRepository.save(mccc);
 
         return Optional.of(mccc);
+    }
+
+    private boolean verifyUniversityDepartment(@NotNull Connection connection, @NotNull Resource resource) {
+        UniversityDepartment universityDepartment = connection.getUniversityDepartment();
+        UniversityDepartment resourceUniversityDepartment = resource.getUniversityDepartment();
+        if (universityDepartment == null || resourceUniversityDepartment == null) return false;
+        Long universityDepartmentId = universityDepartment.getUniversityDepartmentID();
+        Long resourceUniversityDepartmentId = resourceUniversityDepartment.getUniversityDepartmentID();
+
+        return universityDepartmentId.equals(resourceUniversityDepartmentId);
     }
 
     @NotNull
@@ -127,6 +140,7 @@ public class McccService {
         return teacherResources;
     }
 
+    @NotNull
     public Set<Integer> getAllYears() {
         List<Mccc> mcccs = mcccRepository.findAll();
         Set<Integer> years = new HashSet<>();
@@ -154,5 +168,11 @@ public class McccService {
         }
 
         return skills;
+    }
+
+    public List<McccResponse> getMcccsByDepartmentAndYear(UniversityDepartment department, Integer year) {
+        List<Mccc> correspondingMcccs = mcccRepository.findByAcademicYearStartAndUniversityDepartment(department, year);
+
+        return correspondingMcccs.stream().map(McccResponse::new).toList();
     }
 }

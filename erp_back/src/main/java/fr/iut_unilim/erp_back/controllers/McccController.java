@@ -1,9 +1,11 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
-import fr.iut_unilim.erp_back.entity.CourseHours;
+import fr.iut_unilim.erp_back.dto.McccResponse;
+import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Mccc;
-import fr.iut_unilim.erp_back.service.CourseHoursService;
+import fr.iut_unilim.erp_back.entity.UniversityDepartment;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.McccService;
 import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,25 +21,28 @@ import java.util.Optional;
 public class McccController {
 
     private final McccService mcccService;
-    private final CourseHoursService courseHoursService;
     private final SaeService saeService;
+    private final ConnectionService connectionService;
 
-    public McccController(McccService mcccService, CourseHoursService courseHoursService, SaeService saeService) {
+    public McccController(McccService mcccService, SaeService saeService, ConnectionService connectionService) {
         this.mcccService = mcccService;
-        this.courseHoursService = courseHoursService;
         this.saeService = saeService;
+        this.connectionService = connectionService;
     }
 
     @GetMapping("/mcccs/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getMccc(Authentication authentication, @PathVariable Integer year) {
-        return ResponseEntity.ok(null);
+        UniversityDepartment universityDepartment = connectionService.findByDepartmentFromAuthentification(authentication);
+        List<McccResponse> mcccResponses = mcccService.getMcccsByDepartmentAndYear(universityDepartment, year);
+        return ResponseEntity.ok(mcccResponses);
     }
 
     @PostMapping("/save")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
-        Optional<Mccc> hasBeenSaved = mcccService.saveFromDto(dto);
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+        Optional<Mccc> hasBeenSaved = mcccService.saveFromDto(dto, connection);
         if (hasBeenSaved.isEmpty()) {
             return ResponseEntity.badRequest().body("Une erreur est survenue lors de la sauvegarde de la MCCC");
         }
@@ -55,13 +61,6 @@ public class McccController {
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getSaes(Authentication authentication) {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
-    }
-
-    @PostMapping("/saveHourlyVolume")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
-        courseHoursService.save(courseHours);
-        return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
     }
 
     @GetMapping("/getReferentIds/{id}")
