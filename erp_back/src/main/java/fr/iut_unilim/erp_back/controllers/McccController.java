@@ -6,7 +6,6 @@ import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.service.CourseHoursService;
 import fr.iut_unilim.erp_back.service.McccService;
 import fr.iut_unilim.erp_back.service.SaeService;
-import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -35,7 +34,7 @@ public class McccController {
     }
 
     @PostMapping("/save")
-    @Transactional
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveMccc(@RequestBody McccRequest dto, Authentication authentication) {
         Optional<Mccc> hasBeenSaved = mcccService.saveFromDto(dto);
         if (hasBeenSaved.isEmpty()) {
@@ -58,33 +57,11 @@ public class McccController {
         return ResponseEntity.ok(saeService.getAllSaesFromDepartment(authentication.getName()));
     }
 
-    @GetMapping("/getHourlyVolumes")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getCourseHours() {
-        return ResponseEntity.ok(courseHoursService.getAllCourseHours());
-    }
-
     @PostMapping("/saveHourlyVolume")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> saveCourseHours(@RequestBody CourseHours courseHours) {
         courseHoursService.save(courseHours);
         return ResponseEntity.ok("Volumes horaires mis à jour avec succès !");
-    }
-
-    @GetMapping("/getHourlyVolumesID/{id}")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getCourseHoursID(@PathVariable Long id) {
-        Optional<CourseHours> courseHours = courseHoursService.findById(id);
-        if (courseHours.isPresent()) {
-            return ResponseEntity.ok(courseHours.get());
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/getCreationDate/{id}")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getCreationDate(@PathVariable Long id) {
-        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/getReferentIds/{id}")
