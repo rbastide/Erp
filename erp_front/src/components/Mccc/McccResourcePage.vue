@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { mcccStore } from '@/services/mcccStore';
+import {onMounted, ref, watch} from 'vue';
+import {useRouter} from 'vue-router';
+import {mcccStore} from '@/services/mcccStore';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -37,9 +37,9 @@ const fetchMcccsByYear = async () => {
 
     resources.value = response.data.map((item: any) => {
       return {
-        resourceID: item.resourceId.resourceID,
-        num: item.resourceId.num,
-        name: item.resourceId.name
+        resourceID: item.resourceID,
+        num: item.num,
+        name: item.name
       };
     });
   } catch (error) {

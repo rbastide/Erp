@@ -1,7 +1,7 @@
 package fr.iut_unilim.erp_back.controllers;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
-import fr.iut_unilim.erp_back.dto.McccResponse;
+import fr.iut_unilim.erp_back.dto.ResourceResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
@@ -32,9 +32,9 @@ public class McccController {
 
     @GetMapping("/mcccs/{year}")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
-    public ResponseEntity<?> getMccc(Authentication authentication, @PathVariable Integer year) {
+    public ResponseEntity<?> getMcccResources(Authentication authentication, @PathVariable Integer year) {
         UniversityDepartment universityDepartment = connectionService.findByDepartmentFromAuthentification(authentication);
-        List<McccResponse> mcccResponses = mcccService.getMcccsByDepartmentAndYear(universityDepartment, year);
+        List<ResourceResponse> mcccResponses = mcccService.getMcccsByDepartmentAndYear(universityDepartment, year);
         return ResponseEntity.ok(mcccResponses);
     }
 

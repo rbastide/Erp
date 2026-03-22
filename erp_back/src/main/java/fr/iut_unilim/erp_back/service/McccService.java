@@ -1,7 +1,7 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.dto.McccRequest;
-import fr.iut_unilim.erp_back.dto.McccResponse;
+import fr.iut_unilim.erp_back.dto.ResourceResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.model.TeacherMccModel;
 import fr.iut_unilim.erp_back.repository.*;
@@ -170,9 +170,9 @@ public class McccService {
         return skills;
     }
 
-    public List<McccResponse> getMcccsByDepartmentAndYear(UniversityDepartment department, Integer year) {
+    public List<ResourceResponse> getMcccsByDepartmentAndYear(UniversityDepartment department, Integer year) {
         List<Mccc> correspondingMcccs = mcccRepository.findByAcademicYearStartAndUniversityDepartment(department, year);
 
-        return correspondingMcccs.stream().map(McccResponse::new).toList();
+        return correspondingMcccs.stream().map(Mccc::getResourceId).map(ResourceResponse::new).toList();
     }
 }
