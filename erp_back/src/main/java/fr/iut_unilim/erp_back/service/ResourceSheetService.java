@@ -52,6 +52,18 @@ public class ResourceSheetService {
         return resourceSheets;
     }
 
+    public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        List<ResourceSheet> resourceSheets = new ArrayList<>();
+        for (Resource resource : resourceRepository.findAllByUniversityDepartment(department)) {
+            resourceSheets.addAll(resourceSheetRepository.findAllByResource(resource));
+        }
+
+        return resourceSheets;
+    }
+
     public Optional<ResourceSheet> getResourceSheetForResourceFromYear(Long resourceID, int academicYearStart) {
         Optional<Resource> resource = resourceRepository.findById(resourceID);
         if (resource.isEmpty()) return Optional.empty();
@@ -149,6 +161,33 @@ public class ResourceSheetService {
 
     public List<HistoryResponse> getHistoryResponses(String identifier, Integer year) {
         List<ResourceSheet> sheets = getAllResourceSheetsFromDepartmentAndYear(identifier, year);
+        List<HistoryResponse> historyList = new ArrayList<>();
+
+        for (ResourceSheet sheet : sheets) {
+            Resource resource = sheet.getResource();
+            String code = resource.getNum();
+            String name = resource.getName();
+
+            Date dateToUse = sheet.getLastModificationDate() != null ?
+                    sheet.getLastModificationDate() : sheet.getCreationDate();
+
+            historyList.add(new HistoryResponse(
+                    sheet.getSheetID(),
+                    code,
+                    name,
+                    dateToUse,
+                    sheet.isValidate(),
+                    sheet.getAcademicYearStart()));
+        }
+
+        Collections.reverse(historyList);
+
+        return historyList;
+    }
+
+
+    public List<HistoryResponse> getAllHistoryResponses(String identifier) {
+        List<ResourceSheet> sheets = getAllResourceSheetsFromDepartment(identifier);
         List<HistoryResponse> historyList = new ArrayList<>();
 
         for (ResourceSheet sheet : sheets) {

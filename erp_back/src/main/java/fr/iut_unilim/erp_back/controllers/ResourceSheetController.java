@@ -78,6 +78,14 @@ public class ResourceSheetController {
         return ResponseEntity.ok(historyResponses);
     }
 
+    @GetMapping("/getResourceSheet/ALL")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<List<HistoryResponse>> getAllHistory(Authentication authentication) {
+        List<HistoryResponse> historyResponses = resourceSheetService.getAllHistoryResponses(authentication.getName());
+
+        return ResponseEntity.ok(historyResponses);
+    }
+
     @GetMapping("available-years")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getResourceSheetYears() {
