@@ -88,4 +88,9 @@ public class McccController {
         return ResponseEntity.ok(mcccService.getAllYears());
     }
 
+    @GetMapping("/mcccs/all")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<List<Mccc>> getAllMcccs() {
+        return ResponseEntity.ok(mcccService.getAllMcccs());
+    }
 }
