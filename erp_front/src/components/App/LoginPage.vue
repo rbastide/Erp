@@ -1,14 +1,16 @@
 <script setup>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
 import api, {connectWithCas} from "@/services/api.js";
+import {mcccStore} from "@/services/mcccStore.js";
 
 const router = useRouter();
 const username = ref('');
 const errorMessage = ref('');
 const role = ref('');
+const isDev = window.location.hostname === 'localhost';
 
 const handleLogin = async () => {
   await AuthService.logout();
@@ -38,6 +40,14 @@ const handleLogin = async () => {
 const loginWithCAS = () => {
   connectWithCas()
 };
+
+onMounted(() => {
+  console.log(window.location.hostname);
+  if(!isDev){
+    connectWithCas();
+  }
+});
+
 </script>
 
 <template>
