@@ -5,9 +5,9 @@ import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
 import api from '@/services/api'
 
-let isAdmin = false;
+// Correction de la réactivité pour le rôle
 const role = localStorage.getItem('user_role');
-isAdmin = role == 'Super-Admin';
+const isAdmin = ref(role === 'Super-Admin' || role === 'SUPER-ADMIN' || role === 'SUPER_ADMIN' || role === 'ADMIN');
 
 const router = useRouter()
 const route = useRoute()
@@ -97,6 +97,28 @@ const totalGlobal = computed(() => {
 })
 
 const handleFermer = () => router.back()
+
+// --- FONCTION DE VALIDATION AJOUTÉE ICI ---
+const handleValidate = async () => {
+  const id = route.query.id;
+
+  if (!id) return;
+
+  if (!confirm(`Es-tu sûr de vouloir valider la fiche ${resourceCode.value} ?`)) {
+    return;
+  }
+
+  try {
+    await api.put(`resourceSheet/validate/${id}`);
+
+    alert("La fiche a été validée avec succès !");
+    router.back();
+
+  } catch (error) {
+    console.error("Erreur lors de la validation :", error);
+    alert("Une erreur est survenue lors de la validation.");
+  }
+}
 
 const handleExport = async () => {
   try {
@@ -214,6 +236,9 @@ const hourConfig = {
       <div class="actions-footer">
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
         <button @click="handleFermer" class="btn btn-outline">Retour</button>
+
+        <button @click="handleValidate" class="btn btn-success">Valider la fiche</button>
+
         <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier la fiche</button>
       </div>
     </div>
@@ -426,6 +451,18 @@ const hourConfig = {
 .btn-dark {
   background: #334155;
   color: white;
+}
+
+/* --- CLASSE CSS AJOUTÉE POUR LE BOUTON VERT --- */
+.btn-success {
+  background-color: #2e7d32;
+  color: white;
+  border: 2px solid #2e7d32;
+}
+
+.btn-success:hover {
+  background-color: #1b5e20;
+  border-color: #1b5e20;
 }
 
 .btn:hover {
