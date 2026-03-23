@@ -208,4 +208,8 @@ public class McccService {
                 lastModificationDate
         );
     }
+
+    public List<Mccc> getAllMcccs() {
+        return mcccRepository.findAll();
+    }
 }
