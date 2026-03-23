@@ -13,7 +13,8 @@ const isLoading = ref(true);
 const showDeleteModal = ref(false);
 const itemToDelete = ref<{ id: number, code: string } | null>(null);
 const userRole = ref('');
-const selectedYear = ref(new Date().getFullYear());
+
+const selectedYear = ref<number | string>(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
 
 const formatDate = (dateString: string) => {
@@ -29,8 +30,9 @@ const fetchAvailableYears = async () => {
     const yearsNumbers = yearsData.map((item: any) => item.year === undefined ? item : item.year);
     const uniqueYears = [...new Set(yearsNumbers)].sort((a: any, b: any) => b - a) as number[];
     availableYears.value = uniqueYears;
-    if (uniqueYears.length > 0 && !uniqueYears.includes(selectedYear.value)) {
-      selectedYear.value = uniqueYears[0];
+
+    if (uniqueYears.length > 0 && !uniqueYears.includes(selectedYear.value as number)) {
+      selectedYear.value = "ALL";
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des années disponibles :", error);
@@ -40,16 +42,18 @@ const fetchAvailableYears = async () => {
 
 const getRole = () => {
   const role = localStorage.getItem('user_role');
-  userRole.value = role.toUpperCase() || 'Not Found';
+  userRole.value = role?.toUpperCase() || 'Not Found';
 };
 
 
 const fetchHistory = async () => {
   try {
     isLoading.value = true;
+
     const response = await api.get(`/resourceSheet/getHistory/${selectedYear.value}`);
+
     historyItems.value = response.data;
-    historyItems.value = historyItems.value.filter((item: any) => item.isValidate === true)
+    historyItems.value = historyItems.value.filter((item: any) => item.isValidate === true);
   } catch (error) {
     console.error("Erreur chargement historique :", error);
     historyItems.value = [];
@@ -86,7 +90,7 @@ const handleShow = (item: any) => {
       id: item.sheetID,
       code: item.resourceCode,
       date: formatDate(item.date),
-      year: selectedYear.value
+      year: item.academicYearStart
     }
   });
 };
@@ -142,6 +146,7 @@ const clearSearch = () => searchQuery.value = '';
         <div class="year-filter">
           <label for="year-select">Année académique :</label>
           <select id="year-select" v-model="selectedYear" class="year-select">
+            <option value="ALL">Toutes les fiches (Toutes années)</option>
             <option v-for="year in availableYears" :key="year" :value="year">
               {{ year }} / {{ year + 1 }}
             </option>
@@ -156,7 +161,10 @@ const clearSearch = () => searchQuery.value = '';
 
         <div v-else-if="filteredVersions.length === 0" class="no-result">
           <p v-if="searchQuery">Aucune fiche trouvée pour "<strong>{{ searchQuery }}</strong>"</p>
-          <p v-else>Aucun historique disponible pour l'année {{ selectedYear }}.</p>
+          <p v-else>Aucun historique disponible pour
+            <span v-if="selectedYear === 'ALL'">le moment.</span>
+            <span v-else>l'année {{ selectedYear }}.</span>
+          </p>
           <button v-if="searchQuery" @click="clearSearch" class="btn-clear-link">Réinitialiser la recherche</button>
         </div>
 
@@ -175,6 +183,10 @@ const clearSearch = () => searchQuery.value = '';
               </div>
             </div>
 
+            <div v-if="selectedYear === 'ALL'" class="year-badge">
+              {{ item.academicYearStart }} / {{ item.academicYearStart + 1 }}
+            </div>
+
             <button class="btn-icon-container" @click.stop="handleExportPdf(item.sheetID, item.resourceCode)"
                     title="Exporter en PDF">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="24" height="24" class="bi bi-file-earmark-arrow-down btn-icon" viewBox="0 0 16 16">
@@ -184,7 +196,7 @@ const clearSearch = () => searchQuery.value = '';
             </button>
 
             <button
-                v-if="userRole.valueOf() === 'ADMIN' || userRole.valueOf() === 'SUPER-ADMIN'"
+                v-if="userRole === 'ADMIN' || userRole === 'SUPER-ADMIN'"
                 class="btn-icon-container delete"
                 @click.stop="handleDelete(item.sheetID || item.id, item.resourceCode)"
                 title="Supprimer la fiche"
@@ -330,6 +342,18 @@ const clearSearch = () => searchQuery.value = '';
   font-size: 0.9rem;
   color: #64748b;
   font-weight: 400;
+}
+
+.year-badge {
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-left: 15px;
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 .btn-icon-container {

@@ -78,7 +78,7 @@ public class ResourceSheetController {
         return ResponseEntity.ok(historyResponses);
     }
 
-    @GetMapping("/getResourceSheet/ALL")
+    @GetMapping("/getHistory/ALL")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<List<HistoryResponse>> getAllHistory(Authentication authentication) {
         List<HistoryResponse> historyResponses = resourceSheetService.getAllHistoryResponses(authentication.getName());
