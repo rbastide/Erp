@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.TeacherResource;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.McccRepository;
+import fr.iut_unilim.erp_back.repository.UniversityDepartmentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,10 +18,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class AutomaticMailService {
+    private static final String ROLE_PROFESSEUR = "Professeur";
+    private static final String ROLE_VACATAIRE = "Vacataire";
+    private static final Set<String> TARGET_ROLE_NAMES = Set.of(
+            ROLE_PROFESSEUR.toUpperCase(),
+            ROLE_VACATAIRE.toUpperCase()
+    );
 
     private final JavaMailSender mailSender;
     private final ConnectionRepository connectionRepository;
     private final McccRepository mcccRepository;
+    private final ConnectionService connectionService;
+    private final UniversityDepartmentRepository universityDepartmentRepository;
 
     @Value("${mail.from}")
     private String from;
@@ -31,10 +40,12 @@ public class AutomaticMailService {
     @Value("${mail.subject}")
     private String subject;
 
-    public AutomaticMailService(JavaMailSender mailSender, ConnectionRepository connectionRepository, McccRepository mcccRepository) {
+    public AutomaticMailService(JavaMailSender mailSender, ConnectionRepository connectionRepository, McccRepository mcccRepository, ConnectionService connectionService, UniversityDepartmentRepository universityDepartmentRepository) {
         this.mailSender = mailSender;
         this.connectionRepository = connectionRepository;
         this.mcccRepository = mcccRepository;
+        this.connectionService = connectionService;
+        this.universityDepartmentRepository = universityDepartmentRepository;
     }
 
     //NE PAS SUPPRIMER LE SCHEDULER
@@ -76,19 +87,17 @@ public class AutomaticMailService {
     @Transactional(readOnly = true)
     public AutomaticMailAudience getAutomaticMailAudience() {
         int academicYearStart = getCurrentAcademicYearStart();
-        List<Connection> allConnections = connectionRepository.findAll();
-        Set<Long> teacherUserIds = allConnections.stream()
-                .filter(this::isTeacherConnection)
-                .map(Connection::getId)
+        List<Connection> teachersAndVacataires = getTeacherAndVacataireConnections();
+        Map<Long, Connection> connectionByUserId = teachersAndVacataires.stream()
+                .collect(Collectors.toMap(Connection::getId, connection -> connection, (existing, replacement) -> existing));
+
+        Set<Long> teacherUserIds = connectionByUserId.keySet().stream()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         if (teacherUserIds.isEmpty()) {
             return new AutomaticMailAudience(academicYearStart, List.of(), List.of(), List.of(), List.of());
         }
-
-        Map<Long, Connection> connectionByUserId = allConnections.stream()
-                .filter(connection -> teacherUserIds.contains(connection.getId()))
-                .collect(Collectors.toMap(Connection::getId, connection -> connection));
 
         Set<Long> fillerUserIds = new LinkedHashSet<>();
         Set<Long> validatorUserIds = new LinkedHashSet<>();
@@ -146,13 +155,30 @@ public class AutomaticMailService {
         return email != null && !email.isBlank();
     }
 
-    private boolean isTeacherConnection(Connection connection) {
+    private boolean isTargetRoleConnection(Connection connection) {
         if (connection == null || connection.getRole() == null || connection.getRole().getRoleName() == null) {
             return false;
         }
 
         String roleName = connection.getRole().getRoleName().trim().toUpperCase();
-        return roleName.contains("TEACHER") || roleName.contains("VACATAIRE");
+        return TARGET_ROLE_NAMES.contains(roleName);
+    }
+
+    private List<Connection> getTeacherAndVacataireConnections() {
+        LinkedHashSet<Connection> connections = new LinkedHashSet<>();
+        String[] roleNames = {ROLE_PROFESSEUR, ROLE_VACATAIRE};
+
+        universityDepartmentRepository.findAll().forEach(department -> {
+            try {
+                connections.addAll(connectionService.getAllConnectionsFromDepartmentAndRoleNames(department, roleNames));
+            } catch (RuntimeException ignored) {
+                // Fallback local strict sur role.roleName si la récupération par noms échoue.
+                List<Connection> departmentConnections = connectionRepository.findAllByUniversityDepartment(department);
+                connections.addAll(departmentConnections.stream().filter(this::isTargetRoleConnection).toList());
+            }
+        });
+
+        return new ArrayList<>(connections);
     }
 
     private int getCurrentAcademicYearStart() {
