@@ -4,8 +4,9 @@ import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
 import api from '@/services/api'
+import ErrorValidationModal from "@/components/Information/ErrorValidationModal.vue";
+import ValidationSavedModal from "@/components/Information/ValidationSavedModal.vue";
 
-// Correction de la réactivité pour le rôle
 const role = localStorage.getItem('user_role');
 const isAdmin = ref(role === 'Super-Admin' || role === 'SUPER-ADMIN' || role === 'SUPER_ADMIN' || role === 'ADMIN');
 
@@ -15,6 +16,9 @@ const route = useRoute()
 const resourceCode = ref('')
 const resourceDate = ref('')
 const academicYear = ref<number>(2025)
+
+const showError = ref(false);
+const showSuccess = ref(false);
 
 const hours = ref({
   cm: 0, td: 0, tp: 0, ds: 0, ds_tp: 0, student: 0
@@ -57,7 +61,6 @@ const fetchSheetData = async () => {
     contents.value.studentFeedback = sheet.studentFeedbacks || '';
     contents.value.upgrades = sheet.improvementIdeas || '';
 
-    // Si l'année est stockée dans la fiche reçue, on met à jour l'affichage
     if (sheet.academicYearStart) {
       academicYear.value = sheet.academicYearStart;
     }
@@ -98,7 +101,6 @@ const totalGlobal = computed(() => {
 
 const handleFermer = () => router.back()
 
-// --- FONCTION DE VALIDATION AJOUTÉE ICI ---
 const handleValidate = async () => {
   const id = route.query.id;
 
@@ -110,13 +112,11 @@ const handleValidate = async () => {
 
   try {
     await api.put(`resourceSheet/validate/${id}`);
-
-    alert("La fiche a été validée avec succès !");
-    router.back();
+    showSuccess.value = true;
 
   } catch (error) {
     console.error("Erreur lors de la validation :", error);
-    alert("Une erreur est survenue lors de la validation.");
+    showError.value = !showError.value;
   }
 }
 
@@ -155,6 +155,14 @@ const hourConfig = {
   <AppHeader title="Consultation Ressource" :inline="`${resourceCode}`" />
 
   <main class="main-content">
+    <ErrorValidationModal
+        v-if="showError"
+        @close="showError = false"
+    />
+    <ValidationSavedModal
+        v-if="showSuccess"
+        @close="showSuccess = false"
+    />
     <div class="container">
 
       <section class="form-card year-display-card">
@@ -260,7 +268,6 @@ const hourConfig = {
   max-width: 900px;
 }
 
-/* Styles spécifique Année */
 .year-display-card {
   padding: 20px 35px !important;
   margin-bottom: 20px;
