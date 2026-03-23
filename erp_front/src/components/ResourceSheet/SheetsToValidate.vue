@@ -91,8 +91,23 @@ const handleShow = (item: any) => {
   });
 };
 
-const handleValidateSheet = (item: any) => {
-  console.log(`Fiche validée : ${item.resourceCode}`);
+const handleValidateSheet = async (item: any) => {
+  const id = item.sheetID || item.id;
+
+  if(!confirm(`Etes-vous sûr de vouloir valider la fiche ${item.resourceCode} ?`)){
+    return;
+  }
+
+  try {
+    await api.put(`resourceSheet/validate/${id}`);
+
+    historyItems.value = historyItems.value.filter((hItem: any) => (hItem.sheetID || hItem.id) !== id);
+
+    console.log(`Fiche validée : ${item.resourceCode}`);
+  } catch(error){
+    console.error("Erreur lors de la validation de la fiche :", error);
+    alert("Une erreur est survenue lors de la validation.");
+  }
 };
 
 const handleDelete = (id: number, code: string) => {
