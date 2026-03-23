@@ -1,9 +1,12 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.dto.TeacherResponse;
 import fr.iut_unilim.erp_back.dto.UserResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
+import fr.iut_unilim.erp_back.entity.Role;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,12 @@ import java.util.Optional;
 public class ConnectionService {
     private final ConnectionRepository connectionRepository;
     private final UniversityDepartmentService universityDepartmentService;
+    private final RoleRepository roleRepository;
 
-    public ConnectionService(ConnectionRepository connectionRepository, UniversityDepartmentService universityDepartmentService) {
+    public ConnectionService(ConnectionRepository connectionRepository, UniversityDepartmentService universityDepartmentService, RoleRepository roleRepository) {
         this.connectionRepository = connectionRepository;
         this.universityDepartmentService = universityDepartmentService;
+        this.roleRepository = roleRepository;
     }
 
     public List<UserResponse> getAllConnectionFromDepartment(@NotNull String identifier) {
@@ -49,7 +54,23 @@ public class ConnectionService {
         Connection connection = findByIdentifier(authentication.getName());
         return connection.getUniversityDepartment();
     }
+    
+    public List<Connection> getAllConnectionsFromDepartmentAndRoleNames(@NotNull UniversityDepartment department, @NotNull String[] roleNames) {
+        List<Connection> connections = new ArrayList<>();
+        for (String roleName : roleNames) {
+            Optional<Role> roleOptional = roleRepository.findByRoleName(roleName);
+            if (roleOptional.isEmpty()) throw new RuntimeException("Role " + roleName + " non trouvé");
+            List<Connection> connectionsFromRole = connectionRepository.findAllByUniversityDepartmentAndRole(department, roleOptional.get());
+            connections.addAll(connectionsFromRole);
+        }
 
+        return connections;
+    }
+
+    public List<TeacherResponse> convertEntityToTeacherResponse(@NotNull List<Connection> connections) {
+        return connections.stream().map(TeacherResponse::new).toList();
+    }
+    
     private List<UserResponse> convertToUserResponse(List<Connection> connections) {
         List<UserResponse> userResponses = new ArrayList<>();
         for (Connection connection : connections) {

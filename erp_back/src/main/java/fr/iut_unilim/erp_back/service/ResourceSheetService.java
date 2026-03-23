@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.*;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,18 @@ public class ResourceSheetService {
         List<ResourceSheet> resourceSheets = new ArrayList<>();
         for (Resource resource : resourceRepository.findAllByUniversityDepartment(department)) {
             resourceSheets.addAll(resourceSheetRepository.findAllByResourceAndAcademicYearStart(resource, year));
+        }
+
+        return resourceSheets;
+    }
+
+    public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
+        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        UniversityDepartment department = senderConnection.getUniversityDepartment();
+
+        List<ResourceSheet> resourceSheets = new ArrayList<>();
+        for (Resource resource : resourceRepository.findAllByUniversityDepartment(department)) {
+            resourceSheets.addAll(resourceSheetRepository.findAllByResource(resource));
         }
 
         return resourceSheets;
@@ -172,6 +185,33 @@ public class ResourceSheetService {
         return historyList;
     }
 
+
+    public List<HistoryResponse> getAllHistoryResponses(String identifier) {
+        List<ResourceSheet> sheets = getAllResourceSheetsFromDepartment(identifier);
+        List<HistoryResponse> historyList = new ArrayList<>();
+
+        for (ResourceSheet sheet : sheets) {
+            Resource resource = sheet.getResource();
+            String code = resource.getNum();
+            String name = resource.getName();
+
+            Date dateToUse = sheet.getLastModificationDate() != null ?
+                    sheet.getLastModificationDate() : sheet.getCreationDate();
+
+            historyList.add(new HistoryResponse(
+                    sheet.getSheetID(),
+                    code,
+                    name,
+                    dateToUse,
+                    sheet.isValidate(),
+                    sheet.getAcademicYearStart()));
+        }
+
+        Collections.reverse(historyList);
+
+        return historyList;
+    }
+
     @Nullable
     private ResourceSheet createOrExtractResourceSheetFromRequest(ResourceSheetRequest resourceSheetRequest) {
         ResourceSheet resourceSheet;
@@ -221,5 +261,31 @@ public class ResourceSheetService {
         resourceSheet.setImprovementIdeas(improvementIdeaOptional.orElseGet(() -> new ImprovementIdea(sanitizedImprovementIdea)));
         resourceSheet.setStudentFeedbacks(studentFeedbackOptional.orElseGet(() -> new StudentFeedback(sanitizedStudentFeedback)));
         resourceSheet.setTeacherFeedbacks(teacherFeedbackOptional.orElseGet(() -> new TeacherFeedback(sanitizedTeacherFeedback)));
+    }
+
+    public Set<Long> getResourceSheetNonValidate() {
+        List<ResourceSheet> resourceSheets = resourceSheetRepository.findAll();
+        Set<Long> NonValidate = new HashSet<>();
+        for (ResourceSheet resourceSheet : resourceSheets) {
+            if(!resourceSheet.isValidate()) {
+                NonValidate.add(resourceSheet.getSheetID());
+            }
+        }
+        return NonValidate;
+
+    }
+    @Transactional
+    public boolean validateSheet(Long id) {
+        Optional<ResourceSheet> sheetOptional = resourceSheetRepository.findById(id);
+
+        if(sheetOptional.isPresent()) {
+            ResourceSheet resourceSheet = sheetOptional.get();
+
+            resourceSheet.setValidate(true);
+
+            resourceSheetRepository.save(resourceSheet);
+            return true;
+        }
+        return false;
     }
 }

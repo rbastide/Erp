@@ -1,26 +1,36 @@
-<script setup>
-const emit = defineEmits(['close']);
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { onMounted, ref } from "vue";
 
-const onClose = () => emit('close');
+const router = useRouter();
+const userRole = ref('');
+
+onMounted(() => {
+  const role = localStorage.getItem('user_role');
+  userRole.value = role ? role.toUpperCase() : 'USER';
+});
+
+const handleBack = () => {
+  router.push('/home');
+};
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="onClose">
+  <div class="modal-overlay">
     <div class="modal-card">
 
-      <div class="icon-circle error">
+      <div class="icon-circle success">
         <svg width="60" height="60" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
 
-      <h2>Une erreur est survenue !</h2>
-      <p class="sub-text">La sauvegarde n'a pas pu être effectuée. Veuillez vérifier votre connexion ou réessayer.</p>
+      <h2>Sauvegarde réussie !</h2>
+      <p class="sub-text">La validation a bien été effectuée.</p>
 
       <div class="modal-actions">
-        <button @click="onClose" class="btn-modal primary">
-          Fermer et réessayer
+        <button @click="handleBack" class="btn-modal primary">
+          Retour au menu
         </button>
       </div>
 
@@ -64,14 +74,14 @@ const onClose = () => emit('close');
   margin: 0 auto 20px;
 }
 
-.icon-circle.error {
-  background: rgba(239, 83, 80, 0.1);
-  color: #ef5350;
+.icon-circle.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
 }
 
 .modal-card h2 {
   margin: 0 0 10px;
-  color: #B51621;
+  color: #2e7d32; /* Vert foncé pour le titre */
 }
 
 .sub-text {
@@ -97,11 +107,13 @@ const onClose = () => emit('close');
 }
 
 .btn-modal.primary {
-  background: #B51621;
+  background: linear-gradient(135deg, #B51621 0%, #d92533 100%);
   color: white;
+  box-shadow: 0 4px 10px rgba(181, 22, 33, 0.3);
 }
 
 .btn-modal.primary:hover {
-  background: #96121b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(181, 22, 33, 0.4);
 }
 </style>

@@ -16,7 +16,7 @@ const onClose = () => emit('close');
       </div>
 
       <h2>Une erreur est survenue !</h2>
-      <p class="sub-text">La sauvegarde n'a pas pu être effectuée. Veuillez vérifier votre connexion ou réessayer.</p>
+      <p class="sub-text">La validation n'a pas pu être effectuée. Veuillez vérifier votre connexion ou réessayer.</p>
 
       <div class="modal-actions">
         <button @click="onClose" class="btn-modal primary">

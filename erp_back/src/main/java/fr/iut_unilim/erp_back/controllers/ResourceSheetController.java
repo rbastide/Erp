@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.ResourceSheet;
 import fr.iut_unilim.erp_back.service.ResourceSheetService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -77,9 +78,36 @@ public class ResourceSheetController {
         return ResponseEntity.ok(historyResponses);
     }
 
+    @GetMapping("/getHistory/ALL")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<List<HistoryResponse>> getAllHistory(Authentication authentication) {
+        List<HistoryResponse> historyResponses = resourceSheetService.getAllHistoryResponses(authentication.getName());
+
+        return ResponseEntity.ok(historyResponses);
+    }
+
     @GetMapping("available-years")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> getResourceSheetYears() {
         return ResponseEntity.ok(resourceSheetService.getAllYears());
+    }
+
+
+    @GetMapping("/getNonValidateResourceSheet")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> getNonValidateResourceSheet() {
+        return ResponseEntity.ok(resourceSheetService.getResourceSheetNonValidate());
+    }
+
+
+    @PutMapping("/validate/{id}")
+    public ResponseEntity<String> validateResourceSheet(@PathVariable("id") Long id) {
+        boolean isUpdated = resourceSheetService.validateSheet(id);
+
+        if (isUpdated) {
+            return ResponseEntity.ok().body("La fiche ressource a bien été validée.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erreur : Fiche ressource introuvable.");
+        }
     }
 }
