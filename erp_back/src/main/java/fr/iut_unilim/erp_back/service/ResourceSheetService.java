@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.dto.ResourceSheetRequest;
 import fr.iut_unilim.erp_back.dto.ResourceSheetResponse;
 import fr.iut_unilim.erp_back.entity.*;
 import fr.iut_unilim.erp_back.repository.*;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -221,5 +222,31 @@ public class ResourceSheetService {
         resourceSheet.setImprovementIdeas(improvementIdeaOptional.orElseGet(() -> new ImprovementIdea(sanitizedImprovementIdea)));
         resourceSheet.setStudentFeedbacks(studentFeedbackOptional.orElseGet(() -> new StudentFeedback(sanitizedStudentFeedback)));
         resourceSheet.setTeacherFeedbacks(teacherFeedbackOptional.orElseGet(() -> new TeacherFeedback(sanitizedTeacherFeedback)));
+    }
+
+    public Set<Long> getResourceSheetNonValidate() {
+        List<ResourceSheet> resourceSheets = resourceSheetRepository.findAll();
+        Set<Long> NonValidate = new HashSet<>();
+        for (ResourceSheet resourceSheet : resourceSheets) {
+            if(!resourceSheet.isValidate()) {
+                NonValidate.add(resourceSheet.getSheetID());
+            }
+        }
+        return NonValidate;
+
+    }
+    @Transactional
+    public boolean validateSheet(Long id) {
+        Optional<ResourceSheet> sheetOptional = resourceSheetRepository.findById(id);
+
+        if(sheetOptional.isPresent()) {
+            ResourceSheet resourceSheet = sheetOptional.get();
+
+            resourceSheet.setValidate(true);
+
+            resourceSheetRepository.save(resourceSheet);
+            return true;
+        }
+        return false;
     }
 }
