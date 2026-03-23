@@ -67,7 +67,6 @@ const handleBack = () => {
 const retrieveData = async (year: number, resourceID: number) => {
   try {
     const mcccResponse = await api.get(`/mccc/${year}/${resourceID}`);
-    /** @type {McccResponse} */
     const mcccData = mcccResponse.data;
     mcccStore.resourceID = mcccData.resourceID;
     mcccStore.resourceCode = mcccData.resourceCode;
@@ -76,18 +75,25 @@ const retrieveData = async (year: number, resourceID: number) => {
     mcccStore.minTP = mcccData.minTP;
     mcccStore.minDS = mcccData.minDS;
     mcccStore.minDSTP = mcccData.minDSTP;
-    mcccStore.saeIds = mcccData.saeIDs;
-    mcccStore.skillIds = mcccData.skillIDs;
-    mcccStore.teacherIds = mcccData.teachers;
+    mcccStore.saeIds = mcccData.saeIDs || [];
+    mcccStore.skillIds = mcccData.skillIDs || [];
+    mcccStore.teacherIds = mcccData.teachers || [];
     mcccStore.creationDate = mcccData.creationDate;
     mcccStore.editDate = mcccData.editDate;
   } catch (error) {
-    console.log("Création d'un MCCC non existant");
+    console.log("Création d'un MCCC non existant : On reset les données sauf l'ID");
+    const currentRes = resources.value.find(r => r.resourceID === resourceID);
+    mcccStore.clearMcccStore();
+    mcccStore.resourceID = resourceID;
+    mcccStore.year = year;
+    if (currentRes) mcccStore.resourceCode = currentRes.num;
   }
 }
 
 const handleMccc = async (id: number) => {
   mcccStore.loadMcccStore();
+  mcccStore.resourceID = id;
+  mcccStore.year = selectedYear.value;
   await retrieveData(selectedYear.value, id);
   mcccStore.registerMcccStore();
   await router.push('/mccc-menu');
