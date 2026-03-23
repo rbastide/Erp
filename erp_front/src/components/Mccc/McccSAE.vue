@@ -1,7 +1,7 @@
 <script setup>
-import {useRouter} from 'vue-router';
-import {onMounted, ref} from 'vue';
-import {mcccStore} from "@/services/mcccStore.js";
+import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { mcccStore } from "@/services/mcccStore.js";
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
@@ -16,7 +16,7 @@ const initialState = ref([]);
 
 const fetchSAEs = async () => {
   try {
-    const response = await api.get('/mccc/getSaes');
+    const response = await api.get('/sae/saes');
     let saeData = [];
     if (Array.isArray(response.data)) {
       saeData = response.data;
@@ -24,9 +24,10 @@ const fetchSAEs = async () => {
       saeData = response.data.content;
     }
     availableSae.value = saeData.map(s => ({
-      id: s.num,
+      id: s.saeID,
       title: s.title,
-      semester: s.semester
+      semester: s.num ? parseInt(s.num.match(/\d/)?.[0]) : null,
+      num: s.num,
     }));
   } catch (error) {
     errorMessage.value = "Impossible de charger les SAÉs.";
@@ -37,74 +38,39 @@ onMounted(async () => {
   mcccStore.loadMcccStore();
   await fetchSAEs();
 
-  if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0) {
-
-    if (typeof mcccStore.saeCodes[0] === 'object') {
-      selectedSaeIds.value = mcccStore.saeCodes.map(item => item.saeCode);
-    } else {
-      selectedSaeIds.value = [...mcccStore.saeCodes];
-    }
+  if (mcccStore.saeIds && mcccStore.saeIds.length > 0) {
+    selectedSaeIds.value = [...mcccStore.saeIds];
   } else {
-    await fetchLinkedSAEs();
+    selectedSaeIds.value = [];
   }
 
   initialState.value = [...selectedSaeIds.value];
 });
 
 const getSaeBySemester = (semesterNumber) => {
-  return availableSae.value.filter(sae => {
-    if (sae.semester) {
-      return sae.semester === semesterNumber;
-    }
-    const match = sae.id.match(/S?(\d)\./);
-    return match && parseInt(match[1]) === semesterNumber;
-  });
+  return availableSae.value.filter(sae => sae.semester === semesterNumber);
 };
 
-const fetchLinkedSAEs = async () => {
-  if (!mcccStore.resourceID) return;
-  const targetId = String(mcccStore.resourceID);
-
-  try{
-    const response = await api.get('/mccc/mcccs');
-
-
-    const currentMccc = response.data.find(m =>
-        m.resourceId && String(m.resourceId.resourceID) === targetId
-    );
-
-    if (currentMccc && currentMccc.saesId && currentMccc.saesId.length > 0) {
-
-      selectedSaeIds.value = currentMccc.saesId.map(s => s.num);
-
-      mcccStore.saeCodes = currentMccc.saesId.map(s => ({
-        saeCode: s.num,
-        saeName: s.title
-      }));
-
-      mcccStore.registerMcccStore();
-    }
-  } catch (error) {
-    console.error("Erreur chargement des SAE liées :", error);
-  }
-};
-
-const toggleSae = (saeId) => {
-  errorMessage.value = '';
-  if (selectedSaeIds.value.includes(saeId)) {
-    selectedSaeIds.value = selectedSaeIds.value.filter(id => id !== saeId);
-  } else {
-    selectedSaeIds.value.push(saeId);
-  }
+const syncStoreWithSelection = () => {
+  mcccStore.saeIds = [...selectedSaeIds.value];
 
   mcccStore.saeCodes = selectedSaeIds.value.map(id => {
     const fullSae = availableSae.value.find(s => s.id === id);
     return {
-      saeCode: id,
+      saeCode: fullSae ? fullSae.num : '',
       saeName: fullSae ? fullSae.title : ''
     };
   });
-  mcccStore.registerMcccStore();
+};
+
+const toggleSae = (saeId) => {
+  errorMessage.value = '';
+  const index = selectedSaeIds.value.indexOf(saeId);
+  if (index > -1) {
+    selectedSaeIds.value.splice(index, 1);
+  } else {
+    selectedSaeIds.value.push(saeId);
+  }
 };
 
 const handleValidate = () => {
@@ -112,13 +78,8 @@ const handleValidate = () => {
     errorMessage.value = "Veuillez sélectionner au moins une SAÉ.";
     return;
   }
-  mcccStore.saeCodes = selectedSaeIds.value.map(id => {
-    const fullSae = availableSae.value.find(s => s.id === id);
-    return {
-      saeCode: id,
-      saeName: fullSae ? fullSae.title : ''
-    };
-  });
+
+  syncStoreWithSelection();
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -128,15 +89,8 @@ const handleBack = () => {
 };
 
 const onConfirmCancel = () => {
-  const restoredIds = initialState.value;
-
-  mcccStore.saeCodes = restoredIds.map(id => {
-    const fullSae = availableSae.value.find(s => s.id === id);
-    return {
-      saeCode: id,
-      saeName: fullSae ? fullSae.title : ''
-    };
-  });
+  selectedSaeIds.value = [...initialState.value];
+  syncStoreWithSelection();
   mcccStore.registerMcccStore();
   router.push('/mccc-menu');
 };
@@ -159,7 +113,7 @@ const onConfirmCancel = () => {
                 @click="toggleSae(sae.id)"
             >
               <div class="sae-content">
-                <span class="sae-number">{{ sae.id }}</span>
+                <span class="sae-number">{{ sae.num }}</span>
                 <span class="sae-title">{{ sae.title }}</span>
                 <div class="check-indicator" v-if="selectedSaeIds.includes(sae.id)">
                   <svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
