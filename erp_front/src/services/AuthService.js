@@ -2,6 +2,8 @@ import apiClient from './api';
 import api from './api';
 import {mcccStore} from "@/services/mcccStore.js";
 import {reactive} from "vue";
+const CAS_URL = import.meta.env.VITE_CASURL;
+const FRONT_END = import.meta.env.VITE_FRONTEND_URL;
 
 export default {
   register(user) {
@@ -48,12 +50,21 @@ export default {
 
 
 
-  async logout() {
-    await api.post('/auth/logout');
-    localStorage.removeItem('user_role');
-    authStore.clear();
-    mcccStore.clearMcccStore();
-  },
+    async logout() {
+        try {
+            await api.post('/logout');
+        } catch (error) {
+            console.warn("Erreur lors du logout API", error);
+        }
+
+        localStorage.removeItem('user_role');
+        authStore.clear();
+        mcccStore.clearMcccStore();
+
+        const baseUrl = `${FRONT_END}`;
+        const casLogoutUrl = `${CAS_URL}/logout?service=${encodeURIComponent(baseUrl)}`;
+        window.location.href = casLogoutUrl;
+    },
 
   lastName: '',
   firstName: ''
@@ -86,8 +97,8 @@ export const authStore = reactive({
     clear() {
         this.firstName = '';
         this.lastName = '';
-        cookieStore.delete('user_token').then(_ => {
 
-        });
+        // On écrase le cookie 'auth_token' en lui donnant une date d'expiration passée
+        document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 });
