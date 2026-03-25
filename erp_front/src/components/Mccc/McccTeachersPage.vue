@@ -21,42 +21,18 @@ const initialState = ref({ selected: [], referents: [] });
 
 const fetchTeachers = async () => {
   try {
-    const response = await api.get('/mccc/getTeachers');
-    let teachersData = [];
+    const response = await api.get('/teachers');
+    const teachersData = Array.isArray(response.data) ? response.data : [];
 
-    if (Array.isArray(response.data)) {
-      teachersData = response.data;
-    }
-    allTeachers.value = teachersData.map(t => ({
-      ...t,
-      teacherID: Number(t.teacherID)
-    }));
+    allTeachers.value = teachersData
+        .filter(t => t.teacherID != null)
+        .map(t => ({
+          ...t,
+          teacherID: Number(t.teacherID)
+        }));
   } catch (error) {
     console.error("Erreur API Teachers :", error);
     errorMessage.value = "Impossible de charger les enseignants.";
-  }
-};
-
-const fetchLinkedTeachers = async () => {
-  if (!mcccStore.resourceID) return;
-  const targetResourceId = String(mcccStore.resourceID);
-  try {
-    const mcccResponse = await api.get('/mccc/mcccs');
-
-    const foundMccc = mcccResponse.data.find(m =>
-        m.resourceId && String(m.resourceId.resourceID) === targetResourceId
-    );
-    if (!foundMccc || !foundMccc.mcccId) return;
-    const realMcccId = foundMccc.mcccId;
-
-    const response = await api.get(`mccc/getReferentIds/${realMcccId}`);
-
-    if (response.data && Array.isArray(response.data)) {
-      selectedTeacherIds.value = response.data.map(id => Number(id));
-      updateStoreReferents();
-    }
-  } catch (error) {
-    console.error("Erreur lors de la récupération des enseignants liés au MCCC :", error);
   }
 };
 
@@ -70,32 +46,29 @@ const updateStoreReferents = () => {
       isReferent: referentTeacherIds.value.includes(teacherId)
     } : null;
   }).filter(Boolean);
+
+  mcccStore.teacherIds = selectedTeacherIds.value.map(teacherId => {
+    const user = allTeachers.value.find(u => u.teacherID === teacherId);
+    return user ? {
+      teacherID: user.teacherID,
+      isManager: referentTeacherIds.value.includes(teacherId),
+    } : null;
+  }).filter(Boolean);
 };
 
 onMounted(async () => {
   mcccStore.loadMcccStore();
   await fetchTeachers();
-  const hasLocalEdits = mcccStore.referents && mcccStore.referents.length > 0;
 
-  if (hasLocalEdits) {
-    selectedTeacherIds.value = [];
-    referentTeacherIds.value = [];
+  const storeTeacherIds = mcccStore.teacherIds || [];
 
-    mcccStore.referents.forEach(refObj => {
-      const found = allTeachers.value.find(t =>
-          (t.lastname || "").toLowerCase() === (refObj.lastname || "").toLowerCase() &&
-          (t.firstname || "").toLowerCase() === (refObj.firstname || "").toLowerCase()
-      );
-      if (found) {
-        selectedTeacherIds.value.push(found.teacherID);
-        if (refObj.isReferent) {
-          referentTeacherIds.value.push(found.teacherID);
-        }
-      }
-    });
-  } else {
-    await fetchLinkedTeachers();
-  }
+  selectedTeacherIds.value = storeTeacherIds.map(t => Number(t.teacherID));
+  referentTeacherIds.value = storeTeacherIds
+      .filter(t => t.isManager)
+      .map(t => Number(t.teacherID));
+
+  console.log("Selected IDs:", selectedTeacherIds.value);
+  console.log("Referent IDs:", referentTeacherIds.value);
 
   mcccStore.saveBackup();
   initialState.value = {
@@ -133,7 +106,7 @@ const toggleTeacher = (id) => {
   mcccStore.registerMcccStore();
 };
 
-  const toggleReferent = (id) => {
+const toggleReferent = (id) => {
   const idNumber = Number(id);
   if (referentTeacherIds.value.includes(idNumber)) {
     referentTeacherIds.value = referentTeacherIds.value.filter(rId => rId !== idNumber);

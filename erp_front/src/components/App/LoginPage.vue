@@ -4,13 +4,27 @@ import {useRouter} from 'vue-router';
 import AuthService, {authStore} from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
 import api, {connectWithCas} from "@/services/api.js";
-import {mcccStore} from "@/services/mcccStore.js";
+import RgpdModal from '../Information/RgpdModal.vue';
 
 const router = useRouter();
 const username = ref('');
 const errorMessage = ref('');
 const role = ref('');
 const isDev = window.location.hostname === 'localhost';
+
+const showRgpdModal = ref(false);
+
+const proceedToLogin = () => {
+  if(!isDev){
+    connectWithCas();
+  }
+};
+
+const handleRgpdAccept = () => {
+  localStorage.setItem('rgpd_accepted', 'true');
+  showRgpdModal.value = false;
+  proceedToLogin();
+};
 
 const handleLogin = async () => {
   await AuthService.logout();
@@ -42,9 +56,12 @@ const loginWithCAS = () => {
 };
 
 onMounted(() => {
-  console.log(window.location.hostname);
-  if(!isDev){
-    connectWithCas();
+  const hasAcceptedRgpd = (localStorage.getItem('rgpd_accepted') === 'true');
+
+  if (hasAcceptedRgpd) {
+    proceedToLogin();
+  } else {
+    showRgpdModal.value = true;
   }
 });
 
@@ -52,8 +69,8 @@ onMounted(() => {
 
 <template>
   <AppHeader title="Connexion" :login-page="true"/>
-  <main class="main-content">
 
+  <main class="main-content">
     <div class="brand-header">
       <div class="logo-container">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brand-logo" fill="none">
@@ -66,6 +83,7 @@ onMounted(() => {
       </div>
       <h1 class="app-title">IUT<span class="highlight">'xpress</span></h1>
     </div>
+
     <form class="login-card" @submit.prevent="handleLogin">
       <div class="form-group">
         <label for="username">Identifiant</label>
@@ -74,12 +92,18 @@ onMounted(() => {
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       <button type="submit" class="login-button">Se connecter</button>
     </form>
+
     <div class="cas-login-section">
       <div class="divider">ou</div>
       <button type="button" @click="loginWithCAS" class="cas-button">
         Se connecter avec le CAS
       </button>
     </div>
+
+    <RgpdModal
+        v-if="showRgpdModal"
+        @accept="handleRgpdAccept"
+    />
   </main>
 </template>
 
@@ -216,6 +240,55 @@ onMounted(() => {
   width: 100%;
   font-size: 0.9rem;
   box-sizing: border-box;
+}
+
+.cas-login-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.divider {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  position: relative;
+  width: 100%;
+  text-align: center;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background-color: #dcdcdc;
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.cas-button {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.9rem;
+  background: white;
+  color: #333;
+  border: 2px solid #dcdcdc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.cas-button:hover {
+  background: #f8f9fa;
+  border-color: #bbb;
 }
 
 @keyframes fadeIn {

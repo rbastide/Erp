@@ -61,9 +61,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <Sidebar :dashboardActive="true" :showDepartments="isSuperAdmin" />
+  <Sidebar :dashboardActive="true" />
   <div class="page-container">
-    <AppHeader title="Bonjour," :inline="authStore.lastName + ' ' + authStore.firstName" />
+    <AppHeader title="Bonjour," :inline="authStore.lastName + ' ' + authStore.firstName" :showDepartments="isSuperAdmin" />
 
     <main class="main-content">
       <div

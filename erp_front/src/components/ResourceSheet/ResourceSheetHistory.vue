@@ -4,10 +4,11 @@ import {useRoute, useRouter} from 'vue-router'
 import AppHeader from '../App/Header.vue'
 import Sidebar from '../App/Sidebar.vue'
 import api from '@/services/api'
+import ErrorValidationModal from "@/components/Information/ErrorValidationModal.vue";
+import ValidationSavedModal from "@/components/Information/ValidationSavedModal.vue";
 
-let isAdmin = false;
 const role = localStorage.getItem('user_role');
-isAdmin = role == 'Super-Admin';
+const isAdmin = ref(role === 'Super-Admin' || role === 'SUPER-ADMIN' || role === 'SUPER_ADMIN' || role === 'ADMIN');
 
 const router = useRouter()
 const route = useRoute()
@@ -15,6 +16,9 @@ const route = useRoute()
 const resourceCode = ref('')
 const resourceDate = ref('')
 const academicYear = ref<number>(2025)
+
+const showError = ref(false);
+const showSuccess = ref(false);
 
 const hours = ref({
   cm: 0, td: 0, tp: 0, ds: 0, ds_tp: 0, student: 0
@@ -57,7 +61,6 @@ const fetchSheetData = async () => {
     contents.value.studentFeedback = sheet.studentFeedbacks || '';
     contents.value.upgrades = sheet.improvementIdeas || '';
 
-    // Si l'année est stockée dans la fiche reçue, on met à jour l'affichage
     if (sheet.academicYearStart) {
       academicYear.value = sheet.academicYearStart;
     }
@@ -98,6 +101,25 @@ const totalGlobal = computed(() => {
 
 const handleFermer = () => router.back()
 
+const handleValidate = async () => {
+  const id = route.query.id;
+
+  if (!id) return;
+
+  if (!confirm(`Es-tu sûr de vouloir valider la fiche ${resourceCode.value} ?`)) {
+    return;
+  }
+
+  try {
+    await api.put(`resourceSheet/validate/${id}`);
+    showSuccess.value = true;
+
+  } catch (error) {
+    console.error("Erreur lors de la validation :", error);
+    showError.value = !showError.value;
+  }
+}
+
 const handleExport = async () => {
   try {
     const response = await api.get(`/pdf/resource-sheet/${route.query.id}`, {
@@ -133,6 +155,14 @@ const hourConfig = {
   <AppHeader title="Consultation Ressource" :inline="`${resourceCode}`" />
 
   <main class="main-content">
+    <ErrorValidationModal
+        v-if="showError"
+        @close="showError = false"
+    />
+    <ValidationSavedModal
+        v-if="showSuccess"
+        @close="showSuccess = false"
+    />
     <div class="container">
 
       <section class="form-card year-display-card">
@@ -214,6 +244,9 @@ const hourConfig = {
       <div class="actions-footer">
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
         <button @click="handleFermer" class="btn btn-outline">Retour</button>
+
+        <button @click="handleValidate" class="btn btn-success">Valider la fiche</button>
+
         <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier la fiche</button>
       </div>
     </div>
@@ -235,7 +268,6 @@ const hourConfig = {
   max-width: 900px;
 }
 
-/* Styles spécifique Année */
 .year-display-card {
   padding: 20px 35px !important;
   margin-bottom: 20px;
@@ -426,6 +458,18 @@ const hourConfig = {
 .btn-dark {
   background: #334155;
   color: white;
+}
+
+/* --- CLASSE CSS AJOUTÉE POUR LE BOUTON VERT --- */
+.btn-success {
+  background-color: #2e7d32;
+  color: white;
+  border: 2px solid #2e7d32;
+}
+
+.btn-success:hover {
+  background-color: #1b5e20;
+  border-color: #1b5e20;
 }
 
 .btn:hover {

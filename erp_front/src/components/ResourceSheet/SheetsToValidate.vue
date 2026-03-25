@@ -5,6 +5,8 @@ import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import api from '@/services/api';
 import DeleteHistoryModal from "@/components/Information/DeleteHistoryModal.vue";
+import ErrorValidationModal from "@/components/Information/ErrorValidationModal.vue";
+import ValidationSavedModal from "@/components/Information/ValidationSavedModal.vue";
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -15,6 +17,8 @@ const itemToDelete = ref<{ id: number, code: string } | null>(null);
 const userRole = ref('');
 const selectedYear = ref(new Date().getFullYear());
 const availableYears = ref<number[]>([]);
+const showSuccess = ref(false);
+const showError = ref(false);
 
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
@@ -91,8 +95,21 @@ const handleShow = (item: any) => {
   });
 };
 
-const handleValidateSheet = (item: any) => {
-  console.log(`Fiche validée : ${item.resourceCode}`);
+const handleValidateSheet = async (item: any) => {
+  const id = item.sheetID || item.id;
+
+  if(!confirm(`Etes-vous sûr de vouloir valider la fiche ${item.resourceCode} ?`)){
+    return;
+  }
+
+  try {
+    await api.put(`resourceSheet/validate/${id}`);
+    showSuccess.value = !showSuccess.value;
+    historyItems.value = historyItems.value.filter((hItem: any) => (hItem.sheetID || hItem.id) !== id);
+  } catch(error){
+    console.error("Erreur lors de la validation de la fiche :", error);
+    showError.value = !showError.value;
+  }
 };
 
 const handleDelete = (id: number, code: string) => {
@@ -111,7 +128,6 @@ const confirmDeletion = async () => {
     itemToDelete.value = null;
   } catch (error) {
     console.error("Erreur lors de la suppression :", error);
-    alert("Une erreur est survenue lors de la suppression.");
   }
 };
 
@@ -140,6 +156,14 @@ const clearSearch = () => searchQuery.value = '';
   <AppHeader title="Fiches ressources à valider" />
 
   <main class="main-content">
+    <ErrorValidationModal
+        v-if="showError"
+        @close="showError = false"
+    />
+    <ValidationSavedModal
+        v-if="showSuccess"
+        @close="showSuccess = false"
+    />
     <div class="container">
 
       <div class="filter-wrapper">

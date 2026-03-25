@@ -51,11 +51,6 @@ const handleBack = () => router.back();
 
 const handleValidate = async () => {
   try {
-    const safeAcsGrouped = mcccStore.acsGrouped || [];
-    const currentTime = new Date().toLocaleTimeString('fr-FR');
-    const formattedEditDate = `${mcccStore.editDate} ${currentTime}`;
-    const formattedCreationDate = `${mcccStore.creationDate} ${currentTime}`;
-
     const payload = {
       resourceID: mcccStore.resourceID,
       minCM: mcccStore.minCM,
@@ -63,26 +58,9 @@ const handleValidate = async () => {
       minTP: mcccStore.minTP,
       minDS: mcccStore.minDS,
       minDSTP: mcccStore.minDSTP,
-      saeCodes: (mcccStore.saeCodes || []).map(s => ({
-        saeCode: s.saeNum || s.saeCode
-      })),
-      acsGrouped: safeAcsGrouped.flatMap(skill =>
-          (skill.allLevels || []).map((lvl, lvlIdx) => ({
-            ue: `UE${skill.skillNum}`,
-            levels: `Niveau ${lvlIdx + 1} - ${lvl.title}`,
-            acs: (lvl.acs || []).map(ac => ({
-              conceptNum: ac.learningNum,
-              conceptTitle: ac.learningTitle
-            }))
-          }))
-      ),
-      referents: (mcccStore.referents || []).map(r => ({
-        firstname: r.firstname || r.firstName,
-        lastname: r.lastname || r.lastName,
-        isReferent: !!r.isReferent
-      })),
-      creationDate: formattedCreationDate,
-      editDate: formattedEditDate,
+      saeIDs: mcccStore.saeIds,
+      skillIDs: mcccStore.skillIds,
+      teachers: mcccStore.teacherIds,
       year: mcccStore.year || getCurrentAcademicYear()
     };
 

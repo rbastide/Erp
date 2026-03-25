@@ -1,29 +1,29 @@
 <script setup>
-const emit = defineEmits(['close']);
+const emit = defineEmits(['accept']);
 
-const onClose = () => emit('close');
+const onAccept = () => emit('accept');
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="onClose">
+  <div class="modal-overlay">
     <div class="modal-card">
-
-      <div class="icon-circle error">
-        <svg width="60" height="60" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
+      <div class="icon-circle">
+        <svg width="50" height="50" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill: none;">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
         </svg>
       </div>
 
-      <h2>Une erreur est survenue !</h2>
-      <p class="sub-text">La sauvegarde n'a pas pu être effectuée. Veuillez vérifier votre connexion ou réessayer.</p>
+      <h2>Information sur vos données</h2>
+      <p class="sub-text">
+        Dans le respect du RGPD, nous vous informons que cette application nécessite la collecte et le traitement de certaines de vos données personnelles pour fonctionner correctement.
+        <br><br>
+        En continuant, vous acceptez cette politique de collecte.
+      </p>
 
       <div class="modal-actions">
-        <button @click="onClose" class="btn-modal primary">
-          Fermer et réessayer
-        </button>
+        <button @click="onAccept" class="btn-modal primary">Ok, j'ai compris</button>
       </div>
-
     </div>
   </div>
 </template>
@@ -59,41 +59,40 @@ const onClose = () => emit('close');
 
 .icon-circle {
   width: 80px; height: 80px;
+  background: rgba(181, 22, 33, 0.1);
+  color: #B51621;
   border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
   margin: 0 auto 20px;
 }
 
-.icon-circle.error {
-  background: rgba(239, 83, 80, 0.1);
-  color: #ef5350;
-}
-
 .modal-card h2 {
   margin: 0 0 10px;
-  color: #B51621;
+  color: #333;
 }
 
 .sub-text {
   color: #666;
   margin-bottom: 30px;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .modal-actions {
   display: flex;
-  justify-content: center;
-  width: 100%;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .btn-modal {
-  padding: 12px 30px;
-  border-radius: 50px;
+  padding: 12px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   border: none;
   font-family: 'Roboto', sans-serif;
-  width: 100%;
+  transition: all 0.2s ease;
 }
 
 .btn-modal.primary {
@@ -103,5 +102,6 @@ const onClose = () => emit('close');
 
 .btn-modal.primary:hover {
   background: #96121b;
+  transform: translateY(-2px);
 }
 </style>
