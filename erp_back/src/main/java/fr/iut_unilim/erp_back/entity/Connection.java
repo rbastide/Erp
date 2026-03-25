@@ -13,7 +13,6 @@ public class Connection {
     private Long id;
 
     @Column(name = "identifier")
-    @Convert(converter = StringEncryptionConverter.class)
     private String identifier;
 
     @ManyToOne
