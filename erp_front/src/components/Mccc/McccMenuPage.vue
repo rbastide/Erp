@@ -17,6 +17,12 @@ const fetchResourceYears = async () => {
   try {
     const response = await api.get('/mccc/available-years');
     const allYears: number[] = response.data;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const referenceYear = currentMonth >= 8 ? currentYear : currentYear - 1;
+    const nextAcademicYear = referenceYear + 1;
+
     const checkPromises = allYears.map(async (year) => {
       try {
         const res = await api.get(`/mccc/${year}/${mcccStore.resourceID}`);
@@ -25,11 +31,11 @@ const fetchResourceYears = async () => {
         return null;
       }
     });
+
     const results = await Promise.all(checkPromises);
     let filteredYears = results.filter((y): y is number => y !== null);
-    const nextYear = new Date().getFullYear() + 1;
-    if (!filteredYears.includes(nextYear)) {
-      filteredYears.push(nextYear);
+    if (!filteredYears.includes(nextAcademicYear)) {
+      filteredYears.push(nextAcademicYear);
     }
     availableYears.value = filteredYears.sort((a, b) => b - a);
     if (mcccStore.year && !availableYears.value.includes(Number(mcccStore.year))) {
@@ -39,8 +45,10 @@ const fetchResourceYears = async () => {
 
   } catch (error) {
     console.error("Erreur filtrage années:", error);
-    const current = new Date().getFullYear();
-    availableYears.value = [current + 1, current];
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const nextYear = now.getMonth() >= 8 ? currentYear + 1 : currentYear;
+    availableYears.value = [nextYear, nextYear - 1];
   }
 };
 
