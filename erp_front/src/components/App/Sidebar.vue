@@ -1,62 +1,26 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { onMounted, ref, watchEffect, watch } from "vue";
-import api from '@/services/api';
+import { onMounted, ref, watchEffect } from "vue";
 
 const props = defineProps({
   dashboardActive: { type: Boolean, default: false },
   settingsActive: { type: Boolean, default: false },
   helpActive: { type: Boolean, default: false },
   quitActive: { type: Boolean, default: false },
-  showDepartments: { type: Boolean, default: false },
 });
 
 const router = useRouter();
 const isExpanded = ref(false);
 const userRole = ref('');
-const selectedDept = ref<number | null>(null);
-const universityDepartments = ref<any[]>([]);
 
 const updateRole = () => {
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
 };
 
-const formatDeptName = (name: string) => {
-  if (name.trim().includes(' ')) {
-    return name.replaceAll(/[^A-ZÀ-ÖØ-Þ]/g, '');
-  }
-  return name;
-};
-
-const fetchDepartments = async () => {
-  try {
-    const response = await api.get('/universityDepartment/getUniversityDepartments');
-    universityDepartments.value = response.data;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des départements :", error);
-  }
-};
-
-const fetchCurrentDepartment = async () => {
-  try {
-    const response = await api.get('/auth/user/department');
-    selectedDept.value = response.data.departmentId;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des départements :", error);
-  }
-}
-
 onMounted(() => {
   updateRole();
 });
-
-watch(() => props.showDepartments, (newValue) => {
-  if (newValue === true) {
-    fetchCurrentDepartment();
-    fetchDepartments();
-  }
-}, { immediate: true });
 
 watchEffect(() => {
   updateRole();
@@ -64,12 +28,6 @@ watchEffect(() => {
 
 const handleDashboardClick = () => {
   router.push('/home');
-};
-
-const selectDept = async (id: number) => {
-  selectedDept.value = id;
-  await api.patch(`/auth/users/department/${id}`)
-  globalThis.location.reload();
 };
 
 const handleSettings = () => router.push('/settings');
@@ -96,41 +54,20 @@ const handleDisconnection = () => router.push('/logout');
     </div>
 
     <nav class="sidebar-nav">
-      <div class="dropdown-container">
-        <div
-            class="nav-item main-item"
-            :class="{ active: props.dashboardActive }"
-            @click="handleDashboardClick"
-        >
-          <div class="icon-wrapper">
-            <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-          </div>
-          <span class="nav-text">Dashboard</span>
-
-          <svg v-if="isExpanded && props.showDepartments && universityDepartments.length > 0" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6 6-6"/>
+      <div
+          class="nav-item main-item"
+          :class="{ active: props.dashboardActive }"
+          @click="handleDashboardClick"
+      >
+        <div class="icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" style="fill: none;" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
         </div>
-
-        <div v-if="props.showDepartments" class="submenu">
-          <div
-              v-for="dept in universityDepartments"
-              :key="dept.universityDepartmentID"
-              class="nav-item sub-item"
-              :class="{ 'sub-active': selectedDept === dept.universityDepartmentID }"
-              @click="selectDept(dept.universityDepartmentID)"
-          >
-            <div class="icon-wrapper sub-icon">
-              <div class="dot"></div>
-            </div>
-            <span class="nav-text">{{ formatDeptName(dept.universityDepartmentName) }}</span>
-          </div>
-        </div>
+        <span class="nav-text">Dashboard</span>
       </div>
 
       <div class="nav-item" :class="{ active: props.settingsActive }" @click="handleSettings">
@@ -275,59 +212,5 @@ const handleDisconnection = () => router.push('/logout');
 .logout:hover {
   color: #B51621;
   background-color: #ffebee;
-}
-
-.dropdown-container {
-  position: relative;
-}
-
-.submenu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  opacity: 0;
-  background-color: #fafafa;
-}
-
-.dropdown-container:hover .submenu {
-  max-height: 400px;
-  opacity: 1;
-}
-
-.sub-item {
-  padding: 10px 28px 10px 45px;
-  font-size: 14px;
-}
-
-.sub-icon {
-  min-width: 14px;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  background-color: currentColor;
-  border-radius: 50%;
-}
-
-.chevron-icon {
-  margin-left: auto;
-  transition: transform 0.3s ease;
-  color: #999;
-}
-
-.dropdown-container:hover .chevron-icon {
-  transform: rotate(180deg);
-}
-
-.sub-item.sub-active {
-  background-color: #f0f0f0;
-  color: #B51621;
-  font-weight: 700;
-  border-left: 4px solid #B51621;
-}
-
-.sub-item.sub-active .dot {
-  transform: scale(1.3);
 }
 </style>
