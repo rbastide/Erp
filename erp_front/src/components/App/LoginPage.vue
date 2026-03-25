@@ -56,12 +56,12 @@ const loginWithCAS = () => {
 };
 
 onMounted(() => {
-  const hasAcceptedRgpd = localStorage.getItem('rgpd_accepted');
+  const hasAcceptedRgpd = (localStorage.getItem('rgpd_accepted') === 'true');
 
-  if (!hasAcceptedRgpd) {
-    showRgpdModal.value = true;
-  } else {
+  if (hasAcceptedRgpd) {
     proceedToLogin();
+  } else {
+    showRgpdModal.value = true;
   }
 });
 
