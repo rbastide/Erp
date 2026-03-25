@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.entity;
 
+import fr.iut_unilim.erp_back.converter.StringEncryptionConverter;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,6 +20,7 @@ public class Connection {
     private Role role;
 
     @Column(name = "email")
+    @Convert(converter = StringEncryptionConverter.class)
     private String email;
 
     @ManyToOne
@@ -26,9 +28,11 @@ public class Connection {
     private UniversityDepartment universityDepartment;
 
     @JoinColumn(name = "firstName")
+    @Convert(converter = StringEncryptionConverter.class)
     private String firstName;
 
     @JoinColumn(name = "lastName")
+    @Convert(converter = StringEncryptionConverter.class)
     private String lastName;
 
     public Connection() {
