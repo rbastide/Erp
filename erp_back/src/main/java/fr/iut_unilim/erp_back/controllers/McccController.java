@@ -7,12 +7,14 @@ import fr.iut_unilim.erp_back.entity.Mccc;
 import fr.iut_unilim.erp_back.entity.McccResponse;
 import fr.iut_unilim.erp_back.entity.UniversityDepartment;
 import fr.iut_unilim.erp_back.service.ConnectionService;
+import fr.iut_unilim.erp_back.service.McccImportService;
 import fr.iut_unilim.erp_back.service.McccService;
 import fr.iut_unilim.erp_back.service.SaeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +26,13 @@ public class McccController {
     private final McccService mcccService;
     private final SaeService saeService;
     private final ConnectionService connectionService;
-    private final
+    private final McccImportService mcccImportService;
 
-    public McccController(McccService mcccService, SaeService saeService, ConnectionService connectionService) {
+    public McccController(McccService mcccService, SaeService saeService, ConnectionService connectionService, McccImportService mcccImportService) {
         this.mcccService = mcccService;
         this.saeService = saeService;
         this.connectionService = connectionService;
+        this.mcccImportService = mcccImportService;
     }
 
     @GetMapping("/mcccs/{year}")
@@ -93,5 +96,23 @@ public class McccController {
     @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<List<Mccc>> getAllMcccs() {
         return ResponseEntity.ok(mcccService.getAllMcccs());
+    }
+
+    @PostMapping("/import")
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<?> importMcccFromExcel(@RequestParam("file") MultipartFile file, @RequestParam("year") Integer year, Authentication authentication) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Le fichier est vide.");
+        }
+
+        Connection connection = connectionService.findByIdentifier(authentication.getName());
+
+        try {
+            // On délègue la lecture et la sauvegarde à un nouveau service
+            mcccImportService.importExcelFile(file, year, connection);
+            return ResponseEntity.ok("Les MCCC ont été importées et sauvegardées avec succès !");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erreur lors de l'importation : " + e.getMessage());
+        }
     }
 }
