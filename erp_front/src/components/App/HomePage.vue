@@ -26,7 +26,7 @@ const icons = {
 const fetchPendingCount = async () => {
   try {
     const currentYear = new Date().getFullYear();
-    const response = await api.get(`/resourceSheet/getHistory/${currentYear}`);
+    const response = await api.get(`/resourceSheet/getHistory/ALL`);
     const pendingSheets = response.data.filter((item) => item.isValidate == 0 || item.isValidate == false);
     pendingCount.value = pendingSheets.length;
   } catch (error) {
