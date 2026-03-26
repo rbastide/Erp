@@ -20,16 +20,17 @@ const props = defineProps({
   showDepartments: {
     type: Boolean,
     default: false
-  }
+  },
 });
 
 const isConnected = ref(false);
 const router = useRouter();
-const dep = ref('');
+
+const dep = ref(localStorage.getItem('user_department_name') || '');
+const selectedDept = ref(Number(localStorage.getItem('user_department_id')) || null);
 const userRole = ref('');
 
 const universityDepartments = ref([]);
-const selectedDept = ref(null);
 const isDropdownOpen = ref(false);
 
 const formatDeptName = (name) => {
@@ -52,9 +53,13 @@ const fetchDepartmentsAndUser = async () => {
 
     if (rightDep.data) {
       selectedDept.value = rightDep.data.departmentId;
+      // @ts-ignore
+      localStorage.setItem('user_department_id', selectedDept.value);
+
       const depFound = universityDepartments.value.find(d => d.universityDepartmentID === selectedDept.value);
       if (depFound){
         dep.value = formatDeptName(depFound.universityDepartmentName);
+        localStorage.setItem('user_department_name', dep.value);
       }
     }
   } catch (e) {
@@ -71,6 +76,13 @@ const selectDept = async (id) => {
     selectedDept.value = id;
     isDropdownOpen.value = false;
     await api.patch(`/auth/users/department/${id}`);
+
+    localStorage.setItem('user_department_id', id);
+    const depFound = universityDepartments.value.find(d => d.universityDepartmentID === id);
+    if (depFound) {
+      localStorage.setItem('user_department_name', formatDeptName(depFound.universityDepartmentName));
+    }
+
     globalThis.location.reload();
   } catch (e) {
     console.error("Erreur lors du changement de département", e);
@@ -95,7 +107,9 @@ onMounted(() => {
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
 
-  fetchDepartmentsAndUser();
+  if(!props.loginPage) {
+    fetchDepartmentsAndUser();
+  }
   document.addEventListener('click', closeDropdown);
 });
 
@@ -119,7 +133,7 @@ onUnmounted(() => {
             :class="{ 'clickable': canChangeDepartment }"
             @click="toggleDropdown"
         >
-           Département {{ dep }}
+          Département {{ dep }}
           <svg v-if="canChangeDepartment" class="chevron" :class="{ 'open': isDropdownOpen }" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9l6 6 6-6"/>
           </svg>
