@@ -20,6 +20,8 @@ const academicYear = ref<number>(2025)
 const showError = ref(false);
 const showSuccess = ref(false);
 
+const isValidated = ref(false);
+
 const hours = ref({
   cm: 0, td: 0, tp: 0, ds: 0, ds_tp: 0, student: 0
 })
@@ -56,6 +58,8 @@ const fetchSheetData = async () => {
   try {
     const response = await api.get(`/resourceSheet/resource-sheet/${sheetIdFromUrl}`)
     const sheet = response.data
+
+    isValidated.value = !!sheet.isValidate;
 
     contents.value.teacherFeedback = sheet.teacherFeedbacks || '';
     contents.value.studentFeedback = sheet.studentFeedbacks || '';
@@ -113,6 +117,7 @@ const handleValidate = async () => {
   try {
     await api.put(`resourceSheet/validate/${id}`);
     showSuccess.value = true;
+    isValidated.value = true;
 
   } catch (error) {
     console.error("Erreur lors de la validation :", error);
@@ -166,9 +171,14 @@ const hourConfig = {
     <div class="container">
 
       <section class="form-card year-display-card">
-        <div class="year-info">
-          <span class="label">Période :</span>
-          <span class="year-badge">Année Universitaire {{ academicYear }} - {{ academicYear + 1 }}</span>
+        <div class="year-info-wrapper">
+          <div class="year-info">
+            <span class="label">Période :</span>
+            <span class="year-badge">Année Universitaire {{ academicYear }} - {{ academicYear + 1 }}</span>
+          </div>
+          <div v-if="isValidated" class="status-badge validated">
+            ✓ Fiche validée
+          </div>
         </div>
       </section>
 
@@ -245,9 +255,9 @@ const hourConfig = {
         <button @click="handleExport" class="btn btn-dark">Exporter en PDF</button>
         <button @click="handleFermer" class="btn btn-outline">Retour</button>
 
-        <button @click="handleValidate" class="btn btn-success">Valider la fiche</button>
+        <button v-if="!isValidated" @click="handleValidate" class="btn btn-success">Valider la fiche</button>
 
-        <button v-if="isAdmin" @click="handleModifier" class="btn btn-primary">Modifier la fiche</button>
+        <button v-if="isAdmin && !isValidated" @click="handleModifier" class="btn btn-primary">Modifier la fiche</button>
       </div>
     </div>
   </main>
@@ -272,6 +282,13 @@ const hourConfig = {
   padding: 20px 35px !important;
   margin-bottom: 20px;
 }
+
+.year-info-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .year-info {
   display: flex;
   align-items: center;
@@ -290,6 +307,21 @@ const hourConfig = {
   font-weight: 800;
   font-size: 1rem;
   box-shadow: 0 2px 8px rgba(233, 37, 51, 0.2);
+}
+
+.status-badge {
+  font-size: 0.9rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.validated {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
 }
 
 .form-card {
@@ -460,7 +492,6 @@ const hourConfig = {
   color: white;
 }
 
-/* --- CLASSE CSS AJOUTÉE POUR LE BOUTON VERT --- */
 .btn-success {
   background-color: #2e7d32;
   color: white;
