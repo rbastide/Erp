@@ -41,16 +41,16 @@ public class RoleService {
     }
 
     public boolean deleteRole(Long roleId) {
-        Optional<RolePermission> permissionOptional = permissionRepository.findById(roleId);
-        if (permissionOptional.isEmpty()) return false;
-        permissionRepository.deleteById(roleId);
-
         Optional<Role> roleOptional = roleRepository.findById(roleId);
         if (roleOptional.isEmpty()) return false;
 
         List<Connection> connections = connectionRepository.findAllByRole(roleOptional.get());
 
         if (!connections.isEmpty()) return false;
+
+        Optional<RolePermission> permissionOptional = permissionRepository.findById(roleId);
+        if (permissionOptional.isEmpty()) return false;
+        permissionRepository.deleteById(roleId);
 
         roleRepository.deleteById(roleId);
 
