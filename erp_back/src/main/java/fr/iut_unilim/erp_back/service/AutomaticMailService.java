@@ -52,13 +52,17 @@ public class AutomaticMailService {
     //@Scheduled(cron = "0 0 8 1 1-6,10-12 ?")
     //0sec | 0min | 8heures |tous les 1er du mois sauf Juillet, Août et Septembre | peu importe le jour de la semaine
     @Transactional(readOnly = true)
-    public AutomaticMailReport sendAutomaticMails() {
-        AutomaticMailAudience audience = getAutomaticMailAudience();
-        int sentCount = 0;
-        int failedCount = 0;
-        List<String> failedEmails = new ArrayList<>();
+    public void sendAutomaticMails() {
+        List<Connection> allUsers = connectionRepository.findAll();
 
-        for (String email : audience.concernedEmails()) {
+        List<String> targetEmails = allUsers.stream()
+                .filter(this::isTargetRoleConnection)
+                .map(Connection::getEmail)
+                .filter(this::isValidEmail)
+                .distinct() // Évite les doublons
+                .toList();
+
+        for (String email : targetEmails) {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(from);
             message.setTo(email);
@@ -67,21 +71,10 @@ public class AutomaticMailService {
 
             try {
                 mailSender.send(message);
-                sentCount++;
             } catch (Exception e) {
-                failedCount++;
-                failedEmails.add(email);
+                System.err.println("Erreur d'envoi Postfix vers : " + email);
             }
         }
-
-        return new AutomaticMailReport(
-                audience.academicYearStart(),
-                sentCount,
-                failedCount,
-                audience.concernedEmails().size(),
-                audience.nonConcernedEmails().size(),
-                failedEmails
-        );
     }
 
     @Transactional(readOnly = true)
@@ -151,17 +144,18 @@ public class AutomaticMailService {
                 .toList();
     }
 
-    private boolean isValidEmail(String email) {
-        return email != null && !email.isBlank();
-    }
-
     private boolean isTargetRoleConnection(Connection connection) {
         if (connection == null || connection.getRole() == null || connection.getRole().getRoleName() == null) {
             return false;
         }
 
-        String roleName = connection.getRole().getRoleName().trim().toUpperCase();
+        String roleName = connection.getRole().getRoleName().trim();
+
         return TARGET_ROLE_NAMES.contains(roleName);
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && !email.isBlank();
     }
 
     private List<Connection> getTeacherAndVacataireConnections() {
@@ -172,7 +166,6 @@ public class AutomaticMailService {
             try {
                 connections.addAll(connectionService.getAllConnectionsFromDepartmentAndRoleNames(department, roleNames));
             } catch (RuntimeException ignored) {
-                // Fallback local strict sur role.roleName si la récupération par noms échoue.
                 List<Connection> departmentConnections = connectionRepository.findAllByUniversityDepartment(department);
                 connections.addAll(departmentConnections.stream().filter(this::isTargetRoleConnection).toList());
             }

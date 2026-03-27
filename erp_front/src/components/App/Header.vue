@@ -3,25 +3,16 @@ import { useRouter } from 'vue-router';
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import '../../assets/css/variable.css';
 import api from "@/services/api.js";
+import { useDepartmentStore } from "@/services/departmentStore"; // Import du store
 
 const props = defineProps({
-  title: {
-    type: String,
-    default: ''
-  },
-  inline: {
-    type: String,
-    default: ''
-  },
-  loginPage:{
-    type: Boolean,
-    default: false
-  },
-  showDepartments: {
-    type: Boolean,
-    default: false
-  },
+  title: String,
+  inline: String,
+  loginPage: Boolean,
+  showDepartments: Boolean,
 });
+
+const { universityDepartments, fetchDepartments } = useDepartmentStore();
 
 const isConnected = ref(false);
 const router = useRouter();
@@ -29,32 +20,25 @@ const router = useRouter();
 const dep = ref(localStorage.getItem('user_department_name') || '');
 const selectedDept = ref(Number(localStorage.getItem('user_department_id')) || null);
 const userRole = ref('');
-
-const universityDepartments = ref([]);
 const isDropdownOpen = ref(false);
 
 const formatDeptName = (name) => {
+  if (!name) return '';
   if (name.trim().indexOf(' ') !== -1) {
     return name.replace(/[^A-ZÀ-ÖØ-Þ]/g, '');
   }
   return name;
 };
 
-const fetchDepartmentsAndUser = async () => {
-  try {
-    const [allDeps, rightDep] = await Promise.all([
-      api.get('/universityDepartment/getUniversityDepartments'),
-      api.get('/auth/user/department')
-    ]);
+const loadData = async () => {
+  await fetchDepartments();
 
-    if (allDeps.data) {
-      universityDepartments.value = allDeps.data;
-    }
+  try {
+    const rightDep = await api.get('/auth/user/department');
 
     if (rightDep.data) {
       selectedDept.value = rightDep.data.departmentId;
-      // @ts-ignore
-      localStorage.setItem('user_department_id', selectedDept.value);
+      localStorage.setItem('user_department_id', String(selectedDept.value));
 
       const depFound = universityDepartments.value.find(d => d.universityDepartmentID === selectedDept.value);
       if (depFound){
@@ -63,7 +47,7 @@ const fetchDepartmentsAndUser = async () => {
       }
     }
   } catch (e) {
-    console.error("Erreur lors de la récupération des départements", e);
+    console.error("Erreur du département de l'utilisateur", e);
   }
 };
 
@@ -85,30 +69,25 @@ const selectDept = async (id) => {
 
     globalThis.location.reload();
   } catch (e) {
-    console.error("Erreur lors du changement de département", e);
+    console.error("Erreur lors du changement", e);
   }
 };
 
 const toggleDropdown = () => {
-  if (canChangeDepartment.value) {
-    isDropdownOpen.value = !isDropdownOpen.value;
-  }
+  if (canChangeDepartment.value) isDropdownOpen.value = !isDropdownOpen.value;
 };
 
 const closeDropdown = (e) => {
-  if (!e.target.closest('.header-dep-wrapper')) {
-    isDropdownOpen.value = false;
-  }
+  if (!e.target.closest('.header-dep-wrapper')) isDropdownOpen.value = false;
 };
 
 onMounted(() => {
   isConnected.value = !!localStorage.getItem('user_token');
-
   const role = localStorage.getItem('user_role');
   userRole.value = role ? role.toUpperCase() : 'USER';
 
   if(!props.loginPage) {
-    fetchDepartmentsAndUser();
+    loadData();
   }
   document.addEventListener('click', closeDropdown);
 });
@@ -299,16 +278,5 @@ onUnmounted(() => {
   height: 8px;
   background-color: currentColor;
   border-radius: 50%;
-}
-
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  transform-origin: top right;
-}
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: scale(0.95) translateY(-10px);
 }
 </style>
