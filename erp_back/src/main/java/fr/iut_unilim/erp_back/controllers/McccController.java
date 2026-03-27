@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.dto.ResourceResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
@@ -99,16 +100,17 @@ public class McccController {
     }
 
     @PostMapping("/import")
-    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
     public ResponseEntity<?> importMcccFromExcel(@RequestParam("file") MultipartFile file, @RequestParam("year") Integer year, Authentication authentication) {
+        ErpBackApplication.LOGGER.info("Ok");
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Le fichier est vide.");
         }
+        ErpBackApplication.LOGGER.info("ficheir compris");
+
 
         Connection connection = connectionService.findByIdentifier(authentication.getName());
 
         try {
-            // On délègue la lecture et la sauvegarde à un nouveau service
             mcccImportService.importExcelFile(file, year, connection);
             return ResponseEntity.ok("Les MCCC ont été importées et sauvegardées avec succès !");
         } catch (Exception e) {

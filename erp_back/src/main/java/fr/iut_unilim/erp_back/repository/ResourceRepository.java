@@ -15,5 +15,4 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
     List<Resource> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
 
-    Long findIdByApogeeCode(String codeApogee);
 }
