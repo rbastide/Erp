@@ -44,18 +44,17 @@ public class AuthController {
 
     @PostMapping("/register")
     @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req, Authentication authentication) {
         if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
             return ResponseEntity.badRequest().body("Username is already in use");
         }
 
         Connection user = new Connection();
         user.setIdentifier(req.getIdentifier());
-        user.setEmail(req.getEmail());
+
         user.setRole(roleService.createOrAccessRoleByRoleName(req.getRole()));
-        user.setUniversityDepartment(req.getUniversityDepartment());
-        user.setFirstName(req.getFirstname());
-        user.setLastName(req.getLastname());
+        Connection existingUser = connectionRepository.findByIdentifier(authentication.getName());
+        user.setUniversityDepartment(existingUser.getUniversityDepartment());
 
         connectionRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
