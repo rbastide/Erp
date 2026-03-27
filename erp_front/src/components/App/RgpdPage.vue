@@ -1,17 +1,24 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import AppHeader from './Header.vue';
+import { connectWithCas } from "@/services/api.js";
 
 const router = useRouter();
+const isDev = window.location.hostname === 'localhost';
 
 const handleAccept = () => {
   localStorage.setItem('rgpd_accepted', 'true');
-  router.push('/login');
+
+  if (!isDev) {
+    connectWithCas();
+  } else {
+    router.push('/login');
+  }
 };
 </script>
 
 <template>
-  <AppHeader title="Politique de Confidentialité" :login-page="true" />
+  <AppHeader title="Protection des Données" :login-page="true" />
 
   <main class="main-content">
     <div class="rgpd-card">
@@ -21,7 +28,7 @@ const handleAccept = () => {
         </svg>
       </div>
 
-      <h1 class="title">Protection de vos données</h1>
+      <h1 class="title">Règlement RGPD</h1>
 
       <div class="rgpd-content">
         <p>
@@ -70,7 +77,6 @@ const handleAccept = () => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: fadeIn 0.5s ease-out;
 }
 
 .icon-header {
@@ -101,13 +107,6 @@ const handleAccept = () => {
 .rgpd-content p {
   margin-bottom: 1rem;
 }
-.rgpd-content p:last-child {
-  margin-bottom: 0;
-}
-
-.actions {
-  width: 100%;
-}
 
 .accept-btn {
   width: 100%;
@@ -125,10 +124,5 @@ const handleAccept = () => {
 .accept-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(181, 22, 33, 0.3);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 </style>
