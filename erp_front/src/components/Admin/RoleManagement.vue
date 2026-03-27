@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import ErrorDeleteRoleModal from "@/components/Information/ErrorDeleteRoleModal.vue";
+import ErrorDeleteRoleModal from "../Information/ErrorDeleteRoleModal.vue";
 import api from "@/services/api.js";
 
 const router = useRouter();
