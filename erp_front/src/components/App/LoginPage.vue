@@ -1,30 +1,15 @@
 <script setup>
-import {onMounted, ref} from 'vue';
-import {useRouter} from 'vue-router';
-import AuthService, {authStore} from '../../services/AuthService.js';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import AuthService, { authStore } from '../../services/AuthService.js';
 import AppHeader from './Header.vue';
-import api, {connectWithCas} from "@/services/api.js";
-import RgpdModal from '../Information/RgpdModal.vue';
+import api, { connectWithCas } from "@/services/api.js";
 
 const router = useRouter();
 const username = ref('');
 const errorMessage = ref('');
 const role = ref('');
 const isDev = window.location.hostname === 'localhost';
-
-const showRgpdModal = ref(false);
-
-const proceedToLogin = () => {
-  if(!isDev){
-    connectWithCas();
-  }
-};
-
-const handleRgpdAccept = () => {
-  localStorage.setItem('rgpd_accepted', 'true');
-  showRgpdModal.value = false;
-  proceedToLogin();
-};
 
 const handleLogin = async () => {
   await AuthService.logout();
@@ -52,19 +37,14 @@ const handleLogin = async () => {
 };
 
 const loginWithCAS = () => {
-  connectWithCas()
+  connectWithCas();
 };
 
 onMounted(() => {
-  const hasAcceptedRgpd = (localStorage.getItem('rgpd_accepted') === 'true');
-
-  if (hasAcceptedRgpd) {
-    proceedToLogin();
-  } else {
-    showRgpdModal.value = true;
+  if (!isDev) {
+    connectWithCas();
   }
 });
-
 </script>
 
 <template>
@@ -99,11 +79,6 @@ onMounted(() => {
         Se connecter avec le CAS
       </button>
     </div>
-
-    <RgpdModal
-        v-if="showRgpdModal"
-        @accept="handleRgpdAccept"
-    />
   </main>
 </template>
 
