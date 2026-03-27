@@ -3,12 +3,14 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
+import ErrorDeleteRoleModal from "@/components/Information/ErrorDeleteRoleModal.vue";
 import api from "@/services/api.js";
 
 const router = useRouter();
 
 const editingIndex = ref(null);
 const showAddForm = ref(false);
+const showErrorModal = ref(false);
 const searchQuery = ref('');
 
 const roles = ref([]);
@@ -98,11 +100,11 @@ const filteredRoles = computed(() => {
 const handleDelete = async (id) => {
   if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
     try {
-      await api.delete(`role/roles/${id}`);
+      await api.delete(`role/${id}`);
       roles.value = roles.value.filter(r => r.id !== id);
       if (editedRole.id === id) handleCancel();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      showErrorModal.value = true;
     }
   }
 };
@@ -150,7 +152,17 @@ const saveModification = async () => {
   }
 
   try {
-    if (!editedRole.id) {
+    if (editedRole.id) {
+      const updatePayload = perms.value.map(p => {
+        return {
+          permissionRoleId: editedRole.id,
+          permissionId: p.id,
+          permissionState: editedRole.permissions.includes(String(p.id))
+        };
+      });
+
+      await api.post('perm/perms/role', updatePayload);
+    } else {
       const permsMap = {};
       perms.value.forEach(p => {
         permsMap[p.id] = editedRole.permissions.includes(String(p.id));
@@ -165,24 +177,11 @@ const saveModification = async () => {
       await api.post('role', createPayload);
 
     }
-
-    else {
-      const updatePayload = perms.value.map(p => {
-        return {
-          permissionRoleId: editedRole.id,
-          permissionId: p.id,
-          permissionState: editedRole.permissions.includes(String(p.id))
-        };
-      });
-
-      await api.post('perm/perms/role', updatePayload);
-    }
-
-    await fetchRoles();
-    handleCancel();
-
   } catch (error) {
     console.error("Erreur lors de la sauvegarde :", error);
+  } finally {
+    await fetchRoles();
+    handleCancel();
   }
 };
 
@@ -209,6 +208,11 @@ const handleValidate = () => router.push('/home');
 <template>
   <Sidebar />
   <div class="page-container">
+
+    <ErrorDeleteRoleModal
+      v-if="showErrorModal"
+      @close="showErrorModal= false"/>
+
     <AppHeader title="Gestion des Rôles" />
 
     <main class="main-content">

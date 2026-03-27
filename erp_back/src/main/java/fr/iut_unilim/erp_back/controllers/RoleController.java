@@ -30,7 +30,7 @@ public class RoleController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(permissionService.createEditPermission(createRoleRequest));
+        return ResponseEntity.ok(hasBeenCreated);
     }
 
     @GetMapping("/all")
