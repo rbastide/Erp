@@ -197,4 +197,17 @@ public class AuthController {
                 "lastname", user.getLastName()
         ));
     }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
+    public ResponseEntity<?> updateUserMail(@PathVariable Long id, @RequestBody String newmail) {
+        Optional<Connection> existingUser = connectionRepository.findById(id);
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Connection userToEdit = existingUser.get();
+        userToEdit.setEmail(newmail);
+
+        return ResponseEntity.ok().build();
+    }
 }
