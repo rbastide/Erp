@@ -9,7 +9,6 @@ import fr.iut_unilim.erp_back.repository.PermissionRepository;
 import fr.iut_unilim.erp_back.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
-import java.security.Permission;
 import java.util.List;
 import java.util.Optional;
 
