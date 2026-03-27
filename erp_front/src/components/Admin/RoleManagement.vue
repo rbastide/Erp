@@ -149,21 +149,40 @@ const saveModification = async () => {
         .replaceAll(/[^A-Z0-9]/g, '_');
   }
 
-  const payload = perms.value.map(p => {
-    const isGranted = editedRole.permissions.includes(String(p.id));
-    return {
-      permissionRoleId: editedRole.id,
-      permissionId: p.id,
-      permissionState: isGranted
-    };
-  });
-
   try {
-    await api.post('perm/perms/role', payload);
+    if (!editedRole.id) {
+      const permsMap = {};
+      perms.value.forEach(p => {
+        permsMap[p.id] = editedRole.permissions.includes(String(p.id));
+      });
+
+      const createPayload = {
+        id: null,
+        roleName: editedRole.name,
+        permissions: permsMap
+      };
+
+      await api.post('role', createPayload);
+
+    }
+
+    else {
+      const updatePayload = perms.value.map(p => {
+        return {
+          permissionRoleId: editedRole.id,
+          permissionId: p.id,
+          permissionState: editedRole.permissions.includes(String(p.id))
+        };
+      });
+
+      await api.post('perm/perms/role', updatePayload);
+    }
+
     await fetchRoles();
     handleCancel();
+
   } catch (error) {
-    console.error(error);
+    console.error("Erreur lors de la sauvegarde :", error);
   }
 };
 
