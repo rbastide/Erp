@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.controllers;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -123,7 +122,6 @@ public class AuthController {
         } catch (Exception e) {
             hashedIdentifier = null;
         }
-        ErpBackApplication.LOGGER.info("Hashed identifier : " + hashedIdentifier);
         userToEdit.setHashedIdentifier(hashedIdentifier);
         userToEdit.setRole(roleService.createOrAccessRoleByRoleName(user.role()));
         userToEdit.setEmail(user.email());
