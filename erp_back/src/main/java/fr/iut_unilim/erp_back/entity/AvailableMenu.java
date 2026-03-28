@@ -2,6 +2,8 @@ package fr.iut_unilim.erp_back.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "AvailableMenu")
 public class AvailableMenu {
@@ -22,8 +24,12 @@ public class AvailableMenu {
     @Column(name = "iconID")
     private String iconId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parentID")
-    private Long parentId;
+    private AvailableMenu parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<AvailableMenu> children;
 
     public String getPermissionKey() {
         return permissionKey;
@@ -45,7 +51,11 @@ public class AvailableMenu {
         return route;
     }
 
-    public Long getParentId() {
-        return parentId;
+    public AvailableMenu getParent() {
+        return parent;
+    }
+
+    public List<AvailableMenu> getChildren() {
+        return children;
     }
 }

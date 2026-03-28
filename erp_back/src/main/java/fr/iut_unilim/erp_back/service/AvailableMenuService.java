@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AvailableMenuService {
@@ -29,20 +30,30 @@ public class AvailableMenuService {
         List<MenuResponse> authorizedMenus = new ArrayList<>();
         List<AvailableMenu> menus = availableMenuRepository.findByParentIdIsNull();
         for (AvailableMenu menu : menus) {
-            String permissionKey = menu.getPermissionKey();
-            boolean hasPermission = permissionService.hasPrivilege(role, permissionKey);
-
-            if (hasPermission) {
-                authorizedMenus.add(convertEntityToResponse(menu));
-            }
+            Optional<MenuResponse> availableMenuOptional = resolveAuthorizedMenu(menu, role);
+            availableMenuOptional.ifPresent(authorizedMenus::add);
         }
 
         return authorizedMenus;
     }
 
-    private MenuResponse convertEntityToResponse(AvailableMenu menu) {
-        List<AvailableMenu> subMenus = availableMenuRepository.findByParentId(menu.getId());
-        List<MenuResponse> children = subMenus.stream().map(this::convertEntityToResponse).toList();
+    private Optional<MenuResponse> resolveAuthorizedMenu(AvailableMenu menu, Role role) {
+        boolean isLeaf = menu.getChildren().isEmpty();
+        boolean hasPermission = permissionService.hasPrivilege(role, menu.getPermissionKey());
+
+        if (isLeaf && !hasPermission) {
+            return Optional.empty();
+        }
+
+        return Optional.of(convertEntityToResponse(menu, role));
+    }
+
+    private MenuResponse convertEntityToResponse(AvailableMenu menu, Role role) {
+        List<AvailableMenu> subMenus = menu.getChildren();
+        List<MenuResponse> children = subMenus.stream()
+                .filter((cMenu) -> permissionService.hasPrivilege(role, cMenu.getPermissionKey()))
+                .map((cMenu) -> convertEntityToResponse(cMenu, role))
+                .toList();
 
         return new MenuResponse(menu.getId(), menu.getLabel(), menu.getRoute(), menu.getIconId(), children);
     }

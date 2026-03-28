@@ -9,6 +9,4 @@ import java.util.List;
 @Repository
 public interface AvailableMenuRepository extends JpaRepository<AvailableMenu, Long> {
     List<AvailableMenu> findByParentIdIsNull();
-
-    List<AvailableMenu> findByParentId(Long parentId);
 }
