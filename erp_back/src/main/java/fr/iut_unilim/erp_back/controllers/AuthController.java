@@ -107,7 +107,6 @@ public class AuthController {
     }
 
     @PostMapping("/user")
-    @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> editUser(@RequestBody EditUserRequest user) {
         Optional<Connection> existingUser = connectionRepository.findById(user.id());
         if (existingUser.isEmpty()) {
@@ -125,6 +124,8 @@ public class AuthController {
         userToEdit.setHashedIdentifier(hashedIdentifier);
         userToEdit.setRole(roleService.createOrAccessRoleByRoleName(user.role()));
         userToEdit.setEmail(user.email());
+        userToEdit.setFirstName(user.firstname());
+        userToEdit.setLastName(user.lastname());
 
         connectionRepository.save(userToEdit);
         return ResponseEntity.ok().build();
