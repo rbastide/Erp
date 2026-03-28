@@ -19,7 +19,7 @@ public class AvailableMenu {
     @Column(name = "route")
     private String route;
 
-    @Column(name = "icon_id")
+    @Column(name = "iconID")
     private String iconId;
 
     public String getPermissionKey() {
