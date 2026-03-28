@@ -27,7 +27,7 @@ public class AvailableMenuService {
         Role role = connection.getRole();
 
         List<MenuResponse> authorizedMenus = new ArrayList<>();
-        List<AvailableMenu> menus = availableMenuRepository.findAll();
+        List<AvailableMenu> menus = availableMenuRepository.findByParentIdIsNull();
         for (AvailableMenu menu : menus) {
             String permissionKey = menu.getPermissionKey();
             boolean hasPermission = permissionService.hasPrivilege(role, permissionKey);
@@ -41,6 +41,9 @@ public class AvailableMenuService {
     }
 
     private MenuResponse convertEntityToResponse(AvailableMenu menu) {
-        return new MenuResponse(menu.getId(), menu.getLabel(), menu.getRoute(), menu.getIconId());
+        List<AvailableMenu> subMenus = availableMenuRepository.findByParentId(menu.getId());
+        List<MenuResponse> children = subMenus.stream().map(this::convertEntityToResponse).toList();
+
+        return new MenuResponse(menu.getId(), menu.getLabel(), menu.getRoute(), menu.getIconId(), children);
     }
 }

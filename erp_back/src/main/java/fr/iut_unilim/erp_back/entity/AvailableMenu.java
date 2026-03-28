@@ -22,6 +22,9 @@ public class AvailableMenu {
     @Column(name = "iconID")
     private String iconId;
 
+    @JoinColumn(name = "parentID")
+    private Long parentId;
+
     public String getPermissionKey() {
         return permissionKey;
     }
@@ -40,5 +43,9 @@ public class AvailableMenu {
 
     public String getRoute() {
         return route;
+    }
+
+    public Long getParentId() {
+        return parentId;
     }
 }
