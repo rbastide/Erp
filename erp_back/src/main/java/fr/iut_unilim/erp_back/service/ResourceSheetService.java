@@ -44,7 +44,9 @@ public class ResourceSheetService {
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartmentAndYear(@NotNull String identifier, Integer year) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = connectionService.findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<ResourceSheet> resourceSheets = new ArrayList<>();
@@ -56,7 +58,9 @@ public class ResourceSheetService {
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = connectionService.findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<ResourceSheet> resourceSheets = new ArrayList<>();
@@ -279,9 +283,10 @@ public class ResourceSheetService {
     }
     @Transactional
     public boolean validateSheet(Long id, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
-        if (connection == null) return false;
+        Optional<Connection> connectionOptional = connectionService.findByIdentifier(authentication.getName());
+        if (connectionOptional.isEmpty()) return false;
 
+        Connection connection = connectionOptional.get();
         Optional<ResourceSheet> sheetOptional = resourceSheetRepository.findById(id);
 
         if (sheetOptional.isPresent()) {

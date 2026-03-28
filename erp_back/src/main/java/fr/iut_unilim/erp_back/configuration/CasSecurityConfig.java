@@ -182,4 +182,9 @@ public class CasSecurityConfig {
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(Collections.singletonList(casAuthenticationProvider()));
     }
+
+    @Bean
+    public TextEncryptor textEncryptor() {
+        return Encryptors.text("password", "5c0744940b5c369b");
+    }
 }

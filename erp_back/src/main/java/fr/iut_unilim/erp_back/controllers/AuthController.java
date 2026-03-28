@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.controllers;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.configuration.JwtUtils;
 import fr.iut_unilim.erp_back.dto.AuthResponse;
 import fr.iut_unilim.erp_back.dto.EditUserRequest;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
+import static fr.iut_unilim.erp_back.tools.utils.HashGenerator.generateBlindIndex;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,16 +48,26 @@ public class AuthController {
     @PostMapping("/register")
     @PreAuthorize("@securityService.hasPermission('USER_MANAGEMENT')")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req, Authentication authentication) {
-        if (connectionRepository.findByIdentifier(req.getIdentifier()) != null) {
+        if (connectionService.findByIdentifier(req.getIdentifier()).isPresent()) {
             return ResponseEntity.badRequest().body("Username is already in use");
         }
 
         Connection user = new Connection();
         user.setIdentifier(req.getIdentifier());
+        String hashedIdentifier;
+        try {
+            hashedIdentifier = generateBlindIndex(req.getIdentifier());
+        } catch (Exception e) {
+            hashedIdentifier = null;
+        }
+        user.setHashedIdentifier(hashedIdentifier);
 
         user.setRole(roleService.createOrAccessRoleByRoleName(req.getRole()));
-        Connection existingUser = connectionRepository.findByIdentifier(authentication.getName());
-        user.setUniversityDepartment(existingUser.getUniversityDepartment());
+        Optional<Connection> existingUser = connectionService.findByIdentifier(authentication.getName());
+        if (existingUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+        user.setUniversityDepartment(existingUser.get().getUniversityDepartment());
 
         connectionRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -101,10 +114,20 @@ public class AuthController {
         if (existingUser.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         Connection userToEdit = existingUser.get();
         userToEdit.setIdentifier(user.identifier());
+        String hashedIdentifier;
+        try {
+            hashedIdentifier = generateBlindIndex(user.identifier());
+        } catch (Exception e) {
+            hashedIdentifier = null;
+        }
+        ErpBackApplication.LOGGER.info("Hashed identifier : " + hashedIdentifier);
+        userToEdit.setHashedIdentifier(hashedIdentifier);
         userToEdit.setRole(roleService.createOrAccessRoleByRoleName(user.role()));
         userToEdit.setEmail(user.email());
+
         connectionRepository.save(userToEdit);
         return ResponseEntity.ok().build();
     }
@@ -137,10 +160,12 @@ public class AuthController {
     @GetMapping("/user-info/{identifier}")
     @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfo(@PathVariable String identifier) {
-        Connection user = connectionRepository.findByIdentifier(identifier);
-        if (user == null) {
+        Optional<Connection> userOptional = connectionService.findByIdentifier(identifier);
+        if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Connection user = userOptional.get();
 
         return ResponseEntity.ok(Map.of("firstname", user.getFirstName(), "lastname", user.getLastName()));
     }
@@ -148,7 +173,13 @@ public class AuthController {
     @GetMapping("/user/department")
     @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserDepartment(Authentication authentication) {
-        Connection user = connectionRepository.findByIdentifier(authentication.getName());
+        Optional<Connection> userOptional = connectionService.findByIdentifier(authentication.getName());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Connection user = userOptional.get();
+
         return ResponseEntity.ok(Map.of("departmentId", user.getUniversityDepartment().getUniversityDepartmentID()));
     }
 
@@ -184,10 +215,12 @@ public class AuthController {
     @GetMapping("/user-info-and-role/{identifier}")
     @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> getUserInfoAndRole(@PathVariable String identifier) {
-        Connection user = connectionRepository.findByIdentifier(identifier);
-        if (user == null) {
+        Optional<Connection> userOptional = connectionService.findByIdentifier(identifier);
+        if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Connection user = userOptional.get();
 
         String roleName = user.getRole().getRoleName();
 

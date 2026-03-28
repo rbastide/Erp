@@ -24,7 +24,10 @@ public class AvailableMenuService {
     }
 
     public List<MenuResponse> getAvailableMenusFromUser(String username) {
-        Connection connection = connectionService.findByIdentifier(username);
+        Optional<Connection> connectionOptional = connectionService.findByIdentifier(username);
+        if (connectionOptional.isEmpty()) return new ArrayList<>();
+
+        Connection connection = connectionOptional.get();
         Role role = connection.getRole();
 
         List<MenuResponse> authorizedMenus = new ArrayList<>();

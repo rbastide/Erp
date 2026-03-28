@@ -25,4 +25,6 @@ public interface ConnectionRepository extends JpaRepository<Connection, Long> {
     List<Connection> findAllByUniversityDepartmentAndRole(UniversityDepartment universityDepartment, Role role);
 
     List<Connection> findAllByRole(Role role);
+
+    Optional<Connection> findByHashedIdentifier(String username);
 }

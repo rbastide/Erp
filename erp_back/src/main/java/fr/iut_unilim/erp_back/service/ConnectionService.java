@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static fr.iut_unilim.erp_back.tools.utils.HashGenerator.generateBlindIndex;
+
 @Service
 public class ConnectionService {
     private final ConnectionRepository connectionRepository;
@@ -28,7 +30,9 @@ public class ConnectionService {
     }
 
     public List<UserResponse> getAllConnectionFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         if (department == null) return new ArrayList<>();
@@ -37,12 +41,20 @@ public class ConnectionService {
         return convertToUserResponse(connections);
     }
 
-    public Connection findByIdentifier(@NotNull String identifier) {
-        return connectionRepository.findByIdentifier(identifier);
+    public Optional<Connection> findByIdentifier(@NotNull String identifier) {
+        String hashedIdentifier;
+        try {
+            hashedIdentifier = generateBlindIndex(identifier);
+        } catch (Exception e) {
+            hashedIdentifier = null;
+        }
+        return connectionRepository.findByHashedIdentifier(hashedIdentifier);
     }
 
     public boolean updateDepartment(@NotNull String identifier, @NotNull Long departmentId) {
-        Connection connection = findByIdentifier(identifier);
+        Optional<Connection> connectionOptional = findByIdentifier(identifier);
+        if (connectionOptional.isEmpty()) return false;
+        Connection connection = connectionOptional.get();
         Optional<UniversityDepartment> universityDepartment = universityDepartmentService.getUniversityDepartmentById(departmentId);
         if (universityDepartment.isEmpty()) return false;
         connection.setUniversityDepartment(universityDepartment.get());
@@ -51,7 +63,9 @@ public class ConnectionService {
     }
 
     public UniversityDepartment findByDepartmentFromAuthentification(Authentication authentication) {
-        Connection connection = findByIdentifier(authentication.getName());
+        Optional<Connection> connectionOptional = findByIdentifier(authentication.getName());
+        if (connectionOptional.isEmpty()) return null;
+        Connection connection = connectionOptional.get();
         return connection.getUniversityDepartment();
     }
     

@@ -7,6 +7,7 @@ import fr.iut_unilim.erp_back.repository.SkillRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +39,9 @@ public class SkillService {
     }
 
     public List<Skill> getAllSkillsFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
-        UniversityDepartment department = senderConnection.getUniversityDepartment();
+        Optional<Connection> senderConnection = connectionService.findByIdentifier(identifier);
+        if (senderConnection.isEmpty()) return new ArrayList<>();
+        UniversityDepartment department = senderConnection.get().getUniversityDepartment();
 
         return skillRepository.findAllByUniversityDepartment(department);
     }
