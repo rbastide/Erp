@@ -101,8 +101,9 @@ public class ResourceSheetController {
 
 
     @PutMapping("/validate/{id}")
-    public ResponseEntity<String> validateResourceSheet(@PathVariable("id") Long id) {
-        boolean isUpdated = resourceSheetService.validateSheet(id);
+    @PreAuthorize("@securityService.hasPermission('RESOURCE_SHEET_MANAGEMENT')")
+    public ResponseEntity<String> validateResourceSheet(@PathVariable Long id, Authentication authentication) {
+        boolean isUpdated = resourceSheetService.validateSheet(id, authentication);
 
         if (isUpdated) {
             return ResponseEntity.ok().body("La fiche ressource a bien été validée.");

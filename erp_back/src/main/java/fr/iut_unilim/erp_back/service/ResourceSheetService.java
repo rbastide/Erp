@@ -9,6 +9,7 @@ import fr.iut_unilim.erp_back.repository.*;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,8 +27,9 @@ public class ResourceSheetService {
     private final StudentFeedbackRepository studentFeedbackRepository;
     private final TeacherFeedbackRepository teacherFeedbackRepository;
     private final SanitizeService sanitizeService;
+    private final TeacherResourceRepository teacherResourceRepository;
 
-    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService, ImprovementIdeaRepository improvementIdeaRepository, StudentFeedbackRepository studentFeedbackRepository, TeacherFeedbackRepository teacherFeedbackRepository, SanitizeService sanitizeService, SanitizeService sanitizeService1) {
+    public ResourceSheetService(ResourceSheetRepository resourceSheetRepository, ConnectionService connectionService, ResourceRepository resourceRepository, EducationalContentService educationalContentService, ClassTypeRepository classTypeRepository, CourseHoursService courseHoursService, ImprovementIdeaRepository improvementIdeaRepository, StudentFeedbackRepository studentFeedbackRepository, TeacherFeedbackRepository teacherFeedbackRepository, SanitizeService sanitizeService, TeacherResourceRepository teacherResourceRepository) {
         this.resourceSheetRepository = resourceSheetRepository;
         this.connectionService = connectionService;
         this.resourceRepository = resourceRepository;
@@ -37,11 +39,14 @@ public class ResourceSheetService {
         this.improvementIdeaRepository = improvementIdeaRepository;
         this.studentFeedbackRepository = studentFeedbackRepository;
         this.teacherFeedbackRepository = teacherFeedbackRepository;
-        this.sanitizeService = sanitizeService1;
+        this.sanitizeService = sanitizeService;
+        this.teacherResourceRepository = teacherResourceRepository;
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartmentAndYear(@NotNull String identifier, Integer year) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = connectionService.findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<ResourceSheet> resourceSheets = new ArrayList<>();
@@ -53,7 +58,9 @@ public class ResourceSheetService {
     }
 
     public List<ResourceSheet> getAllResourceSheetsFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = connectionService.findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<ResourceSheet> resourceSheets = new ArrayList<>();
@@ -275,11 +282,24 @@ public class ResourceSheetService {
 
     }
     @Transactional
-    public boolean validateSheet(Long id) {
+    public boolean validateSheet(Long id, Authentication authentication) {
+        Optional<Connection> connectionOptional = connectionService.findByIdentifier(authentication.getName());
+        if (connectionOptional.isEmpty()) return false;
+
+        Connection connection = connectionOptional.get();
         Optional<ResourceSheet> sheetOptional = resourceSheetRepository.findById(id);
 
-        if(sheetOptional.isPresent()) {
+        if (sheetOptional.isPresent()) {
             ResourceSheet resourceSheet = sheetOptional.get();
+
+            if (resourceSheet.isValidate()) return false;
+
+            Resource resource = resourceSheet.getResource();
+            Optional<TeacherResource> teacherResourceOptional = teacherResourceRepository
+                    .findByConnectionAndResource(connection, resource);
+            if (teacherResourceOptional.isEmpty()) return false;
+
+            if (!teacherResourceOptional.get().getIsManager()) return false;
 
             resourceSheet.setValidate(true);
 

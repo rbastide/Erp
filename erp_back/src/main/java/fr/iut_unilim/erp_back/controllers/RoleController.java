@@ -30,7 +30,7 @@ public class RoleController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(permissionService.createEditPermission(createRoleRequest));
+        return ResponseEntity.ok(hasBeenCreated);
     }
 
     @GetMapping("/all")
@@ -38,5 +38,14 @@ public class RoleController {
     public ResponseEntity<?> getRoles() {
         List<Role> roles = roleService.getAllRole();
         return ResponseEntity.ok(roleService.convertEntitiesToResponses(roles));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.hasPermission('PERM_MANAGEMENT')")
+    public ResponseEntity<?> deleteRole(@PathVariable Long id) {
+        boolean hasBeenDeleted = roleService.deleteRole(id);
+        if (!hasBeenDeleted) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok().build();
     }
 }

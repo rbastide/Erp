@@ -13,7 +13,11 @@ public class Connection {
     private Long id;
 
     @Column(name = "identifier")
+    @Convert(converter = StringEncryptionConverter.class)
     private String identifier;
+
+    @Column(name = "hashedIdentifier", unique = true)
+    private String hashedIdentifier;
 
     @ManyToOne
     @JoinColumn(name = "roleID")
@@ -38,8 +42,9 @@ public class Connection {
     public Connection() {
     }
 
-    public Connection(String identifier, Role role, String email, UniversityDepartment universityDepartment) {
+    public Connection(String identifier, String hashedIdentifier, Role role, String email, UniversityDepartment universityDepartment) {
         this.identifier = identifier;
+        this.hashedIdentifier = hashedIdentifier;
         this.role = role;
         this.email = email;
         this.universityDepartment = universityDepartment;
@@ -53,6 +58,10 @@ public class Connection {
         return identifier;
     }
 
+    public String getHashedIdentifier() {
+        return hashedIdentifier;
+    }
+
     public Role getRole() {
         return role;
     }
@@ -63,6 +72,10 @@ public class Connection {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public void setHashedIdentifier(String hashedIdentifier) {
+        this.hashedIdentifier = hashedIdentifier;
     }
 
     public void setRole(Role role) {

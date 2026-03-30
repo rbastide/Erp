@@ -1,5 +1,6 @@
-import  {createRouter, createWebHistory} from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from './components/App/LoginPage.vue';
+import RgpdPage from './components/App/RgpdPage.vue'
 import ResourcePage from '@/components/ResourceSheet/ResourcePage.vue';
 import HomePage from './components/App/HomePage.vue';
 import HistoryPage from '@/components/ResourceSheet/HistoryPage.vue';
@@ -21,17 +22,20 @@ import SaeManagement from "./components/Admin/SaeManagement.vue";
 import Settings from "./components/App/Settings.vue";
 import LogoutModal from "./components/Information/LogoutModal.vue";
 import RoleManagement from "@/components/Admin/RoleManagement.vue";
-import SheetsToValidate from "@/components/ResourceSheet/SheetsToValidate.vue";
 import ResourceSheetToValidate from "@/components/ResourceSheet/ResourceSheetToValidate.vue";
 import RecallManagement from "@/components/Admin/RecallManagement.vue";
 import AuthSuccess from "@/components/App/AuthSuccess.vue";
-
 
 const routes = [
     {
         path: '/',
         name: 'Default',
         component: LoginPage
+    },
+    {
+        path: '/rgpd',
+        name: 'Rgpd',
+        component: RgpdPage
     },
     {
         path: '/home',
@@ -140,22 +144,17 @@ const routes = [
     },
     {
         path:'/role-management',
-        name: RoleManagement,
+        name: 'RoleManagement',
         component: RoleManagement
     },
     {
-        path:'/to-validate',
-        name: SheetsToValidate,
-        component: SheetsToValidate
-    },
-    {
         path:'/resource-sheet-to-validate',
-        name: ResourceSheetToValidate,
+        name: 'ResourceSheetToValidate',
         component: ResourceSheetToValidate
     },
     {
         path:'/recall-management',
-        name: RecallManagement,
+        name: 'RecallManagement',
         component: RecallManagement
     },
     {
@@ -168,6 +167,16 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    const hasAcceptedRgpd = localStorage.getItem('rgpd_accepted') === 'true';
+
+    if (!hasAcceptedRgpd && to.path !== '/rgpd' && to.path !== '/success') {
+        next('/rgpd');
+    } else {
+        next();
+    }
 });
 
 export default router;
