@@ -60,15 +60,37 @@ onMounted(async () => {
   mcccStore.loadMcccStore();
   await fetchTeachers();
 
-  const storeTeacherIds = mcccStore.teacherIds || [];
+  if (mcccStore.referents && mcccStore.referents.length > 0) {
+    selectedTeacherIds.value = mcccStore.referents.map(t => {
+      const id = typeof t === 'object' ? (t.teacherID || t.id) : t;
+      return Number(id);
+    });
 
-  selectedTeacherIds.value = storeTeacherIds.map(t => Number(t.teacherID));
-  referentTeacherIds.value = storeTeacherIds
-      .filter(t => t.isManager)
-      .map(t => Number(t.teacherID));
+    referentTeacherIds.value = mcccStore.referents
+        .filter(t => typeof t === 'object' && (t.isManager || t.isReferent))
+        .map(t => {
+          const id = typeof t === 'object' ? (t.teacherID || t.id) : t;
+          return Number(id);
+        });
+  }
+  else if (mcccStore.teacherIds && mcccStore.teacherIds.length > 0) {
+    selectedTeacherIds.value = mcccStore.teacherIds.map(t => {
+      const id = typeof t === 'object' ? (t['teacherID'] || t['id']) : t;
+      return Number(id);
+    });
 
-  console.log("Selected IDs:", selectedTeacherIds.value);
-  console.log("Referent IDs:", referentTeacherIds.value);
+    referentTeacherIds.value = mcccStore.teacherIds
+        .filter(t => typeof t === 'object' && (t['isManager'] || t['isReferent']))
+        .map(t => {
+          const id = typeof t === 'object' ? (t['teacherID'] || t['id']) : t;
+          return Number(id);
+        });
+  }
+  else {
+    selectedTeacherIds.value = [];
+    referentTeacherIds.value = [];
+  }
+  updateStoreReferents();
 
   mcccStore.saveBackup();
   initialState.value = {
