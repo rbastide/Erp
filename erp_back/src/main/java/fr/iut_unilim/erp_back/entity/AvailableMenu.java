@@ -31,6 +31,17 @@ public class AvailableMenu {
     @OneToMany(mappedBy = "parent")
     private List<AvailableMenu> children;
 
+    public AvailableMenu() {
+    }
+
+    public AvailableMenu(String label, String permissionKey, String route, String iconId, AvailableMenu parent) {
+        this.label = label;
+        this.permissionKey = permissionKey;
+        this.route = route;
+        this.iconId = iconId;
+        this.parent = parent;
+    }
+
     public String getPermissionKey() {
         return permissionKey;
     }
