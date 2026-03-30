@@ -14,4 +14,5 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     List<Resource> findByNum(String num);
 
     List<Resource> findAllByUniversityDepartment(UniversityDepartment universityDepartment);
+
 }
