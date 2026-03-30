@@ -114,11 +114,11 @@ public class SkillController {
     }
 
     private void handleDepartment(Skill resourceSheet, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
+        Optional<Connection> connection = connectionService.findByIdentifier(authentication.getName());
 
-        if (connection == null) return;
+        if (connection.isEmpty()) return;
 
-        resourceSheet.setUniversityDepartment(connection.getUniversityDepartment());
+        resourceSheet.setUniversityDepartment(connection.get().getUniversityDepartment());
     }
 
     @NotNull

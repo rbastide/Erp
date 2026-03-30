@@ -24,8 +24,9 @@ public class SaeService {
     }
 
     public List<SaeDto> getAllSaesFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
-        UniversityDepartment department = senderConnection.getUniversityDepartment();
+        Optional<Connection> senderConnection = connectionService.findByIdentifier(identifier);
+        if (senderConnection.isEmpty()) return new ArrayList<>();
+        UniversityDepartment department = senderConnection.get().getUniversityDepartment();
 
         List<Sae> saes = saeRepository.findAllByUniversityDepartment(department);
 
@@ -72,11 +73,11 @@ public class SaeService {
     }
 
     private void handleDepartment(Sae sae, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
+        Optional<Connection> connection = connectionService.findByIdentifier(authentication.getName());
 
-        if (connection == null) return;
+        if (connection.isEmpty()) return;
 
-        sae.setUniversityDepartment(connection.getUniversityDepartment());
+        sae.setUniversityDepartment(connection.get().getUniversityDepartment());
     }
 
     private List<SaeDto> convertToSaeDto(List<Sae> saes) {

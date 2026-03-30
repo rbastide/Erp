@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/resources")
 public class ResourceController {
@@ -30,10 +32,11 @@ public class ResourceController {
     @PostMapping("/edit-resource")
     @PreAuthorize("@securityService.hasPermission('RESOURCE_MANAGEMENT')")
     public ResponseEntity<?> createAndEditResource(@RequestBody ResourceDto res, Authentication authentication) {
-        Connection connection = connectionService.findByIdentifier(authentication.getName());
+        Optional<Connection> connectionOptional = connectionService.findByIdentifier(authentication.getName());
 
-        if (connection == null) return ResponseEntity.badRequest().build();
+        if (connectionOptional.isEmpty()) return ResponseEntity.badRequest().build();
 
+        Connection connection = connectionOptional.get();
         final boolean resourceHasBeenSaved = resourceService.saveFromDto(res, connection.getUniversityDepartment());
 
         if (!resourceHasBeenSaved) {
