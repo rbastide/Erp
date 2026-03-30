@@ -4,7 +4,10 @@ import fr.iut_unilim.erp_back.dto.McccRequest;
 import fr.iut_unilim.erp_back.dto.TeacherMccDto;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Resource;
+import fr.iut_unilim.erp_back.entity.Skill;
 import fr.iut_unilim.erp_back.repository.ResourceRepository;
+import fr.iut_unilim.erp_back.repository.SkillRepository;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -12,105 +15,116 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class McccImportService {
 
     private final McccService mcccService;
     private final ResourceRepository resourceRepository;
+    private final SkillRepository skillRepository;
 
-    public McccImportService(McccService mcccService, ResourceRepository resourceRepository) {
+    public McccImportService(McccService mcccService, ResourceRepository resourceRepository, SkillRepository skillRepository) {
         this.mcccService = mcccService;
         this.resourceRepository = resourceRepository;
+        this.skillRepository = skillRepository;
     }
 
     public void importExcelFile(MultipartFile file, Integer year, Connection connection) throws Exception {
         try (InputStream is = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(is)) {
 
-            // On boucle sur TOUTES les feuilles du fichier (BUT1, BUT2, BUT3)
             for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
                 Sheet sheet = workbook.getSheetAt(sheetIndex);
 
-                // --- ⚙️ ZONE DE CONFIGURATION DES COLONNES ⚙️ ---
-                // Ouvre ton fichier Excel et vérifie ces numéros (Rappel : A=0, B=1, C=2, D=3, E=4...)
-                final int COL_TITLE = 1; // Colonne B (Intitulé de la ressource, ex: "R3.01 Dév web")
+                int colTitle = -1;
+                int colCm = -1, colTd = -1, colTp = -1;
+                Map<Integer, String> ueColumns = new HashMap<>();
 
-                // Remplace ces valeurs par les vraies colonnes où se trouvent tes heures CM, TD, TP
-                final int COL_CM = 4;    // Exemple: Colonne E
-                final int COL_TD = 5;    // Exemple: Colonne F
-                final int COL_TP = 6;    // Exemple: Colonne G
-
-                // Colonnes des Compétences (UE)
-                final int COL_UE_31 = 11; // Exemple: Colonne L
-                final int COL_UE_32 = 12; // Exemple: Colonne M
-                final int COL_UE_33 = 13; // Exemple: Colonne N
-                final int COL_UE_34 = 14; // Exemple: Colonne O
-                final int COL_UE_35 = 15; // Exemple: Colonne P
-                final int COL_UE_36 = 16; // Exemple: Colonne Q
-
-                // ------------------------------------------------
+                boolean inDataSection = false;
 
                 for (Row row : sheet) {
-                    // Les fichiers MCCC ont souvent de gros en-têtes. On ignore les 4 premières lignes.
-                    if (row.getRowNum() <= 4) continue;
 
-                    // 1. Lecture du nom complet
-                    Cell titleCell = row.getCell(COL_TITLE);
-                    if (titleCell == null) continue;
+                    if (!inDataSection) {
+                        for (Cell cell : row) {
+                            if (cell.getCellType() == CellType.STRING) {
+                                String val = cell.getStringCellValue().replaceAll("[\\n\\r\\u00A0]", " ").replaceAll("\\s+", " ").trim().toUpperCase();
 
-                    String fullTitle = titleCell.getStringCellValue().trim();
-                    if (fullTitle.isEmpty()) continue;
+                                if (val.contains("INTITULÉ DES RESSOURCES ET DES SAÉ") || val.contains("INTITULE DES RESSOURCES ET DES SAE")) {
+                                    colTitle = cell.getColumnIndex();
+                                } else if (val.contains("COEFFICIENTS UE")) {
+                                    ueColumns.put(cell.getColumnIndex(), val);
+                                } else if (val.equals("CM") && colCm == -1) {
+                                    colCm = cell.getColumnIndex();
+                                } else if (val.equals("TD") && colTd == -1) {
+                                    colTd = cell.getColumnIndex();
+                                } else if (val.equals("TP") && colTp == -1) {
+                                    colTp = cell.getColumnIndex();
+                                }
+                            }
+                        }
 
-                    // 2. Séparation Numéro / Nom
-                    String[] parts = fullTitle.split(" ", 2);
-                    if (parts.length < 2) continue;
+                        if (colTitle != -1 && colCm != -1 && colTd != -1 && colTp != -1 && !ueColumns.isEmpty()) {
+                            inDataSection = true;
+                        }
+                        continue;
+                    }
 
-                    String resourceNum = parts[0]; // Contient "R3.01"
+                    Cell titleCell = row.getCell(colTitle);
+                    if (titleCell == null || titleCell.getCellType() != CellType.STRING) continue;
 
-                    // 3. Recherche en base
-                    List<Resource> resources = resourceRepository.findByNum(resourceNum);
+                    String fullTitle = titleCell.getStringCellValue().replaceAll("[\\n\\r\\u00A0]", " ").replaceAll("\\s+", " ").trim();
 
-                    if (resources != null && !resources.isEmpty()) {
-                        Long resourceId = resources.get(0).getResourceID();
+                    if (fullTitle.isEmpty() || fullTitle.toUpperCase().startsWith("TOTAL") || fullTitle.startsWith("%") || fullTitle.toUpperCase().startsWith("PORTFOLIO")) continue;
 
-                        // 4. Lecture des heures via nos variables de configuration
-                        Float minCM = getNumericValueFromCell(row, COL_CM);
-                        Float minTD = getNumericValueFromCell(row, COL_TD);
-                        Float minTP = getNumericValueFromCell(row, COL_TP);
+                    if (fullTitle.toUpperCase().startsWith("R")) {
 
-                        // 5. Gestion des Compétences (Skills)
-                        List<Long> skillIdsList = new ArrayList<>();
+                        String resourceNum = fullTitle.split(" ")[0].replace("|", "").trim();
 
-                        // Ajout dynamique des compétences si la cellule contient un coefficient
-                        if (getNumericValueFromCell(row, COL_UE_31) > 0) skillIdsList.add(1L); // Remplace 1L par l'ID réel de l'UE 1
-                        if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(2L); // Remplace 2L par l'ID réel de l'UE 2
-                        if (getNumericValueFromCell(row, COL_UE_33) > 0) skillIdsList.add(3L); // Remplace 3L par l'ID réel de l'UE 3
-                        if (getNumericValueFromCell(row, COL_UE_34) > 0) skillIdsList.add(4L); // Remplace 4L par l'ID réel de l'UE 4
-                        if (getNumericValueFromCell(row, COL_UE_35) > 0) skillIdsList.add(5L); // Remplace 5L par l'ID réel de l'UE 5
-                        if (getNumericValueFromCell(row, COL_UE_36) > 0) skillIdsList.add(6L); // Remplace 6L par l'ID réel de l'UE 6
-                        // N'hésite pas à copier-coller cette ligne pour les autres UE de ton tableau
+                        List<Resource> resources = resourceRepository.findByNum(resourceNum);
 
-                        // 6. Gestion des SAÉs (Même principe)
-                        List<Long> saeIdsList = new ArrayList<>();
+                        if (resources != null && !resources.isEmpty()) {
+                            Long resourceId = resources.get(0).getResourceID();
 
-                        // 7. Création du DTO
-                        McccRequest dto = new McccRequest(
-                                resourceId,
-                                minCM,
-                                minTD,
-                                minTP,
-                                0f, // minDS laissé à 0
-                                0f, // minDSTP laissé à 0
-                                year,
-                                saeIdsList.toArray(new Long[0]),
-                                skillIdsList.toArray(new Long[0]),
-                                new TeacherMccDto[]{}
-                        );
+                            Float minCM = getNumericValueFromCell(row, colCm);
+                            Float minTD = getNumericValueFromCell(row, colTd);
+                            Float minTP = getNumericValueFromCell(row, colTp);
 
-                        // 8. Sauvegarde
-                        mcccService.saveFromDto(dto, connection);
+                            List<Long> skillIdsList = new ArrayList<>();
+
+                            for (Map.Entry<Integer, String> entry : ueColumns.entrySet()) {
+                                Float coeff = getNumericValueFromCell(row, entry.getKey());
+                                if (coeff != null && coeff > 0f) {
+                                    int skillNum = extractSkillNum(entry.getValue());
+
+                                    if (skillNum > 0) {
+                                        List<Skill> skills = skillRepository.findBySkillNum(skillNum);
+                                        if (skills != null && !skills.isEmpty()) {
+                                            skillIdsList.add(skills.get(0).getSkillID());
+                                        }
+                                    }
+                                }
+                            }
+
+                            McccRequest dto = new McccRequest(
+                                    resourceId,
+                                    minCM,
+                                    minTD,
+                                    minTP,
+                                    0f,
+                                    0f,
+                                    year,
+                                    new Long[0],
+                                    skillIdsList.toArray(new Long[0]),
+                                    new TeacherMccDto[]{}
+                            );
+
+                            mcccService.saveFromDto(dto, connection);
+                        }
                     }
                 }
             }
@@ -126,8 +140,8 @@ public class McccImportService {
                 return (float) cell.getNumericCellValue();
             case STRING:
                 try {
-                    String stringValue = cell.getStringCellValue().replace(",", ".");
-                    if (stringValue.trim().isEmpty()) return 0f;
+                    String stringValue = cell.getStringCellValue().replace(",", ".").trim();
+                    if (stringValue.isEmpty() || stringValue.equals("-")) return 0f;
                     return Float.parseFloat(stringValue);
                 } catch (NumberFormatException e) {
                     return 0f;
@@ -135,5 +149,14 @@ public class McccImportService {
             default:
                 return 0f;
         }
+    }
+
+    private int extractSkillNum(String columnName) {
+        Pattern pattern = Pattern.compile("UE\\s*\\d+\\.(\\d+)");
+        Matcher matcher = pattern.matcher(columnName.toUpperCase());
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return -1;
     }
 }
