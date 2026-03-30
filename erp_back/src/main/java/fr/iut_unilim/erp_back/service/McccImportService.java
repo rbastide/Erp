@@ -86,13 +86,10 @@ public class McccImportService {
                         // Ajout dynamique des compétences si la cellule contient un coefficient
                         if (getNumericValueFromCell(row, COL_UE_31) > 0) skillIdsList.add(1L); // Remplace 1L par l'ID réel de l'UE 1
                         if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(2L); // Remplace 2L par l'ID réel de l'UE 2
-                        if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(3L); // Remplace 3L par l'ID réel de l'UE 2
-                        if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(4L); // Remplace 4L par l'ID réel de l'UE 2
-                        if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(5L); // Remplace 5L par l'ID réel de l'UE 2
-                        if (getNumericValueFromCell(row, COL_UE_32) > 0) skillIdsList.add(6L); // Remplace 6L par l'ID réel de l'UE 2
-
-
-
+                        if (getNumericValueFromCell(row, COL_UE_33) > 0) skillIdsList.add(3L); // Remplace 3L par l'ID réel de l'UE 3
+                        if (getNumericValueFromCell(row, COL_UE_34) > 0) skillIdsList.add(4L); // Remplace 4L par l'ID réel de l'UE 4
+                        if (getNumericValueFromCell(row, COL_UE_35) > 0) skillIdsList.add(5L); // Remplace 5L par l'ID réel de l'UE 5
+                        if (getNumericValueFromCell(row, COL_UE_36) > 0) skillIdsList.add(6L); // Remplace 6L par l'ID réel de l'UE 6
                         // N'hésite pas à copier-coller cette ligne pour les autres UE de ton tableau
 
                         // 6. Gestion des SAÉs (Même principe)
