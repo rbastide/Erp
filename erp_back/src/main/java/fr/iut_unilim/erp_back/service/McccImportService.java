@@ -10,6 +10,7 @@ import fr.iut_unilim.erp_back.repository.SkillRepository;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,32 +97,9 @@ public class McccImportService {
 
                             List<Long> skillIdsList = new ArrayList<>();
 
-                            for (Map.Entry<Integer, String> entry : ueColumns.entrySet()) {
-                                Float coeff = getNumericValueFromCell(row, entry.getKey());
-                                if (coeff != null && coeff > 0f) {
-                                    int skillNum = extractSkillNum(entry.getValue());
+                            getSkillNum(row, ueColumns, skillIdsList);
 
-                                    if (skillNum > 0) {
-                                        List<Skill> skills = skillRepository.findBySkillNum(skillNum);
-                                        if (skills != null && !skills.isEmpty()) {
-                                            skillIdsList.add(skills.get(0).getSkillID());
-                                        }
-                                    }
-                                }
-                            }
-
-                            McccRequest dto = new McccRequest(
-                                    resourceId,
-                                    minCM,
-                                    minTD,
-                                    minTP,
-                                    0f,
-                                    0f,
-                                    year,
-                                    new Long[0],
-                                    skillIdsList.toArray(new Long[0]),
-                                    new TeacherMccDto[]{}
-                            );
+                            McccRequest dto = newMccRequest(year, resourceId, minCM, minTD, minTP, skillIdsList);
 
                             mcccService.saveFromDto(dto, connection);
                         }
@@ -129,6 +107,39 @@ public class McccImportService {
                 }
             }
         }
+    }
+
+    private void getSkillNum(Row row, Map<Integer, String> ueColumns, List<Long> skillIdsList) {
+        for (Map.Entry<Integer, String> entry : ueColumns.entrySet()) {
+            Float coeff = getNumericValueFromCell(row, entry.getKey());
+            if (coeff != null && coeff > 0f) {
+                int skillNum = extractSkillNum(entry.getValue());
+
+                if (skillNum > 0) {
+                    List<Skill> skills = skillRepository.findBySkillNum(skillNum);
+                    if (skills != null && !skills.isEmpty()) {
+                        skillIdsList.add(skills.get(0).getSkillID());
+                    }
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private static McccRequest newMccRequest(Integer year, Long resourceId, Float minCM, Float minTD, Float minTP, List<Long> skillIdsList) {
+        McccRequest dto = new McccRequest(
+                resourceId,
+                minCM,
+                minTD,
+                minTP,
+                0f,
+                0f,
+                year,
+                new Long[0],
+                skillIdsList.toArray(new Long[0]),
+                new TeacherMccDto[]{}
+        );
+        return dto;
     }
 
     private Float getNumericValueFromCell(Row row, int columnIndex) {
