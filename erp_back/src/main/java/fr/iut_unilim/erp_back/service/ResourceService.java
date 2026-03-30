@@ -73,7 +73,9 @@ public class ResourceService {
     }
 
     public List<ResourceDto> getAllResourceFromDepartment(@NotNull String identifier) {
-        Connection senderConnection = connectionService.findByIdentifier(identifier);
+        Optional<Connection> senderConnectionOptional = connectionService.findByIdentifier(identifier);
+        if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
+        Connection senderConnection = senderConnectionOptional.get();
         UniversityDepartment department = senderConnection.getUniversityDepartment();
 
         List<Resource> resources = resourceRepository.findAllByUniversityDepartment(department);

@@ -11,6 +11,7 @@ import ModifSavedModal from '../Information/ModifSavedModal.vue';
 const router = useRouter();
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
+const isFetchingData = ref(false);
 
 const getCurrentAcademicYear = () => {
   const now = new Date();
@@ -19,13 +20,78 @@ const getCurrentAcademicYear = () => {
   return month < 8 ? year - 1 : year;
 };
 
-onMounted(() => {
-  mcccStore.loadMcccStore();
+const loadMissingData = async () => {
+  isFetchingData.value = true;
+  try {
+    if (mcccStore.saeIds && mcccStore.saeIds.length > 0 && (!mcccStore.saeCodes || mcccStore.saeCodes.length === 0)) {
+      const resSae = await api.get('/sae/saes');
+      const allSaes = Array.isArray(resSae.data) ? resSae.data : (resSae.data.content || []);
+      mcccStore.saeCodes = mcccStore.saeIds.map(id => {
+        const found = allSaes.find(s => s.saeID === id);
+        return {
+          saeCode: found ? found.num : '',
+          saeName: found ? found.title : ''
+        };
+      });
+    }
+    if (mcccStore.skillIds && mcccStore.skillIds.length > 0 && (!mcccStore.acsGrouped || mcccStore.acsGrouped.length === 0)) {
+      const resSkills = await api.get('/skill/skills');
+      const allSkills = resSkills.data || [];
+      mcccStore.acsGrouped = [];
 
+      allSkills.forEach(skill => {
+        if (mcccStore.skillIds.includes(skill.id)) {
+          mcccStore.acsGrouped.push({
+            id: skill.id,
+            resourceCode: mcccStore.resourceCode,
+            ue: skill.skillName,
+            skillNum: skill.skillNum,
+            allLevels: skill.levels.map(level => ({
+              title: level.title || level.name || level.label || level.levelTitle || level.rankTitle || "Niveau sans titre",
+              acs: level.acs.map(ac => ({
+                learningNum: ac.num || ac.acNum || ac.learningNum,
+                learningTitle: ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "Titre manquant"
+              }))
+            }))
+          });
+        }
+      });
+    }
+
+    if (mcccStore.teacherIds && mcccStore.teacherIds.length > 0 && (!mcccStore.referents || mcccStore.referents.length === 0)) {
+      const resUsers = await api.get('/auth/users');
+      const allUsers = Array.isArray(resUsers.data) ? resUsers.data : (resUsers.data.content || []);
+
+      // Suppression de (t: any) -> (t)
+      mcccStore.referents = mcccStore.teacherIds.map((t) => {
+        const tId = typeof t === 'object' ? t.teacherID : t;
+        const isRef = typeof t === 'object' ? (t.isManager === true) : false;
+
+        const found = allUsers.find((u) => u.id === tId);
+        return {
+          id: tId,
+          firstname: found ? found.firstName : 'Enseignant',
+          lastname: found ? found.lastName : 'Inconnu',
+          isReferent: isRef
+        };
+      });
+    }
+    mcccStore.registerMcccStore();
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données manquantes :", error);
+  } finally {
+    isFetchingData.value = false;
+  }
+};
+
+onMounted(async () => {
+  mcccStore.loadMcccStore();
   if(!mcccStore.creationDate){
     mcccStore.creationDate = new Date().toLocaleDateString('fr-FR');
   }
   mcccStore.editDate = new Date().toLocaleDateString('fr-FR');
+  await loadMissingData();
 });
 
 const formatHour = (minutesVal) => {
@@ -180,7 +246,7 @@ const handleCloseSuccess = () => {
       </div>
 
       <div class="container-btn">
-        <button @click="handleValidate" class="btn-sys primary">Valider et Sauvegarder</button>
+        <button @click="handleValidate" class="btn-sys primary" :disabled="isFetchingData">Valider et Sauvegarder</button>
         <button @click="handleBack" class="btn-sys secondary">Retour</button>
       </div>
 
@@ -369,6 +435,17 @@ const handleCloseSuccess = () => {
 .btn-sys.primary {
   background: #B51621;
   color: white;
+}
+
+.btn-sys:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-sys.primary:hover:not(:disabled) {
+  background: #96121b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(181, 22, 33, 0.3);
 }
 
 .btn-sys.primary:hover {

@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
+
+import static fr.iut_unilim.erp_back.tools.utils.HashGenerator.generateBlindIndex;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -21,14 +24,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Connection user = userRepository.findByIdentifier(username);
+        String hashedIdentifier;
+        try {
+            hashedIdentifier = generateBlindIndex(username);
+        } catch (Exception e) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        Optional<Connection> userOptional = userRepository.findByHashedIdentifier(hashedIdentifier);
 
-        if (user == null) {
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
         return new org.springframework.security.core.userdetails.User(
-                user.getIdentifier(),
+                userOptional.get().getIdentifier(),
                 "",
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getRoleName())));
+                Collections.singletonList(new SimpleGrantedAuthority(userOptional.get().getRole().getRoleName())));
     }
 }

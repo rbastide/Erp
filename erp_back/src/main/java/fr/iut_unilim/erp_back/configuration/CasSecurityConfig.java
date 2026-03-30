@@ -53,6 +53,12 @@ public class CasSecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${encryption.key}")
+    private String encryptionPassword;
+
+    @Value("${encryption.salt}")
+    private String encryptionSalt;
+
     public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils, ConnectionRepository connectionRepository) {
         this.customUserDetailsService = customUserDetailsService;
         this.JwtUtils = jwtUtils;
@@ -96,7 +102,6 @@ public class CasSecurityConfig {
         return (request, response, authentication) -> {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String username = userDetails.getUsername();
-            String email = "";
 
             if (authentication instanceof CasAuthenticationToken casToken) {
                 Map<String,Object> attributes = casToken.getAssertion().getPrincipal().getAttributes();
@@ -210,5 +215,10 @@ public class CasSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(Collections.singletonList(casAuthenticationProvider()));
+    }
+
+    @Bean
+    public TextEncryptor textEncryptor() {
+        return Encryptors.text(encryptionPassword, encryptionSalt);
     }
 }
