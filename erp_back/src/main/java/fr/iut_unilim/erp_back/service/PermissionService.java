@@ -94,10 +94,10 @@ public class PermissionService {
     }
 
     public boolean hasPrivilege(Role role, PermissionDefinition permissionDefinition) {
-        List<RolePermission> permissions = permissionRepository.findByRole(role);
-        if (permissions.size() != 1) return false;
+        Optional<RolePermission> permissions = permissionRepository.findByRole(role);
+        if (permissions.isEmpty()) return false;
 
-        RolePermission permission = permissions.get(0);
+        RolePermission permission = permissions.get();
 
         BitSet permBits = permission.getBitSet();
         int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();

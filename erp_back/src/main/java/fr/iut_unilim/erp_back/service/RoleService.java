@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.RoleResponse;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.entity.Role;
@@ -45,18 +44,16 @@ public class RoleService {
         if (roleId == 1) return false;
 
         Optional<Role> roleOptional = roleRepository.findById(roleId);
-        ErpBackApplication.LOGGER.info("roleOptional: " + roleOptional);
         if (roleOptional.isEmpty()) return false;
 
         List<Connection> connections = connectionRepository.findAllByRole(roleOptional.get());
 
-        ErpBackApplication.LOGGER.info("connections: " + connections);
         if (!connections.isEmpty()) return false;
 
-        Optional<RolePermission> permissionOptional = permissionRepository.findById(roleId);
-        if (permissionOptional.isPresent()) {
-            permissionRepository.deleteById(roleId);
-        }
+        Optional<RolePermission> permissionOptional = permissionRepository.findByRole(roleOptional.get());
+        permissionOptional.ifPresent(rolePermission ->
+                permissionRepository.deleteById(rolePermission.getPermissionID())
+        );
 
         roleRepository.deleteById(roleId);
 
