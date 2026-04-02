@@ -1,5 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.MenuResponse;
 import fr.iut_unilim.erp_back.entity.AvailableMenu;
 import fr.iut_unilim.erp_back.entity.Connection;
@@ -43,12 +44,18 @@ public class AvailableMenuService {
     private Optional<MenuResponse> resolveAuthorizedMenu(AvailableMenu menu, Role role) {
         boolean isLeaf = menu.getChildren().isEmpty();
         boolean hasPermission = permissionService.hasPrivilege(role, menu.getPermissionKey());
+        ErpBackApplication.LOGGER.info("Menu: " + menu.getLabel() + " has permission: " + hasPermission);
 
         if (isLeaf && !hasPermission) {
             return Optional.empty();
         }
 
-        return Optional.of(convertEntityToResponse(menu, role));
+        MenuResponse menuResponse = convertEntityToResponse(menu, role);
+
+        boolean hasNoAuthorizedChildren = menuResponse.children().isEmpty();
+        if (!isLeaf && hasNoAuthorizedChildren) return Optional.empty();
+
+        return Optional.of(menuResponse);
     }
 
     private MenuResponse convertEntityToResponse(AvailableMenu menu, Role role) {
