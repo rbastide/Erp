@@ -15,9 +15,10 @@ interface Resource {
   semester: string;
 }
 
+const nextYear = ref<number>(new Date().getFullYear() + 1);
+const selectedYear = ref<number>(nextYear.value);
 const resources = ref<Resource[]>([]);
-const availableYears = ref<number[]>([]);
-const selectedYear = ref<number>(new Date().getFullYear());
+const availableYears = ref<number[]>([nextYear.value]);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const isImporting = ref(false);
@@ -25,7 +26,8 @@ const isImporting = ref(false);
 const fetchYears = async () => {
   try {
     const response = await api.get('/mccc/available-years');
-    availableYears.value = response.data.sort((a: number, b: number) => b - a);
+    availableYears.value = availableYears.value.concat(response.data)
+    availableYears.value.sort((a, b) => a - b);
     if (availableYears.value.length > 0 && !availableYears.value.includes(selectedYear.value)) {
       selectedYear.value = availableYears.value[0];
     }
@@ -51,16 +53,36 @@ const fetchMcccsByYear = async () => {
   }
 };
 
-onMounted(() => {
-  fetchMcccsByYear();
+const fetchResources = async () => {
+  try {
+    const response = await api.get('/resources/resources');
+    resources.value = response.data.map((item: any) => {
+      return {
+        resourceID: item.resourceID,
+        num: item.num,
+        name: item.name
+      };
+    });
+  } catch (error) {
+    console.error("Erreur lors du chargement des ressources:", error);
+  }
+}
+
+onMounted(async () => {
+  await fetchResources();
   fetchYears();
   mcccStore.loadMcccStore();
   mcccStore.saveBackup();
 });
 
-watch(selectedYear, (newYear) => {
+watch(selectedYear, async (newYear) => {
   mcccStore.year = newYear;
-  fetchMcccsByYear();
+  console.log(selectedYear.value, nextYear.value)
+  if (selectedYear.value !== nextYear.value) {
+    await fetchMcccsByYear();
+  } else {
+    await fetchResources();
+  }
 });
 
 const handleBack = () => {
