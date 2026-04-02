@@ -1,9 +1,11 @@
 package fr.iut_unilim.erp_back.configuration;
 
 
+import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apereo.cas.client.validation.Cas30ServiceTicketValidator;
@@ -33,6 +35,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +46,7 @@ public class CasSecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils JwtUtils;
     private final ConnectionRepository connectionRepository;
+    private final ConnectionService connectionService;
 
     @Value("${cas.server}")
     private String casServerUrl;
@@ -59,10 +63,11 @@ public class CasSecurityConfig {
     @Value("${encryption.salt}")
     private String encryptionSalt;
 
-    public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils, ConnectionRepository connectionRepository) {
+    public CasSecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils, ConnectionRepository connectionRepository, ConnectionService connectionService) {
         this.customUserDetailsService = customUserDetailsService;
         this.JwtUtils = jwtUtils;
         this.connectionRepository = connectionRepository;
+        this.connectionService = connectionService;
     }
 
 
@@ -106,15 +111,15 @@ public class CasSecurityConfig {
             if (authentication instanceof CasAuthenticationToken casToken) {
                 Map<String,Object> attributes = casToken.getAssertion().getPrincipal().getAttributes();
 
-                Connection user = connectionRepository.findByIdentifier(username);
-
-
+                Optional<Connection> userOpt = connectionService.findByIdentifier(username);
                 boolean needUpdate = false;
-                if (user != null) {
+                if(userOpt.isPresent()) {
+                    Connection user = userOpt.get();
+
+                System.out.println(user);
 
                     if (attributes.containsKey("mail")) {
                         String casEmail = (String) attributes.get("mail");
-
                         if (casEmail != null && !casEmail.equals(user.getEmail())) {
                             user.setEmail(casEmail);
                             needUpdate = true;
@@ -130,11 +135,12 @@ public class CasSecurityConfig {
                         user.setFirstName((String) attributes.get("givenName"));
                         needUpdate = true;
                     }
-                }
 
                     if (needUpdate) {
                         connectionRepository.save(user);
                     }
+                }
+
                 }
 
             String jwt = JwtUtils.generateToken(username);
