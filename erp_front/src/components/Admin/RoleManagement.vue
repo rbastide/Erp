@@ -82,18 +82,19 @@ onMounted(() => {
 
 const filteredRoles = computed(() => {
   let result = roles.value;
-
   const query = searchQuery.value.toLowerCase().trim();
   if (query) {
     result = result.filter(roleItem =>
-        (roleItem.role?.name || roleItem.name || roleItem.label || '').toLowerCase().includes(query)
+        (roleItem.role?.name).toLowerCase().includes(query)
     );
   }
 
-  return result.slice().sort((a, b) => {
-    const aLen = getActivePermissions(a.permissions).length;
-    const bLen = getActivePermissions(b.permissions).length;
-    return bLen - aLen;
+  const getRoleWeight = (role) => getActivePermissions(role.permissions).length;
+
+  return result.slice().sort((roleA, roleB) => {
+    const weightA = getRoleWeight(roleA);
+    const weightB = getRoleWeight(roleB);
+    return weightB - weightA;
   });
 });
 
@@ -121,7 +122,7 @@ const handleDuplicate = (sourceRole) => {
   Object.assign(editedRole, {
     id: null,
     name: '',
-    label: `${sourceRole.role?.name || sourceRole.name || sourceRole.label} (Copie)`,
+    label: `${sourceRole.role?.name} (Copie)`,
     permissions: getActivePermissions(sourceRole.permissions)
   });
 };
@@ -210,8 +211,8 @@ const handleValidate = () => router.push('/home');
   <div class="page-container">
 
     <ErrorDeleteRoleModal
-      v-if="showErrorModal"
-      @close="showErrorModal= false"/>
+        v-if="showErrorModal"
+        @close="showErrorModal= false"/>
 
     <AppHeader title="Gestion des Rôles" />
 
