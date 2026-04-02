@@ -24,7 +24,7 @@ const fetchSAEs = async () => {
       saeData = response.data.content;
     }
     availableSae.value = saeData.map(s => ({
-      id: s.saeID,
+      id: Number(s.saeID || s.id),
       title: s.title,
       semester: s.num ? parseInt(s.num.match(/\d/)?.[0]) : null,
       num: s.num,
@@ -38,9 +38,23 @@ onMounted(async () => {
   mcccStore.loadMcccStore();
   await fetchSAEs();
 
-  if (mcccStore.saeIds && mcccStore.saeIds.length > 0) {
-    selectedSaeIds.value = [...mcccStore.saeIds];
-  } else {
+  if (mcccStore.saeCodes && mcccStore.saeCodes.length > 0 && (!mcccStore.saeIds || mcccStore.saeIds.length === 0)) {
+    selectedSaeIds.value = mcccStore.saeCodes.map(saeObj => {
+      const foundSae = availableSae.value.find(s => s.num === saeObj['saeCode']);
+      return foundSae ? Number(foundSae.id) : null;
+    }).filter(id => id !== null);
+
+    mcccStore.saeIds = [...selectedSaeIds.value];
+  }
+  else if (mcccStore.saeIds && mcccStore.saeIds.length > 0) {
+    selectedSaeIds.value = mcccStore.saeIds.map(item => {
+      const obj = Object(item);
+
+      const id = typeof item === 'object' ? (obj.saeID || obj.id) : item;
+      return Number(id);
+    });
+  }
+  else {
     selectedSaeIds.value = [];
   }
 
@@ -65,11 +79,13 @@ const syncStoreWithSelection = () => {
 
 const toggleSae = (saeId) => {
   errorMessage.value = '';
-  const index = selectedSaeIds.value.indexOf(saeId);
+  const idNumber = Number(saeId); // Sécurité supplémentaire
+  const index = selectedSaeIds.value.indexOf(idNumber);
+
   if (index > -1) {
     selectedSaeIds.value.splice(index, 1);
   } else {
-    selectedSaeIds.value.push(saeId);
+    selectedSaeIds.value.push(idNumber);
   }
 };
 

@@ -5,6 +5,7 @@ import fr.iut_unilim.erp_back.entity.Connection;
 import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apereo.cas.client.validation.Cas30ServiceTicketValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collections;
 import java.util.Map;
@@ -147,7 +150,6 @@ public class CasSecurityConfig {
         filter.setServiceProperties(serviceProperties());
         filter.setFilterProcessesUrl("/login/cas");
         filter.setAuthenticationSuccessHandler(casSuccessHandler());
-
         return filter;
     }
 
@@ -159,15 +161,42 @@ public class CasSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/login/cas").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/logout","/api/auth/logout").permitAll()
                         .anyRequest().authenticated()
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout") // L'endpoint appelé par votre front
+                        .logoutSuccessHandler(customLogoutSuccessHandler())
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                )
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(casAuthenticationEntryPoint())
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            if (request.getRequestURI().startsWith("/api/")
+                                    || "XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json");
+                                response.getWriter().write("{\"error\": \"Non authentifié\"}");
+                            } else {
+                                casAuthenticationEntryPoint().commence(request, response, authException);
+                            }
+                        })
                 )
                 .addFilterBefore(casAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtFilter(customUserDetailsService, JwtUtils), CasAuthenticationFilter.class)
                 .build();
+    }
+
+
+    @Bean
+    public LogoutSuccessHandler customLogoutSuccessHandler() {
+        return (request, response, authentication) -> {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            String casLogoutUrl = casServerUrl + "/logout?service=" + frontendUrl;
+            response.getWriter().write("{\"logoutUrl\": \"" + casLogoutUrl + "\"}");
+            response.getWriter().flush();
+        };
     }
 
     @Bean

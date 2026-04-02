@@ -183,7 +183,6 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @PreAuthorize("@securityService.isLogin()")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from("auth_token", "")
                 .httpOnly(true)
