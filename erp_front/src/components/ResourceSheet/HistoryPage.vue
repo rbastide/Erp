@@ -234,7 +234,7 @@ const clearSearch = () => searchQuery.value = '';
             </div>
 
             <button
-                v-if="!item.isValidate && (userRole === 'ADMIN' || userRole === 'SUPER-ADMIN')"
+                v-if="!item.isValidate && (userRole === 'ADMINISTRATEUR' || userRole === 'SUPER-ADMIN')"
                 class="btn-icon-container validate"
                 @click.stop="handleValidateSheet(item)"
                 title="Valider la fiche"
