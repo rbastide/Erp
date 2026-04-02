@@ -1,6 +1,5 @@
 package fr.iut_unilim.erp_back.service;
 
-import fr.iut_unilim.erp_back.ErpBackApplication;
 import fr.iut_unilim.erp_back.dto.MenuResponse;
 import fr.iut_unilim.erp_back.entity.AvailableMenu;
 import fr.iut_unilim.erp_back.entity.Connection;
@@ -25,46 +24,39 @@ public class AvailableMenuService {
     }
 
     public List<MenuResponse> getAvailableMenusFromUser(String username) {
-        Optional<Connection> connectionOptional = connectionService.findByIdentifier(username);
-        if (connectionOptional.isEmpty()) return new ArrayList<>();
+        Connection connection = connectionService.findByIdentifier(username).orElse(null);
+        if (connection == null) return new ArrayList<>();
 
-        Connection connection = connectionOptional.get();
         Role role = connection.getRole();
+        List<AvailableMenu> roots = availableMenuRepository.findByParentIdIsNull();
 
-        List<MenuResponse> authorizedMenus = new ArrayList<>();
-        List<AvailableMenu> menus = availableMenuRepository.findByParentIdIsNull();
-        for (AvailableMenu menu : menus) {
-            Optional<MenuResponse> availableMenuOptional = resolveAuthorizedMenu(menu, role);
-            availableMenuOptional.ifPresent(authorizedMenus::add);
-        }
-
-        return authorizedMenus;
+        return roots.stream()
+                .map(menu -> resolve(menu, role))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
-    private Optional<MenuResponse> resolveAuthorizedMenu(AvailableMenu menu, Role role) {
-        boolean isLeaf = menu.getChildren().isEmpty();
-        boolean hasPermission = permissionService.hasPrivilege(role, menu.getPermissionKey());
-        ErpBackApplication.LOGGER.info("Menu: " + menu.getLabel() + " has permission: " + hasPermission);
-
-        if (isLeaf && !hasPermission) {
-            return Optional.empty();
-        }
-
-        MenuResponse menuResponse = convertEntityToResponse(menu, role);
-
-        boolean hasNoAuthorizedChildren = menuResponse.children().isEmpty();
-        if (!isLeaf && hasNoAuthorizedChildren) return Optional.empty();
-
-        return Optional.of(menuResponse);
-    }
-
-    private MenuResponse convertEntityToResponse(AvailableMenu menu, Role role) {
-        List<AvailableMenu> subMenus = menu.getChildren();
-        List<MenuResponse> children = subMenus.stream()
-                .filter((cMenu) -> permissionService.hasPrivilege(role, cMenu.getPermissionKey()))
-                .map((cMenu) -> convertEntityToResponse(cMenu, role))
+    private Optional<MenuResponse> resolve(AvailableMenu menu, Role role) {
+        List<MenuResponse> authorizedChildren = menu.getChildren().stream()
+                .map(child -> resolve(child, role))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
 
-        return new MenuResponse(menu.getId(), menu.getLabel(), menu.getRoute(), menu.getIconId(), children);
+        boolean hasDirectPermission = permissionService.hasPrivilege(role, menu.getPermissionKey());
+        boolean hasVisibleChildren = !authorizedChildren.isEmpty();
+
+        if (hasDirectPermission || hasVisibleChildren) {
+            return Optional.of(new MenuResponse(
+                    menu.getId(),
+                    menu.getLabel(),
+                    menu.getRoute(),
+                    menu.getIconId(),
+                    authorizedChildren
+            ));
+        }
+
+        return Optional.empty();
     }
 }

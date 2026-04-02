@@ -30,7 +30,7 @@ public class AvailableMenuLoader implements CommandLineRunner {
         ));
 
         AvailableMenu parentMccc = availableMenuRepository.save(new AvailableMenu(
-                "MCCC", "MCC_MANAGEMENT", "/mccc-resource", "5", null
+                "MCCC", "MCCC_MANAGEMENT", "/mccc-resource", "5", null
         ));
         availableMenuRepository.save(parentMccc);
 
@@ -45,7 +45,7 @@ public class AvailableMenuLoader implements CommandLineRunner {
                 "Utilisateurs", "USER_MANAGEMENT", "/users-management", "1", parentUtilisateurs
         ));
         availableMenuRepository.save(new AvailableMenu(
-                "Rôles", "ROLE_MANAGEMENT", "/role-management", "10", parentUtilisateurs
+                "Rôles", "PERM_MANAGEMENT", "/role-management", "10", parentUtilisateurs
         ));
         availableMenuRepository.save(new AvailableMenu(
                 "Periodicité des rappels", "RECALL_MANAGEMENT", "/recall-management", "11", parentUtilisateurs
