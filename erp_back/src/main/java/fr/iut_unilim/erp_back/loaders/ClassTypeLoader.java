@@ -2,6 +2,7 @@ package fr.iut_unilim.erp_back.loaders;
 
 import fr.iut_unilim.erp_back.entity.ClassType;
 import fr.iut_unilim.erp_back.repository.ClassTypeRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,24 +18,16 @@ public class ClassTypeLoader implements CommandLineRunner {
     public void run(String... args) {
         if (classTypeRepository.count() != 0) return;
 
+        saveClassType("CM");
+        saveClassType("DS");
+        saveClassType("DS/TP");
+        saveClassType("TD");
+        saveClassType("TP");
+    }
+
+    private void saveClassType(@NotNull String classTypeName) {
         ClassType cmClassType = new ClassType();
-        cmClassType.setClassTypeName("CM");
+        cmClassType.setClassTypeName(classTypeName);
         classTypeRepository.save(cmClassType);
-
-        ClassType dsClassType = new ClassType();
-        dsClassType.setClassTypeName("DS");
-        classTypeRepository.save(dsClassType);
-
-        ClassType dstpClassType = new ClassType();
-        dstpClassType.setClassTypeName("DS/TP");
-        classTypeRepository.save(dstpClassType);
-
-        ClassType tdClassType = new ClassType();
-        tdClassType.setClassTypeName("TD");
-        classTypeRepository.save(tdClassType);
-
-        ClassType tpClassType = new ClassType();
-        tpClassType.setClassTypeName("TP");
-        classTypeRepository.save(tpClassType);
     }
 }

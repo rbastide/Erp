@@ -19,6 +19,9 @@ const resources = ref<Resource[]>([]);
 const availableYears = ref<number[]>([]);
 const selectedYear = ref<number>(new Date().getFullYear());
 
+const fileInput = ref<HTMLInputElement | null>(null);
+const isImporting = ref(false);
+
 const fetchYears = async () => {
   try {
     const response = await api.get('/mccc/available-years');
@@ -98,6 +101,41 @@ const handleMccc = async (id: number) => {
   mcccStore.registerMcccStore();
   await router.push('/mccc-menu');
 }
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('year', selectedYear.value.toString());
+
+  try {
+    isImporting.value = true;
+    const response = await api.post('/mccc/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    alert(response.data || "Les MCCC ont été importées et sauvegardées avec succès !");
+    await fetchMcccsByYear();
+  } catch (error: any) {
+    console.error("Erreur lors de l'importation :", error);
+    alert(error.response?.data || "Une erreur est survenue lors de l'importation du fichier.");
+  } finally {
+    isImporting.value = false;
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+  }
+};
 </script>
 
 <template>
@@ -143,6 +181,18 @@ const handleMccc = async (id: number) => {
       </div>
 
       <div class="footer-actions">
+        <input
+            type="file"
+            ref="fileInput"
+            @change="handleFileUpload"
+            accept=".xlsx, .xls"
+            style="display: none"
+        />
+
+        <button @click="triggerFileInput" class="import-btn" :disabled="isImporting">
+          {{ isImporting ? 'Importation en cours...' : 'Importer un fichier Excel' }}
+        </button>
+
         <button @click="handleBack" class="quit-btn">Retour</button>
       </div>
     </main>
@@ -287,11 +337,37 @@ const handleMccc = async (id: number) => {
   margin-top: 60px;
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.import-btn {
+  width: 250px;
+  padding: 12px;
+  border: 2px solid #217346;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #217346;
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.import-btn:hover:not(:disabled) {
+  background-color: transparent;
+  color: #217346;
+}
+
+.import-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .quit-btn {
-  width: 180px;
+  width: 250px;
   padding: 12px;
   border: 2px solid #B51621;
   text-align: center;
