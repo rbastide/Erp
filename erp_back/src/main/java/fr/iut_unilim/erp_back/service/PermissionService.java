@@ -61,7 +61,8 @@ public class PermissionService {
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
         Optional<RolePermission> permissionOptional = permissionRepository.findById(editRolePermissionRequest.permissionRoleId());
-        Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(editRolePermissionRequest.permissionId());
+        Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository
+                .findById(editRolePermissionRequest.permissionId());
 
         if (permissionOptional.isEmpty() || permissionDefinitionOptional.isEmpty()) {
             return false;
