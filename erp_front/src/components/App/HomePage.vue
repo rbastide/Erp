@@ -52,7 +52,7 @@ const isValidationMenu = (menu) => {
 };
 
 const openMenu = (menu) => {
-  if (menu.route !== null) {
+  if (menu.route !== null && menu.route !== undefined && menu.route !== '') {
     router.push(menu.route);
     return;
   }
