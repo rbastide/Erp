@@ -99,7 +99,6 @@ const filteredRoles = computed(() => {
 });
 
 const handleDelete = async (id) => {
-  console.log("id", id);
   if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
     try {
       await api.delete(`role/${id}`);
