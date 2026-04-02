@@ -29,6 +29,10 @@ public class ConnectionService {
         this.roleRepository = roleRepository;
     }
 
+    public long countAllConnections() {
+        return connectionRepository.count();
+    }
+
     public List<UserResponse> getAllConnectionFromDepartment(@NotNull String identifier) {
         Optional<Connection> senderConnectionOptional = findByIdentifier(identifier);
         if (senderConnectionOptional.isEmpty()) return new ArrayList<>();
