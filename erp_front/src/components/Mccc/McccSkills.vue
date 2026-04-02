@@ -17,6 +17,10 @@ const showModal = ref(false);
 const showSkillErrorModal = ref(false);
 const initialState = ref(null);
 
+const getSkillId = (skill) => {
+  return skill.id ?? skill.skillID ?? skill.skillId ?? skill.skillNum;
+};
+
 const fetchReferential = async () => {
   try {
     isLoading.value = true;
@@ -30,31 +34,46 @@ const fetchReferential = async () => {
 };
 
 const syncSkillsFromStore = () => {
+  if (mcccStore.acsGrouped?.length > 0 && (!mcccStore.skillIds || mcccStore.skillIds.length === 0)) {
+    mcccStore.skillIds = mcccStore.acsGrouped.map(g => getSkillId(g));
+  }
+
+  const oldGrouped = [...(mcccStore.acsGrouped || [])];
   mcccStore.acsGrouped = [];
 
   if (!mcccStore.skillIds || !Array.isArray(mcccStore.skillIds)) return;
 
   allSkills.value.forEach(skill => {
-    if (mcccStore.skillIds.includes(skill.id)) {
+    const sId = getSkillId(skill);
+    if (mcccStore.skillIds.some(id => String(id) === String(sId))) {
       const selection = formatSkillForStore(skill);
       mcccStore.acsGrouped.push(selection);
     }
   });
+
+  if (mcccStore.acsGrouped.length < mcccStore.skillIds.length) {
+    const foundIds = mcccStore.acsGrouped.map(g => String(getSkillId(g)));
+    oldGrouped.forEach(g => {
+      if (!foundIds.includes(String(getSkillId(g)))) {
+        mcccStore.acsGrouped.push(g);
+      }
+    });
+  }
 };
 
 const formatSkillForStore = (skill) => {
   return {
-    id: skill.id,
+    id: getSkillId(skill),
     resourceCode: mcccStore.resourceCode,
-    ue: skill.skillName,
+    ue: skill.skillName || skill.ue,
     skillNum: skill.skillNum,
-    allLevels: skill.levels.map(level => ({
+    allLevels: skill.levels?.map(level => ({
       title: level.title || level.name || level.label || level.levelTitle || level.rankTitle || "Niveau sans titre",
-      acs: level.acs.map(ac => ({
+      acs: level.acs?.map(ac => ({
         learningNum: ac.num || ac.acNum || ac.learningNum,
         learningTitle: ac.title || ac.name || ac.label || ac.acTitle || ac.learningTitle || ac.libelle || "Titre manquant"
-      }))
-    }))
+      })) || []
+    })) || []
   };
 };
 
@@ -79,7 +98,8 @@ const filteredSkills = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
 
   return allSkills.value.filter(s => {
-    const isAlreadySelected = mcccStore.skillIds.includes(s.id);
+    const sId = getSkillId(s);
+    const isAlreadySelected = mcccStore.skillIds.some(id => String(id) === String(sId));
     if (isAlreadySelected) return false;
 
     if (!query) return true;
@@ -90,7 +110,7 @@ const filteredSkills = computed(() => {
     }
 
     const matchSkill = (
-        s.skillName.toLowerCase().includes(query) ||
+        (s.skillName && s.skillName.toLowerCase().includes(query)) ||
         s.skillNum?.toString().includes(query)
     );
 
@@ -112,8 +132,10 @@ const addSkillDirectly = (skill) => {
     return;
   }
 
-  if (!mcccStore.skillIds.includes(skill.id)) {
-    mcccStore.skillIds.push(skill.id);
+  const sId = getSkillId(skill);
+
+  if (!mcccStore.skillIds.some(id => String(id) === String(sId))) {
+    mcccStore.skillIds.push(sId);
   }
 
   const newSelection = formatSkillForStore(skill);
@@ -124,10 +146,9 @@ const addSkillDirectly = (skill) => {
 
 const removeGroup = (index) => {
   const skillToRemove = mcccStore.acsGrouped[index];
+  const sId = getSkillId(skillToRemove);
 
-  const skillId = skillToRemove.id;
-  mcccStore.skillIds = mcccStore.skillIds.filter(id => id !== skillId);
-
+  mcccStore.skillIds = mcccStore.skillIds.filter(id => String(id) !== String(sId));
   mcccStore.acsGrouped.splice(index, 1);
 
   mcccStore.registerMcccStore();
@@ -193,7 +214,7 @@ const clearSearch = () => searchQuery.value = '';
 
         <div class="grid-container">
           <div v-for="skill in filteredSkills"
-               :key="skill.id"
+               :key="skill.id || skill.skillID || skill.skillNum"
                class="admin-card"
                @click="addSkillDirectly(skill)">
 
@@ -209,7 +230,7 @@ const clearSearch = () => searchQuery.value = '';
                 </span>
 
                 <div class="ac-details-list">
-                  <div v-for="ac in level.acs" :key="ac.id || ac.num" class="ac-detail-item">
+                  <div v-for="ac in level.acs" :key="ac.id || ac.num || ac.learningNum" class="ac-detail-item">
                     <strong>AC {{ ac.num || ac.acNum || ac.learningNum }} :</strong>
                     {{ ac.title || ac.name || ac.label || ac.learningTitle }}
                   </div>
@@ -228,7 +249,7 @@ const clearSearch = () => searchQuery.value = '';
 
         <div v-if="!isLoading && filteredSkills.length === 0" class="no-result">
           <span v-if="searchQuery">Aucune compétence ne correspond à "{{ searchQuery }}"</span>
-          <span v-else>Toutes les compétences sont sélectionnées ou aucune compétence trouvé.</span>
+          <span v-else>Toutes les compétences sont sélectionnées ou aucune compétence trouvée.</span>
         </div>
       </div>
 
