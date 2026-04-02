@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AvailableMenuService {
@@ -23,24 +24,39 @@ public class AvailableMenuService {
     }
 
     public List<MenuResponse> getAvailableMenusFromUser(String username) {
-        Connection connection = connectionService.findByIdentifier(username);
+        Connection connection = connectionService.findByIdentifier(username).orElse(null);
+        if (connection == null) return new ArrayList<>();
+
         Role role = connection.getRole();
+        List<AvailableMenu> roots = availableMenuRepository.findByParentIdIsNull();
 
-        List<MenuResponse> authorizedMenus = new ArrayList<>();
-        List<AvailableMenu> menus = availableMenuRepository.findAll();
-        for (AvailableMenu menu : menus) {
-            String permissionKey = menu.getPermissionKey();
-            boolean hasPermission = permissionService.hasPrivilege(role, permissionKey);
-
-            if (hasPermission) {
-                authorizedMenus.add(convertEntityToResponse(menu));
-            }
-        }
-
-        return authorizedMenus;
+        return roots.stream()
+                .map(menu -> resolve(menu, role))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
-    private MenuResponse convertEntityToResponse(AvailableMenu menu) {
-        return new MenuResponse(menu.getId(), menu.getLabel(), menu.getRoute(), menu.getIconId());
+    private Optional<MenuResponse> resolve(AvailableMenu menu, Role role) {
+        List<MenuResponse> authorizedChildren = menu.getChildren().stream()
+                .map(child -> resolve(child, role))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        boolean hasDirectPermission = permissionService.hasPrivilege(role, menu.getPermissionKey());
+        boolean hasVisibleChildren = !authorizedChildren.isEmpty();
+
+        if (hasDirectPermission || hasVisibleChildren) {
+            return Optional.of(new MenuResponse(
+                    menu.getId(),
+                    menu.getLabel(),
+                    menu.getRoute(),
+                    menu.getIconId(),
+                    authorizedChildren
+            ));
+        }
+
+        return Optional.empty();
     }
 }

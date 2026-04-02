@@ -261,6 +261,7 @@ const handleAddUser = () => router.push('/new-user');
   transition: all 0.3s ease;
   border: 1px solid transparent;
   position: relative;
+  box-sizing: border-box;
 }
 .user-card.is-editing {
   border: 2px solid #B51621;
@@ -274,6 +275,7 @@ const handleAddUser = () => router.push('/new-user');
   text-align: center;
   height: 100%;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 .icon-circle {
   width: 50px;
@@ -353,9 +355,36 @@ const handleAddUser = () => router.push('/new-user');
   margin-bottom: 10px;
 }
 .edit-header h4 { margin: 0; font-size: 14px; color: #B51621; }
-.input-group-compact { width: 100%; margin-bottom: 8px; }
-.card-input-compact { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fafafa; }
-.save-btn-compact { width: 100%; padding: 10px; background: #B51621; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
+.input-group-compact {
+  width: 100%;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.card-input-compact {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fafafa;
+  box-sizing: border-box; /* CORRECTION ICI */
+}
+
+.save-btn-compact {
+  width: 100%;
+  padding: 10px;
+  background: #B51621;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
+  box-sizing: border-box; /* CORRECTION ICI */
+}
+
 .sticky-bar {
   position: fixed;
   bottom: 0;
@@ -376,7 +405,7 @@ const handleAddUser = () => router.push('/new-user');
 }
 .search-container { position: relative; width: 320px; }
 .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
-.search-input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 50px; border: 1px solid #ddd; outline: none; font-size: 14px; }
+.search-input { width: 100%; padding: 10px 15px 10px 40px; border-radius: 50px; border: 1px solid #ddd; outline: none; font-size: 14px; box-sizing: border-box; }
 .btn-sys.primary {
   background: #B51621;
   color: white;

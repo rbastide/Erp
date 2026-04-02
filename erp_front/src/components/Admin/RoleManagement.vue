@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
 import ErrorDeleteRoleModal from "../Information/ErrorDeleteRoleModal.vue";
@@ -82,18 +82,19 @@ onMounted(() => {
 
 const filteredRoles = computed(() => {
   let result = roles.value;
-
   const query = searchQuery.value.toLowerCase().trim();
   if (query) {
     result = result.filter(roleItem =>
-        (roleItem.role?.name || roleItem.name || roleItem.label || '').toLowerCase().includes(query)
+        (roleItem.role?.name).toLowerCase().includes(query)
     );
   }
 
-  return result.slice().sort((a, b) => {
-    const aLen = getActivePermissions(a.permissions).length;
-    const bLen = getActivePermissions(b.permissions).length;
-    return bLen - aLen;
+  const getRoleWeight = (role) => getActivePermissions(role.permissions).length;
+
+  return result.slice().sort((roleA, roleB) => {
+    const weightA = getRoleWeight(roleA);
+    const weightB = getRoleWeight(roleB);
+    return weightB - weightA;
   });
 });
 
@@ -101,7 +102,7 @@ const handleDelete = async (id) => {
   if (confirm("Êtes-vous sûr de vouloir supprimer ce rôle ?")) {
     try {
       await api.delete(`role/${id}`);
-      roles.value = roles.value.filter(r => r.id !== id);
+      roles.value = roles.value.filter(r => r.role.id !== id);
       if (editedRole.id === id) handleCancel();
     } catch {
       showErrorModal.value = true;
@@ -121,7 +122,7 @@ const handleDuplicate = (sourceRole) => {
   Object.assign(editedRole, {
     id: null,
     name: '',
-    label: `${sourceRole.role?.name || sourceRole.name || sourceRole.label} (Copie)`,
+    label: `${sourceRole.role?.name} (Copie)`,
     permissions: getActivePermissions(sourceRole.permissions)
   });
 };
@@ -210,8 +211,8 @@ const handleValidate = () => router.push('/home');
   <div class="page-container">
 
     <ErrorDeleteRoleModal
-      v-if="showErrorModal"
-      @close="showErrorModal= false"/>
+        v-if="showErrorModal"
+        @close="showErrorModal= false"/>
 
     <AppHeader title="Gestion des Rôles" />
 
@@ -301,7 +302,7 @@ const handleValidate = () => router.push('/home');
                 </svg>
               </button>
 
-              <button class="action-btn delete" @click="handleDelete(roleItem.id)" title="Supprimer">
+              <button class="action-btn delete" @click="handleDelete(roleItem.role.id)" title="Supprimer">
                 <svg width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="fill: none;" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
             </div>

@@ -1,9 +1,9 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import {useRouter} from 'vue-router';
 import AppHeader from '../App/Header.vue';
 import Sidebar from '../App/Sidebar.vue';
-import { onMounted, ref } from "vue";
-import { authStore } from "@/services/AuthService.js";
+import {onMounted, ref} from "vue";
+import {authStore} from "@/services/AuthService.js";
 import api from "@/services/api.js";
 
 const router = useRouter();
@@ -38,7 +38,7 @@ const fetchPendingCount = async () => {
 const fetchAvaliableMenu = async () => {
   try {
     const response = await api.get('/menus');
-    menus.value = response.data;
+    menus.value.push(response.data);
     isSuperAdmin.value = menus.value.some(menu => (menu.menuID || menu.id) === 1);
   } catch (error) {
     console.error("Erreur menus:", error);
@@ -50,6 +50,17 @@ const isValidationMenu = (menu) => {
   const id = menu.menuID || menu.id;
   return (menu.label).toLowerCase().includes('fiches ressources');
 };
+
+const openMenu = (menu) => {
+  if (menu.route !== null) {
+    router.push(menu.route);
+    return;
+  }
+
+  if (menu.children) {
+    menus.value.push(menu.children);
+  }
+}
 
 onMounted(() => {
   fetchAvaliableMenu();
@@ -66,9 +77,9 @@ onMounted(() => {
     <main class="main-content">
       <div
           class="card-action"
-          v-for="menu in menus"
+          v-for="menu in menus[menus.length - 1]"
           :key="menu.menuID || menu.id"
-          @click="router.push(menu.route)"
+          @click="openMenu(menu)"
       >
         <div
             v-if="isValidationMenu(menu) && pendingCount > 0"
@@ -85,6 +96,10 @@ onMounted(() => {
           ></svg>
         </div>
         <p>{{ menu.label }}</p>
+      </div>
+
+      <div v-if="menus.length > 1" class="footer-actions">
+        <button @click="menus.pop()" class="quit-btn">Retour</button>
       </div>
     </main>
   </div>
@@ -203,5 +218,31 @@ onMounted(() => {
   .card-action p {
     font-size: 20px;
   }
+}
+
+.footer-actions {
+  margin-top: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.quit-btn {
+  width: 180px;
+  padding: 12px;
+  border: 2px solid #B51621;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #B51621;
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quit-btn:hover {
+  background-color: transparent;
+  color: #B51621;
 }
 </style>

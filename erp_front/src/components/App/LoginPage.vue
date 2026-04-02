@@ -12,7 +12,6 @@ const role = ref('');
 const isDev = window.location.hostname === 'localhost';
 
 const handleLogin = async () => {
-  await AuthService.logout();
   errorMessage.value = '';
 
   /** @type {LoginRequest} */

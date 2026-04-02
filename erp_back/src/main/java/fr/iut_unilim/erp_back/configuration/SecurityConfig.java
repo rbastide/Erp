@@ -2,6 +2,7 @@ package fr.iut_unilim.erp_back.configuration;
 
 import fr.iut_unilim.erp_back.filter.JwtFilter;
 import fr.iut_unilim.erp_back.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -29,6 +30,12 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtils jwtUtils;
+
+    @Value("${encryption.key}")
+    private String encryptionPassword;
+
+    @Value("${encryption.salt}")
+    private String encryptionSalt;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtUtils jwtUtils) {
         this.customUserDetailsService = customUserDetailsService;
@@ -70,6 +77,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/user").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(customUserDetailsService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
@@ -91,6 +99,6 @@ public class SecurityConfig {
 
     @Bean
     public TextEncryptor textEncryptor() {
-        return Encryptors.text("password", "5c0744940b5c369b");
+        return Encryptors.text(encryptionPassword, encryptionSalt);
     }
 }

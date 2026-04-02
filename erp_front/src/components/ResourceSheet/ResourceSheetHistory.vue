@@ -51,7 +51,7 @@ const fetchSheetData = async () => {
 
   const now = new Date();
   const defaultYear = now.getMonth() < 8 ? now.getFullYear() - 1 : now.getFullYear();
-  academicYear.value = route.query.year ? parseInt(route.query.year as string) : defaultYear;
+  academicYear.value = route.query.year ? Number.parseInt(route.query.year as string) : defaultYear;
 
   if (!sheetIdFromUrl) return
 
@@ -137,7 +137,7 @@ const handleExport = async () => {
     link.setAttribute('download', `fiche-ressource-${resourceCode.value}-${academicYear.value}.pdf`);
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
     URL.revokeObjectURL(fileURL);
   } catch (error) {
     console.error("Erreur lors de la génération du PDF", error);

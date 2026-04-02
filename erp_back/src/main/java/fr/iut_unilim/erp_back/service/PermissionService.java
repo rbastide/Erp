@@ -61,7 +61,8 @@ public class PermissionService {
 
     public boolean editRolePermission(EditRolePermissionRequest editRolePermissionRequest) {
         Optional<RolePermission> permissionOptional = permissionRepository.findById(editRolePermissionRequest.permissionRoleId());
-        Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository.findById(editRolePermissionRequest.permissionId());
+        Optional<PermissionDefinition> permissionDefinitionOptional = permissionDefinitionRepository
+                .findById(editRolePermissionRequest.permissionId());
 
         if (permissionOptional.isEmpty() || permissionDefinitionOptional.isEmpty()) {
             return false;
@@ -93,10 +94,10 @@ public class PermissionService {
     }
 
     public boolean hasPrivilege(Role role, PermissionDefinition permissionDefinition) {
-        List<RolePermission> permissions = permissionRepository.findByRole(role);
-        if (permissions.size() != 1) return false;
+        Optional<RolePermission> permissions = permissionRepository.findByRole(role);
+        if (permissions.isEmpty()) return false;
 
-        RolePermission permission = permissions.get(0);
+        RolePermission permission = permissions.get();
 
         BitSet permBits = permission.getBitSet();
         int permIndex = permissionDefinition.getPermissionDefinitionBitIndex();

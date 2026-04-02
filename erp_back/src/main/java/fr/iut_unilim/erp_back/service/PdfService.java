@@ -11,15 +11,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.ArrayList;
 
 @Service
 public class PdfService {
-    private final CourseHoursService courseHoursService;
     private final ResourceService resourceService;
     private final McccService mcccService;
 
-    public PdfService(CourseHoursService courseHoursService, ResourceService resourceService, McccService mcccService) {
-        this.courseHoursService = courseHoursService;
+    public PdfService(ResourceService resourceService, McccService mcccService) {
         this.resourceService = resourceService;
         this.mcccService = mcccService;
     }
@@ -36,56 +36,56 @@ public class PdfService {
         }
         Resource resource = canHaveResource.get();
 
-        Optional<CourseHours> courseHours = courseHoursService.findById(resourceSheet.getResource().getResourceID());
-        if (courseHours.isEmpty()) {
-            throw new IllegalStateException("[" + requestId + "] Volumes horaires introuvables pour la ressource " + resource.getResourceID());
-        }
+        CourseHours courseHours = resourceSheet.getCourseHours();
 
         int semester = resource.getSemester();
 
         Optional<Mccc> canHaveMccc = mcccService.getCurrentMcccFromResource(resource, resourceSheet.getAcademicYearStart());
+        Mccc mccc = null;
         if (canHaveMccc.isEmpty()) {
-            throw new IllegalStateException("[" + requestId + "] MCCC introuvable pour la ressource " + resource.getNum());
+            ErpBackApplication.LOGGER.warning("[" + requestId + "] MCCC introuvable pour la ressource " + resource.getNum() + ". Le PDF sera généré avec des valeurs par défaut.");
+        } else {
+            mccc = canHaveMccc.get();
         }
-        Mccc mccc = canHaveMccc.get();
 
         McccDatas fromMccc = handleFromMccc(resourceSheet, mccc, resource);
 
-        if (fromMccc.skills() == null) {
-            throw new IllegalStateException("[" + requestId + "] Compétences introuvables pour la ressource " + resource.getNum());
+        List<EducationalContent> educationalContents = resourceSheet.getEducationalContents();
+        if (educationalContents == null) {
+            educationalContents = new ArrayList<>();
         }
 
-        List<EducationalContent> educationallContents = resourceSheet.getEducationalContents();
-        if (educationallContents == null) {
-            throw new IllegalStateException("[" + requestId + "] Contenu pédagogique introuvable pour la fiche " + resourceSheet.getSheetID());
-        }
+        String teacherFeedback = resourceSheet.getTeacherFeedbacks() != null ? resourceSheet.getTeacherFeedbacks().getContent() : "";
+        String studentFeedback = resourceSheet.getStudentFeedbacks() != null ? resourceSheet.getStudentFeedbacks().getContent() : "";
+        String improvementIdeas = resourceSheet.getImprovementIdeas() != null ? resourceSheet.getImprovementIdeas().getContent() : "";
 
-        if (resourceSheet.getTeacherFeedbacks() == null || resourceSheet.getStudentFeedbacks() == null || resourceSheet.getImprovementIdeas() == null) {
-            throw new IllegalStateException("[" + requestId + "] Feedbacks incomplets pour la fiche " + resourceSheet.getSheetID());
-        }
+        Date creationDate = resourceSheet.getCreationDate() != null ? resourceSheet.getCreationDate() : new Date();
+        Date lastModificationDate = resourceSheet.getLastModificationDate() != null ? resourceSheet.getLastModificationDate() : new Date();
 
         ErpBackApplication.LOGGER.info("PDF [" + requestId + "] données prêtes pour la fiche " + resourceSheet.getSheetID()
-                + " (resource=" + resource.getNum() + ", contenus=" + educationallContents.size() + ")");
+                + " (resource=" + resource.getNum() + ", contenus=" + educationalContents.size() + ")");
 
-        return new ResourceSheetViewModel(resource, courseHours.get(),
-                resourceSheet.getTeacherFeedbacks().getContent(), resourceSheet.getStudentFeedbacks().getContent(),
-                resourceSheet.getImprovementIdeas().getContent(), semester,
-                fromMccc.saes(), fromMccc.creationDate(),
-                fromMccc.lastModificationDate(), fromMccc.teachers(),
-                fromMccc.criticalConcepts(), educationallContents, fromMccc.skills());
+        return new ResourceSheetViewModel(resource, courseHours,
+                teacherFeedback, studentFeedback, improvementIdeas, semester,
+                fromMccc.saes(), creationDate,
+                lastModificationDate, fromMccc.teachers(),
+                fromMccc.criticalConcepts(), educationalContents, fromMccc.skills());
     }
 
     @NotNull
     private McccDatas handleFromMccc(@NotNull ResourceSheet resourceSheet, Mccc mccc, Resource resource) {
-        Set<Sae> saes = mccc.getSaesId();
+        Set<Sae> saes = (mccc != null && mccc.getSaesId() != null) ? mccc.getSaesId() : new HashSet<>();
+        Set<TeacherResource> teachers = (mccc != null && mccc.getTeacherResources() != null) ? mccc.getTeacherResources() : new HashSet<>();
+        Set<CriticalConcept> criticalConcepts = (mccc != null && mccc.getCriticalConceptsId() != null) ? mccc.getCriticalConceptsId() : new HashSet<>();
 
-        Date creationDate = resourceSheet.getCreationDate();
-        Date lastModificationDate = resourceSheet.getLastModificationDate();
+        Date creationDate = resourceSheet.getCreationDate() != null ? resourceSheet.getCreationDate() : new Date();
+        Date lastModificationDate = resourceSheet.getLastModificationDate() != null ? resourceSheet.getLastModificationDate() : new Date();
 
-        Set<TeacherResource> teachers = mccc.getTeacherResources();
-
-        Set<CriticalConcept> criticalConcepts = mccc.getCriticalConceptsId();
         Set<Skill> skills = mcccService.getSkillsByResource(resource, resourceSheet.getAcademicYearStart());
+        if (skills == null) {
+            skills = new HashSet<>();
+        }
+
         return new McccDatas(saes, creationDate, lastModificationDate, teachers, criticalConcepts, skills);
     }
 

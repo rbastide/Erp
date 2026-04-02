@@ -1,21 +1,23 @@
 package fr.iut_unilim.erp_back.configuration;
 
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.repository.ConnectionRepository;
+import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.PermissionService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component("securityService")
 public class SecurityService {
 
     private final PermissionService permissionService;
-    private final ConnectionRepository connectionRepository;
+    private final ConnectionService connectionService;
 
-    public SecurityService(PermissionService permissionService, ConnectionRepository connectionRepository) {
+    public SecurityService(PermissionService permissionService, ConnectionService connectionService) {
         this.permissionService = permissionService;
-        this.connectionRepository = connectionRepository;
+        this.connectionService = connectionService;
     }
 
     public boolean hasPermission(String permissionKey) {
@@ -25,11 +27,12 @@ public class SecurityService {
         String username = auth.getName();
         if (username == null) return false;
 
-        Connection connection = connectionRepository.findByIdentifier(username);
+        Optional<Connection> connection = connectionService.findByIdentifier(username);
 
-        if (connection == null) return false;
+        return connection
+                .filter(value -> permissionService.hasPrivilege(value.getRole(), permissionKey))
+                .isPresent();
 
-        return permissionService.hasPrivilege(connection.getRole(), permissionKey);
     }
 
     public boolean isLogin() {
