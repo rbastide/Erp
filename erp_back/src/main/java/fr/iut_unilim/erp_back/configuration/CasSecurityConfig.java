@@ -116,8 +116,6 @@ public class CasSecurityConfig {
                 if(userOpt.isPresent()) {
                     Connection user = userOpt.get();
 
-                System.out.println(user);
-
                     if (attributes.containsKey("mail")) {
                         String casEmail = (String) attributes.get("mail");
                         if (casEmail != null && !casEmail.equals(user.getEmail())) {
