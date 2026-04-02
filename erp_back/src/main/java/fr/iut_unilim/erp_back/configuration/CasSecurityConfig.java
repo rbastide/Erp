@@ -37,7 +37,7 @@ import java.util.Map;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@Profile("prod  ")
+@Profile("prod")
 public class CasSecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
