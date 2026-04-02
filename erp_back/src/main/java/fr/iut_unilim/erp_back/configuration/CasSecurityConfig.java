@@ -37,7 +37,7 @@ import java.util.Map;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@Profile("prod")
+@Profile("prod  ")
 public class CasSecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -165,7 +165,7 @@ public class CasSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/api/logout") // L'endpoint appelé par votre front
+                        .logoutUrl("/api/logout")
                         .logoutSuccessHandler(customLogoutSuccessHandler())
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
