@@ -1,8 +1,6 @@
 package fr.iut_unilim.erp_back.service;
 
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.ResourceSheet;
-import fr.iut_unilim.erp_back.entity.TeacherResource;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
 import fr.iut_unilim.erp_back.repository.TeacherResourceRepository;
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class AutomaticMailService {
@@ -53,26 +50,11 @@ public class AutomaticMailService {
     //0sec | 0min | 8heures |tous les 1er du mois sauf Juillet, Août et Septembre | peu importe le jour de la semaine
     @Transactional(readOnly = true)
     public void sendAutomaticMails() {
-        int currentYear = getCurrentAcademicYearStart();
-
-        List<ResourceSheet> allSheets = resourceSheetRepository.findAll();
-        Set<Long> validatedResourceIds = allSheets.stream()
-                .filter(sheet -> sheet.getAcademicYearStart() != null && sheet.getAcademicYearStart() == currentYear)
-                .filter(ResourceSheet::isValidate)
-                .map(sheet -> sheet.getResource().getResourceID())
-                .collect(Collectors.toSet());
-
-        List<TeacherResource> allTeacherResources = teacherResourceRepository.findAll();
-        Set<Long> usersWithPendingTasks = allTeacherResources.stream()
-                .filter(tr -> !validatedResourceIds.contains(tr.getResource().getResourceID()))
-                .map(tr -> tr.getConnection().getId())
-                .collect(Collectors.toSet());
 
         List<Connection> allUsers = connectionRepository.findAll();
 
         List<String> targetEmails = allUsers.stream()
                 .filter(this::isTargetRoleConnection)
-                .filter(user -> usersWithPendingTasks.contains(user.getId()))
                 .map(Connection::getEmail)
                 .filter(this::isValidEmail)
                 .distinct()
@@ -87,9 +69,8 @@ public class AutomaticMailService {
 
             try {
                 mailSender.send(message);
-                System.out.println("Mail envoyé avec succès à : " + email);
             } catch (Exception e) {
-                System.err.println("Erreur d'envoi Postfix vers : " + email);
+                fr.iut_unilim.erp_back.ErpBackApplication.LOGGER.severe("Échec de l'envoi Postfix vers " + email + " : " + e.getMessage());
             }
         }
     }
