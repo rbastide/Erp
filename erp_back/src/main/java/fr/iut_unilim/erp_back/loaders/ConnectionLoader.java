@@ -6,6 +6,7 @@ import fr.iut_unilim.erp_back.repository.ConnectionRepository;
 import fr.iut_unilim.erp_back.repository.UniversityDepartmentRepository;
 import fr.iut_unilim.erp_back.service.ConnectionService;
 import fr.iut_unilim.erp_back.service.RoleService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,9 @@ public class ConnectionLoader implements CommandLineRunner {
     private final UniversityDepartmentRepository universityDepartmentRepository;
 
     private static final String SUPER_ADMIN_ROLE = "Super-Admin";
-    private static final String SUPER_ADMIN_IDENTIFIER = "admin";
+
+    @Value("${initial.identifier}")
+    private String initialIdentifier;
 
     public ConnectionLoader(ConnectionService connectionService, ConnectionRepository connectionRepository, RoleService roleService, UniversityDepartmentRepository universityDepartmentRepository) {
         this.connectionService = connectionService;
@@ -35,10 +38,10 @@ public class ConnectionLoader implements CommandLineRunner {
         if (connectionService.countAllConnections() != 0) return;
 
         Connection user = new Connection();
-        user.setIdentifier(SUPER_ADMIN_IDENTIFIER);
+        user.setIdentifier(initialIdentifier);
         String hashedIdentifier;
         try {
-            hashedIdentifier = generateBlindIndex(SUPER_ADMIN_IDENTIFIER);
+            hashedIdentifier = generateBlindIndex(initialIdentifier);
         } catch (Exception e) {
             hashedIdentifier = null;
         }

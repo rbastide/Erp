@@ -21,6 +21,7 @@ public class DatabaseConnectionManager {
     private static final String[] SSL_ENVIRONMENT_VARIABLES = {"SSL_PASSWORD"};
     private static final String[] CAS_ENVIRONMENT_VARIABLES = {"CAS_URL", "BACKEND_URL", "FRONTEND_URL", "AUTH_MODE"};
     private static final String[] ENCRYPTION_ENVIRONMENT_VARIABLES = {"ENCRYPTION_PASSWORD", "ENCRYPTION_SALT"};
+    private static final String[] LOADER_ENVIRONMENT_VARIABLES = {"INITIAL_IDENTIFIER"};
 
     private static final int SSH_PORT = 22;
     private static final int DB_PORT_RECEIVER = 3306;
@@ -44,6 +45,7 @@ public class DatabaseConnectionManager {
         updateSystemEnvironmentVariables(dotenv, SSL_ENVIRONMENT_VARIABLES);
         updateSystemEnvironmentVariables(dotenv, CAS_ENVIRONMENT_VARIABLES);
         updateSystemEnvironmentVariables(dotenv, ENCRYPTION_ENVIRONMENT_VARIABLES);
+        updateSystemEnvironmentVariables(dotenv, LOADER_ENVIRONMENT_VARIABLES);
 
         Map<String, String> loginsSSH = retrieveEnvironmentVariablesValues(dotenv, SSH_ENVIRONMENT_VARIABLES);
 
