@@ -62,12 +62,15 @@ const fetchMcccData = async (year: number) => {
     mcccStore.minDS = data.minDS || 0;
     mcccStore.minDSTP = data.minDSTP || 0;
     mcccStore.creationDate = data.creationDate;
-    mcccStore.teacherIds = data.teacherIds || [];
-    mcccStore.saeIds = data.saeIds || [];
+    mcccStore.editDate = data.editDate;
+
+    mcccStore.teacherIds = data.teachers || [];
+    mcccStore.saeIds = data.saeIDs || [];
+    mcccStore.skillIds = data.skillIDs || [];
     mcccStore.year = year;
 
     mcccStore.registerMcccStore();
-  } catch (error) {
+  } catch (error: any) {
     if (error.response && error.response.status === 404) {
       console.log("Fiche inexistante pour cette année, création d'une nouvelle.");
       const resId = mcccStore.resourceID;
@@ -97,7 +100,7 @@ onMounted(async () => {
     selectedYear.value = Number(mcccStore.year);
   }
   await fetchResourceYears();
-  await fetchMcccData(selectedYear.value);
+
   mcccStore.saveBackup();
   await nextTick();
   isReady.value = true;
