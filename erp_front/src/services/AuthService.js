@@ -61,6 +61,11 @@ export default {
         authStore.clear();
         mcccStore.clearMcccStore();
 
+        if (!CAS_URL || CAS_URL === 'undefined') {
+            window.location.href = '/login';
+            return;
+        }
+
         const baseUrl = `${FRONT_END}`;
         const casLogoutUrl = `${CAS_URL}/logout?service=${encodeURIComponent(baseUrl)}`;
         window.location.href = casLogoutUrl;
