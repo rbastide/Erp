@@ -16,12 +16,10 @@ import java.util.ArrayList;
 
 @Service
 public class PdfService {
-    private final CourseHoursService courseHoursService;
     private final ResourceService resourceService;
     private final McccService mcccService;
 
-    public PdfService(CourseHoursService courseHoursService, ResourceService resourceService, McccService mcccService) {
-        this.courseHoursService = courseHoursService;
+    public PdfService(ResourceService resourceService, McccService mcccService) {
         this.resourceService = resourceService;
         this.mcccService = mcccService;
     }
@@ -38,17 +36,7 @@ public class PdfService {
         }
         Resource resource = canHaveResource.get();
 
-        Optional<CourseHours> courseHoursOpt = courseHoursService.findById(resourceSheet.getResource().getResourceID());
-        CourseHours courseHours = courseHoursOpt.orElseGet(() -> {
-            ErpBackApplication.LOGGER.warning("[" + requestId + "] Volumes horaires introuvables pour la ressource " + resource.getResourceID() + ".");
-            CourseHours defaultHours = new CourseHours();
-            defaultHours.setNbMinCM(0f);
-            defaultHours.setNbMinTD(0f);
-            defaultHours.setNbMinTP(0f);
-            defaultHours.setNbMinDS(0f);
-            defaultHours.setNbMinDSTP(0f);
-            return defaultHours;
-        });
+        CourseHours courseHours = resourceSheet.getCourseHours();
 
         int semester = resource.getSemester();
 
@@ -71,13 +59,16 @@ public class PdfService {
         String studentFeedback = resourceSheet.getStudentFeedbacks() != null ? resourceSheet.getStudentFeedbacks().getContent() : "";
         String improvementIdeas = resourceSheet.getImprovementIdeas() != null ? resourceSheet.getImprovementIdeas().getContent() : "";
 
+        Date creationDate = resourceSheet.getCreationDate() != null ? resourceSheet.getCreationDate() : new Date();
+        Date lastModificationDate = resourceSheet.getLastModificationDate() != null ? resourceSheet.getLastModificationDate() : new Date();
+
         ErpBackApplication.LOGGER.info("PDF [" + requestId + "] données prêtes pour la fiche " + resourceSheet.getSheetID()
                 + " (resource=" + resource.getNum() + ", contenus=" + educationalContents.size() + ")");
 
         return new ResourceSheetViewModel(resource, courseHours,
                 teacherFeedback, studentFeedback, improvementIdeas, semester,
-                fromMccc.saes(), fromMccc.creationDate(),
-                fromMccc.lastModificationDate(), fromMccc.teachers(),
+                fromMccc.saes(), creationDate,
+                lastModificationDate, fromMccc.teachers(),
                 fromMccc.criticalConcepts(), educationalContents, fromMccc.skills());
     }
 
