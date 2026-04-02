@@ -1,35 +1,36 @@
 package fr.iut_unilim.erp_back.service;
 
+import fr.iut_unilim.erp_back.entity.AutomaticMailConfig;
 import fr.iut_unilim.erp_back.entity.Connection;
-import fr.iut_unilim.erp_back.entity.Mccc;
-import fr.iut_unilim.erp_back.entity.TeacherResource;
+import fr.iut_unilim.erp_back.repository.AutomaticMailRepository;
 import fr.iut_unilim.erp_back.repository.ConnectionRepository;
-import fr.iut_unilim.erp_back.repository.McccRepository;
-import fr.iut_unilim.erp_back.repository.UniversityDepartmentRepository;
+import fr.iut_unilim.erp_back.repository.ResourceSheetRepository;
+import fr.iut_unilim.erp_back.repository.TeacherResourceRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AutomaticMailService {
-    private static final String ROLE_PROFESSEUR = "Professeur";
-    private static final String ROLE_VACATAIRE = "Vacataire";
-    private static final Set<String> TARGET_ROLE_NAMES = Set.of(
-            ROLE_PROFESSEUR.toUpperCase(),
-            ROLE_VACATAIRE.toUpperCase()
-    );
+    private static final Set<String> TARGET_ROLE_NAMES = Set.of("Professeur", "Vacataire");
 
     private final JavaMailSender mailSender;
     private final ConnectionRepository connectionRepository;
-    private final McccRepository mcccRepository;
-    private final ConnectionService connectionService;
-    private final UniversityDepartmentRepository universityDepartmentRepository;
+    private final AutomaticMailRepository configRepository;
+    private ThreadPoolTaskScheduler taskScheduler;
+    private final Map<Long, java.util.concurrent.ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     @Value("${mail.from}")
     private String from;
@@ -40,26 +41,81 @@ public class AutomaticMailService {
     @Value("${mail.subject}")
     private String subject;
 
-    public AutomaticMailService(JavaMailSender mailSender, ConnectionRepository connectionRepository, McccRepository mcccRepository, ConnectionService connectionService, UniversityDepartmentRepository universityDepartmentRepository) {
+    public AutomaticMailService(
+            JavaMailSender mailSender,
+            ConnectionRepository connectionRepository,
+            TeacherResourceRepository teacherResourceRepository,
+            ResourceSheetRepository resourceSheetRepository, AutomaticMailRepository configRepository) {
         this.mailSender = mailSender;
         this.connectionRepository = connectionRepository;
-        this.mcccRepository = mcccRepository;
-        this.connectionService = connectionService;
-        this.universityDepartmentRepository = universityDepartmentRepository;
+        this.configRepository = configRepository;
     }
 
-    //NE PAS SUPPRIMER LE SCHEDULER
-    //@Scheduled(cron = "0 0 8 1 1-6,10-12 ?")
-    //0sec | 0min | 8heures |tous les 1er du mois sauf Juillet, Août et Septembre | peu importe le jour de la semaine
+    @PostConstruct
+    public void initScheduler() {
+        taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(5);
+        taskScheduler.setThreadNamePrefix("AutoMail-");
+        taskScheduler.initialize();
+        reloadSchedules();
+        System.out.println("Heure actuelle du serveur : " + java.time.LocalDateTime.now());
+    }
+
+    public void reloadSchedules() {
+        scheduledTasks.values().forEach(task -> task.cancel(false));
+        scheduledTasks.clear();
+
+        List<AutomaticMailConfig> configs = configRepository.findAll();
+        for (AutomaticMailConfig config : configs) {
+            String cron = generateCron(config);
+            if (cron != null) {
+                java.util.concurrent.ScheduledFuture<?> future = taskScheduler.schedule(
+                        this::sendAutomaticMails,
+                        new CronTrigger(cron, java.util.TimeZone.getTimeZone("Europe/Paris"))
+                );
+                scheduledTasks.put(config.getId(), future);
+            }
+        }
+    }
+
+    private String generateCron(AutomaticMailConfig config) {
+        try {
+            String[] timeParts = config.getTime().split(":");
+            String hour = timeParts[0];
+            String minute = timeParts[1];
+            String day = String.valueOf(config.getDayOfMonth());
+            String month = config.getMonths() == null || config.getMonths().isEmpty() ? "*" : config.getMonths();
+            return "0 " + minute + " " + hour + " " + day + " " + month + " ?";
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<AutomaticMailConfig> getAllConfigs() {
+        return configRepository.findAll();
+    }
+
+    public AutomaticMailConfig saveConfig(AutomaticMailConfig config) {
+        AutomaticMailConfig saved = configRepository.save(config);
+        reloadSchedules();
+        return saved;
+    }
+
+    public void deleteConfig(Long id) {
+        configRepository.deleteById(id);
+        reloadSchedules();
+    }
+
     @Transactional(readOnly = true)
     public void sendAutomaticMails() {
+        //Pour tester dans les logs : fr.iut_unilim.erp_back.ErpBackApplication.LOGGER.info(">>> Déclenchement de la tâche planifiée d'envoi de mails...");
         List<Connection> allUsers = connectionRepository.findAll();
 
         List<String> targetEmails = allUsers.stream()
                 .filter(this::isTargetRoleConnection)
                 .map(Connection::getEmail)
                 .filter(this::isValidEmail)
-                .distinct() // Évite les doublons
+                .distinct()
                 .toList();
 
         for (String email : targetEmails) {
@@ -72,66 +128,10 @@ public class AutomaticMailService {
             try {
                 mailSender.send(message);
             } catch (Exception e) {
-                System.err.println("Erreur d'envoi Postfix vers : " + email);
+                fr.iut_unilim.erp_back.ErpBackApplication.LOGGER.severe("Échec de l'envoi Postfix vers " + email + " : " + e.getMessage());
             }
         }
-    }
-
-    @Transactional(readOnly = true)
-    public AutomaticMailAudience getAutomaticMailAudience() {
-        int academicYearStart = getCurrentAcademicYearStart();
-        List<Connection> teachersAndVacataires = getTeacherAndVacataireConnections();
-        Map<Long, Connection> connectionByUserId = teachersAndVacataires.stream()
-                .collect(Collectors.toMap(Connection::getId, connection -> connection, (existing, replacement) -> existing));
-
-        Set<Long> teacherUserIds = connectionByUserId.keySet().stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        if (teacherUserIds.isEmpty()) {
-            return new AutomaticMailAudience(academicYearStart, List.of(), List.of(), List.of(), List.of());
-        }
-
-        Set<Long> fillerUserIds = new LinkedHashSet<>();
-        Set<Long> validatorUserIds = new LinkedHashSet<>();
-        List<Mccc> currentYearMcccs = mcccRepository.findAll().stream()
-                .filter(mccc -> Objects.equals(mccc.getAcademicYearStart(), academicYearStart))
-                .toList();
-
-        for (Mccc mccc : currentYearMcccs) {
-            Set<TeacherResource> teacherResources = mccc.getTeacherResources();
-            if (teacherResources == null) continue;
-
-            for (TeacherResource teacherResource : teacherResources) {
-                Connection teacherConnection = teacherResource.getConnection();
-                if (teacherConnection == null || !teacherUserIds.contains(teacherConnection.getId())) continue;
-
-                if (teacherResource.getIsManager()) {
-                    validatorUserIds.add(teacherConnection.getId());
-                } else {
-                    fillerUserIds.add(teacherConnection.getId());
-                }
-            }
-        }
-
-        Set<Long> concernedUserIds = new LinkedHashSet<>(fillerUserIds);
-        concernedUserIds.addAll(validatorUserIds);
-
-        List<String> concernedEmails = extractEmails(concernedUserIds, connectionByUserId);
-        List<String> nonConcernedEmails = extractEmails(
-                teacherUserIds.stream()
-                        .filter(userId -> !concernedUserIds.contains(userId))
-                        .collect(Collectors.toCollection(LinkedHashSet::new)),
-                connectionByUserId
-        );
-
-        return new AutomaticMailAudience(
-                academicYearStart,
-                concernedEmails,
-                nonConcernedEmails,
-                extractEmails(fillerUserIds, connectionByUserId),
-                extractEmails(validatorUserIds, connectionByUserId)
-        );
+        //Pour tester dans les logs : fr.iut_unilim.erp_back.ErpBackApplication.LOGGER.info(">>> Fin de la tâche planifiée. Mails cibles : " + targetEmails.size());
     }
 
     private List<String> extractEmails(Set<Long> userIds, Map<Long, Connection> connectionByUserId) {
@@ -148,7 +148,6 @@ public class AutomaticMailService {
         if (connection == null || connection.getRole() == null || connection.getRole().getRoleName() == null) {
             return false;
         }
-
         String roleName = connection.getRole().getRoleName().trim();
 
         return TARGET_ROLE_NAMES.contains(roleName);
@@ -158,43 +157,8 @@ public class AutomaticMailService {
         return email != null && !email.isBlank();
     }
 
-    private List<Connection> getTeacherAndVacataireConnections() {
-        LinkedHashSet<Connection> connections = new LinkedHashSet<>();
-        String[] roleNames = {ROLE_PROFESSEUR, ROLE_VACATAIRE};
-
-        universityDepartmentRepository.findAll().forEach(department -> {
-            try {
-                connections.addAll(connectionService.getAllConnectionsFromDepartmentAndRoleNames(department, roleNames));
-            } catch (RuntimeException ignored) {
-                List<Connection> departmentConnections = connectionRepository.findAllByUniversityDepartment(department);
-                connections.addAll(departmentConnections.stream().filter(this::isTargetRoleConnection).toList());
-            }
-        });
-
-        return new ArrayList<>(connections);
-    }
-
     private int getCurrentAcademicYearStart() {
         LocalDate now = LocalDate.now();
         return now.getMonthValue() >= 9 ? now.getYear() : now.getYear() - 1;
-    }
-
-    public record AutomaticMailAudience(
-            int academicYearStart,
-            List<String> concernedEmails,
-            List<String> nonConcernedEmails,
-            List<String> fillerTeacherEmails,
-            List<String> validatorTeacherEmails
-    ) {
-    }
-
-    public record AutomaticMailReport(
-            int academicYearStart,
-            int sentCount,
-            int failedCount,
-            int concernedCount,
-            int nonConcernedCount,
-            List<String> failedEmails
-    ) {
     }
 }

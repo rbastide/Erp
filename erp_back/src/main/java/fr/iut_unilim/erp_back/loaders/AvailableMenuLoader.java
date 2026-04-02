@@ -22,7 +22,7 @@ public class AvailableMenuLoader implements CommandLineRunner {
         ));
 
         AvailableMenu parentUtilisateurs = availableMenuRepository.save(new AvailableMenu(
-                "Utilisateurs", "", "", "1", null
+                "Autorisations", "", "", "1", null
         ));
 
         AvailableMenu parentPedagogie = availableMenuRepository.save(new AvailableMenu(
@@ -42,23 +42,23 @@ public class AvailableMenuLoader implements CommandLineRunner {
         ));
 
         availableMenuRepository.save(new AvailableMenu(
-                "Gestion des utilisateurs", "USER_MANAGEMENT", "/users-management", "1", parentUtilisateurs
+                "Utilisateurs", "USER_MANAGEMENT", "/users-management", "1", parentUtilisateurs
         ));
         availableMenuRepository.save(new AvailableMenu(
-                "Gestion des rôles", "ROLE_MANAGEMENT", "/role-management", "10", parentUtilisateurs
+                "Rôles", "ROLE_MANAGEMENT", "/role-management", "10", parentUtilisateurs
         ));
         availableMenuRepository.save(new AvailableMenu(
                 "Periodicité des rappels", "RECALL_MANAGEMENT", "/recall-management", "11", parentUtilisateurs
         ));
 
         availableMenuRepository.save(new AvailableMenu(
-                "Gestion des compétences", "SKILL_MANAGEMENT", "/skill-creating", "7", parentPedagogie
+                "Compétences", "SKILL_MANAGEMENT", "/skill-creating", "7", parentPedagogie
         ));
         availableMenuRepository.save(new AvailableMenu(
-                "Gestion des ressources", "RESOURCE_MANAGEMENT", "/resources-management", "8", parentPedagogie
+                "Ressources", "RESOURCE_MANAGEMENT", "/resources-management", "8", parentPedagogie
         ));
         availableMenuRepository.save(new AvailableMenu(
-                "Gestion des SAE", "SAE_MANAGEMENT", "/sae-management", "9", parentPedagogie
+                "SAE", "SAE_MANAGEMENT", "/sae-management", "9", parentPedagogie
         ));
     }
 }
