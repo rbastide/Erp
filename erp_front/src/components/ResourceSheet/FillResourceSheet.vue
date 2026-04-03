@@ -269,7 +269,7 @@ const fetchResourceSheetData = async () => {
     } else {
       console.error("Erreur lors du chargement de la fiche :", error.response?.status, error.message);
     }
-  }}
+}}
 const loadSheetOrMccc = async () => {
   if (!currentResourceId.value) return;
   resourceSheetId.value = null;

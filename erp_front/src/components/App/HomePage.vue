@@ -39,7 +39,7 @@ const fetchAvaliableMenu = async () => {
   try {
     const response = await api.get('/menus');
     menus.value.push(response.data);
-    isSuperAdmin.value = menus.value.some(menu => (menu.menuID || menu.id) === 1);
+    isSuperAdmin.value = (localStorage.user_role === "Super-Admin");
   } catch (error) {
     console.error("Erreur menus:", error);
   }
