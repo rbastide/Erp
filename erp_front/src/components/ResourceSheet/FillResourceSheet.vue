@@ -199,24 +199,22 @@ const fetchResourceData = async () => {
 
 const fetchHoursData = async () => {
   try {
-    const response = await api.get('/mccc/mcccs');
-    if (response.data && Array.isArray(response.data)) {
-      const mcccFound = response.data.find((m: any) =>
-          m.resourceId && m.resourceId.num === resourceCode.value
-      );
+    const response = await api.get(`/mccc/${academicYearStart.value}/${currentResourceId.value}`);
+    const mcccData = response.data;
 
-      if (mcccFound && mcccFound.courseHoursId) {
-        const vol = mcccFound.courseHoursId;
-        splitHours.cm = convertDecimalToSplit(vol.nbMinCM);
-        splitHours.td = convertDecimalToSplit(vol.nbMinTD);
-        splitHours.tp = convertDecimalToSplit(vol.nbMinTP);
-        splitHours.ds = convertDecimalToSplit(vol.nbMinDS);
-        splitHours.ds_tp = convertDecimalToSplit(vol.nbMinDSTP);
-        currentCourseHoursId.value = vol.courseHoursID;
-      }
+    if (mcccData) {
+      splitHours.cm = convertDecimalToSplit(mcccData.minCM);
+      splitHours.td = convertDecimalToSplit(mcccData.minTD);
+      splitHours.tp = convertDecimalToSplit(mcccData.minTP);
+      splitHours.ds = convertDecimalToSplit(mcccData.minDS);
+      splitHours.ds_tp = convertDecimalToSplit(mcccData.minDSTP);
     }
-  } catch (error) {
-    console.error("Erreur MCCC :", error);
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      console.log("Aucune MCCC trouvée pour cette ressource et cette année.");
+    } else {
+      console.error("Erreur MCCC :", error.response?.status, error.message);
+    }
   }
 };
 
@@ -265,17 +263,25 @@ const fetchResourceSheetData = async () => {
 
       await populateRichEditors();
     }
-  } catch (_) {
-    console.log("Aucune fiche n'existe pour cette ressource à cette année.");
+  } catch (error : any) {
+    if (error.response?.status === 404) {
+      console.log("Aucune fiche n'existe pour cette ressource à cette année.");
+    } else {
+      console.error("Erreur lors du chargement de la fiche :", error.response?.status, error.message);
+    }
+}}
+const loadSheetOrMccc = async () => {
+  if (!currentResourceId.value) return;
+  resourceSheetId.value = null;
+  await fetchResourceSheetData();
+  if (resourceSheetId.value === null) {
+    await fetchHoursData();
   }
 };
 
 onMounted(async () => {
   await fetchResourceData();
-  await fetchResourceSheetData();
-  if (resourceSheetId.value === null) {
-    await fetchHoursData();
-  }
+  await loadSheetOrMccc();
 });
 
 const createFieldManager = (contentRef: any, elementRefs: any) => {
@@ -392,7 +398,7 @@ const pedagogicalSections = computed(() => [
                 v-model="academicYearStart"
                 class="simple-line-input year-input"
                 @keydown="blockKeyboardInput"
-                @change="fetchResourceSheetData"
+                @change="loadSheetOrMccc"
                 @input="validateYearInput"
             />
             <span class="year-helper">
