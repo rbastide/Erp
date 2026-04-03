@@ -39,7 +39,7 @@ const fetchAvaliableMenu = async () => {
   try {
     const response = await api.get('/menus');
     menus.value.push(response.data);
-    isSuperAdmin.value = menus.value.some(menu => (menu.menuID || menu.id) === 1);
+    isSuperAdmin.value = (localStorage.user_role === "Super-Admin");
   } catch (error) {
     console.error("Erreur menus:", error);
   }
@@ -52,7 +52,7 @@ const isValidationMenu = (menu) => {
 };
 
 const openMenu = (menu) => {
-  if (menu.route !== null) {
+  if (menu.route !== null && menu.route !== undefined && menu.route !== '') {
     router.push(menu.route);
     return;
   }

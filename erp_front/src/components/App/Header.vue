@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 import { onMounted, onUnmounted, ref, computed } from "vue";
 import '../../assets/css/variable.css';
 import api from "@/services/api.js";
-import { useDepartmentStore } from "@/services/departmentStore"; // Import du store
+import { useDepartmentStore } from "@/services/departmentStore";
 
 const props = defineProps({
   title: String,
@@ -24,8 +24,8 @@ const isDropdownOpen = ref(false);
 
 const formatDeptName = (name) => {
   if (!name) return '';
-  if (name.trim().indexOf(' ') !== -1) {
-    return name.replace(/[^A-ZÀ-ÖØ-Þ]/g, '');
+  if (name.trim().includes(' ')) {
+    return name.replaceAll(/[^A-ZÀ-ÖØ-Þ]/g, '');
   }
   return name;
 };
